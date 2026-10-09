@@ -1,0 +1,9 @@
+# Normalise text to LF in the index and in working copies on every OS, so
+# file hashes, line counts and the PREREG lock comparison are identical on
+# Windows and Linux.
+* text=auto eol=lf
+
+*.pdf binary
+*.png binary
+*.parquet binary
+*.npz binary
