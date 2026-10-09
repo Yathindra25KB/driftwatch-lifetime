@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: "DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring"
+abstract: >-
+  Pre-release research software. A time-aware protocol (TESSERACT constraints
+  C1-C3, AUT and A-AUT) applied to pre-extracted LAMDA (Android) and BODMAS
+  (Windows PE) feature files to study how label delay, a fixed analyst budget
+  and drift monitoring change a malware detector's useful lifetime.
+authors:
+  - given-names: Yathindra
+    family-names: K B
+    affiliation: "VISTAS"
+repository-code: "https://github.com/Yathindra25KB/Driftwatch-"
+license: MIT
+version: 0.0.0
+keywords:
+  - malware detection
+  - concept drift
+  - label delay
+  - conformal prediction
+  - time-aware evaluation

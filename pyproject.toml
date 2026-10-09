@@ -2,6 +2,7 @@
 name = "driftwatch-lifetime"
 version = "0.0.0"
 description = "Time-aware study of malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring (pre-release)."
+readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Yathindra K B" }]
