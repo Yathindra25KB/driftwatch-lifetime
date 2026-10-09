@@ -1,0 +1,55 @@
+[project]
+name = "driftwatch-lifetime"
+version = "0.0.0"
+description = "Time-aware study of malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring (pre-release)."
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Yathindra K B" }]
+requires-python = ">=3.12,<3.13"
+dependencies = []
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Programming Language :: Python :: 3.12",
+    # PyPI rejects any upload carrying a "Private ::" classifier. Removed only
+    # in Phase 12, after the licence, ethics and claims audits (ADR-0003).
+    "Private :: Do Not Upload",
+]
+
+[project.scripts]
+driftwatch = "driftwatch.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv]
+# Never build the environment on a system, conda or Anaconda interpreter.
+python-preference = "only-managed"
+
+[tool.uv.build-backend]
+# Distribution name is driftwatch-lifetime (ADR-0003); the import name stays driftwatch.
+module-name = "driftwatch"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["driftwatch"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = ["--strict-markers", "-m", "not slow"]
+markers = ["slow: long-running tests; excluded by default, run with `uv run pytest -m slow`"]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.168.5",
+    "pre-commit>=4.6.2",
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+]

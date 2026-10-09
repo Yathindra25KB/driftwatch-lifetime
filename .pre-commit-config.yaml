@@ -1,0 +1,15 @@
+# Local hooks only: they call the ruff version pinned in uv.lock, so no hook
+# repositories are fetched and the versions match CI exactly.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check --fix
+        entry: uv run --frozen ruff check --fix
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --frozen ruff format
+        language: system
+        types_or: [python, pyi]
