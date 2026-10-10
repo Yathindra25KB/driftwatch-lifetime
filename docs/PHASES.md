@@ -7,7 +7,7 @@ Status, evidence, commit and the hours the researcher reports, for every phase a
 | # | Phase | Weeks (dates) | Planned h | Status | Evidence | Commit | Hours (actual) | Notes |
 |---|---|---|---|---|---|---|---|---|
 | 1 | Foundations and governance | 1-2 (12-25 Oct 2026) | 8 | DONE | [CI run 38028624827](https://github.com/Yathindra25KB/Driftwatch-/actions/runs/38028624827) (Linux + Windows green, 258 tests, 45/45 guardrail scenarios each); [guardrail review](reviews/guardrail-review.md); [ADR-0001](DECISIONS/ADR-0001-tooling-and-guardrails.md); [PROTOCOL](PROTOCOL.md) | d634836 | 3 | Done 10 Oct 2026, before week 1; prompt rev 1.2. See "Phase 1 closeout" below |
-| 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | IN PROGRESS | | | | Started 10 Oct 2026. Peak-memory cap 1.5 GB approved by the researcher (measured: 7.25 GB RAM, 913 MB available); guard allowlist widened for HF and Google Drive (ADR-0001 change requests) |
+| 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | DONE | [inventory](../reports/data_inventory.md); [notes, Q1-Q7, leakage review](../reports/data_inventory_notes.md); [LAMDA card](data_cards/lamda.md); [BODMAS card](data_cards/bodmas.md); [ADR-0004](DECISIONS/ADR-0004-slot-definition.md) (ACCEPTED); [CLAIMS D-01..D-14](CLAIMS.md); `data/manifest.json` | 14da248 | 2 | Done 10 Oct 2026, before week 1. Cap 1.5 GB approved; LAMDA peak 0.87 GB (rebuild 0.93), BODMAS 0.56 GB. Guard allowlist widened (ADR-0001). Cache v2 after leakage review. See "Phase 2 closeout" below |
 | 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | NOT STARTED | | | | Never compress (plan §7) |
 | 4 | Models, AUT/A-AUT, E0 baselines | 3-4 (26 Oct-8 Nov 2026) | 10 | NOT STARTED | | | | Never compress (plan §7) |
 | 5 | Delay and budget simulator, E1 | 5-8 (9 Nov-6 Dec 2026) | 32 | NOT STARTED | | | | |
@@ -38,7 +38,7 @@ The researcher fills this in weekly (about 20 minutes, plan §5.1 step 9). Compa
 
 | Week | Dates | Hours | Cumulative | 4-week average | Notes |
 |---|---|---|---|---|---|
-| 0 | 10 Oct 2026 (before week 1) | 3 | 3 | | Phase 1 (researcher-reported) |
+| 0 | 10 Oct 2026 (before week 1) | 5 | 5 | | Phase 1 (3 h) and Phase 2 (2 h), researcher-reported |
 | 1 | 12 Oct - 18 Oct 2026 | | | | |
 | 2 | 19 Oct - 25 Oct 2026 | | | | |
 | 3 | 26 Oct - 01 Nov 2026 | | | | |
@@ -150,3 +150,30 @@ Checklist run by hand, as the prompt requires for the phase that creates the ski
 - Disk: E: has 121 GB free (allow about 30 GB for raw files and caches [estimate]). C: has only 5.4 GB free and holds the uv cache and the uv-managed Pythons. Moving `UV_CACHE_DIR` and `UV_PYTHON_INSTALL_DIR` to E: before Phase 2 is recommended (researcher's machine setting).
 - Start the LAMDA download early in week 1. `huggingface.co` and the BODMAS host must be added to the guard's download allowlist by a Phase 2 CHANGE_REQUEST.
 - RAM: 7.25 GB visible, about 0.6 GB free at the 10 Oct check. Phase 2 measures free memory and proposes a peak-memory cap for approval.
+
+## Phase 2 closeout (10 Oct 2026)
+
+| Check | Result |
+|---|---|
+| `uv run pytest -q`; `ruff check .`; `ruff format --check .` | 322 passed; All checks passed!; 82 files already formatted |
+| `uv run python scripts/check_guardrails.py` | 45/45 scenarios passed |
+| `uv run driftwatch data verify` (data/ and the clean-rebuild root data/rebuild_check/) | OK, 0 problems on both; 1,088 cache files byte-identical between them (cache v2) |
+| Builds under the approved 1.5 GB cap | LAMDA 1,008,381 rows, 120 monthly units, peak 0.87 GB (rebuild 0.93), 93.1 s, 119.7 MB; BODMAS 134,435 rows, 424 weekly units, peak 0.56 GB, 23.4 s, 1,231.2 MB |
+| HANDOFF check (`check_handoff.py 2`) | 8 items, all exist |
+| Leakage review (leakage-reviewer subagent) | 13 findings (2 high, 4 medium, 7 low). 11 were fixed with tests in `bba2692` (cache v2). 2 are carried to the Phase 3, 4 and 8 ADRs (slot-boundary hold-outs; past-only duplicate sensitivity) and recorded in ADR-0004 |
+| ADRs | ADR-0004 ACCEPTED by the researcher (LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50, strict gaps; placeholder-dated benign rows excluded). ADR-0001 change request (download allowlist) approved |
+| Sources | LAMDA HF commit `ad9614bdd5556767f97ced2fce797c2f06408ebf`; BODMAS Google Drive file IDs in data/manifest.json. The BODMAS download worked without a quota error |
+
+Deviations and notes:
+- LAMDA timestamps come from the root `metadata.csv` (`added`, AndroZoo's collection date), which the README does not describe. `year_month` matches it for every row.
+- The BODMAS dataset licence is not stated by its authors (the code is BSD-2-Clause): open question Q5.
+- Cache v1 (the first build) is archived in the manifest. Its files under `data/cache/*/v1/` and the rebuild root `data/rebuild_check/` can be deleted by the researcher; the guard blocks recursive deletes outside temp folders.
+- The Phase 2 prompt's CHANGE_REQUEST was "none". The allowlist change was approved at plan time as the CHANGE_REQUEST noted in "Phase 2 prerequisites".
+
+### Phase 2 config hashes
+
+| File | SHA-256 |
+|---|---|
+| uv.lock | `1c7380afb87669761538e9cc8fec08f100a1b94d5e5bf719ca9b61b26745afd0` |
+
+(no configs/*.yaml yet)
