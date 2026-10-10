@@ -458,7 +458,8 @@ def behaviour_checks(report: Report, settings: dict, repo: Path, bash: str | Non
     ok = (
         r.returncode == 0
         and "Hard rules" in out
-        and "In progress: Phase 1" in out
+        and "In progress:" in out
+        and "1 Foundations and governance" in out  # phase status list from docs/PHASES.md
         and len(out) < 10_000
     )
     report.check(
