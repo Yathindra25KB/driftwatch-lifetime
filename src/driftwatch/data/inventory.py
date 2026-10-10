@@ -282,6 +282,7 @@ def day_batches(facts: DatasetFacts) -> pd.DataFrame:
     """Rows per date-only timestamp (benign batches), largest first: audits PLACEHOLDER_TIE."""
     rows = facts.rows[facts.rows["ts_date_only"]]
     t = rows.groupby(["ts", "label"]).size().unstack(fill_value=0)
+    t = t.reindex(columns=[0, 1], fill_value=0)  # both classes, even if one has no dates
     t = t.rename(columns={0: "benign", 1: "malware"}).reset_index()
     t["ts"] = pd.to_datetime(t["ts"], utc=True).dt.date.astype(str)
     t["placeholder_candidate"] = t[["benign", "malware"]].sum(axis=1) >= PLACEHOLDER_TIE
