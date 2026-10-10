@@ -370,6 +370,7 @@ def test_download_blocked_in_powershell(guard, locked_repo, command):
     "command",
     [
         "curl -sSf https://pypi.org/pypi/driftwatch/json",
+        "uvx check-jsonschema --schemafile https://json.schemastore.org/claude-code.json x",
         "git clone https://github.com/astral-sh/uv.git",
         "uv sync --frozen",
         "git fetch origin",

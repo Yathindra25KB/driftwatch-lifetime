@@ -45,6 +45,8 @@ ALLOWED_HOSTS = frozenset(
         "astral.sh",
         "code.claude.com",
         "docs.anthropic.com",
+        # Published Claude Code settings schema, linked from the official settings docs.
+        "json.schemastore.org",
     }
 )
 ALLOWED_HOST_SUFFIXES = (".githubusercontent.com",)
