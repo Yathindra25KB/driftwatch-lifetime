@@ -6,7 +6,7 @@ Status, evidence, commit and the hours the researcher reports, for every phase a
 
 | # | Phase | Weeks (dates) | Planned h | Status | Evidence | Commit | Hours (actual) | Notes |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Foundations and governance | 1-2 (12-25 Oct 2026) | 8 | IN PROGRESS | | | | Started 10 Oct 2026 (before week 1); prompt rev 1.2 |
+| 1 | Foundations and governance | 1-2 (12-25 Oct 2026) | 8 | DONE | [CI run 38028624827](https://github.com/Yathindra25KB/Driftwatch-/actions/runs/38028624827) (Linux + Windows green, 258 tests, 45/45 guardrail scenarios each); [guardrail review](reviews/guardrail-review.md); [ADR-0001](DECISIONS/ADR-0001-tooling-and-guardrails.md); [PROTOCOL](PROTOCOL.md) | d634836 | 3 | Done 10 Oct 2026, before week 1; prompt rev 1.2. See "Phase 1 closeout" below |
 | 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | NOT STARTED | | | | Peak-memory cap to be proposed for 8 GB machine (rev 1.2) |
 | 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | NOT STARTED | | | | Never compress (plan §7) |
 | 4 | Models, AUT/A-AUT, E0 baselines | 3-4 (26 Oct-8 Nov 2026) | 10 | NOT STARTED | | | | Never compress (plan §7) |
@@ -38,6 +38,7 @@ The researcher fills this in weekly (about 20 minutes, plan §5.1 step 9). Compa
 
 | Week | Dates | Hours | Cumulative | 4-week average | Notes |
 |---|---|---|---|---|---|
+| 0 | 10 Oct 2026 (before week 1) | 3 | 3 | | Phase 1 (researcher-reported) |
 | 1 | 12 Oct - 18 Oct 2026 | | | | |
 | 2 | 19 Oct - 25 Oct 2026 | | | | |
 | 3 | 26 Oct - 01 Nov 2026 | | | | |
@@ -110,7 +111,42 @@ OS Windows-native (Git Bash + PowerShell tools); repository github.com/Yathindra
 |---|---|---|
 | `cli` | Module `src/driftwatch/cli.py`, not a `cli/` package | Phases 7 and 12 name `src/driftwatch/cli.py` (PROTOCOL D11) |
 | Plan Appendix B | MultiEdit dropped; PowerShell covered; hook paths anchored on `$CLAUDE_PROJECT_DIR`; no Bash deny rules | Current Claude Code docs (ADR-0001) |
+| Phase 1 plan: restart after step E | No restart needed | Hooks went live through the settings file watcher (verified live, ADR-0001) |
+| Phase 1 plan: GitHub repo creation | Existing private repo `Driftwatch-` (created 6 Oct 2026) used as `origin` | Researcher supplied it |
+| Guard download allowlist | `json.schemastore.org` added | Validating settings against the docs-linked schema (a schema-rejected settings file disables the guardrails) |
+| phase-closeout skill | Authored with skill-creator guidance; its LLM eval/viewer loop was not run | Deterministic helper scripts are unit-tested; the prompt runs the checklist by hand in Phase 1 |
 
 ## Relief levers used
 
 None.
+
+## Phase 1 closeout (10 Oct 2026)
+
+Checklist run by hand, as the prompt requires for the phase that creates the skill.
+
+| Check | Result |
+|---|---|
+| Clean clone of `phase-01-foundations` at `180368d`: `uv sync --frozen && uv run pytest -q && uv run ruff check . && uv run ruff format --check .` | 258 passed; All checks passed!; 60 files already formatted |
+| `uv run python scripts/check_guardrails.py` (local, Windows) | 45/45 scenarios passed; latency median: guard 189 ms, reviewer guard 176 ms, formatter 346 ms, re-injection 181 ms, Stop gate 803 ms (runs the tests: justified) |
+| CI run 38028624827 on `0d2b8ca` | lint-test (ubuntu) success: 258 passed, 45/45; windows-smoke success: 258 passed, 45/45. `d634836` only loosens scenario 44 to stop expecting Phase 1 to be IN PROGRESS (local: 258 passed, 45/45); CI reruns on the ledger push |
+| Live checks in Claude Code | Guard blocked real Bash and PowerShell force pushes and an unlisted download; permissions denied a `docs/source/` write and a `.env` read; formatter, scoped rules and skill discovery observed; `/memory` lists CLAUDE.md and the rules, and approval prompts appeared for guardrail edits (researcher check) |
+| `.claude/settings.json` vs https://json.schemastore.org/claude-code-settings.json | ok -- validation done |
+| CITATION.cff (`cffconvert --validate`) and `.github/workflows/ci.yml` (`check-jsonschema` vendor.github-workflows) | valid; valid |
+| HANDOFF check (`check_handoff.py 1`) | 35 items, all exist |
+| Adversarial review | 21 findings: 20 fixed with regression tests (`6cdb589`), 1 accepted fail-closed ([review](reviews/guardrail-review.md)); residual risks in ADR-0001 |
+| ADRs | ADR-0001 ACCEPTED (researcher), ADR-0002 ACCEPTED (MIT), ADR-0003 ACCEPTED (`driftwatch-lifetime`) |
+| GitHub | `main` and `phase-01-foundations` pushed to the private repo; `main` protected (required check `lint-test`, strict; PR required with 0 approvals; enforced for admins; no force pushes or deletions) |
+| Low-priority items | `report/ch01_introduction.md` skeleton; `paper/references.bib` with 13 identifier-verified entries; unverified items in `paper/REFERENCES_TODO.md` |
+
+### Phase 1 config hashes
+
+| File | SHA-256 |
+|---|---|
+| uv.lock | `ef115bb63578ddd01a6826c68eb6a52d275cdfe05084e59faa63ac8b8b705d22` |
+
+(no configs/*.yaml yet)
+
+### Phase 2 prerequisites
+- Disk: E: has 121 GB free (allow about 30 GB for raw files and caches [estimate]). C: has only 5.4 GB free and holds the uv cache and the uv-managed Pythons. Moving `UV_CACHE_DIR` and `UV_PYTHON_INSTALL_DIR` to E: before Phase 2 is recommended (researcher's machine setting).
+- Start the LAMDA download early in week 1. `huggingface.co` and the BODMAS host must be added to the guard's download allowlist by a Phase 2 CHANGE_REQUEST.
+- RAM: 7.25 GB visible, about 0.6 GB free at the 10 Oct check. Phase 2 measures free memory and proposes a peak-memory cap for approval.
