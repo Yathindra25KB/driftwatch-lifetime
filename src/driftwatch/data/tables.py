@@ -71,6 +71,17 @@ class CalendarMonthScheme:
         return {"kind": "calendar-month"}
 
 
+def _read_timestamps(table: pd.DataFrame, ts_col: str) -> np.ndarray:
+    """The table's timestamps as naive-UTC ``datetime64[ns]``."""
+    ts = pd.to_datetime(table[ts_col], utc=True).dt.tz_localize(None)
+    return ts.to_numpy(dtype=NS)
+
+
+def _slot_bounds(ts_sorted: np.ndarray, edges: np.ndarray) -> np.ndarray:
+    """First row of each slot in a time-sorted array: a row at an edge opens the next slot."""
+    return np.searchsorted(ts_sorted, edges, side="left")
+
+
 class TableSource:
     """A :class:`~driftwatch.data.slicer.SlotSource` over a pandas table held in memory."""
 
@@ -91,8 +102,7 @@ class TableSource:
         self.scheme = scheme
         self.sparse = bool(sp.issparse(x)) if x is not None else False
         n = len(table)
-        ts = pd.to_datetime(table[ts_col], utc=True).dt.tz_localize(None)
-        ts = ts.to_numpy(dtype=NS)
+        ts = _read_timestamps(table, ts_col)
         y = table[label_col].to_numpy()
         ids = table[id_col].to_numpy(dtype=np.int64)
         if n == 0:
@@ -119,7 +129,7 @@ class TableSource:
 
         edges = scheme.edges(self._ts[0], self._ts[-1])
         self._edges = edges
-        bounds = np.searchsorted(self._ts, edges, side="left")
+        bounds = _slot_bounds(self._ts, edges)
         self._slots: list[tuple[SlotRef, int, int]] = []
         for k in range(len(edges) - 1):
             ref = SlotRef(scheme.slot_id(edges[k]), edges[k], edges[k + 1], k)

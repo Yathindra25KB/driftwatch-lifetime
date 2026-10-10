@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import subprocess
 import sys
 from pathlib import Path
 from types import ModuleType
 
 import pytest
-from hypothesis import settings
+from hypothesis import Phase, settings
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOKS = ROOT / ".claude" / "hooks"
@@ -17,7 +18,15 @@ HOOKS = ROOT / ".claude" / "hooks"
 # Derandomised in CI so a property-test failure reproduces exactly.
 settings.register_profile("ci", derandomize=True, deadline=None)
 settings.register_profile("dev", deadline=None)
-settings.load_profile("ci")
+# scripts/mutation_check.py: a broken slicer only has to fail once, so skip shrinking.
+settings.register_profile(
+    "mutants",
+    derandomize=True,
+    deadline=None,
+    database=None,
+    phases=[Phase.explicit, Phase.generate],
+)
+settings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "ci"))
 
 GIT = ["git", "-c", "user.name=test", "-c", "user.email=test@example.invalid"]
 GIT += ["-c", "commit.gpgsign=false", "-c", "tag.gpgsign=false", "-c", "core.autocrlf=false"]

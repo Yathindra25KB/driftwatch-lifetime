@@ -193,6 +193,11 @@ class Schedule:
 # --- planning -------------------------------------------------------------------------------
 
 
+def _fails_size_gate(kept: int, spec: WindowSpec) -> bool:
+    """The gate of ADR-0004: fewer than M malware would survive C3 subsampling."""
+    return kept < spec.min_malware
+
+
 def plan_slots(source: SlotSource, spec: WindowSpec) -> list[PlannedSlot]:
     """Apply the size gate to every grid slot. Reads counts only, never features."""
     table = source.slot_table()
@@ -210,7 +215,7 @@ def plan_slots(source: SlotSource, spec: WindowSpec) -> list[PlannedSlot]:
             reason = SKIP_GAP
         elif info.structural == SKIP_PARTIAL:
             reason = SKIP_PARTIAL
-        elif kept < spec.min_malware:
+        elif _fails_size_gate(kept, spec):
             reason = SKIP_SIZE_GATE
         else:
             reason = ""
@@ -405,6 +410,13 @@ class Window:
             yield slot
 
 
+def _train_rows(
+    source: SlotSource, planned: dict[str, PlannedSlot], plan: WindowPlan
+) -> tuple[SlotRows, ...]:
+    """The raw rows of a window's training slots, in time order."""
+    return tuple(_load(source, planned, ref) for ref in plan.train)
+
+
 def _open_window(
     source: SlotSource,
     plan: WindowPlan,
@@ -418,7 +430,7 @@ def _open_window(
     for ref in refs:
         if not planned[ref.slot_id].usable:
             raise SlicerError(f"{plan.window_id}: {ref.slot_id} failed the gate but is in a window")
-    train = TrainWindow(tuple(_load(source, planned, ref) for ref in plan.train))
+    train = TrainWindow(_train_rows(source, planned, plan))
     if slicelog is not None:
         slicelog.record_train(plan, train)
     return Window(plan, source.name, train, spec, source, planned, slicelog)
