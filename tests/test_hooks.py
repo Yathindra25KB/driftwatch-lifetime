@@ -84,8 +84,8 @@ def test_reinject_survives_missing_files(reinject, tmp_path, monkeypatch, capsys
 
 def test_hook_files_are_stdlib_only():
     allowed = {
-        "__future__", "base64", "contextlib", "dataclasses", "json", "os", "pathlib", "re",
-        "shlex", "subprocess", "sys", "tempfile",
+        "__future__", "base64", "contextlib", "dataclasses", "fnmatch", "json", "os", "pathlib",
+        "posixpath", "re", "shlex", "subprocess", "sys", "tempfile",
     }  # fmt: skip
     for path in (ROOT / ".claude" / "hooks").glob("*.py"):
         for line in path.read_text(encoding="utf-8").splitlines():

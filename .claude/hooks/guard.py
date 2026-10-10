@@ -7,24 +7,33 @@ exit 0 allows it. It blocks:
   must equal the blob at the highest tag), and to docs/prereg/addendum-vN.md
   once prereg-vN exists; deleting or moving prereg tags;
 - edits to tests/golden/ files already committed at HEAD;
-- force or destructive pushes (-f, --force, --force-with-lease, +refspec, ...);
-- `git add` that would stage anything under data/ or results/ (except
-  data/manifest.json);
-- recursive deletes outside temporary folders and project caches;
+- edits inside .git/ and to Claude Code settings files other than the project's
+  .claude/settings.json (which the `ask` permission rule gates);
+- shell writes that mention a locked path, literally, through quotes or through
+  a glob, or that touch .git/ or .claude/{settings*,hooks,agents};
+- force or destructive pushes (-f, --force, --force-with-lease, +refspec, ...),
+  including through git aliases;
+- staging anything under data/ or results/ (except data/manifest.json) with
+  `git add`, `git update-index` or `git commit <paths>`;
+- recursive deletes outside temporary folders and project caches (including
+  `pytest --basetemp`);
 - downloads from hosts outside ALLOWED_HOSTS.
 
 Crash policy: malformed input fails closed (exit 2). An internal error fails
 closed when the call mentions a protected operation and is allowed (exit 0)
 with a warning otherwise. `--reviewer-bash` mode lets read-only reviewer
-subagents run only `uv run pytest ...`. Design and residual risks: ADR-0001.
+subagents run only `uv run pytest` with test-selection options. Design,
+review findings and residual risks: ADR-0001, docs/reviews/guardrail-review.md.
 """
 
 from __future__ import annotations
 
 import base64
 import contextlib
+import fnmatch
 import json
 import os
+import posixpath
 import re
 import shlex
 import subprocess
@@ -64,12 +73,88 @@ READ_ONLY_PROGRAMS = frozenset(
         "readlink", "pwd", "get-content", "gc", "select-string", "sls", "get-filehash",
         "get-item", "gi", "get-childitem", "gci", "test-path", "format-hex", "measure-object",
         "write-output", "write-host", "select-object", "where-object", "compare-object",
+        "check-jsonschema", "cd", "chdir", "pushd", "popd", "set-location", "sl",
     }
 )  # fmt: skip
 # git subcommands that cannot change a working-tree file's content.
 SAFE_GIT_FOR_LOCKED = frozenset(
     {"diff", "log", "show", "status", "blame", "ls-files", "ls-tree", "cat-file", "rev-parse"}
     | {"grep", "shortlog", "describe", "commit", "add", "tag", "push", "hash-object"}
+)
+KNOWN_GIT = frozenset(
+    [
+        "add",
+        "am",
+        "apply",
+        "archive",
+        "bisect",
+        "blame",
+        "branch",
+        "bundle",
+        "cat-file",
+        "checkout",
+        "cherry-pick",
+        "clean",
+        "clone",
+        "commit",
+        "config",
+        "describe",
+        "diff",
+        "difftool",
+        "fetch",
+        "for-each-ref",
+        "format-patch",
+        "gc",
+        "grep",
+        "hash-object",
+        "help",
+        "init",
+        "log",
+        "ls-files",
+        "ls-remote",
+        "ls-tree",
+        "maintenance",
+        "merge",
+        "mergetool",
+        "mv",
+        "notes",
+        "pack-refs",
+        "prune",
+        "pull",
+        "push",
+        "range-diff",
+        "rebase",
+        "reflog",
+        "remote",
+        "repack",
+        "replace",
+        "reset",
+        "restore",
+        "rev-list",
+        "rev-parse",
+        "revert",
+        "rm",
+        "shortlog",
+        "show",
+        "show-ref",
+        "sparse-checkout",
+        "stage",
+        "stash",
+        "status",
+        "submodule",
+        "switch",
+        "symbolic-ref",
+        "tag",
+        "update-index",
+        "update-ref",
+        "verify-commit",
+        "version",
+        "worktree",
+    ]
+)
+COMMIT_VALUE_OPTIONS = frozenset(
+    {"-m", "-F", "-c", "-C", "-t", "--author", "--date", "--cleanup", "--fixup", "--squash"}
+    | {"--trailer", "--file", "--message", "--reuse-message", "--reedit-message", "--template"}
 )
 NETWORK_PROGRAMS = frozenset(
     {
@@ -83,18 +168,42 @@ DELETE_PROGRAMS = frozenset({"rm", "remove-item", "del", "erase", "ri", "rd", "r
 POSIX_SHELLS = frozenset({"bash", "sh", "zsh", "dash", "ksh"})
 WRAPPERS = frozenset({"command", "builtin", "exec", "nohup", "time", "sudo", "doas"})
 XARGS_VALUE_OPTIONS = frozenset({"-I", "-i", "-n", "-P", "-L", "-l", "-s", "-d", "-E", "-e", "-a"})
+UV_RUN_VALUE_OPTIONS = frozenset(
+    {"--with", "--with-editable", "--with-requirements", "--python", "-p", "--project"}
+    | {"--directory", "--env-file", "--extra", "--group", "--only-group", "--package", "--index"}
+    | {"--default-index", "--index-url", "--extra-index-url", "-i", "--find-links", "-f"}
+    | {"--config-file", "--cache-dir", "--python-preference"}
+)
 PROTECTED_WORDS = re.compile(
     r"prereg|golden|push|\bgit\b|\brm\b|remove-item|\bdel\b|rmdir|\brd\b|clean|://|curl|wget"
-    r"|invoke-|rmtree|\biwr\b|\birm\b|data/|results/",
+    r"|invoke-|rmtree|\biwr\b|\birm\b|data/|results/|\.claude|\.git/",
     re.IGNORECASE,
 )
 URL_RE = re.compile(r"(?i)\b[a-z][a-z0-9+.-]*://(?:[^\s'\"/@]*@)?([^\s'\"/:?#\\]+)")
 SCP_RE = re.compile(r"^[\w.-]+@([\w.-]+):")
 PY_NET_RE = re.compile(r"urllib|requests\.|http\.client|urlopen|urlretrieve|httpx|aiohttp|socket")
+NET_HINT_RE = re.compile(
+    r"webclient|downloadfile|downloadstring|downloaddata|httpclient|net\.http|bitstransfer"
+    r"|urlretrieve|urlopen|invoke-webrequest|invoke-restmethod"
+)
 PREREG_TAG_RE = re.compile(r"prereg-v(\d+)")
 ADDENDUM_RE = re.compile(r"docs/prereg/addendum-v(\d+)\.md")
 PREREG_DIR_RE = re.compile(r"docs/prereg/?(?=$|[\s'\"*;|&)])")
+INTERNAL_RE = re.compile(r"(?:^|[\s'\"=/])(?:\.git/|\.claude/(?:settings|hooks/|agents/))")
+GLOB_RE = re.compile(r"[*?\[{]")
 REDIRECT_SAFE_RE = re.compile(r"\d?>&\d|\d?>\s*(?:/dev/null|\$null|nul)\b", re.IGNORECASE)
+QUOTED_RE = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")
+FUNCTION_DEF_RE = re.compile(r"[\w.-]+\(\)")
+SETTINGS_FILE_RE = re.compile(r"(?:managed-)?settings(?:\.local)?\.json")
+
+REVIEWER_UV_FLAGS = frozenset({"--no-sync", "--frozen", "--locked", "--offline", "-q", "--quiet"})
+REVIEWER_PYTEST_FLAGS = frozenset(
+    {"-q", "-qq", "-v", "-vv", "-x", "--exitfirst", "-l", "--lf", "--last-failed", "--ff"}
+    | {"--failed-first", "--co", "--collect-only", "--no-header", "--strict-markers", "-s"}
+)
+REVIEWER_PYTEST_VALUE = frozenset({"-k", "-m", "--tb", "--maxfail", "--durations"})
+REVIEWER_PYTEST_PREFIXES = ("--tb=", "--maxfail=", "--durations=", "-r")
+REVIEWER_SAFE_ARG = re.compile(r"[\w.\-/:\[\]]+")
 
 
 @dataclass(frozen=True)
@@ -211,8 +320,26 @@ def lock_for(rel_cf: str, project: Path) -> tuple[str, str] | None:
     return None
 
 
+def golden_files(project: Path) -> list[str]:
+    return git(project, "ls-tree", "-r", "--name-only", "HEAD", "--", "tests/golden").splitlines()
+
+
 def golden_committed(project: Path, rel: str) -> bool:
     return bool(git(project, "ls-tree", "--name-only", "HEAD", "--", rel).strip())
+
+
+def locked_paths(project: Path) -> dict[str, str]:
+    """Casefolded project path -> label, for every file currently locked."""
+    paths: dict[str, str] = {}
+    tags = prereg_tags(project)
+    if tags:
+        paths["docs/prereg.md"] = "docs/PREREG.md"
+        for t in tags:
+            n = PREREG_TAG_RE.fullmatch(t).group(1)  # type: ignore[union-attr]
+            paths[f"docs/prereg/addendum-v{n}.md"] = f"docs/prereg/addendum-v{n}.md"
+    for rel in golden_files(project):
+        paths[rel.casefold()] = rel
+    return paths
 
 
 def normalise_text(text: str) -> str:
@@ -236,11 +363,11 @@ def proposed_content(tool: str, tool_input: dict, target: Path) -> str | None:
             return None
         count = -1 if tool_input.get("replace_all") else 1
         return current.replace(old, new, count)
-    return None
+    return None  # NotebookEdit and unknown edit tools: content cannot be checked
 
 
 def check_file_tool(tool: str, tool_input: dict, cwd: Path, project: Path) -> Decision:
-    key = "notebook_path" if tool == "NotebookEdit" else "file_path"
+    key = "notebook_path" if "notebook_path" in tool_input else "file_path"
     text = tool_input.get(key)
     if not isinstance(text, str) or not text.strip():
         return blocked(f"{tool} call without {key}; failing closed.")
@@ -248,9 +375,21 @@ def check_file_tool(tool: str, tool_input: dict, cwd: Path, project: Path) -> De
     if target is None:
         return blocked(f"cannot resolve path {text!r}; failing closed.")
     rel = relative_to(target, project)
-    if rel is None:
+    rel_cf = rel.casefold() if rel is not None else None
+    name_cf = target.name.casefold()
+    is_settings = SETTINGS_FILE_RE.fullmatch(name_cf) and (
+        target.parent.name.casefold() == ".claude" or name_cf.startswith("managed")
+    )
+    # The shared .claude/settings.json is gated by an `ask` permission rule instead.
+    if is_settings and rel_cf != ".claude/settings.json":
+        return blocked(
+            f"{text} is a Claude Code settings file that could disable the guardrails; "
+            "ask the researcher."
+        )
+    if rel_cf is None:
         return ALLOW
-    rel_cf = rel.casefold()
+    if rel_cf == ".git" or rel_cf.startswith(".git/"):
+        return blocked(f"direct edits inside .git/ ({rel}) are not allowed; use git commands.")
     if rel_cf == "docs/prereg.md" or rel_cf.startswith("docs/prereg/"):
         try:
             lock = lock_for(rel_cf, project)
@@ -274,7 +413,7 @@ def check_file_tool(tool: str, tool_input: dict, cwd: Path, project: Path) -> De
                 )
     if rel_cf.startswith("tests/golden/"):
         try:
-            committed = golden_committed(project, rel)
+            committed = golden_committed(project, rel or "")
         except GitError:
             return blocked(f"cannot verify whether {rel} is a locked golden file; failing closed.")
         if committed:
@@ -332,9 +471,22 @@ def tokenize(segment: str, posix: bool) -> list[str] | None:
     lexer.commenters = ""
     lexer.escape = "\\" if posix else ""  # backslash is literal in PowerShell
     try:
-        return list(lexer)
+        tokens = list(lexer)
     except ValueError:
         return None
+    # Drop grouping syntax so `(git push -f)`, `{ git push -f; }` and `& { ... }` are seen as
+    # plain commands; keep the `{}` placeholder of find/xargs; drop `name()` function headers.
+    out = []
+    for tok in tokens:
+        if tok == "{}":
+            out.append(tok)
+            continue
+        if FUNCTION_DEF_RE.fullmatch(tok):
+            continue
+        stripped = tok.strip("(){}")
+        if stripped:
+            out.append(stripped)
+    return out
 
 
 def program_name(token: str) -> str:
@@ -348,6 +500,11 @@ def strip_wrappers(tokens: list[str]) -> list[str]:
         tok, name = tokens[i], program_name(tokens[i])
         if tok in ("&", ".") or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", tok) or name in WRAPPERS:
             i += 1
+        elif name == "uvx" or (name == "uv" and i + 1 < len(tokens) and tokens[i + 1] == "run"):
+            i += 1 if name == "uvx" else 2
+            while i < len(tokens) and tokens[i].startswith("-"):
+                opt = tokens[i].split("=", 1)[0]
+                i += 2 if opt in UV_RUN_VALUE_OPTIONS and "=" not in tokens[i] else 1
         elif name in ("env", "nice", "stdbuf", "timeout"):
             i += 1
             while i < len(tokens) and tokens[i].startswith("-"):
@@ -360,20 +517,27 @@ def strip_wrappers(tokens: list[str]) -> list[str]:
     return tokens[i:]
 
 
-def git_subcommand(args: list[str]) -> tuple[str, list[str], str | None]:
-    i, cdir = 0, None
+def git_subcommand(args: list[str]) -> tuple[str, list[str], str | None, dict[str, str]]:
+    """(subcommand, its args, -C directory, inline aliases from -c alias.X=...)."""
+    i, cdir, aliases = 0, None, {}
     while i < len(args):
         a = args[i]
         if a == "-C":
             cdir = args[i + 1] if i + 1 < len(args) else None
             i += 2
-        elif a in ("-c", "--git-dir", "--work-tree", "--namespace", "--config-env"):
+        elif a == "-c":
+            value = args[i + 1] if i + 1 < len(args) else ""
+            key, _, val = value.partition("=")
+            if key.casefold().startswith("alias."):
+                aliases[key[6:].casefold()] = val
+            i += 2
+        elif a in ("--git-dir", "--work-tree", "--namespace", "--config-env"):
             i += 2
         elif a.startswith("-"):
             i += 1
         else:
-            return a.casefold(), args[i + 1 :], cdir
-    return "", [], cdir
+            return a.casefold(), args[i + 1 :], cdir, aliases
+    return "", [], cdir, aliases
 
 
 def short_flags(arg: str) -> str:
@@ -381,11 +545,24 @@ def short_flags(arg: str) -> str:
     return arg[1:] if re.fullmatch(r"-[A-Za-z]+", arg) else ""
 
 
+def expand_braces(pattern: str, limit: int = 64) -> list[str]:
+    m = re.search(r"\{([^{}]*,[^{}]*)\}", pattern)
+    if not m:
+        return [pattern]
+    out: list[str] = []
+    for alt in m.group(1).split(","):
+        out += expand_braces(pattern[: m.start()] + alt + pattern[m.end() :], limit)
+        if len(out) >= limit:
+            break
+    return out[:limit]
+
+
 # --- command checks ----------------------------------------------------------------------
 
 
 def is_read_only(command: str, posix: bool) -> bool:
-    if ">" in REDIRECT_SAFE_RE.sub("", command):
+    unquoted = QUOTED_RE.sub("", command)  # redirection happens only outside quotes
+    if ">" in REDIRECT_SAFE_RE.sub("", unquoted):
         return False
     for segment in split_segments(command, posix):
         tokens = tokenize(segment, posix)
@@ -406,33 +583,67 @@ def is_read_only(command: str, posix: bool) -> bool:
     return True
 
 
-def check_locked_mentions(command: str, posix: bool, project: Path) -> Decision:
-    text = command.replace("\\", "/").casefold()
+def glob_hits(text: str, cwd: Path, project: Path, locked: dict[str, str]) -> list[str]:
+    """Locked files matched by glob or brace patterns in a casefolded, unquoted command."""
+    cwd_rel = (relative_to(cwd, project) or "").casefold()
+    project_prefix = str(Path(os.path.realpath(project))).replace("\\", "/").casefold() + "/"
+    hits: list[str] = []
+    for raw in re.split(r"[\s=<>|;&()]+", text):
+        if not raw or not GLOB_RE.search(raw):
+            continue
+        for pattern in expand_braces(raw):
+            if pattern.startswith(project_prefix):
+                pattern = pattern[len(project_prefix) :]
+            elif pattern.startswith("/") or re.match(r"[a-z]:/", pattern):
+                continue
+            joined = posixpath.normpath(posixpath.join(cwd_rel, pattern))
+            for path_cf, label in locked.items():
+                basename = path_cf.rsplit("/", 1)[-1]
+                if fnmatch.fnmatchcase(path_cf, joined) or (
+                    "/" not in pattern and fnmatch.fnmatchcase(basename, pattern)
+                ):
+                    hits.append(label)
+    return hits
+
+
+def check_locked_mentions(command: str, posix: bool, ctx: dict) -> Decision:
+    text = re.sub(r"['\"]", "", command.replace("\\", "/").casefold())  # quotes cannot hide paths
+    locked: list[str] = []
+    if INTERNAL_RE.search(text):
+        locked.append(".git/ or .claude/ settings, hooks or agents")
     mentions_prereg = "prereg.md" in text
     addenda = set(re.findall(r"addendum-v(\d+)", text))
     mentions_dir = bool(PREREG_DIR_RE.search(text))
     mentions_golden = "tests/golden" in text
-    if not (mentions_prereg or addenda or mentions_dir or mentions_golden):
+    has_glob = bool(GLOB_RE.search(text))
+    if not (locked or mentions_prereg or addenda or mentions_dir or mentions_golden or has_glob):
         return ALLOW
+    project = ctx["project"]
     try:
-        locked: list[str] = []
         if mentions_prereg or addenda or mentions_dir:
             tags = prereg_tags(project)
             if tags and (mentions_prereg or mentions_dir):
                 locked.append("docs/PREREG.md or docs/prereg/")
             locked += [f"addendum-v{n}" for n in addenda if f"prereg-v{n}" in tags]
-        if mentions_golden and git(
-            project, "ls-tree", "-r", "--name-only", "HEAD", "--", "tests/golden"
-        ):
+        if mentions_golden and golden_files(project):
             locked.append("tests/golden/")
+        if has_glob:
+            locked += glob_hits(text, ctx["cwd"], project, locked_paths(project))
     except GitError:
+        if not (mentions_prereg or addenda or mentions_dir or mentions_golden):
+            return ALLOW if not locked else _locked_decision(command, posix, locked)
         return blocked(
             "command touches a lockable path and the lock state cannot be read; failing closed."
         )
+    return _locked_decision(command, posix, locked)
+
+
+def _locked_decision(command: str, posix: bool, locked: list[str]) -> Decision:
     if locked and not is_read_only(command, posix):
+        unique = ", ".join(dict.fromkeys(locked))
         return blocked(
-            f"command may write to locked files ({', '.join(locked)}). Only read-only commands "
-            "may touch them; changes go into an addendum or an ADR."
+            f"command may write to locked files ({unique}). Only read-only commands may touch "
+            "them; changes go into an addendum, an ADR or the Edit tool (which asks first)."
         )
     return ALLOW
 
@@ -474,21 +685,38 @@ def is_data_path(rel_cf: str) -> bool:
     return first in ("data", "results") and rel_cf != "data/manifest.json"
 
 
+def first_data_path(args: list[str], gcwd: Path, value_options: frozenset[str]) -> str | None:
+    """First argument (or the path part of mode,sha,path) that points into data/ or results/."""
+    try:
+        top = Path(git(gcwd, "rev-parse", "--show-toplevel").strip())
+    except GitError:
+        return None  # not a repository: the git command itself will fail
+    skip = False
+    for a in args:
+        if skip:
+            skip = False
+            continue
+        if a in value_options:
+            skip = True
+            continue
+        if a.startswith("-"):
+            continue
+        for candidate in dict.fromkeys((a, a.rsplit(",", 1)[-1])):
+            target = resolve(candidate, gcwd)
+            rel = relative_to(target, top) if target else None
+            if rel and is_data_path(rel.casefold()):
+                return a
+    return None
+
+
 def check_add(rest: list[str], gcwd: Path) -> Decision:
     try:
         top = Path(git(gcwd, "rev-parse", "--show-toplevel").strip())
     except GitError:
         return blocked("cannot locate the git repository for `git add`; failing closed.")
-    after_dd = False
-    for a in rest:
-        if a == "--":
-            after_dd = True
-            continue
-        if after_dd or not a.startswith("-"):
-            target = resolve(a, gcwd)
-            rel = relative_to(target, top) if target else None
-            if rel and is_data_path(rel.casefold()):
-                return blocked(f"`git add {a}` would stage data/ or results/; never commit data.")
+    explicit = first_data_path(rest, gcwd, frozenset({"--chmod"}))
+    if explicit:
+        return blocked(f"`git add {explicit}` would stage data/ or results/; never commit data.")
     interactive = ("-p", "--patch", "-i", "--interactive", "-e", "--edit", "-n", "--dry-run")
     dry_args = [a for a in rest if a not in interactive]
     try:
@@ -505,6 +733,48 @@ def check_add(rest: list[str], gcwd: Path) -> Decision:
             return blocked(
                 f"`git add` would stage {m.group(1)}; data/ and results/ are never committed."
             )
+    return ALLOW
+
+
+def check_git(args: list[str], ctx: dict, cwd: Path, depth: int = 0) -> Decision:
+    sub, rest, cdir, inline_aliases = git_subcommand(args)
+    gcwd = (resolve(cdir, cwd) if cdir else None) or cwd
+    if sub and sub not in KNOWN_GIT:
+        if depth > 3:
+            return blocked("git alias nesting is too deep to check; failing closed.")
+        value = inline_aliases.get(sub)
+        if value is None:
+            try:
+                value = git(gcwd, "config", "--get", f"alias.{sub}").strip() or None
+            except GitError:
+                value = None
+        if value and value.startswith("!"):
+            inner = value[1:] + " " + " ".join(shlex.quote(r) for r in rest)
+            return evaluate_shell(inner, {**ctx, "cwd": gcwd}, posix=True, depth=depth + 1)
+        if value:
+            try:
+                expanded = shlex.split(value)
+            except ValueError:
+                return blocked(f"git alias {sub} cannot be parsed; failing closed.")
+            return check_git([*expanded, *rest], ctx, gcwd, depth + 1)
+    if sub == "push":
+        return check_push(rest)
+    if sub == "tag":
+        return check_tag(rest)
+    if sub == "update-ref" and any("refs/tags/prereg-v" in a.casefold() for a in rest):
+        return blocked("changing refs/tags/prereg-v* is not allowed.")
+    if sub in ("add", "stage"):
+        return check_add(rest, gcwd)
+    if sub == "update-index":
+        if "--index-info" in rest or "--stdin" in rest:
+            return blocked("`git update-index` reading paths from stdin cannot be checked.")
+        path = first_data_path(rest, gcwd, frozenset())
+        if path:
+            return blocked(f"`git update-index` would stage {path}; never commit data.")
+    if sub == "commit":
+        path = first_data_path(rest, gcwd, COMMIT_VALUE_OPTIONS)
+        if path:
+            return blocked(f"`git commit {path}` would commit data/ or results/.")
     return ALLOW
 
 
@@ -567,7 +837,7 @@ def check_delete(prog: str, args: list[str], ctx: dict, xargs: bool) -> Decision
             targets.append(a)
         targets = targets or ["."]
     elif prog == "git":
-        sub, rest, cdir = git_subcommand(args)
+        sub, rest, cdir, _ = git_subcommand(args)
         letters = "".join(short_flags(a) for a in rest)
         if sub != "clean" or "n" in letters or "--dry-run" in rest:
             return ALLOW
@@ -584,6 +854,19 @@ def check_delete(prog: str, args: list[str], ctx: dict, xargs: bool) -> Decision
     return ALLOW
 
 
+def check_basetemp(tokens: list[str], ctx: dict) -> Decision:
+    """pytest empties --basetemp before a run, so it is a recursive delete."""
+    for j, tok in enumerate(tokens):
+        if not tok.startswith("--basetemp"):
+            continue
+        target = (
+            tok.split("=", 1)[1] if "=" in tok else (tokens[j + 1] if j + 1 < len(tokens) else "")
+        )
+        if not target or not safe_delete_target(target, ctx["cwd"], ctx["project"], ctx["scratch"]):
+            return blocked(f"pytest --basetemp {target!r} would delete a folder outside temp.")
+    return ALLOW
+
+
 def host_allowed(host: str) -> bool:
     host = host.casefold().rstrip(".")
     return host in ALLOWED_HOSTS or host.endswith(ALLOWED_HOST_SUFFIXES)
@@ -592,13 +875,16 @@ def host_allowed(host: str) -> bool:
 def check_network(prog: str, args: list[str], segment: str) -> Decision:
     hosts = [m.group(1) for m in URL_RE.finditer(segment)]
     hosts += [m.group(1) for a in args if (m := SCP_RE.match(a))]
-    python_net = (
-        (prog.startswith("python") or prog == "py") and "-c" in args and PY_NET_RE.search(segment)
+    is_python = prog.startswith("python") or prog == "py"
+    python_net = is_python and "-c" in args and PY_NET_RE.search(segment)
+    is_net = (
+        prog in NETWORK_PROGRAMS or bool(python_net) or bool(NET_HINT_RE.search(segment.casefold()))
     )
-    is_net = prog in NETWORK_PROGRAMS or bool(python_net)
     if prog == "git":
         is_net = git_subcommand(args)[0] in GIT_NETWORK
-    elif prog in ("pip", "pip3", "uv", "uvx", "pipx", "conda", "npm", "npx") and hosts:
+    elif hosts and (
+        is_python or prog in ("pip", "pip3", "uv", "uvx", "pipx", "conda", "npm", "npx")
+    ):
         is_net = True
     if not is_net:
         return ALLOW
@@ -642,7 +928,7 @@ def evaluate_shell(command: str, ctx: dict, posix: bool, depth: int = 0) -> Deci
         return blocked("command nesting is too deep to check; failing closed.")
     if "\x00undecodable" in command:
         return blocked("encoded command cannot be decoded and checked; failing closed.")
-    decision = check_locked_mentions(command, posix, ctx["project"])
+    decision = check_locked_mentions(command, posix, ctx)
     if decision.block:
         return decision
     if posix:
@@ -662,6 +948,8 @@ def evaluate_shell(command: str, ctx: dict, posix: bool, depth: int = 0) -> Deci
         tokens = strip_wrappers(tokens)
         if not tokens:
             continue
+        if any(ch in tokens[0] for ch in "$`") and PROTECTED_WORDS.search(segment):
+            return blocked("command name comes from a variable or substitution; failing closed.")
         prog, args = program_name(tokens[0]), tokens[1:]
         xargs = False
         if prog == "xargs":
@@ -682,30 +970,18 @@ def evaluate_shell(command: str, ctx: dict, posix: bool, depth: int = 0) -> Deci
             if decision.block:
                 return decision
         if prog == "git":
-            decision = check_git(args, cwd)
+            decision = check_git(args, local, cwd, depth)
             if decision.block:
                 return decision
         if (prog.startswith("python") or prog == "py") and re.search(r"rmtree|removedirs", segment):
             return blocked("recursive delete from Python code cannot be checked; failing closed.")
-        decision = check_delete(prog, args, local, xargs)
-        if decision.block:
-            return decision
-        decision = check_network(prog, args, segment)
-        if decision.block:
-            return decision
-    return ALLOW
-
-
-def check_git(args: list[str], cwd: Path) -> Decision:
-    sub, rest, cdir = git_subcommand(args)
-    if sub == "push":
-        return check_push(rest)
-    if sub == "tag":
-        return check_tag(rest)
-    if sub == "update-ref" and any("refs/tags/prereg-v" in a.casefold() for a in rest):
-        return blocked("changing refs/tags/prereg-v* is not allowed.")
-    if sub in ("add", "stage"):
-        return check_add(rest, (resolve(cdir, cwd) if cdir else None) or cwd)
+        for decision in (
+            check_delete(prog, args, local, xargs),
+            check_basetemp(tokens, local),
+            check_network(prog, args, segment),
+        ):
+            if decision.block:
+                return decision
     return ALLOW
 
 
@@ -722,7 +998,10 @@ def evaluate(payload: dict, project_dir: Path | None = None) -> Decision:
     scratch = (
         payload.get("scratchpad_dir") if isinstance(payload.get("scratchpad_dir"), str) else None
     )
-    if tool in ("Edit", "Write", "NotebookEdit"):
+    edits_a_file = re.search(r"edit|write", tool, re.IGNORECASE) and (
+        "file_path" in tool_input or "notebook_path" in tool_input
+    )
+    if tool in ("Edit", "Write", "NotebookEdit") or edits_a_file:
         return check_file_tool(tool, tool_input, cwd, project)
     if tool in ("Bash", "PowerShell"):
         command = tool_input.get("command")
@@ -733,21 +1012,47 @@ def evaluate(payload: dict, project_dir: Path | None = None) -> Decision:
     return ALLOW
 
 
-REVIEWER_ALLOWED = re.compile(
-    r"\s*uv\s+run\s+(?:--[\w-]+(?:=\S+)?\s+)*pytest(?:\s+[^;&|<>`$\n\r]*)?\s*"
-)
-
-
 def reviewer_check(payload: dict) -> Decision:
-    if payload.get("tool_name") not in ("Bash", "PowerShell"):
+    """Reviewer subagents may run only `uv run [safe flags] pytest [test selection]`."""
+    tool = payload.get("tool_name")
+    if tool not in ("Bash", "PowerShell"):
         return ALLOW
+    deny = blocked(
+        "reviewer subagents are read-only; the only shell command allowed is "
+        "`uv run pytest` with test-selection options (-q -x -k -m --tb, test paths)."
+    )
     tool_input = payload.get("tool_input")
     command = tool_input.get("command") if isinstance(tool_input, dict) else None
-    if isinstance(command, str) and REVIEWER_ALLOWED.fullmatch(command):
-        return ALLOW
-    return blocked(
-        "reviewer subagents are read-only; the only shell command allowed is `uv run pytest ...`."
-    )
+    if not isinstance(command, str) or re.search(r"[\n\r;&|<>$`]", command):
+        return deny
+    tokens = tokenize(command, posix=tool == "Bash")
+    if not tokens or tokens[:2] != ["uv", "run"]:
+        return deny
+    i = 2
+    while i < len(tokens) and tokens[i].startswith("-"):
+        if tokens[i] not in REVIEWER_UV_FLAGS:
+            return deny
+        i += 1
+    if i >= len(tokens) or tokens[i] != "pytest":
+        return deny
+    rest, j = tokens[i + 1 :], 0
+    while j < len(rest):
+        tok = rest[j]
+        if tok in REVIEWER_PYTEST_VALUE:
+            j += 2
+            continue
+        if tok in REVIEWER_PYTEST_FLAGS or tok.startswith(REVIEWER_PYTEST_PREFIXES):
+            j += 1
+            continue
+        if (
+            tok.startswith(("-", "/", "\\"))
+            or ".." in tok
+            or re.match(r"[A-Za-z]:", tok)
+            or not REVIEWER_SAFE_ARG.fullmatch(tok)
+        ):
+            return deny
+        j += 1
+    return ALLOW
 
 
 def report(reason: str) -> int:

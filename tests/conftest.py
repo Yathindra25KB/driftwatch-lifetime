@@ -89,6 +89,16 @@ def data_repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture(scope="session")
+def alias_repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Repo with git aliases that hide a force push."""
+    repo = make_repo(tmp_path_factory.mktemp("alias"), {"src/x.py": "x = 1\n"})
+    git(repo, "config", "alias.fp", "push --force")
+    git(repo, "config", "alias.shp", "!git push -f")
+    git(repo, "config", "alias.st", "status")
+    return repo
+
+
+@pytest.fixture(scope="session")
 def ignored_data_repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Repo whose .gitignore ignores data/ (except the manifest) and results/."""
     gitignore = "/data/*\n!/data/manifest.json\n/results/\n"
