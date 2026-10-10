@@ -1,6 +1,6 @@
 # ADR-0004: Slot definition, minimum-size gate and gap handling
 
-**Status:** PROPOSED
+**Status:** ACCEPTED (by the researcher, 10 Oct 2026)
 **Date:** 2026-10-10
 **Deciders:** Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
 **Phase:** 2
@@ -91,7 +91,9 @@ A slot passes when C3 subsampling to 10% malware keeps at least M malware (n_mal
 - **B. Drop cross-slot duplicates everywhere.** This changes the population the detector faces.
 - **C. Ignore them.** The guardrails forbid this.
 
-## Decision (proposed; the researcher decides)
+## Decision (accepted by the researcher, 10 Oct 2026)
+The researcher chose: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50 with strict gaps; exclude placeholder-dated benign rows; and the remaining items as written (answers recorded in the Phase 2 session, 10 Oct 2026).
+
 1. **LAMDA: monthly slots (option 1A).** Calendar months in UTC, keyed by AndroZoo `added`. Quarters stay available for a sensitivity check, not for the headline.
 2. **BODMAS: 2-week slots (option 2B)** in the study window from **2019-08-26** (Monday of ISO week 2019-W35, the first week with malware) to 2020-10-04.
    - The slots are anchored explicitly at 2019-08-26 (`build_slots(..., anchor=...)`), so slot ids do not move when early rows are dropped.
