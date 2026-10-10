@@ -179,3 +179,16 @@ def test_watchdog_records_peak_under_the_cap():
     with MemoryWatchdog(cap_bytes=1 << 40) as wd:
         np.ones(1 << 20)
     assert wd.peak_bytes > 0 and wd.exceeded_at is None
+
+
+def test_inventory_writes_report_tables_and_figures(tmp_path, built_data):
+    from driftwatch.data.inventory import write_inventory
+
+    report = write_inventory(Layout(built_data), ["lamda", "bodmas"], tmp_path)
+    text = report.read_text(encoding="utf-8")
+    assert "## LAMDA" in text and "## BODMAS" in text and "longest_passing_run" in text
+    for name in ("lamda_slots_month", "lamda_slots_quarter", "bodmas_slots_4w", "lamda_years"):
+        assert (tmp_path / "tables" / f"data_{name}.csv").exists()
+    assert (tmp_path / "figures" / "data_lamda_counts.png").exists()
+    gates = pd.read_csv(tmp_path / "tables" / "data_lamda_slots_month.csv")
+    assert gates.loc[gates["slot"] == "month:2013-02", "pass_M30"].item() == False  # noqa: E712
