@@ -100,3 +100,13 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 | D15 | Guide §8 vs plan App. C, phase prompts | Config names: `configs/tier1_bodmas.yaml` (guide) vs `configs/e0_*.yaml` … `e5_*.yaml` (plan, prompts). The prompts' names are used. | Phase 4 onward |
 | D16 | Guide §6 vs Phase 10 prompt | The guide allows a small MLP in Tier 3; the Phase 10 prompt has no MLP (E5/E6 only). | Phase 10 |
 | D17 | Guide §3 AUT formula vs TESSERACT arXiv v4 | The arXiv v4 comment (arxiv.org/abs/1807.07838, accessed 2026-10-10) says the published Eq. (4) had an extra 1/N normalisation factor. The guide's `1/(N-1)` form should be checked against v4. | Phase 4 ADR-0006 |
+
+## 7. Phase 2 measurements against open differences (no value changed here)
+
+| ID | Measured (10 Oct 2026) | Evidence |
+|---|---|---|
+| D2 | Delay units: LAMDA slot = 1 month; BODMAS proposed slot = 14 days | ADR-0004 (PROPOSED) |
+| D9 | LAMDA: 4,561 int8 features (counts 0-17); `year_month` derives from AndroZoo `added` (second resolution); no 2015 rows, and the empty run is 2014-09..2016-01; the provided 80/20 split is pooled | reports/data_inventory.md, CLAIMS D-02..D-04 |
+| D10 | BODMAS malware spans 2019-08-29..2020-09-30 (58 ISO weeks); benign timestamps reach back to 2007 | CLAIMS D-08 |
+| D13 | LAMDA time = AndroZoo collection date (`added`); BODMAS time = "first appeared" (malware) but benign dates are mostly date-only or placeholders | docs/data_cards/, reports/data_inventory_notes.md Q1-Q2 |
+| D14 | Peak-memory cap 1.5 GB approved by the researcher; LAMDA build peak 0.85 GB, BODMAS 0.55 GB | CLAIMS D-06, D-09 |

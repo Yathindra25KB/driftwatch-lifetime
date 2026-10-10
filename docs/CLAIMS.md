@@ -16,3 +16,13 @@ Every number or claim of consequence that appears in the README, the report (`re
 
 | Claim ID | Statement | Value | Source file | Commit | Tag | Access date |
 |---|---|---|---|---|---|---|
+| D-01 | LAMDA size and class counts (Baseline subset, HF commit ad9614bd) | 1,008,381 apps; 369,906 malware; 638,475 benign | reports/data_inventory.md | ade5116 | [verified] (matches arXiv 2505.18551 Table 2) | 2026-10-10 |
+| D-02 | LAMDA feature count, storage and density | 4,561 int8 features (values 0-17); 1.63% non-zero | reports/data_inventory.md | ade5116 | [measured] | 2026-10-10 |
+| D-03 | LAMDA slotting timestamp | AndroZoo `added` (seconds) for 100% of rows; `year_month` equals its month for every row | reports/data_inventory.md; reports/data_inventory_notes.md §1 | 18b189d | [measured]; meaning of `added` [verify] | 2026-10-10 |
+| D-04 | LAMDA empty months in 2013-06..2025-01 | 20, including 2014-09..2016-01 (17 consecutive); 2025 holds January only | reports/tables/data_lamda_slots_month.csv | ade5116 | [measured] | 2026-10-10 |
+| D-05 | LAMDA duplicate feature vectors | 679,423 distinct vectors; 238,576 rows (23.7%) repeat a vector from an earlier month; 2,177 vectors with both labels (54,835 rows) | reports/data_inventory.md | ade5116 | [measured] | 2026-10-10 |
+| D-06 | LAMDA cache build on the 8 GB laptop | peak 0.85 GB (cap 1.5 GB), 93.1 s, cache 119.6 MB, raw 340.5 MB | reports/data_inventory.md (from data/manifest.json build record) | ade5116 | [measured] | 2026-10-10 |
+| D-07 | BODMAS size and features | 134,435 samples (57,293 malware, 77,142 benign); 2,381 float32 features; 27.6% non-zero | reports/data_inventory.md | ade5116 | [verified] against the BODMAS page; density [measured] | 2026-10-10 |
+| D-08 | BODMAS timestamps by class | malware 2019-08-29..2020-09-30 (second resolution); benign 2007-01-01..2020-09-30, 85.8% at midnight, 5,877 at 2020-01-01 00:00:00, 13,514 before 2019-W35 | reports/data_inventory.md; reports/data_inventory_notes.md §1 | 18b189d | [measured] | 2026-10-10 |
+| D-09 | BODMAS cache build | peak 0.55 GB (cap 1.5 GB), 23.1 s, cache 1,230.5 MB, raw 265.5 MB | reports/data_inventory.md | ade5116 | [measured] | 2026-10-10 |
+| D-10 | Clean rebuild reproducibility | all 1,088 cache files byte-identical to data/manifest.json; `driftwatch data verify` 0 problems | reports/data_inventory_notes.md §7 | 18b189d | [measured] | 2026-10-10 |
