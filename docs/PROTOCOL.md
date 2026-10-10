@@ -99,3 +99,4 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 | D14 | Plan §4.3, Phase 2 prompt vs Phase 1 prompt rev 1.2 | The plan assumes a 16 GB laptop and a 6 GB peak cap. The machine has 8 GB (7.2 GB usable); rev 1.2 overrides. Each affected place is listed in docs/PHASES.md. | Phase 2 cap proposal |
 | D15 | Guide §8 vs plan App. C, phase prompts | Config names: `configs/tier1_bodmas.yaml` (guide) vs `configs/e0_*.yaml` … `e5_*.yaml` (plan, prompts). The prompts' names are used. | Phase 4 onward |
 | D16 | Guide §6 vs Phase 10 prompt | The guide allows a small MLP in Tier 3; the Phase 10 prompt has no MLP (E5/E6 only). | Phase 10 |
+| D17 | Guide §3 AUT formula vs TESSERACT arXiv v4 | The arXiv v4 comment (arxiv.org/abs/1807.07838, accessed 2026-10-10) says the published Eq. (4) had an extra 1/N normalisation factor. The guide's `1/(N-1)` form should be checked against v4. | Phase 4 ADR-0006 |
