@@ -107,3 +107,23 @@ def ignored_data_repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
         (repo / rel).parent.mkdir(parents=True, exist_ok=True)
         (repo / rel).write_text("content\n", encoding="utf-8")
     return repo
+
+
+# --- data caches built from the committed synthetic fixture (Phase 2) ----------------------
+
+FIXTURE_ROOT = ROOT / "tests" / "fixtures" / "synthetic"
+
+
+def build_fixture_caches(root: Path) -> Path:
+    from driftwatch.data.build import build_dataset
+    from driftwatch.data.cache import Layout
+
+    for name in ("lamda", "bodmas"):
+        build_dataset(name, Layout(root), raw_layout=Layout(FIXTURE_ROOT), batch_size=16)
+    return root
+
+
+@pytest.fixture(scope="session")
+def built_data(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """A data root with both datasets cached from the fixture (read-only for tests)."""
+    return build_fixture_caches(tmp_path_factory.mktemp("built") / "data")

@@ -7,7 +7,16 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Yathindra K B" }]
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+    "gdown>=6.4.2",
+    "huggingface-hub>=2.2.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "psutil>=7.2.2",
+    "pyarrow>=26.0.0",
+    "scipy>=1.18.1",
+]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Programming Language :: Python :: 3.12",
