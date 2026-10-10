@@ -368,17 +368,23 @@ def dataset_section(facts: DatasetFacts, out: Path) -> tuple[str, dict[str, Any]
     name = facts.name
     tables = {length: slot_table(facts, length) for length in SLOT_LENGTHS[name]}
     for length, t in tables.items():
-        t.to_csv(out / "tables" / f"data_{name}_slots_{length}.csv", index=False)
-    facts.units.to_csv(out / "tables" / f"data_{name}_units.csv", index=False)
+        t.to_csv(
+            out / "tables" / f"data_{name}_slots_{length}.csv", index=False, lineterminator="\n"
+        )
+    facts.units.to_csv(out / "tables" / f"data_{name}_units.csv", index=False, lineterminator="\n")
     gates = gate_summary(facts, tables)
     dup_summary, dup_per_slot = duplicate_tables(facts, tables)
-    dup_per_slot.to_csv(out / "tables" / f"data_{name}_duplicates_per_slot.csv", index=False)
+    dup_per_slot.to_csv(
+        out / "tables" / f"data_{name}_duplicates_per_slot.csv", index=False, lineterminator="\n"
+    )
     families, fam_info = family_table(facts)
-    families.to_csv(out / "tables" / f"data_{name}_families_top20.csv", index=False)
+    families.to_csv(
+        out / "tables" / f"data_{name}_families_top20.csv", index=False, lineterminator="\n"
+    )
     ts = timestamp_facts(facts)
     ids = identifier_facts(facts)
     years = year_table(facts)
-    years.to_csv(out / "tables" / f"data_{name}_years.csv", index=False)
+    years.to_csv(out / "tables" / f"data_{name}_years.csv", index=False, lineterminator="\n")
     stats = build_stats(facts)
     cache, source = facts.manifest["cache"], facts.manifest["source"]
     build = facts.manifest["builds"][-1]
