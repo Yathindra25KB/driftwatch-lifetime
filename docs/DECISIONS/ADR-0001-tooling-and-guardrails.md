@@ -64,6 +64,11 @@ The formatter and re-injection hooks always exit 0. The Stop gate exits 2 only o
 - The PostToolUse formatter reformatted files as they were written; path-scoped rules loaded when matching files were touched; the `phase-closeout` skill appeared in Claude Code's skill list.
 - `.claude/settings.json` validates against https://json.schemastore.org/claude-code-settings.json (`check-jsonschema`: "ok -- validation done"). This matters because the settings docs say a schema-rejected file raises a Settings Error and the session can continue without it.
 
+### Change requests
+| Date | Change | Authority | Evidence |
+|---|---|---|---|
+| 10 Oct 2026 | Download allowlist gains `huggingface.co`, `drive.google.com`, `drive.usercontent.google.com` and the suffixes `.huggingface.co` (LFS CDN) and `.hf.co` (Xet storage). Look-alikes (`huggingface.co.evil.com`, `evilhf.co`) and other Google hosts (`docs.google.com`, `google.com`) stay blocked. | Researcher, Phase 2 plan approval (Phase 2 CHANGE_REQUEST noted in docs/PHASES.md "Phase 2 prerequisites") | `tests/test_guard.py` download tests (allowed and blocked cases) |
+
 ### Defense in depth
 `tests/test_repo_invariants.py` runs on every Stop. It fails if docs/PREREG.md differs from its highest prereg tag, if a LOCKED status names a missing tag, if a committed golden file changed, or if data/ or results/ files are tracked. Any route around the guard (scripts, git history operations) therefore turns the next stop red.
 

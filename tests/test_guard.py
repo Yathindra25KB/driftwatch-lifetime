@@ -348,6 +348,12 @@ def test_powershell_non_recursive_delete_allowed(guard, locked_repo):
         "curl $URL",
         "certutil -urlcache -f https://example.com/x x",
         "curl https://pypi.org.evil.com/x",
+        # Phase 2 hosts must not open look-alikes or the rest of Google.
+        "curl https://huggingface.co.evil.com/x",
+        "curl https://evilhf.co/x",
+        "curl https://hf.co.evil.com/x",
+        "curl https://docs.google.com/x",
+        "curl https://google.com/x",
     ],
 )
 def test_download_from_unlisted_host_blocked(guard, locked_repo, command):
@@ -375,6 +381,13 @@ def test_download_blocked_in_powershell(guard, locked_repo, command):
         "uv sync --frozen",
         "git fetch origin",
         "echo https://example.com",
+        # Phase 2 dataset hosts (ADR-0001, Phase 2 CHANGE_REQUEST): LAMDA on Hugging Face
+        # (API, LFS CDN, Xet storage) and BODMAS on Google Drive.
+        "curl -sSfI https://huggingface.co/api/datasets/IQSeC-Lab/LAMDA",
+        "curl -sSfI https://cdn-lfs.huggingface.co/x",
+        "curl -sSfI https://cas-bridge.xethub.hf.co/x",
+        "curl -sSfI https://drive.google.com/drive/folders/x",
+        "curl -sSfI https://drive.usercontent.google.com/download?id=x",
     ],
 )
 def test_allowed_network_commands(guard, locked_repo, command):

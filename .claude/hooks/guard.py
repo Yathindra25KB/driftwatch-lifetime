@@ -56,9 +56,15 @@ ALLOWED_HOSTS = frozenset(
         "docs.anthropic.com",
         # Published Claude Code settings schema, linked from the official settings docs.
         "json.schemastore.org",
+        # Phase 2 dataset sources (ADR-0001, Phase 2 CHANGE_REQUEST): LAMDA on Hugging Face,
+        # BODMAS on the Google Drive folder its authors publish. No other Google host.
+        "huggingface.co",
+        "drive.google.com",
+        "drive.usercontent.google.com",
     }
 )
-ALLOWED_HOST_SUFFIXES = (".githubusercontent.com",)
+# Hugging Face serves files from cdn-lfs*.huggingface.co and its Xet storage under *.hf.co.
+ALLOWED_HOST_SUFFIXES = (".githubusercontent.com", ".huggingface.co", ".hf.co")
 
 CACHE_DIRS = frozenset(
     {".pytest_cache", ".ruff_cache", "__pycache__", ".hypothesis", ".mypy_cache", "build", "dist"}

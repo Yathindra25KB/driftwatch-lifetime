@@ -7,7 +7,7 @@ Status, evidence, commit and the hours the researcher reports, for every phase a
 | # | Phase | Weeks (dates) | Planned h | Status | Evidence | Commit | Hours (actual) | Notes |
 |---|---|---|---|---|---|---|---|---|
 | 1 | Foundations and governance | 1-2 (12-25 Oct 2026) | 8 | DONE | [CI run 38028624827](https://github.com/Yathindra25KB/Driftwatch-/actions/runs/38028624827) (Linux + Windows green, 258 tests, 45/45 guardrail scenarios each); [guardrail review](reviews/guardrail-review.md); [ADR-0001](DECISIONS/ADR-0001-tooling-and-guardrails.md); [PROTOCOL](PROTOCOL.md) | d634836 | 3 | Done 10 Oct 2026, before week 1; prompt rev 1.2. See "Phase 1 closeout" below |
-| 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | NOT STARTED | | | | Peak-memory cap to be proposed for 8 GB machine (rev 1.2) |
+| 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | IN PROGRESS | | | | Started 10 Oct 2026. Peak-memory cap 1.5 GB approved by the researcher (measured: 7.25 GB RAM, 913 MB available); guard allowlist widened for HF and Google Drive (ADR-0001 change requests) |
 | 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | NOT STARTED | | | | Never compress (plan §7) |
 | 4 | Models, AUT/A-AUT, E0 baselines | 3-4 (26 Oct-8 Nov 2026) | 10 | NOT STARTED | | | | Never compress (plan §7) |
 | 5 | Delay and budget simulator, E1 | 5-8 (9 Nov-6 Dec 2026) | 32 | NOT STARTED | | | | |
