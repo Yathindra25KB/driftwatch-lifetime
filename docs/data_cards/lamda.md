@@ -45,5 +45,6 @@
 ## Processing in DriftWatch
 `uv run driftwatch data download lamda`, then `data build lamda`, then `data verify`.
 - Batches of 8,192 rows are streamed into one CSR int8 cache per month (`data/cache/lamda/v1/units/YYYY-MM/`), and the full matrix is never densified.
-- The build peaked at 0.85 GB against the approved 1.5 GB cap and took 93 s; the cache is 119.6 MB [measured].
+- The cache v2 build peaked at 0.87 GB against the approved 1.5 GB cap (0.93 GB in the clean rebuild) and took 93.1 s; the cache is 119.7 MB [measured].
+- `family` and `vt_count` reveal the label exactly, so selectors, policies and monitors get `SlotData.public()` only (ADR-0004).
 - No normalisation or feature selection happens at ingestion.

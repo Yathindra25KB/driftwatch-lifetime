@@ -31,9 +31,11 @@ from driftwatch.data.slots import SLOT_LENGTHS, build_slots, unit_start
 log = logging.getLogger(__name__)
 
 GATE_M = (30, 50, 100)  # malware per slot after C3 subsampling to 10% (needs 9M benign)
-# A date-only timestamp shared by at least this many rows is treated as a placeholder
-# (BODMAS: 5,877 benign rows at 2020-01-01 00:00:00); reported, never dropped here.
-PLACEHOLDER_TIE = 100
+# A date-only timestamp shared by at least this many rows is reported as a placeholder
+# candidate. BODMAS benign rows arrive in daily batches (median 150 per day in the study
+# window, regular days at most 599), so 1,000 flags only the outlier days: 2020-01-01
+# (5,877), 2015-01-01, 2018-02-01 and 2018-03-19. Reported, never dropped here (ADR-0004).
+PLACEHOLDER_TIE = 1000
 C3_RATIO = 0.10
 BENIGN_COLOR, MALWARE_COLOR = "#2a78d6", "#eb6834"  # dataviz categorical slots 1-2, validated
 INK, MUTED, SURFACE = "#1f1f1e", "#6b6a63", "#fcfcfb"
@@ -276,6 +278,16 @@ def identifier_facts(facts: DatasetFacts) -> dict[str, Any]:
     }
 
 
+def day_batches(facts: DatasetFacts) -> pd.DataFrame:
+    """Rows per date-only timestamp (benign batches), largest first: audits PLACEHOLDER_TIE."""
+    rows = facts.rows[facts.rows["ts_date_only"]]
+    t = rows.groupby(["ts", "label"]).size().unstack(fill_value=0)
+    t = t.rename(columns={0: "benign", 1: "malware"}).reset_index()
+    t["ts"] = pd.to_datetime(t["ts"], utc=True).dt.date.astype(str)
+    t["placeholder_candidate"] = t[["benign", "malware"]].sum(axis=1) >= PLACEHOLDER_TIE
+    return t.sort_values("benign", ascending=False, kind="stable").rename(columns={"ts": "day"})
+
+
 def year_table(facts: DatasetFacts) -> pd.DataFrame:
     ts = pd.to_datetime(facts.rows["ts"], utc=True)
     t = pd.crosstab(ts.dt.year, facts.rows["label"]).rename(columns={0: "benign", 1: "malware"})
@@ -413,6 +425,10 @@ def dataset_section(facts: DatasetFacts, out: Path) -> tuple[str, dict[str, Any]
     ids = identifier_facts(facts)
     years = year_table(facts)
     years.to_csv(out / "tables" / f"data_{name}_years.csv", index=False, lineterminator="\n")
+    if name == "bodmas":
+        day_batches(facts).to_csv(
+            out / "tables" / "data_bodmas_benign_days.csv", index=False, lineterminator="\n"
+        )
     stats = build_stats(facts)
     cache, source = facts.manifest["cache"], facts.manifest["source"]
     build = facts.manifest["builds"][-1]
