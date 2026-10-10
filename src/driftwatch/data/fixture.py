@@ -35,6 +35,11 @@ LAMDA_DEFAULT_ROWS = 14
 FAMILIES = ("dowgin", "airpush", "kuguo")
 
 
+def _write_json(path: Path, obj: dict) -> None:
+    # LF on every OS, so the committed fixture is byte-identical wherever it is regenerated.
+    path.write_bytes((json.dumps(obj, indent=2, sort_keys=True) + "\n").encode())
+
+
 def _sha(rng: np.random.Generator) -> str:
     return rng.bytes(32).hex()
 
@@ -85,7 +90,7 @@ def _write_lamda(root: Path, rng: np.random.Generator) -> None:
             "mapped_name": [f"feat_{i}" for i in range(LAMDA_FEATURES)],
         }
     )
-    mapping.to_csv(snap / "Baseline" / "feature_mapping.csv", index=False)
+    mapping.to_csv(snap / "Baseline" / "feature_mapping.csv", index=False, lineterminator="\n")
     meta = df.drop_duplicates("hash").iloc[:-1].copy()  # last app missing from metadata.csv
     shifted = meta.index[meta.year_month == "2016-07"][0]
     meta.loc[shifted, "added"] = datetime(2016, 6, 30, 23, 0, tzinfo=UTC)  # outside year_month
@@ -100,10 +105,10 @@ def _write_lamda(root: Path, rng: np.random.Generator) -> None:
             "family": meta["family"],
         }
     )
-    out.to_csv(snap / "metadata.csv", index=False)
-    (snap / "README.md").write_text("Synthetic LAMDA-schema fixture. Not real data.\n")
+    out.to_csv(snap / "metadata.csv", index=False, lineterminator="\n")
+    (snap / "README.md").write_bytes(b"Synthetic LAMDA-schema fixture. Not real data.\n")
     source = {"dataset": "lamda", "revision": FIXTURE_REVISION, "fixture": True}
-    (snap / "SOURCE.json").write_text(json.dumps(source, indent=2, sort_keys=True) + "\n")
+    _write_json(snap / "SOURCE.json", source)
 
 
 def _bodmas_times(rng: np.random.Generator) -> list[datetime]:
@@ -132,17 +137,18 @@ def _write_bodmas(root: Path, rng: np.random.Generator) -> None:
     meta = pd.DataFrame(
         {"sha": shas, "timestamp": [t.isoformat(sep=" ") for t in times], "family": families}
     )
-    meta.to_csv(raw / "bodmas_metadata.csv", index=False)
+    meta.to_csv(raw / "bodmas_metadata.csv", index=False, lineterminator="\n")
     malware = [s for s, v in zip(shas, y, strict=True) if v]
     cats = pd.DataFrame({"sha256": malware[1:], "category": "trojan"})  # first lacks a category
-    cats.to_csv(raw / "bodmas_malware_category.csv", index=False)
+    cats.to_csv(raw / "bodmas_malware_category.csv", index=False, lineterminator="\n")
     with zipfile.ZipFile(raw / "bodmas.npz", "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for name, arr in (("X.npy", X), ("y.npy", y)):
             buf = io.BytesIO()
             np.lib.format.write_array(buf, arr, allow_pickle=False)
-            zf.writestr(name, buf.getvalue())
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            zf.writestr(info, buf.getvalue(), compress_type=zipfile.ZIP_DEFLATED)
     source = {"dataset": "bodmas", "method": "fixture", "fixture": True}
-    (raw / "SOURCE.json").write_text(json.dumps(source, indent=2, sort_keys=True) + "\n")
+    _write_json(raw / "SOURCE.json", source)
 
 
 def write_fixture(root: Path, seed: int = 20261010) -> Path:
