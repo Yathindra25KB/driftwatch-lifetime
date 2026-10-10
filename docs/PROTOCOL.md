@@ -73,7 +73,7 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 
 | Value | Fixed in | Record |
 |---|---|---|
-| Slot length per dataset, minimum-size gate, gap handling | Phase 2 | ADR-0004-slot-definition |
+| Slot length per dataset, minimum-size gate, gap handling | Phase 2 | ADR-0004-slot-definition (ACCEPTED 10 Oct 2026: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50, strict gaps) |
 | nT, nE, stride per dataset; size-gate numbers; ratio policy incl. the sensitivity ratio | Phase 3 | ADR-0005-windows-and-size-gate |
 | Decision threshold (default fixed 0.5 per Phase 4 prompt), scaling policy, A-AUT window formula | Phase 4 | ADR-0006-metrics-threshold-scaling |
 | Training-pool composition, new-label weight, budget base | Phase 5 | ADR-0007-pool-composition-and-budget |
@@ -105,7 +105,7 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 
 | ID | Measured (10 Oct 2026) | Evidence |
 |---|---|---|
-| D2 | Delay units: LAMDA slot = 1 month; BODMAS proposed slot = 14 days | ADR-0004 (PROPOSED) |
+| D2 | Delay units: LAMDA slot = 1 month; BODMAS slot = 14 days | ADR-0004 (ACCEPTED) |
 | D9 | LAMDA: 4,561 int8 features (counts 0-17); `year_month` derives from AndroZoo `added` (second resolution); no 2015 rows, and the empty run is 2014-09..2016-01; the provided 80/20 split is pooled | reports/data_inventory.md, CLAIMS D-02..D-04 |
 | D10 | BODMAS malware spans 2019-08-29..2020-09-30 (58 ISO weeks); benign timestamps reach back to 2007 | CLAIMS D-08 |
 | D13 | LAMDA time = AndroZoo collection date (`added`); BODMAS time = "first appeared" (malware) but benign dates are mostly date-only or placeholders | docs/data_cards/, reports/data_inventory_notes.md Q1-Q2 |
