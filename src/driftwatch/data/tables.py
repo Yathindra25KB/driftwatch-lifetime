@@ -56,6 +56,34 @@ class FixedWidthScheme:
         }
 
 
+class ExplicitScheme:
+    """Slots exactly as given: consecutive refs that tile one stretch of time.
+
+    Used by the canary to re-slice a window's pooled rows on the window's own slot grid.
+    """
+
+    def __init__(self, refs: list[SlotRef]) -> None:
+        if not refs:
+            raise ValueError("an explicit scheme needs at least one slot")
+        for a, b in zip(refs, refs[1:], strict=False):
+            if a.end != b.start:
+                raise ValueError(f"{a.slot_id} and {b.slot_id} are not adjacent")
+        self._refs = list(refs)
+        self._edges = np.array([r.start for r in refs] + [refs[-1].end], dtype=NS)
+        self._ids = {r.start: r.slot_id for r in refs}
+
+    def edges(self, lo: np.datetime64, hi: np.datetime64) -> np.ndarray:
+        if lo < self._edges[0] or hi >= self._edges[-1]:
+            raise SlicerError("rows lie outside the explicit slot grid")
+        return self._edges
+
+    def slot_id(self, start: np.datetime64) -> str:
+        return self._ids[np.datetime64(start, "ns")]
+
+    def describe(self) -> dict[str, Any]:
+        return {"kind": "explicit", "first": self._refs[0].slot_id, "n_slots": len(self._refs)}
+
+
 class CalendarMonthScheme:
     """Calendar months in UTC, ids ``month:YYYY-MM`` (the LAMDA slot ids)."""
 

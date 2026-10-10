@@ -29,7 +29,7 @@ import hashlib
 import json
 import logging
 import platform
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from importlib import metadata
@@ -437,11 +437,17 @@ def _open_window(
 
 
 def slice_windows(
-    source: SlotSource, spec: WindowSpec, slicelog: SliceLog | None = None
+    source: SlotSource,
+    spec: WindowSpec,
+    slicelog: SliceLog | None = None,
+    *,
+    only: Sequence[int] | None = None,
 ) -> Iterator[Window]:
     """Plan once, then yield each window with its training slots loaded.
 
     Skipped slots and runs are logged through :mod:`logging` and recorded in ``slicelog``.
+    ``only`` restricts iteration to those positions of the schedule (other windows are not
+    loaded), which keeps spot checks such as the canary cheap.
     """
     planned = plan_slots(source, spec)
     schedule = plan_windows(planned, spec)
@@ -460,8 +466,15 @@ def slice_windows(
     if slicelog is not None:
         slicelog.record_plan(planned, schedule)
     by_id = {p.ref.slot_id: p for p in planned}
-    for plan in schedule.windows:
-        yield _open_window(source, plan, spec, by_id, slicelog)
+    wanted = None if only is None else set(only)
+    for position, plan in enumerate(schedule.windows):
+        if wanted is None or position in wanted:
+            yield _open_window(source, plan, spec, by_id, slicelog)
+
+
+def count_windows(source: SlotSource, spec: WindowSpec) -> int:
+    """How many windows the spec yields on this source (features-free)."""
+    return len(plan_windows(plan_slots(source, spec), spec).windows)
 
 
 # --- manifest -------------------------------------------------------------------------------
