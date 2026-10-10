@@ -92,8 +92,13 @@ class CachedDataset:
             return sp.load_npz(path).tocsr()
         return np.load(path, mmap_mode="r" if mmap else None, allow_pickle=False)
 
+    def unit_meta(self, unit: str, columns: list[str] | None = None) -> pd.DataFrame:
+        """One unit's metadata without its feature matrix (planning never loads X)."""
+        path = self.layout.unit_dir(self.dataset, unit) / "meta.parquet"
+        return pq.read_table(path, columns=columns).to_pandas()
+
     def _unit_meta(self, unit: str) -> pd.DataFrame:
-        return pq.read_table(self.layout.unit_dir(self.dataset, unit) / "meta.parquet").to_pandas()
+        return self.unit_meta(unit)
 
     def load_unit(self, unit: str, mmap: bool = False) -> tuple[Any, pd.DataFrame]:
         x, meta = self._unit_x(unit, mmap), self._unit_meta(unit)
