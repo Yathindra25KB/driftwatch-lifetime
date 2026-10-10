@@ -14,7 +14,7 @@ DriftWatch is an open-source study of how long a malware detector stays useful a
 - Not a production detector, and not related to the PyPI package `driftwatch` (a general ML drift-monitoring library). This project's distribution name is `driftwatch-lifetime` (ADR-0003).
 
 ## Quick start (development)
-Requires [uv](https://docs.astral.sh/uv/). uv installs Python 3.12 itself.
+Requires [uv](https://docs.astral.sh/uv/). uv installs Python 3.12 itself. Start Claude Code from the repository root: the guardrail hooks resolve every path against the folder where the session started (ADR-0001).
 
 ```bash
 uv sync --frozen                            # exact locked environment
