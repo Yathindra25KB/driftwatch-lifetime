@@ -9,7 +9,6 @@ timestamp, so each ISO week is a contiguous run of rows. Values are stored as pu
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import re
 import zipfile
@@ -22,7 +21,14 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 
-from driftwatch.data.cache import Layout, file_record, save_dense, save_table, unit_files_match
+from driftwatch.data.cache import (
+    Layout,
+    dense_row_hashes,
+    file_record,
+    save_dense,
+    save_table,
+    unit_files_match,
+)
 from driftwatch.data.slots import unit_end, unit_start
 from driftwatch.data.sources import BODMAS
 
@@ -39,6 +45,9 @@ META_SCHEMA = pa.schema(
         ("label", pa.int8()),
         ("family", pa.string()),
         ("category", pa.string()),
+        ("ts_naive", pa.bool_()),  # published without a UTC offset; read as UTC
+        ("ts_date_only", pa.bool_()),  # exactly 00:00:00: a date, not a time
+        ("ts_tie_count", pa.int32()),  # rows in the whole file sharing this exact ts
         ("fv_hash", pa.string()),
     ]
 )
@@ -92,6 +101,9 @@ def read_metadata(raw_dir: Path, stats: BodmasStats) -> pd.DataFrame:
     stats.ts_without_offset = int(naive.sum())
     stats.ts_without_offset_malware_family = int((naive & meta["family"].notna()).sum())
     meta["ts"] = pd.to_datetime(raw_ts, format="ISO8601", utc=True)
+    meta["ts_naive"] = naive.to_numpy()
+    meta["ts_date_only"] = (meta["ts"] == meta["ts"].dt.normalize()).to_numpy()
+    meta["ts_tie_count"] = meta.groupby("ts")["ts"].transform("size").astype("int32")
     if meta["ts"].isna().any():
         raise ValueError("unparseable BODMAS timestamps")
     stats.ts_unsorted = int((meta["ts"].diff().dt.total_seconds() < 0).sum())
@@ -110,7 +122,9 @@ def read_metadata(raw_dir: Path, stats: BodmasStats) -> pd.DataFrame:
     return meta
 
 
-def _write_week(layout: Layout, week: str, X: np.ndarray, meta: pd.DataFrame) -> dict[str, Any]:
+def _write_week(
+    layout: Layout, week: str, X: np.ndarray, meta: pd.DataFrame, fingerprint: str
+) -> dict[str, Any]:
     order = meta.sort_values(["ts", "sha256", "row_id"], kind="stable").index.to_numpy()
     meta = meta.iloc[order].reset_index(drop=True)
     X = X[order]
@@ -125,16 +139,13 @@ def _write_week(layout: Layout, week: str, X: np.ndarray, meta: pd.DataFrame) ->
         "nonzero": int(np.count_nonzero(X)),
         "start": unit_start(week).isoformat(),
         "end": unit_end(week).isoformat(),
+        "builder": fingerprint,
         "files": files,
     }
 
 
-def _row_hashes(X: np.ndarray) -> list[str]:
-    return [hashlib.blake2b(row.tobytes(), digest_size=16).hexdigest() for row in X]
-
-
 def build(
-    layout: Layout, raw_dir: Path, cache: dict[str, Any], batch_size: int
+    layout: Layout, raw_dir: Path, cache: dict[str, Any], batch_size: int, fingerprint: str
 ) -> Iterator[dict[str, Any]]:
     """Build (or resume) the weekly caches, updating ``cache`` in place."""
     stats = BodmasStats()
@@ -188,12 +199,17 @@ def build(
             stats.inf += int(np.isinf(X).sum())
             stats.nonzero += int(np.count_nonzero(X))
             existing = cache["units"].get(week)
-            if existing and existing["n_rows"] == X.shape[0] and unit_files_match(layout, existing):
+            if (
+                existing
+                and existing.get("builder") == fingerprint
+                and existing["n_rows"] == X.shape[0]
+                and unit_files_match(layout, existing)
+            ):
                 stats.weeks_skipped += 1
                 continue
             wmeta = meta.iloc[lo:hi].reset_index(drop=True)
-            wmeta["fv_hash"] = _row_hashes(X)
-            cache["units"][week] = _write_week(layout, week, X, wmeta)
+            wmeta["fv_hash"] = dense_row_hashes(X)
+            cache["units"][week] = _write_week(layout, week, X, wmeta, fingerprint)
             written += 1
             if written % SAVE_EVERY_WEEKS == 0:
                 cache["stats"] = stats.as_dict()
@@ -204,5 +220,6 @@ def build(
     if stats.rows != shape[0]:
         raise AssertionError(f"streamed {stats.rows} of {shape[0]} rows")
     stats.extra["n_weeks"] = len(starts)
+    cache["expected_units"] = sorted(set(meta["unit"]))
     cache["stats"] = stats.as_dict()
     yield cache

@@ -12,7 +12,6 @@ receives rows from two chunks. A chunk is also the unit of resume.
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import re
 from collections import Counter, defaultdict
@@ -27,7 +26,14 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import scipy.sparse as sp
 
-from driftwatch.data.cache import Layout, file_record, save_csr, save_table, unit_files_match
+from driftwatch.data.cache import (
+    Layout,
+    csr_row_hashes,
+    file_record,
+    save_csr,
+    save_table,
+    unit_files_match,
+)
 from driftwatch.data.slots import month_key, unit_end, unit_start
 from driftwatch.data.sources import LAMDA
 
@@ -49,6 +55,7 @@ META_SCHEMA = pa.schema(
         ("vt_count", pa.int16()),
         ("src_file", pa.string()),
         ("src_split", pa.string()),
+        ("ts_source", pa.string()),
         ("fv_hash", pa.string()),
     ]
 )
@@ -190,12 +197,15 @@ class AddedIndex:
         return pos, found
 
 
-def load_added_index(snapshot: Path) -> AddedIndex | None:
-    """Read metadata.csv once (about 80 MB in memory); None if the file is absent."""
+def load_added_index(snapshot: Path) -> AddedIndex:
+    """Read metadata.csv once (about 80 MB in memory).
+
+    The file is required: without `added` the within-month order would silently fall back
+    to sha256 order, so a missing file is an error, not a warning.
+    """
     path = snapshot / "metadata.csv"
     if not path.exists():
-        log.warning("LAMDA metadata.csv missing: ts falls back to the first of the month")
-        return None
+        raise FileNotFoundError(f"{path} missing: LAMDA timestamps need AndroZoo `added`")
     import pyarrow.compute as pc
     import pyarrow.csv as pacsv
 
@@ -205,10 +215,13 @@ def load_added_index(snapshot: Path) -> AddedIndex | None:
     table = pacsv.read_csv(
         path, convert_options=pacsv.ConvertOptions(include_columns=cols, column_types=types)
     )
+    table = table.set_column(0, "sha256", pc.utf8_lower(pc.utf8_trim_whitespace(table["sha256"])))
     table = table.take(pc.sort_indices(table, sort_keys=[("sha256", "ascending")]))
     added = pc.strptime(table["added"], format="%Y-%m-%d %H:%M:%S", unit="s", error_is_null=True)
     added_s = pc.fill_null(added.cast(pa.int64()), -1).to_numpy()
-    sha = np.array(pc.utf8_lower(table["sha256"]).to_pylist(), dtype="S64")
+    sha = np.array(table["sha256"].to_pylist(), dtype="S64")
+    if len(sha) > 1 and not (sha[1:] >= sha[:-1]).all():
+        raise AssertionError("metadata.csv sha256 index is not sorted; lookups would miss rows")
     return AddedIndex(
         sha=sha,
         added=added_s,
@@ -219,17 +232,18 @@ def load_added_index(snapshot: Path) -> AddedIndex | None:
     )
 
 
-def _join_added(meta: pd.DataFrame, index: AddedIndex | None, stats: ChunkStats) -> None:
-    """Set `added` and the slotting time `ts`; count every disagreement with metadata.csv.
+def _join_added(meta: pd.DataFrame, index: AddedIndex, stats: ChunkStats) -> None:
+    """Set `added`, the slotting time `ts` and `ts_source`; count every disagreement.
 
-    `ts` is `added` when it lies in the row's year_month, otherwise the first of that month,
-    so the cache unit (chosen by year_month, the dataset's own field) always contains `ts`.
+    `ts` is `added` when it lies in the row's year_month, otherwise the first of that month
+    (`ts_source` = "month_start"), so the cache unit (chosen by year_month, the dataset's
+    own field) always contains `ts`. The real build had 0 such rows.
     """
     month_start = pd.to_datetime(meta["year_month"] + "-01", utc=True)
-    if index is None or meta.empty:
-        meta["added"] = pd.NaT
+    if meta.empty:
+        meta["added"] = pd.Series(dtype="datetime64[ns, UTC]")
         meta["ts"] = month_start
-        stats.meta_missing += len(meta)
+        meta["ts_source"] = pd.Series(dtype=str)
         return
     pos, found = index.lookup(meta["sha256"].tolist())
     stats.meta_missing += int((~found).sum())
@@ -242,6 +256,7 @@ def _join_added(meta: pd.DataFrame, index: AddedIndex | None, stats: ChunkStats)
     stats.added_month_mismatch += int(((secs >= 0) & ~same_month).sum())
     meta["ts"] = np.where(same_month, added, month_start)
     meta["ts"] = pd.to_datetime(meta["ts"], utc=True)
+    meta["ts_source"] = np.where(same_month, "added", "month_start")
     label = meta["label"].to_numpy()
     m_label = index.label[pos]
     stats.meta_label_conflicts += int((found & (m_label != label)).sum())
@@ -252,16 +267,6 @@ def _join_added(meta: pd.DataFrame, index: AddedIndex | None, stats: ChunkStats)
     m_fam = index.family[pos]
     mal = found & (label == 1)
     stats.meta_family_conflicts += int(sum(1 for i in np.flatnonzero(mal) if fam[i] != m_fam[i]))
-
-
-def _row_hashes(m: sp.csr_matrix) -> list[str]:
-    out = []
-    for i in range(m.shape[0]):
-        lo, hi = m.indptr[i], m.indptr[i + 1]
-        h = hashlib.blake2b(m.indices[lo:hi].tobytes(), digest_size=16)
-        h.update(m.data[lo:hi].tobytes())
-        out.append(h.hexdigest())
-    return out
 
 
 def _batch_meta(batch: pa.RecordBatch, f: SourceFile, offset: int, stats: ChunkStats):
@@ -334,7 +339,7 @@ def stream_chunk(
     feats: list[str],
     batch_size: int,
     stats: ChunkStats,
-    index: AddedIndex | None,
+    index: AddedIndex,
 ):
     """Yield (month, csr, meta) pieces for every batch of every file in the chunk."""
     for f in group:
@@ -358,13 +363,15 @@ def stream_chunk(
             del dense
             meta = meta[keep].reset_index(drop=True)
             stats.nnz += csr.nnz
-            meta["fv_hash"] = _row_hashes(csr)
+            meta["fv_hash"] = csr_row_hashes(csr)
             _join_added(meta, index, stats)
             for month, idx in meta.groupby("year_month", sort=True).indices.items():
                 yield month, csr[idx], meta.iloc[idx]
 
 
-def _write_unit(layout: Layout, month: str, xs: list, metas: list) -> dict[str, Any]:
+def _write_unit(
+    layout: Layout, month: str, xs: list, metas: list, fingerprint: str
+) -> dict[str, Any]:
     X = sp.vstack(xs, format="csr")
     meta = pd.concat(metas, ignore_index=True)
     order = meta.sort_values(["ts", "sha256", "row_id"], kind="stable").index.to_numpy()
@@ -382,12 +389,25 @@ def _write_unit(layout: Layout, month: str, xs: list, metas: list) -> dict[str, 
         "nnz": int(X.nnz),
         "start": unit_start(month).isoformat(),
         "end": unit_end(month).isoformat(),
+        "builder": fingerprint,
         "files": files,
     }
 
 
+def _chunk_current(layout: Layout, cache: dict[str, Any], cid: str, fingerprint: str) -> bool:
+    done = cache["chunks"].get(cid)
+    if not done or done.get("builder") != fingerprint:
+        return False
+    return all(
+        m in cache["units"]
+        and cache["units"][m].get("builder") == fingerprint
+        and unit_files_match(layout, cache["units"][m])
+        for m in done["units"]
+    )
+
+
 def build(
-    layout: Layout, snapshot: Path, cache: dict[str, Any], batch_size: int
+    layout: Layout, snapshot: Path, cache: dict[str, Any], batch_size: int, fingerprint: str
 ) -> Iterator[dict[str, Any]]:
     """Build (or resume) the monthly caches, updating ``cache`` in place.
 
@@ -406,20 +426,18 @@ def build(
             "feature_dtype": "int8",
             "x_format": "csr-npz",
             "timestamp": "added (AndroZoo) when inside year_month, else first of the month",
-            "metadata_csv_duplicate_sha256": None if index is None else index.duplicates,
+            "metadata_csv_duplicate_sha256": index.duplicates,
             "prescan": {
                 f.rel: {m or "invalid": c for m, c in sorted(months[f.index].items(), key=str)}
                 for f in files
             },
         }
     )
-    for group in chunks(files, months):
+    groups = chunks(files, months)
+    cache["expected_units"] = sorted({m for f in files for m in months[f.index] if m})
+    for group in groups:
         cid = chunk_id(group)
-        done = cache["chunks"].get(cid)
-        if done and all(
-            m in cache["units"] and unit_files_match(layout, cache["units"][m])
-            for m in done["units"]
-        ):
+        if _chunk_current(layout, cache, cid, fingerprint):
             log.info("LAMDA chunk %s: up to date, skipped", cid)
             continue
         stats = ChunkStats()
@@ -428,10 +446,14 @@ def build(
             pieces[month][0].append(x)
             pieces[month][1].append(meta)
         for month in sorted(pieces):
-            cache["units"][month] = _write_unit(layout, month, *pieces[month])
+            cache["units"][month] = _write_unit(layout, month, *pieces[month], fingerprint)
+        written = sum(cache["units"][m]["n_rows"] for m in pieces)
+        if written != stats.rows_read - sum(stats.excluded.values()):
+            raise AssertionError(f"chunk {cid}: read {stats.rows_read}, wrote {written}")
         cache["chunks"][cid] = {
             "files": [f.rel for f in group],
             "units": sorted(pieces),
+            "builder": fingerprint,
             "stats": stats.as_dict(),
         }
         log.info("LAMDA chunk %s: %d months, %d rows", cid, len(pieces), stats.rows_read)

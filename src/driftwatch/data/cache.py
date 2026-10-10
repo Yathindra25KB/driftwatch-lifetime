@@ -3,7 +3,7 @@
 Layout under a data root (default ``data/``)::
 
     raw/<dataset>/...                 upstream files as downloaded
-    cache/<dataset>/v1/units/<unit>/  one folder per base unit (month or ISO week)
+    cache/<dataset>/<version>/units/<unit>/  one folder per base unit (month or ISO week)
     build_logs/<dataset>-<utc>.json   peak memory, wall-clock, disk size, params
     manifest.json                     sources, file hashes, row counts, builds
 
@@ -177,6 +177,38 @@ def code_version(repo: Path | None = None) -> str:
     except OSError:
         return "unknown"
     return (head or "unknown") + ("-dirty" if dirty else "")
+
+
+def builder_fingerprint(dataset: str) -> str:
+    """Hash of the code that decides a unit's bytes: a unit is reused only if this matches.
+
+    It covers the cache version, this module, the source registry and the dataset builder,
+    so a change to routing, sorting, hashing or the meta schema rebuilds every unit.
+    """
+    here = Path(__file__).resolve().parent
+    digest = hashlib.sha256(CACHE_VERSION.encode())
+    for name in ("cache.py", "sources.py", f"{dataset}.py"):
+        digest.update((here / name).read_bytes().replace(b"\r\n", b"\n"))
+    return digest.hexdigest()[:16]
+
+
+def csr_row_hashes(m: sp.csr_matrix) -> list[str]:
+    """blake2b-128 of each row's (int32 indices, int8 values): independent of batch size."""
+    indices = m.indices.astype("<i4", copy=False)
+    data = m.data.astype("i1", copy=False)
+    out = []
+    for i in range(m.shape[0]):
+        lo, hi = m.indptr[i], m.indptr[i + 1]
+        h = hashlib.blake2b(indices[lo:hi].tobytes(), digest_size=16)
+        h.update(data[lo:hi].tobytes())
+        out.append(h.hexdigest())
+    return out
+
+
+def dense_row_hashes(x: np.ndarray) -> list[str]:
+    """blake2b-128 of each float32 row's bytes."""
+    rows = np.ascontiguousarray(x, dtype="<f4")
+    return [hashlib.blake2b(row.tobytes(), digest_size=16).hexdigest() for row in rows]
 
 
 def dir_size(path: Path) -> int:

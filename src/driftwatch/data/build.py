@@ -20,6 +20,7 @@ import pyarrow.parquet as pq
 from driftwatch.data.cache import (
     Layout,
     atomic_write_bytes,
+    builder_fingerprint,
     code_version,
     dir_size,
     file_record,
@@ -76,9 +77,24 @@ def build_dataset(
     entry["source"] = {**source, "raw_dir": raw_layout.rel(raw_dir), "files": files}
     if raw_layout.root.resolve() != layout.root.resolve():
         entry["source"]["raw_root"] = str(raw_layout.root.resolve())
+    old_cache = entry.get("cache")
+    if old_cache and old_cache.get("version") != CACHE_VERSION:
+        # A new cache version is a new manifest entry: the old one is archived, never mixed.
+        archived = {k: v for k, v in old_cache.items() if k not in ("units", "chunks", "prescan")}
+        archived["n_units"] = len(old_cache.get("units", {}))
+        entry.setdefault("previous_caches", []).append(archived)
+        entry["cache"] = {}
+        log.warning(
+            "%s: cache %s archived in the manifest; building %s",
+            dataset,
+            old_cache.get("version"),
+            CACHE_VERSION,
+        )
     cache = entry.setdefault("cache", {})
     cache["version"] = CACHE_VERSION
     cache["dir"] = layout.rel(layout.cache(dataset))
+    fingerprint = builder_fingerprint(dataset)
+    cache["builder"] = fingerprint
     params = {"batch_size": batch_size, "memory_cap_bytes": memory_cap_bytes}
     started = datetime.now(UTC)
 
@@ -86,15 +102,19 @@ def build_dataset(
         if dataset == "lamda":
             from driftwatch.data import lamda
 
-            steps = lamda.build(layout, raw_dir, cache, batch_size)
+            steps = lamda.build(layout, raw_dir, cache, batch_size, fingerprint)
         elif dataset == "bodmas":
             from driftwatch.data import bodmas
 
-            steps = bodmas.build(layout, raw_dir, cache, batch_size)
+            steps = bodmas.build(layout, raw_dir, cache, batch_size, fingerprint)
         else:
             raise ValueError(dataset)
         for _ in steps:
             save_manifest(layout.manifest, manifest)  # resume point
+        stale = set(cache["units"]) - set(cache.pop("expected_units"))
+        for unit in sorted(stale):  # units the current routing no longer produces
+            log.warning("%s: dropping stale unit %s from the manifest", dataset, unit)
+            del cache["units"][unit]
         cache["n_rows"] = sum(u["n_rows"] for u in cache["units"].values())
         cache["n_malware"] = sum(u["n_malware"] for u in cache["units"].values())
         cache["cross_unit_sha256"] = _cross_unit_sha256(layout, dataset, cache["units"])

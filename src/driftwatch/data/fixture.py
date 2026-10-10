@@ -10,8 +10,9 @@ Planted cases the tests rely on:
   months and years, one sha256 in both train and test, an `added` date outside its
   year_month, and one app missing from metadata.csv.
 - BODMAS has old benign timestamps (2007, 2018) before the dense 2019 period, an empty ISO
-  week, a feature vector repeated across weeks, one malware row without a category, and one
-  timestamp without a UTC offset.
+  week, a feature vector repeated across weeks, one malware row without a category, one
+  timestamp without a UTC offset, a tie of three date-only timestamps, and rows on
+  2019-12-30/31 (ISO week 2020-W01) and 2020-12-31 (2020-W53).
 """
 
 from __future__ import annotations
@@ -119,6 +120,13 @@ def _bodmas_times(rng: np.random.Generator) -> list[datetime]:
         for _ in range(12 if week != 5 else 2):
             offset = timedelta(weeks=week, seconds=int(rng.integers(0, 7 * 86400)))
             times.append(start + offset)
+    times += [datetime(2019, 9, 9, tzinfo=UTC)] * 3  # date-only tie, like 2020-01-01 x 5,877
+    # ISO-year boundaries: Dec 30-31 2019 belong to 2020-W01, Dec 31 2020 to 2020-W53.
+    times += [
+        datetime(2019, 12, 30, 10, tzinfo=UTC),
+        datetime(2019, 12, 31, 10, tzinfo=UTC),
+        datetime(2020, 12, 31, 10, tzinfo=UTC),
+    ]
     return sorted(times)
 
 

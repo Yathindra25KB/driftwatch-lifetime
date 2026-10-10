@@ -31,6 +31,9 @@ from driftwatch.data.slots import SLOT_LENGTHS, build_slots, unit_start
 log = logging.getLogger(__name__)
 
 GATE_M = (30, 50, 100)  # malware per slot after C3 subsampling to 10% (needs 9M benign)
+# A date-only timestamp shared by at least this many rows is treated as a placeholder
+# (BODMAS: 5,877 benign rows at 2020-01-01 00:00:00); reported, never dropped here.
+PLACEHOLDER_TIE = 100
 C3_RATIO = 0.10
 BENIGN_COLOR, MALWARE_COLOR = "#2a78d6", "#eb6834"  # dataviz categorical slots 1-2, validated
 INK, MUTED, SURFACE = "#1f1f1e", "#6b6a63", "#fcfcfb"
@@ -53,13 +56,22 @@ class DatasetFacts:
 def _load(layout: Layout, name: str) -> DatasetFacts:
     manifest = load_manifest(layout.manifest)["datasets"][name]
     cache = manifest["cache"]
-    cols = META_COLS + (["added", "year_month", "src_split"] if name == "lamda" else ["category"])
+    extra = ["added", "year_month", "src_split", "ts_source"]
+    if name == "bodmas":
+        extra = ["category", "ts_naive", "ts_date_only", "ts_tie_count"]
+    cols = META_COLS + extra
     parts = []
     for unit in sorted(cache["units"], key=unit_start):
         t = pq.read_table(layout.unit_dir(name, unit) / "meta.parquet", columns=cols).to_pandas()
         t["unit"] = unit
         parts.append(t)
     rows = pd.concat(parts, ignore_index=True)
+    rows["placeholder"] = (
+        rows["ts_date_only"] & (rows["ts_tie_count"] >= PLACEHOLDER_TIE)
+        if name == "bodmas"
+        else False
+    )
+    placeholder_benign = rows[rows["placeholder"] & (rows["label"] == 0)].groupby("unit").size()
     n_feat = cache["n_features"]
     units = pd.DataFrame(
         [
@@ -71,6 +83,7 @@ def _load(layout: Layout, name: str) -> DatasetFacts:
                 "n_benign": e["n_rows"] - e["n_malware"],
                 "malware_share": round(e["n_malware"] / e["n_rows"], 4) if e["n_rows"] else 0,
                 "density": round(e.get("nnz", e.get("nonzero", 0)) / (e["n_rows"] * n_feat), 6),
+                "n_benign_placeholder_ts": int(placeholder_benign.get(u, 0)),
             }
             for u, e in sorted(cache["units"].items(), key=lambda kv: unit_start(kv[0]))
         ]
@@ -89,20 +102,27 @@ def slot_table(facts: DatasetFacts, length: str) -> pd.DataFrame:
         n_mal = int(by_unit.loc[list(s.units), "n_malware"].sum()) if s.units else 0
         n_all = int(by_unit.loc[list(s.units), "n_rows"].sum()) if s.units else 0
         n_ben = n_all - n_mal
+        n_ph = int(by_unit.loc[list(s.units), "n_benign_placeholder_ts"].sum()) if s.units else 0
         row = {
             "slot": s.slot_id,
             "index": s.index,
             "start": s.start.date().isoformat(),
             "end": s.end.date().isoformat(),
             "gap": s.is_gap,
+            "partial": s.is_partial,  # some base units of the slot are empty
+            "missing_units": " ".join(s.missing_units) if s.is_partial else "",
             "edge": s.index in (0, len(slots) - 1),
             "n_rows": n_all,
             "n_malware": n_mal,
             "n_benign": n_ben,
             "c3_malware_kept": min(n_mal, int(n_ben * C3_RATIO / (1 - C3_RATIO))),
         }
-        for m in GATE_M:
-            row[f"pass_M{m}"] = bool(n_mal >= m and n_ben >= 9 * m)
+        for m in GATE_M:  # a partly empty slot fails: its window is not the stated one (C2)
+            row[f"pass_M{m}"] = bool(n_mal >= m and n_ben >= 9 * m and not s.is_partial)
+        if facts.name == "bodmas":
+            row["n_benign_placeholder_ts"] = n_ph
+            ok = n_mal >= 50 and n_ben - n_ph >= 450 and not s.is_partial
+            row["pass_M50_without_placeholder_ts"] = bool(ok)
         out.append(row)
     return pd.DataFrame(out)
 
@@ -217,6 +237,14 @@ def timestamp_facts(facts: DatasetFacts) -> dict[str, Any]:
         added = pd.to_datetime(facts.rows["added"], utc=True)
         out["share_ts_equals_added"] = round(float((added == ts).mean()), 6)
         out["rows_without_added"] = int(added.isna().sum())
+        out["rows_ts_from_month_start"] = int((facts.rows["ts_source"] != "added").sum())
+    else:
+        rows = facts.rows
+        for lab, name in ((1, "malware"), (0, "benign")):
+            sub = rows[rows["label"] == lab]
+            out[f"{name}_placeholder_ts_rows"] = int(sub["placeholder"].sum())
+            out[f"{name}_ts_without_offset"] = int(sub["ts_naive"].sum())
+        out["placeholder_rule"] = f"date-only timestamp shared by >= {PLACEHOLDER_TIE} rows"
     return out
 
 

@@ -3,8 +3,10 @@
 Checks:
 - the manifest's own content hash;
 - the sha256 of every raw file and every cache file;
+- every unit file lies under the current cache version's directory;
 - per unit: row counts, malware counts, timestamps inside the unit's window, timestamps
-  sorted;
+  sorted, LAMDA `year_month` equal to the unit (independent of `ts`), and X aligned with
+  meta (each row's feature hash recomputed from X);
 - across units: every row_id is unique (no row in two units, hence no row in two slots), and
   units are ordered in time. The number of sha256 values found in more than one unit must
   match the number recorded at build time. That count is a dataset property reported by the
@@ -20,8 +22,16 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import scipy.sparse as sp
 
-from driftwatch.data.cache import Layout, content_hash, load_manifest, sha256_file
+from driftwatch.data.cache import (
+    Layout,
+    content_hash,
+    csr_row_hashes,
+    dense_row_hashes,
+    load_manifest,
+    sha256_file,
+)
 from driftwatch.data.loaders import CachedDataset
 from driftwatch.data.slots import unit_end, unit_start
 
@@ -55,7 +65,17 @@ def _check_unit(name: str, unit: str, entry: dict, x_rows: int, meta: pd.DataFra
         problems.append(f"{name} {unit}: timestamps outside [{start}, {end})")
     if not ts.is_monotonic_increasing:
         problems.append(f"{name} {unit}: timestamps not sorted")
+    if "year_month" in meta and not (meta["year_month"] == unit).all():
+        # Independent of `ts`, which the builder derives inside year_month.
+        problems.append(f"{name} {unit}: year_month differs from the unit")
     return problems
+
+
+def _check_alignment(name: str, unit: str, x, meta: pd.DataFrame) -> list[str]:
+    """Recompute each row's feature hash from X: proves X and meta rows are aligned."""
+    hashes = csr_row_hashes(x) if sp.issparse(x) else dense_row_hashes(np.asarray(x))
+    bad = int((np.asarray(hashes) != meta["fv_hash"].to_numpy()).sum())
+    return [f"{name} {unit}: {bad} rows where X and meta are misaligned"] if bad else []
 
 
 def verify_dataset(layout: Layout, name: str, manifest: dict) -> list[str]:
@@ -66,8 +86,14 @@ def verify_dataset(layout: Layout, name: str, manifest: dict) -> list[str]:
     raw_layout = Layout(Path(raw_root)) if raw_root else layout
     problems = _check_files(raw_layout, entry["source"]["files"], f"{name} raw")
     cache = entry["cache"]
+    cache_dir = layout.rel(layout.cache(name)) + "/"
     for unit, unit_entry in cache["units"].items():
         problems += _check_files(layout, unit_entry["files"], f"{name} cache {unit}")
+        problems += [
+            f"{name} cache {unit}: {rel} is outside {cache_dir}"
+            for rel in unit_entry["files"]
+            if not rel.startswith(cache_dir)
+        ]
     if problems:
         return problems  # content checks on tampered files would only add noise
 
@@ -79,6 +105,7 @@ def verify_dataset(layout: Layout, name: str, manifest: dict) -> list[str]:
     for unit in data.units:
         x, meta = data.load_unit(unit, mmap=True)
         problems += _check_unit(name, unit, cache["units"][unit], x.shape[0], meta)
+        problems += _check_alignment(name, unit, x, meta)
         if previous_end is not None and unit_start(unit) < previous_end:
             problems.append(f"{name} {unit}: overlaps the previous unit")
         previous_end = unit_end(unit)

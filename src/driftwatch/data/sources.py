@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-CACHE_VERSION = "v1"
+CACHE_VERSION = "v2"  # v2: per-row timestamp flags, builder fingerprints (Phase 2 review)
 
 
 @dataclass(frozen=True)

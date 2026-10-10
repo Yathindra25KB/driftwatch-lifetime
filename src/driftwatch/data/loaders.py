@@ -5,14 +5,20 @@ requested slot is ever held in memory. :func:`iter_slots` streams a whole scheme
 at a time. Row order is deterministic: units are taken in time order, and rows inside a unit
 are sorted by (timestamp, sha256).
 
-Labels are returned because later phases need them for queue release and scoring. Policies,
-selectors and monitors must never read them directly (CLAUDE.md hard rule 4).
+`SlotData` holds everything, labels included, because the label queue (sim/queue.py) and
+the metrics need them. Selectors, policies and monitors must receive only
+`SlotData.public()`: the features and row ids (CLAUDE.md hard rule 4). The metadata is not
+safe to hand over. `label`, `family`, `vt_count`, `category` and `year_month` are labels or
+derived from them. On BODMAS, `ts` and its flags also give the class away: benign
+timestamps are mostly midnight dates, and malware timestamps never are (Phase 2 leakage
+review, finding 1). Phase 5 adds the spy test that enforces this boundary.
 """
 
 from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +31,18 @@ from driftwatch.data.cache import Layout, load_manifest
 from driftwatch.data.slots import Slot, build_slots, slot_by_id, unit_start
 
 X_FILES = {"csr-npz": "X.npz", "dense-npy": "X.npy"}
+# The only metadata a selector, policy or monitor may see. Everything else is sealed.
+PUBLIC_COLUMNS = ("row_id",)
+
+
+@dataclass(frozen=True)
+class PublicSlot:
+    """What a selector, policy or monitor may see: features and opaque row ids."""
+
+    dataset: str
+    slot_id: str
+    X: sp.csr_matrix | np.ndarray
+    row_id: np.ndarray
 
 
 @dataclass(frozen=True)
@@ -37,6 +55,12 @@ class SlotData:
 
     def __len__(self) -> int:
         return int(self.y.shape[0])
+
+    def public(self) -> PublicSlot:
+        """The label-free view (hard rule 4); never pass `meta` or `y` to a selector."""
+        return PublicSlot(
+            self.dataset, self.slot.slot_id, self.X, self.meta["row_id"].to_numpy(copy=True)
+        )
 
 
 class CachedDataset:
@@ -59,8 +83,8 @@ class CachedDataset:
     def units(self) -> list[str]:
         return sorted(self._cache["units"], key=unit_start)
 
-    def slots(self, length: str) -> list[Slot]:
-        return build_slots(self.dataset, length, self.units)
+    def slots(self, length: str, anchor: datetime | None = None) -> list[Slot]:
+        return build_slots(self.dataset, length, self.units, anchor)
 
     def _unit_x(self, unit: str, mmap: bool) -> sp.csr_matrix | np.ndarray:
         path = self.layout.unit_dir(self.dataset, unit) / X_FILES[self.x_format]
@@ -77,11 +101,13 @@ class CachedDataset:
             raise ValueError(f"{self.dataset} {unit}: X has {x.shape[0]} rows, meta {len(meta)}")
         return x, meta
 
-    def load_slot(self, slot: Slot | str, length: str | None = None) -> SlotData:
+    def load_slot(
+        self, slot: Slot | str, length: str | None = None, anchor: datetime | None = None
+    ) -> SlotData:
         if isinstance(slot, str):
             if length is None:
                 length = slot.split(":", 1)[0]
-            slot = slot_by_id(self.dataset, length, self.units, slot)
+            slot = slot_by_id(self.dataset, length, self.units, slot, anchor)
         parts = [self.load_unit(u) for u in slot.units]
         if parts:
             xs, metas = zip(*parts, strict=True)
@@ -105,8 +131,10 @@ class CachedDataset:
         first = self.units[0]
         return self._unit_meta(first).iloc[0:0].reset_index(drop=True)
 
-    def iter_slots(self, length: str, include_gaps: bool = False) -> Iterator[SlotData]:
-        for slot in self.slots(length):
+    def iter_slots(
+        self, length: str, include_gaps: bool = False, anchor: datetime | None = None
+    ) -> Iterator[SlotData]:
+        for slot in self.slots(length, anchor):
             if slot.is_gap and not include_gaps:
                 continue
             yield self.load_slot(slot)
