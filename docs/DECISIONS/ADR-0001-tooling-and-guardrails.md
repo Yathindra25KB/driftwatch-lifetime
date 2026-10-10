@@ -1,6 +1,6 @@
 # ADR-0001: Tooling and guardrail design
 
-**Status:** PROPOSED (draft; finalised at Phase 1 closeout after the adversarial review)
+**Status:** ACCEPTED (by the researcher, 2026-10-10, after the adversarial review)
 **Date:** 2026-10-10
 **Deciders:** Yathindra (approves); Claude Code (proposes)
 **Phase:** 1
