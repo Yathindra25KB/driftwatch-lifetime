@@ -10,7 +10,8 @@ Planted cases the tests rely on:
   months and years, one sha256 in both train and test, an `added` date outside its
   year_month, and one app missing from metadata.csv.
 - BODMAS has old benign timestamps (2007, 2018) before the dense 2019 period, an empty ISO
-  week, a feature vector repeated across weeks, and one malware row without a category.
+  week, a feature vector repeated across weeks, one malware row without a category, and one
+  timestamp without a UTC offset.
 """
 
 from __future__ import annotations
@@ -134,9 +135,9 @@ def _write_bodmas(root: Path, rng: np.random.Generator) -> None:
     X[n - 1] = X[5]  # dup across weeks
     shas = [_sha(rng) for _ in range(n)]
     families = [str(rng.choice(("sfone", "wacatac", "upatre"))) if v else "" for v in y]
-    meta = pd.DataFrame(
-        {"sha": shas, "timestamp": [t.isoformat(sep=" ") for t in times], "family": families}
-    )
+    stamps = [t.isoformat(sep=" ") for t in times]
+    stamps[1] = times[1].strftime("%Y-%m-%d %H:%M:%S")  # no UTC offset, as in 3,712 real rows
+    meta = pd.DataFrame({"sha": shas, "timestamp": stamps, "family": families})
     meta.to_csv(raw / "bodmas_metadata.csv", index=False, lineterminator="\n")
     malware = [s for s, v in zip(shas, y, strict=True) if v]
     cats = pd.DataFrame({"sha256": malware[1:], "category": "trojan"})  # first lacks a category

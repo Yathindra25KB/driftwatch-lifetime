@@ -98,6 +98,13 @@ def test_lamda_timestamps_come_from_added(built_data):
     assert meta["added"].notna().all() and (meta["ts"] == meta["added"]).all()
 
 
+def test_bodmas_timestamps_without_offset_are_counted(built_data):
+    stats = load_manifest(Layout(built_data).manifest)["datasets"]["bodmas"]["cache"]["stats"]
+    assert stats["ts_without_offset"] == 1  # planted; read as UTC
+    meta = CachedDataset("bodmas", built_data).load_slot("1w:2018-04-30").meta
+    assert str(meta["ts"].iloc[0]) == "2018-05-03 12:00:00+00:00"
+
+
 def test_rebuild_is_deterministic(tmp_path, built_data):
     other = build_fixture_caches(tmp_path / "data")
     assert _unit_files(other) == _unit_files(built_data)

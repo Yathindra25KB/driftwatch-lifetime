@@ -55,6 +55,8 @@ class BodmasStats:
     bad_sha256: int = 0
     ts_unsorted: int = 0
     ts_with_time_of_day: int = 0
+    ts_without_offset: int = 0
+    ts_without_offset_malware_family: int = 0
     weeks_skipped: int = 0
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -83,7 +85,13 @@ def read_metadata(raw_dir: Path, stats: BodmasStats) -> pd.DataFrame:
         raise ValueError(f"unexpected metadata columns {list(meta.columns)}")
     meta["sha256"] = meta.pop("sha").str.strip().str.lower()
     stats.bad_sha256 = int((~meta["sha256"].str.match(SHA256.pattern)).sum())
-    meta["ts"] = pd.to_datetime(meta.pop("timestamp"), utc=True)
+    raw_ts = meta.pop("timestamp").astype(str)
+    # Most rows end in "+00:00"; a minority carry no offset. Those are read as UTC (an
+    # assumption, counted here and listed as an open question in the inventory notes).
+    naive = ~raw_ts.str.contains(r"(?:[+-]\d{2}:\d{2}|Z)$", regex=True)
+    stats.ts_without_offset = int(naive.sum())
+    stats.ts_without_offset_malware_family = int((naive & meta["family"].notna()).sum())
+    meta["ts"] = pd.to_datetime(raw_ts, format="ISO8601", utc=True)
     if meta["ts"].isna().any():
         raise ValueError("unparseable BODMAS timestamps")
     stats.ts_unsorted = int((meta["ts"].diff().dt.total_seconds() < 0).sum())
