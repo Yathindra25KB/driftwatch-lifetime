@@ -217,7 +217,9 @@ def test_public_view_carries_only_features_and_opaque_row_ids():
     public = slot.public()
     assert {f.name for f in fields(public)} == {"dataset", "slot_id", "X", "row_id"}
     assert public.dataset == "synthetic" and public.slot_id == slot.ref.slot_id
-    assert np.array_equal(public.row_id, slot.row_id)
+    # Handles, not dataset row ids: contiguous, and only the slot can map them back.
+    assert np.array_equal(public.row_id, np.arange(len(slot.y)))
+    assert np.array_equal(np.sort(slot.row_id[slot.resolve(public.row_id)]), np.sort(slot.row_id))
 
 
 def test_feature_rows_follow_the_rows_that_survive_subsampling():
@@ -300,9 +302,9 @@ def test_manifest_counts_evaluation_rows_whose_vector_was_in_the_training_window
     log = SliceLog()
     window = next(iter(slice_windows(src, spec(nT=3, nE=1, stride=1), log)))
     slot = next(window.eval_slots())
-    assert slot.n_seen_in_train == 3
+    assert slot.n_seen_in_initial_train == 3
     row = next(r for r in log.window_rows if r["role"] == "eval")
-    assert row["n_seen_in_train"] == 3
+    assert row["n_seen_in_initial_train"] == 3
 
 
 # --- schemes and parameters -----------------------------------------------------------------

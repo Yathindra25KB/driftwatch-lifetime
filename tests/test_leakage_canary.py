@@ -34,7 +34,7 @@ from driftwatch.data.canary import (
     run_canary,
     shuffle_timestamps,
 )
-from driftwatch.data.constraints import C1Violation
+from driftwatch.data.constraints import C1Violation, ConstraintViolation
 from driftwatch.data.slicer import WindowSpec, _stack
 from driftwatch.data.synthetic import drifting_timeline
 from driftwatch.data.tables import FixedWidthScheme, TableSource
@@ -114,13 +114,13 @@ def test_without_drift_the_canary_has_nothing_to_move():
     assert abs(result.aut_shuffled - result.aut_true) < 0.1
 
 
-def _leak_everything(monkeypatch) -> None:
-    """Make the slicer train on the window's evaluation slots too."""
+def _leak_everything(monkeypatch: pytest.MonkeyPatch, n_future: int | None = None) -> None:
+    """Make the slicer train on the window's first ``n_future`` evaluation slots (all if None)."""
     original = slicer._train_rows
 
     def leaky(source, planned, plan):
         rows = list(original(source, planned, plan))
-        future = [source.load_slot(ref.slot_id) for ref in plan.eval]
+        future = [source.load_slot(ref.slot_id) for ref in plan.eval[:n_future]]
         last = rows[-1]
         parts = [last, *future]
         rows[-1] = slicer.SlotRows(
@@ -136,21 +136,56 @@ def _leak_everything(monkeypatch) -> None:
     monkeypatch.setattr(slicer, "_train_rows", leaky)
 
 
-def test_the_slicers_own_c1_check_stops_a_leak_before_the_canary_runs(monkeypatch):
+def _silence_checks(monkeypatch) -> None:
+    monkeypatch.setattr(constraints, "check_c1", lambda train_ts, eval_ts: None)
+    monkeypatch.setattr(constraints, "check_c2", lambda ts, y, start, end: None)
+
+
+def test_the_slicers_own_checks_stop_a_leak_before_the_canary_runs(monkeypatch):
     _leak_everything(monkeypatch)
+    table, X = drifting_timeline(n_slots=16, rows_per_slot=300, drift=1.0, seed=7)
+    with pytest.raises(ConstraintViolation):  # C2 on the training slots fires first
+        run_canary(source_for(table, X), SPEC, seed=0)
+
+
+def test_c1_alone_also_stops_a_leak_when_the_training_window_check_is_silenced(monkeypatch):
+    _leak_everything(monkeypatch)
+    monkeypatch.setattr(constraints, "check_c2", lambda ts, y, start, end: None)
     table, X = drifting_timeline(n_slots=16, rows_per_slot=300, drift=1.0, seed=7)
     with pytest.raises(C1Violation):
         run_canary(source_for(table, X), SPEC, seed=0)
 
 
-def test_the_canary_still_flags_a_leak_when_the_c1_check_has_been_disabled(monkeypatch):
-    """Second line of defence: leak the future AND silence C1, and AUT gives it away."""
+def test_the_canary_still_flags_a_leak_when_the_checks_have_been_disabled(monkeypatch):
+    """Last line of defence: leak the future AND silence C1 and C2, and AUT gives it away."""
     _leak_everything(monkeypatch)
-    monkeypatch.setattr(constraints, "check_c1", lambda train_ts, eval_ts: None)
+    _silence_checks(monkeypatch)
     table, X = drifting_timeline(n_slots=16, rows_per_slot=300, drift=1.0, seed=7)
     result = run_canary(source_for(table, X), SPEC, seed=0)
     assert result.verdict == "NO_GAP"  # true-time AUT is already at the random-split level
     assert result.aut_true > 0.9 and result.leakage_warning is True
+
+
+def test_canary_sensitivity_to_partial_leaks_is_pinned_not_assumed(monkeypatch):
+    """Review finding 2: the canary only sees leaks big enough to close the gap.
+
+    Leaking 3 of 10 evaluation slots closes it (NO_GAP, which the script exits non-zero
+    on); leaking 1 raises AUT but leaves the gap open, so only C1/C2 and the oracle tests
+    catch that. The test records the limit so nobody reads PASS as "no leak at all".
+    """
+    table, X = drifting_timeline(n_slots=16, rows_per_slot=300, drift=1.0, seed=7)
+    clean = run_canary(source_for(table, X), SPEC, seed=0)
+    with monkeypatch.context() as mp:
+        _silence_checks(mp)
+        _leak_everything(mp, n_future=1)
+        small = run_canary(source_for(table, X), SPEC, seed=0)
+    assert small.aut_true > clean.aut_true + 0.02, "a leak must raise the true-time AUT"
+    assert small.verdict == "PASS"  # the limit: undetected by the canary alone
+    with monkeypatch.context() as mp:
+        _silence_checks(mp)
+        _leak_everything(mp, n_future=3)
+        large = run_canary(source_for(table, X), SPEC, seed=0)
+    assert large.verdict == "NO_GAP" and large.leakage_warning is True
 
 
 def test_a_canary_with_no_window_is_an_error_not_a_pass():
@@ -162,7 +197,9 @@ def test_a_canary_with_no_window_is_an_error_not_a_pass():
 # --- the script -----------------------------------------------------------------------------
 
 
-def _write_drifting_bodmas_raw(raw_root: Path, *, n_weeks: int = 10, per_week: int = 120) -> None:
+def _write_drifting_bodmas_raw(
+    raw_root: Path, *, n_weeks: int = 10, per_week: int = 120, drift: float = 1.0
+) -> None:
     """Raw BODMAS-format files (same layout as the real download) with planted drift."""
     table, X = drifting_timeline(
         n_slots=n_weeks,
@@ -171,6 +208,7 @@ def _write_drifting_bodmas_raw(raw_root: Path, *, n_weeks: int = 10, per_week: i
         n_features=2381,
         width_days=7,
         start="2019-08-26",
+        drift=drift,
         seed=11,
     )
     raw = raw_root / "raw" / "bodmas"

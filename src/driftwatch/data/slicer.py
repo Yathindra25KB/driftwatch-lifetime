@@ -29,6 +29,7 @@ import hashlib
 import json
 import logging
 import platform
+import zlib
 from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -45,6 +46,8 @@ from driftwatch.data.constraints import C3Result
 from driftwatch.data.loaders import PublicSlot
 
 log = logging.getLogger(__name__)
+
+_PUBLIC_ORDER_TAG = 0x70756231  # separates the public-order draw from the C3 draw
 
 SKIP_GAP, SKIP_PARTIAL, SKIP_SIZE_GATE = "gap", "partial", "size_gate"
 SKIP_RUN_SHORT = "shorter_than_window"
@@ -97,14 +100,18 @@ class WindowSpec:
 
 @dataclass(frozen=True)
 class RowFilter:
-    """A named, label-free rule that marks rows to exclude (True = exclude)."""
+    """A named, label-free rule that marks rows to exclude (True = exclude).
+
+    The rule only ever sees the columns it declares, so a filter cannot read labels (or
+    family, VT counts, categories) unless it names them, and a reviewer can see that it does.
+    """
 
     name: str
     fn: Callable[[pd.DataFrame], Any]
     columns: tuple[str, ...] = ()
 
     def __call__(self, meta: pd.DataFrame) -> np.ndarray:
-        return np.asarray(self.fn(meta), dtype=bool)
+        return np.asarray(self.fn(meta.loc[:, list(self.columns)]), dtype=bool)
 
 
 # --- data model -----------------------------------------------------------------------------
@@ -127,7 +134,8 @@ class SlotInfo:
     n_malware: int
     n_benign: int
     n_excluded: int = 0
-    structural: str = ""  # "" or "partial" (a base unit of the slot is missing)
+    structural: str = ""  # "" or "partial" (a base unit of the slot is missing or emptied)
+    n_naive_ts: int = 0  # kept rows whose timestamp was published without a UTC offset
 
 
 @dataclass(frozen=True, eq=False)
@@ -165,6 +173,7 @@ class PlannedSlot:
     structural: str
     usable: bool
     skip_reason: str  # "" when usable
+    n_naive_ts: int = 0
 
 
 @dataclass(frozen=True)
@@ -230,6 +239,7 @@ def plan_slots(source: SlotSource, spec: WindowSpec) -> list[PlannedSlot]:
                 structural=info.structural,
                 usable=reason == "",
                 skip_reason=reason,
+                n_naive_ts=info.n_naive_ts,
             )
         )
     return planned
@@ -271,7 +281,8 @@ def plan_windows(planned: list[PlannedSlot], spec: WindowSpec) -> Schedule:
             rest = run[start + spec.nT :]
             evaluation = tuple(p.ref for p in (rest if spec.nE is None else rest[: spec.nE]))
             n_e = "all" if spec.nE is None else spec.nE
-            window_id = f"{train[0].slot_id}|T{spec.nT}|E{n_e}"
+            # The digest keeps results at another ratio, seed or gate from colliding.
+            window_id = f"{spec.digest()}|{train[0].slot_id}|T{spec.nT}|E{n_e}"
             windows.append(WindowPlan(window_id, segment, train, evaluation))
     skipped = tuple(p for p in planned if not p.usable)
     return Schedule(tuple(windows), skipped, tuple(skipped_runs))
@@ -346,11 +357,25 @@ class EvalSlot:
     ts: np.ndarray
     row_id: np.ndarray
     c3: C3Result
-    n_seen_in_train: int | None = None
+    perm: np.ndarray  # seeded, label-independent shuffle that defines the public order
+    n_seen_in_initial_train: int | None = None
 
     def public(self) -> PublicSlot:
-        """The label-free view (hard rule 4): features and opaque row ids only."""
-        return PublicSlot(self.dataset, self.ref.slot_id, self.X, self.row_id.copy())
+        """The label-free view (hard rule 4): features and opaque handles only.
+
+        Rows come in a seeded shuffle that depends on ``(seed, slot id)`` and nothing else,
+        and the ids are the handles ``0..n-1`` of that order. Neither the order nor the ids
+        say anything about time rank, malware drops, source file or class. The features are a
+        copy, so a consumer cannot alter what is later scored. Only the label queue and the
+        metrics map handles back, with :meth:`resolve`.
+        """
+        X = None if self.X is None else self.X[self.perm]
+        handles = np.arange(len(self.perm), dtype=np.int64)
+        return PublicSlot(self.dataset, self.ref.slot_id, X, handles)
+
+    def resolve(self, handles: Any) -> np.ndarray:
+        """Positions in this slot (indexing ``y``, ``ts``, ``row_id``) of public handles."""
+        return self.perm[np.asarray(handles, dtype=np.int64)]
 
 
 def _load(source: SlotSource, planned: dict[str, PlannedSlot], ref: SlotRef) -> SlotRows:
@@ -385,6 +410,8 @@ class Window:
         train_fv = self.train.fv_hash
         for ref in self.plan.eval:
             rows = _load(self._source, self._planned, ref)
+            # C2 on the whole raw slot first: a stray row must not escape by being subsampled.
+            constraints.check_c2(rows.ts, rows.y, ref.start, ref.end)
             kept = constraints.subsample_malware(
                 rows.y, self.spec.target_ratio, self.spec.seed, ref.slot_id
             )
@@ -395,6 +422,8 @@ class Window:
             seen = None
             if train_fv is not None and rows.fv_hash is not None:
                 seen = int(seen_before_mask(rows.fv_hash[kept], train_fv).sum())
+            entropy = [self.spec.seed, zlib.crc32(ref.slot_id.encode("utf-8")), _PUBLIC_ORDER_TAG]
+            perm = np.random.default_rng(np.random.SeedSequence(entropy)).permutation(len(y))
             slot = EvalSlot(
                 ref=ref,
                 dataset=self.dataset,
@@ -403,7 +432,20 @@ class Window:
                 ts=ts,
                 row_id=row_id,
                 c3=c3,
-                n_seen_in_train=seen,
+                perm=perm,
+                n_seen_in_initial_train=seen,
+            )
+            log.info(
+                "C3 %s: malware %d -> %d, benign %d -> %d, %.1f%% of malware discarded, "
+                "ratio %.4f (%s)",
+                ref.slot_id,
+                c3.n_malware_before,
+                c3.n_malware_after,
+                c3.n_benign_before,
+                c3.n_benign_after,
+                100 * c3.share_malware_discarded,
+                c3.achieved_ratio,
+                c3.status,
             )
             if self._log is not None:
                 self._log.record_eval(self.plan, slot)
@@ -430,7 +472,12 @@ def _open_window(
     for ref in refs:
         if not planned[ref.slot_id].usable:
             raise SlicerError(f"{plan.window_id}: {ref.slot_id} failed the gate but is in a window")
-    train = TrainWindow(_train_rows(source, planned, plan))
+    rows = _train_rows(source, planned, plan)
+    for ref, slot_rows in zip(plan.train, rows, strict=True):
+        # Training rows must belong to their slot's window too; "no gap spanned" would
+        # otherwise rest on how the cache was routed.
+        constraints.check_c2(slot_rows.ts, slot_rows.y, ref.start, ref.end)
+    train = TrainWindow(rows)
     if slicelog is not None:
         slicelog.record_train(plan, train)
     return Window(plan, source.name, train, spec, source, planned, slicelog)
@@ -506,6 +553,7 @@ class SliceLog:
         "n_malware",
         "n_benign",
         "n_excluded",
+        "n_naive_ts",
         "n_malware_kept",
         "structural",
         "usable",
@@ -527,7 +575,7 @@ class SliceLog:
         "achieved_ratio",
         "target_ratio",
         "c3_status",
-        "n_seen_in_train",
+        "n_seen_in_initial_train",
     )
 
     def __init__(self) -> None:
@@ -535,7 +583,7 @@ class SliceLog:
         self.window_rows: list[dict[str, Any]] = []
         self.skipped_runs: list[dict[str, Any]] = []
 
-    def record_plan(self, planned: list[PlannedSlot], schedule: Schedule) -> None:
+    def record_plan(self, planned: list[PlannedSlot], schedule: Schedule | None) -> None:
         self.slot_rows = [
             {
                 "slot_id": p.ref.slot_id,
@@ -546,6 +594,7 @@ class SliceLog:
                 "n_malware": p.n_malware,
                 "n_benign": p.n_benign,
                 "n_excluded": p.n_excluded,
+                "n_naive_ts": p.n_naive_ts,
                 "n_malware_kept": p.n_malware_kept,
                 "structural": p.structural,
                 "usable": p.usable,
@@ -553,7 +602,8 @@ class SliceLog:
             }
             for p in planned
         ]
-        self.skipped_runs = [dataclasses.asdict(r) for r in schedule.skipped_runs]
+        runs = [] if schedule is None else schedule.skipped_runs
+        self.skipped_runs = [dataclasses.asdict(r) for r in runs]
 
     def record_train(self, plan: WindowPlan, train: TrainWindow) -> None:
         for rows in train.slots:
@@ -575,7 +625,7 @@ class SliceLog:
                     "achieved_ratio": n_mal / len(rows) if len(rows) else None,
                     "target_ratio": None,
                     "c3_status": "raw",
-                    "n_seen_in_train": None,
+                    "n_seen_in_initial_train": None,
                 }
             )
 
@@ -598,7 +648,7 @@ class SliceLog:
                 "achieved_ratio": c3.achieved_ratio,
                 "target_ratio": c3.target_ratio,
                 "c3_status": c3.status,
-                "n_seen_in_train": slot.n_seen_in_train,
+                "n_seen_in_initial_train": slot.n_seen_in_initial_train,
             }
         )
 

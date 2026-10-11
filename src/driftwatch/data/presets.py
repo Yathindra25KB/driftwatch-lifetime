@@ -20,6 +20,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 
 from driftwatch.data.cache import load_manifest
 from driftwatch.data.loaders import CachedDataset
@@ -84,6 +85,9 @@ class CachedSource:
         }
         self._table: list[SlotInfo] | None = None
         self._excluded = {"malware": 0, "benign": 0}
+        first_unit = self.data.units[0]
+        schema = pq.read_schema(self.data.layout.unit_dir(dataset, first_unit) / "meta.parquet")
+        self._has_naive_flag = "ts_naive" in schema.names
         self._manifest_hash = load_manifest(self.data.layout.manifest).get("content_hash")
 
     # -- planning --------------------------------------------------------------------------
@@ -95,11 +99,14 @@ class CachedSource:
 
     def _count(self, slot: Any) -> SlotInfo:
         columns = ["label", *(self.exclude.columns if self.exclude is not None else ())]
-        n_rows = n_mal = 0
-        n_excluded = 0
+        if self._has_naive_flag:
+            columns.append("ts_naive")
+        n_rows = n_mal = n_excluded = n_naive = 0
+        emptied_unit = False
         for unit in slot.units:
-            meta = self.data.unit_meta(unit, columns)
+            meta = self.data.unit_meta(unit, list(dict.fromkeys(columns)))
             label = meta["label"].to_numpy()
+            # The rule is handed only the columns it declared (RowFilter), never the labels.
             drop = (
                 self.exclude(meta) if self.exclude is not None else np.zeros(len(meta), dtype=bool)
             )
@@ -107,15 +114,21 @@ class CachedSource:
             self._excluded["benign"] += int((drop & (label == 0)).sum())
             n_excluded += int(drop.sum())
             kept = label[~drop]
+            emptied_unit = emptied_unit or kept.size == 0
             n_rows += int(kept.size)
             n_mal += int((kept == 1).sum())
+            if self._has_naive_flag:
+                n_naive += int((meta["ts_naive"].to_numpy(dtype=bool) & ~drop).sum())
+        # A base unit that the filter emptied leaves half a window of nothing: partial.
+        partial = slot.is_partial or (n_rows > 0 and emptied_unit)
         return SlotInfo(
             ref=self._refs[slot.slot_id],
             n_rows=n_rows,
             n_malware=n_mal,
             n_benign=n_rows - n_mal,
             n_excluded=n_excluded,
-            structural="partial" if slot.is_partial else "",
+            structural="partial" if partial else "",
+            n_naive_ts=n_naive,
         )
 
     # -- loading ---------------------------------------------------------------------------
@@ -126,7 +139,7 @@ class CachedSource:
         meta = data.meta
         X = data.X
         if self.exclude is not None and len(meta):
-            drop = self.exclude(meta)
+            drop = self.exclude(meta)  # sees only its declared columns
             if drop.any():
                 keep = np.flatnonzero(~drop)
                 X, meta = X[keep], meta.iloc[keep].reset_index(drop=True)

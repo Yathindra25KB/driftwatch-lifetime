@@ -6,8 +6,11 @@ at a time. Row order is deterministic: units are taken in time order, and rows i
 are sorted by (timestamp, sha256).
 
 `SlotData` holds everything, labels included, because the label queue (sim/queue.py) and
-the metrics need them. Selectors, policies and monitors must receive only
-`SlotData.public()`: the features and row ids (CLAUDE.md hard rule 4). The metadata is not
+the metrics need them. Selectors, policies and monitors must receive only a public view:
+the features and ids (CLAUDE.md hard rule 4). Use `EvalSlot.public()` from the slicer for
+that: its handles and row order are opaque. `SlotData.public()` here keeps the dataset's
+own `row_id`, which on BODMAS is a time rank and on LAMDA encodes the source file, so it is
+for loader-level code only (Phase 3 leakage review, finding 1). The metadata is not
 safe to hand over. `label`, `family`, `vt_count`, `category` and `year_month` are labels or
 derived from them. On BODMAS, `ts` and its flags also give the class away: benign
 timestamps are mostly midnight dates, and malware timestamps never are (Phase 2 leakage

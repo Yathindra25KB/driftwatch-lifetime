@@ -30,6 +30,7 @@ SUITES = [
     "tests/test_slicer.py",
     "tests/test_slicer_properties.py",
     "tests/test_slicer_cached.py",
+    "tests/test_slicer_review_fixes.py",
 ]
 
 

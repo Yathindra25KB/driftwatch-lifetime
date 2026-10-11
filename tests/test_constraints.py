@@ -237,6 +237,24 @@ def test_subsample_is_deterministic_and_slot_scoped():
     assert not np.array_equal(a, subsample_malware(y, 0.10, seed=1, slot_id="2w:2019-09-23"))
 
 
+@pytest.mark.parametrize("seed", range(8))
+def test_the_malware_draw_is_not_biased_toward_early_or_late_rows(seed):
+    """check_c3 only counts, so uniformity of the draw is pinned here (review finding 6).
+
+    Malware sits evenly through a time-ordered slot. A draw that keeps the oldest (or the
+    newest) malware would shift the mean position of the kept rows far from the middle.
+    """
+    y = np.zeros(2000, dtype=np.int8)
+    y[::3] = 1  # 667 malware spread over the whole slot
+    kept = subsample_malware(y, ratio=0.10, seed=seed, slot_id="month:2020-03")
+    malware_kept = kept[y[kept] == 1]
+    assert len(malware_kept) == target_malware_count(int((y == 0).sum()), 0.10)
+    position = malware_kept / len(y)
+    assert 0.40 < position.mean() < 0.60
+    thirds = np.histogram(position, bins=3, range=(0, 1))[0] / len(position)
+    assert (thirds > 0.20).all(), f"draw concentrated in one part of the slot: {thirds}"
+
+
 def test_lower_ratio_selection_is_nested_in_the_higher_ratio_selection():
     y = labels(600, 1800)
     ten = subsample_malware(y, 0.10, seed=3, slot_id="month:2021-06")

@@ -5,11 +5,16 @@ random-split score (driftwatch.data.canary). PASS: shuffling closes at least hal
 between the time-aware AUT and the random-split F1. FAIL: it does not, so treat the slicer
 as broken and fix it first. NO_GAP: the time-aware AUT is already at the random-split level
 (nothing decays, or something leaks; an AUT above 0.9 is flagged as a leakage warning).
+NO_GAP is inconclusive and exits non-zero: it never counts toward gate G1.
 
     uv run python scripts/leakage_canary.py bodmas --nT 3 --nE 6
     uv run python scripts/leakage_canary.py lamda --nT 4 --nE 12 --max-windows 3
 
-Exit code: 0 for PASS or NO_GAP, 1 for FAIL, 2 when the canary cannot be computed.
+Exit code: 0 PASS, 1 FAIL, 2 cannot be computed, 3 NO_GAP (inconclusive: not a pass).
+
+Limit: the canary sees a leak only when it closes the gap between the time-aware AUT and
+the random-split F1. A small leak that leaves the gap above the band is caught by C1-C3
+and the oracle tests, not by this script.
 
 Phase 4 runs this on the real caches with the windows of the accepted ADR-0005. It was
 deliberately not run on real data before that ADR was accepted: windows must not be chosen
@@ -98,11 +103,14 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  AUT with shuffled timestamps {result.aut_shuffled:.3f}")
     print(f"  random-split F1              {result.f1_random:.3f}")
     closure = "n/a" if result.closure is None else f"{result.closure:.2f}"
-    print(f"  gap {result.gap:.3f}, closure {closure}  ->  {result.verdict}")
+    label = "INCONCLUSIVE (NO_GAP)" if result.verdict == "NO_GAP" else result.verdict
+    print(f"  gap {result.gap:.3f}, closure {closure}  ->  {label}")
+    if result.verdict == "NO_GAP":
+        print("  no gap to close: nothing decays, or something leaks. This is not a pass.")
     if result.leakage_warning:
         print("  WARNING: time-aware AUT above 0.9: possible leakage (guide section 9)")
     print(f"  wrote {out}")
-    return 1 if result.verdict == "FAIL" else 0
+    return {"PASS": 0, "FAIL": 1, "NO_GAP": 3}[result.verdict]
 
 
 if __name__ == "__main__":

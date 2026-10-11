@@ -86,7 +86,18 @@ def probe_same_seed_same_rows() -> None:
     assert run() == run(), "the same seed gave different evaluation rows"
 
 
+def probe_public_view_is_opaque() -> None:
+    import test_slicer_review_fixes as rf
+
+    rf.test_f1_public_row_order_and_handles_carry_no_class_signal()
+    rf.test_f1_public_features_follow_their_handles_and_resolve_to_true_rows()
+
+
 DETECTORS: dict[str, tuple[Callable[[], None], ...]] = {
+    "oldest_malware": (
+        lambda: tc.test_the_malware_draw_is_not_biased_toward_early_or_late_rows(0),
+    ),
+    "public_ids_are_row_ids": (probe_public_view_is_opaque,),
     "shift_boundary": (probe_windows_against_oracle,),
     "shuffle_timestamps": (probe_windows_against_oracle,),
     "leak_one_sample": (probe_windows_against_oracle,),
@@ -118,7 +129,7 @@ def test_mutant_is_caught(name, monkeypatch):
     MUTANTS[name].apply(monkeypatch)
     # test_constraints imported the checks by name; point it at the mutated ones, as the
     # subprocess plugin does by patching before that import.
-    for attr in ("check_c1", "check_c2", "check_c3", "subsample_malware"):
+    for attr in ("check_c1", "check_c2", "check_c3", "subsample_malware", "target_malware_count"):
         monkeypatch.setattr(tc, attr, getattr(constraints, attr))
     caught = []
     for detector in DETECTORS[name]:

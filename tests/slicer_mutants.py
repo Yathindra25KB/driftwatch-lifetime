@@ -166,6 +166,29 @@ def _c3_unseeded(mp: pytest.MonkeyPatch) -> None:
     mp.setattr(constraints, "subsample_malware", unseeded)
 
 
+def _oldest_malware(mp: pytest.MonkeyPatch) -> None:
+    """Seed-dependent in name only: the draw keeps the oldest malware of the slot."""
+
+    def biased(y, ratio, seed, slot_id):
+        y = np.asarray(y)
+        target = constraints.target_malware_count(int((y == 0).sum()), ratio)
+        malware = np.flatnonzero(y == 1)
+        if malware.size <= target:
+            return np.arange(y.size)
+        return np.sort(np.concatenate([np.flatnonzero(y == 0), malware[:target]]))
+
+    mp.setattr(constraints, "subsample_malware", biased)
+
+
+def _public_ids_are_row_ids(mp: pytest.MonkeyPatch) -> None:
+    """The label-free view hands out true row ids in time order (the reviewed behaviour)."""
+
+    def transparent(self):
+        return slicer.PublicSlot(self.dataset, self.ref.slot_id, self.X, self.row_id.copy())
+
+    mp.setattr(slicer.EvalSlot, "public", transparent)
+
+
 def _no_subsampling(mp: pytest.MonkeyPatch) -> None:
     mp.setattr(constraints, "subsample_malware", lambda y, ratio, seed, slot_id: np.arange(len(y)))
 
@@ -185,5 +208,7 @@ MUTANTS: dict[str, Mutant] = {
         Mutant("c3_drop_benign", "C3 subsamples malware only", _c3_drop_benign),
         Mutant("c3_unseeded", "C3 draw is seeded and slot-scoped", _c3_unseeded),
         Mutant("no_subsampling", "C3 reaches the target ratio", _no_subsampling),
+        Mutant("oldest_malware", "C3 draw is uniform over the slot", _oldest_malware),
+        Mutant("public_ids_are_row_ids", "public view is opaque", _public_ids_are_row_ids),
     )
 }
