@@ -71,6 +71,11 @@ class LightGBMDetector(Detector):
     def _params(self) -> dict[str, Any]:
         return {"profile": self.profile, "n_jobs": self.n_jobs}
 
+    @property
+    def seed_sensitive(self) -> bool:
+        p = PROFILES[self.profile]
+        return p["subsample"] < 1.0 or p["colsample_bytree"] < 1.0  # bagging uses the seed
+
     def _fit(self, X: Any, y: np.ndarray) -> dict[str, Any]:
         self.clf_ = LGBMClassifier(
             **PROFILES[self.profile],

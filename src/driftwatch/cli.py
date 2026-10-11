@@ -1,7 +1,8 @@
 """Command-line entry point `driftwatch`.
 
-Phase 2 adds `data download|build|verify|inventory`. Later phases add `run` (Phase 4),
-`grid` (Phase 6) and `reproduce table1` (Phase 7).
+Phase 2 adds `data download|build|verify|inventory`, Phase 3 `data slice` and Phase 4
+`run <config.yaml>` (the E0 baseline). Later phases add `grid` (Phase 6) and
+`reproduce table1` (Phase 7).
 """
 
 import argparse
@@ -61,6 +62,13 @@ def build_parser() -> argparse.ArgumentParser:
     sl.add_argument("--seed", type=int, default=0)
     sl.add_argument("--memory-cap-gb", type=float, default=1.5)
     sl.add_argument("--out", type=Path, default=Path("results") / "slicing")
+
+    run = sub.add_parser("run", help="run one YAML config (E0 baseline) and store its results")
+    run.add_argument("config", type=Path, help="a configs/*.yaml file")
+    run.add_argument("--root", type=Path, default=Path("data"), help="data root (default data)")
+    run.add_argument("--out", type=Path, help="results root (default: the config's output)")
+    run.add_argument("--memory-cap-gb", type=float, default=1.5)
+    run.add_argument("--overwrite", action="store_true", help="replace a finished run")
     return parser
 
 
@@ -143,6 +151,30 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "data":
         logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
         return _run_data(args)
+    if args.command == "run":
+        from driftwatch.sim.config import ConfigError
+        from driftwatch.sim.runner import run_file
+
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+        try:
+            summary = run_file(
+                args.config,
+                data_root=args.root,
+                out_root=args.out,
+                memory_cap_gb=args.memory_cap_gb,
+                overwrite=args.overwrite,
+            )
+        except (ConfigError, FileExistsError) as exc:
+            print(f"driftwatch run: {exc}", file=sys.stderr)
+            return 2
+        print(
+            f"{summary.n_windows} window rows, {summary.n_slot_rows} slot rows, "
+            f"{summary.n_prediction_rows} predictions, {summary.wall_s:.1f} s\n"
+            f"config hash {summary.config_hash}\n"
+            f"predictions sha256 {summary.predictions_sha256}\n"
+            f"results in {summary.dir}"
+        )
+        return 0
     return 0
 
 

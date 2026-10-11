@@ -47,6 +47,10 @@ class LogisticDetector(Detector):
     def _params(self) -> dict[str, Any]:
         return {"C": self.C, "max_iter": self.max_iter, "tol": self.tol, "scaling": SCALING}
 
+    @property
+    def seed_sensitive(self) -> bool:
+        return False  # lbfgs on a convex objective: the seed is not used
+
     @staticmethod
     def _prepare(X: Any) -> Any:
         if sp.issparse(X):

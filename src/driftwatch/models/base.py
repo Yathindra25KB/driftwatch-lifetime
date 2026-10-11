@@ -97,6 +97,14 @@ class Detector(ABC):
             raise RuntimeError(f"{self.name} returned scores of shape {p.shape}")
         return p
 
-    def predict(self, X: Any, window_id: str | None = None) -> np.ndarray:
+    def decide(self, proba: np.ndarray) -> np.ndarray:
         """Malware (1) when P(malware) is strictly above the fixed threshold."""
-        return (self.predict_proba(X, window_id) > self.threshold).astype(np.int8)
+        return (np.asarray(proba) > self.threshold).astype(np.int8)
+
+    def predict(self, X: Any, window_id: str | None = None) -> np.ndarray:
+        return self.decide(self.predict_proba(X, window_id))
+
+    @property
+    def seed_sensitive(self) -> bool:
+        """False when the fit cannot depend on the seed, so one fit serves every seed."""
+        return True
