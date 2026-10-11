@@ -603,9 +603,17 @@ class SliceLog:
         )
 
     def write(
-        self, out_dir: Path | str, *, spec: WindowSpec, source: SlotSource
+        self,
+        out_dir: Path | str,
+        *,
+        spec: WindowSpec,
+        source: SlotSource,
+        extra: dict[str, Any] | None = None,
     ) -> dict[str, Path]:
-        """Write slot_manifest.csv, window_manifest.csv and slicing_run.json under out_dir."""
+        """Write slot_manifest.csv, window_manifest.csv and slicing_run.json under out_dir.
+
+        ``extra`` (wall-clock, peak memory, row counts) is stored under ``run``.
+        """
         from driftwatch.data.cache import code_version
 
         out = Path(out_dir)
@@ -635,6 +643,7 @@ class SliceLog:
                 "windows": int(windows["window_id"].nunique()) if len(windows) else 0,
             },
             "skipped_runs": self.skipped_runs,
+            "run": extra or {},
         }
         paths["run"].write_text(json.dumps(run, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return paths
