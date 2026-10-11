@@ -51,7 +51,11 @@ def test_baseline_table_has_one_row_per_model_variant_and_ratio(tool, run_dir: P
     row = base[(base["variant"] == "rolling") & (base["model"] == "lr")].iloc[0]
     assert row["n_seeds"] == 2 and row["n_windows"] == 4 and row["n_eval_slots"] == 6
     assert row["gap"] == pytest.approx(row["f1_random_split"] - row["a_aut_mean"])
-    assert row["gap_ci_low"] <= row["gap"] <= row["gap_ci_high"] or np.isnan(row["gap_ci_low"])
+    assert row["gap_window_min"] - 1e-9 <= row["gap"] <= row["gap_window_max"] + 1e-9
+    assert row["gap_ci_low"] <= row["gap_ci_high"]
+    assert row["gap_block_len"] == 3  # ceil(nE 6 / stride 2) windows
+    assert 0.0 < row["train_prior_min"] <= row["train_prior_max"] < 1.0
+    assert 0.0 < row["random_test_ratio"] <= 0.10 + 1e-9
     assert 0.0 <= row["share_below_target"] <= 1.0
     assert row["sanity_band"] == "[verify]"
     single = base[base["variant"] == "single_run"]
@@ -68,6 +72,25 @@ def test_a_aut_is_the_mean_of_per_seed_means_and_std_is_over_windows(tool, run_d
     assert row["a_aut_mean"] == pytest.approx(per_seed_mean.mean())
     assert row["a_aut_std"] == pytest.approx(per_seed_std.mean())
     assert row["a_aut_seed_sd"] == pytest.approx(per_seed_mean.std(ddof=1))
+
+
+def test_block_bootstrap_is_deterministic_and_wider_than_iid_for_trending_gaps(tool) -> None:
+    gaps = pd.DataFrame({"aut": np.linspace(0.9, 0.6, 12), "f1_random_split": [0.95] * 12})
+    a = tool._block_bootstrap_gap(gaps, block_len=4)
+    assert a == tool._block_bootstrap_gap(gaps, block_len=4)  # fixed seed
+    one = tool._block_bootstrap_gap(gaps, block_len=1)
+    assert a[1] - a[0] >= one[1] - one[0]  # dependence (a trend) widens the interval
+    assert a[0] <= (gaps.f1_random_split - gaps.aut).mean() <= a[1]
+    single = pd.DataFrame({"aut": [0.5], "f1_random_split": [0.6]})
+    assert np.isnan(tool._block_bootstrap_gap(single, 3)[0])
+
+
+def test_repeats_table_counts_window_slot_cells(tool, run_dir: Path) -> None:
+    table = tool.repeats_table({"bodmas": run_dir})
+    row = table.iloc[0]
+    assert row["window_slot_cells"] == 4 * 6  # four rolling windows of six evaluation slots
+    assert row["eval_rows"] > 0
+    assert pd.isna(row["share"])  # the synthetic table has no feature-vector hashes: unknown
 
 
 def test_pooled_comparator_is_reported_beside_the_headline(tool, run_dir: Path) -> None:

@@ -8,12 +8,19 @@ writes under ``reports/tables/``:
 
 - ``e0_baselines.csv``: one row per (dataset, model, variant, ratio). A-AUT is the mean over
   seeds of the per-seed mean of window AUTs, with the std over windows averaged over seeds
-  (sample std) and the spread of the per-seed means. The gap is the random-split F1 minus
-  A-AUT, with a 95% percentile bootstrap interval over windows (windows averaged over seeds
-  first; 2,000 draws, seed 0). Windows overlap, so the interval is a descriptive guide.
+  (sample std) and the spread of the per-seed means. Seeds are not independent replicates:
+  the logistic fit ignores the seed, so they differ only in the C3 malware draw and the
+  comparator's split. The gap is the random-split F1 minus A-AUT, with the range of
+  per-window gaps and a 95% moving-block bootstrap interval over windows (windows averaged
+  over seeds first, in time order; block length ceil(nE / stride) windows, which is how far
+  a slot's influence reaches; 2,000 draws, seed 0). The windows of one run overlap heavily,
+  so there are only a few independent blocks and the interval is descriptive.
 - ``e0_per_slot.csv``: F1, FPR, FNR and achieved ratio per evaluated slot, averaged over
   windows and seeds (the decay curve).
 - ``e0_canary.csv``: the real-data canary verdicts.
+- ``e0_repeats.csv``: evaluated rows whose feature vector also occurs in their training
+  window (rolling windows, logistic regression, first seed; counted per window-slot cell, so
+  a slot in several windows is counted once per window).
 
 Every number that reaches a report must have a row in docs/CLAIMS.md first.
 """
@@ -34,14 +41,27 @@ KEYS = ["dataset", "model", "variant", "ratio"]
 N_BOOT = 2000
 
 
-def _bootstrap_gap(per_window: pd.DataFrame) -> tuple[float, float]:
+def _block_bootstrap_gap(per_window: pd.DataFrame, block_len: int) -> tuple[float, float]:
+    """95% interval of the mean gap over windows by moving-block bootstrap (time order)."""
     d = (per_window["f1_random_split"] - per_window["aut"]).dropna().to_numpy()
-    if d.size < 2:
+    n = d.size
+    if n < 2:
         return float("nan"), float("nan")
+    b = int(min(max(block_len, 1), n))
     rng = np.random.default_rng(0)
-    draws = d[rng.integers(0, d.size, size=(N_BOOT, d.size))].mean(axis=1)
-    low, high = np.percentile(draws, [2.5, 97.5])
+    n_blocks = -(-n // b)  # ceil
+    starts = rng.integers(0, n - b + 1, size=(N_BOOT, n_blocks))
+    idx = (starts[:, :, None] + np.arange(b)[None, None, :]).reshape(N_BOOT, -1)[:, :n]
+    low, high = np.percentile(d[idx].mean(axis=1), [2.5, 97.5])
     return float(low), float(high)
+
+
+def _block_len(config: dict[str, Any], variant: str) -> int:
+    from driftwatch.metrics.aut import chow_stride
+
+    w = config["window"]
+    stride = chow_stride(w["nT"], w["nE"]) if variant == "rolling_chow" else w["stride"]
+    return max(1, -(-w["nE"] // stride))
 
 
 def _sd(values: pd.Series) -> float:
@@ -49,7 +69,7 @@ def _sd(values: pd.Series) -> float:
 
 
 def _baseline_rows(
-    dataset: str, windows: pd.DataFrame, slots: pd.DataFrame
+    dataset: str, windows: pd.DataFrame, slots: pd.DataFrame, config: dict[str, Any]
 ) -> list[dict[str, Any]]:
     rows = []
     for (model, variant, ratio), g in windows.groupby(["model", "variant", "ratio"], sort=True):
@@ -72,8 +92,12 @@ def _baseline_rows(
         f1_pooled = (
             float(by_seed["f1_pooled"].mean()) if by_seed["f1_pooled"].notna().any() else np.nan
         )
-        per_window = g.groupby("train_first")[["aut", "f1_random_split"]].mean()
-        low, high = _bootstrap_gap(per_window)
+        per_window = g.groupby("train_first")[["aut", "f1_random_split"]].mean().sort_index()
+        block = _block_len(config, variant)
+        low, high = _block_bootstrap_gap(per_window, block)
+        window_gap = (per_window["f1_random_split"] - per_window["aut"]).dropna()
+        prior = g["n_train_malware"] / g["n_train_rows"]
+        distinct = s.drop_duplicates("slot_id")
         first_seed = g[g["seed"] == g["seed"].min()]
         rows.append(
             {
@@ -91,8 +115,14 @@ def _baseline_rows(
                 "a_aut_seed_sd": _sd(by_seed["aut_mean"]),
                 "f1_random_split": f1_random,  # prior-matched comparator (headline)
                 "gap": f1_random - a_aut,
-                "gap_ci_low": low,
+                "gap_ci_low": low,  # moving-block bootstrap over windows
                 "gap_ci_high": high,
+                "gap_block_len": block,
+                "gap_window_min": float(window_gap.min()) if len(window_gap) else np.nan,
+                "gap_window_max": float(window_gap.max()) if len(window_gap) else np.nan,
+                "random_test_ratio": float(g["random_achieved_ratio"].mean()),
+                "train_prior_min": float(prior.min()),
+                "train_prior_max": float(prior.max()),
                 "f1_random_pooled": f1_pooled,  # pool-prior comparator (secondary)
                 "gap_pooled": f1_pooled - a_aut,
                 "f1_first_slot": float(g["f1_first"].mean()),
@@ -101,6 +131,10 @@ def _baseline_rows(
                 "mean_fnr": float(s["fnr"].mean()),
                 "mean_achieved_ratio": float(s["achieved_ratio"].mean()),
                 "share_below_target": float((s["c3_status"] == "below_target").mean()),
+                "n_distinct_slots": int(len(distinct)),
+                "share_distinct_slots_below_target": float(
+                    (distinct["c3_status"] == "below_target").mean()
+                ),
                 "n_drop_events": float(first_seed["n_drop_events"].sum()),
                 "n_recovered": float(first_seed["n_recovered"].sum()),
                 "fit_seconds_median": float(g["fit_seconds"].median()),
@@ -121,7 +155,8 @@ def build_tables(run_dirs: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame]
     for dataset, directory in run_dirs.items():
         windows = pd.read_parquet(Path(directory) / "windows.parquet")
         slots = pd.read_parquet(Path(directory) / "slots.parquet")
-        base.extend(_baseline_rows(dataset, windows, slots))
+        config = json.loads((Path(directory) / "run.json").read_text(encoding="utf-8"))["config"]
+        base.extend(_baseline_rows(dataset, windows, slots, config))
         agg = (
             slots.assign(below=(slots["c3_status"] == "below_target").astype(float))
             .groupby(["model", "variant", "ratio", "slot_id"], as_index=False)
@@ -139,6 +174,27 @@ def build_tables(run_dirs: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame]
         per_slot.append(agg.sort_values(["model", "variant", "ratio", "slot_index"]))
     table = pd.DataFrame(base).sort_values(KEYS).reset_index(drop=True)
     return table, pd.concat(per_slot, ignore_index=True)
+
+
+def repeats_table(run_dirs: dict[str, Path]) -> pd.DataFrame:
+    """Evaluated rows that repeat a feature vector of their training window (time-aware path)."""
+    rows = []
+    for dataset, directory in run_dirs.items():
+        s = pd.read_parquet(Path(directory) / "slots.parquet")
+        s = s[(s["variant"] == "rolling") & (s["model"] == s["model"].iloc[0])]
+        s = s[s["seed"] == s["seed"].min()]
+        n, seen = int(s["n"].sum()), s["n_seen_in_initial_train"]
+        rows.append(
+            {
+                "dataset": dataset,
+                "variant": "rolling",
+                "window_slot_cells": int(len(s)),
+                "eval_rows": n,
+                "repeat_rows": int(seen.sum()) if seen.notna().all() else None,
+                "share": float(seen.sum() / n) if seen.notna().all() else None,
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def canary_table(paths: Iterable[Path]) -> pd.DataFrame:
@@ -228,6 +284,7 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(f"no finished run under {args.results}")
     base, per_slot = build_tables(runs)
     args.out.mkdir(parents=True, exist_ok=True)
+    repeats_table(runs).to_csv(args.out / "e0_repeats.csv", index=False, lineterminator="\n")
     base.round(4).to_csv(args.out / "e0_baselines.csv", index=False, lineterminator="\n")
     per_slot.round(4).to_csv(args.out / "e0_per_slot.csv", index=False, lineterminator="\n")
     canaries = args.canary or sorted((ROOT / "results" / "canary").glob("*-adr0005.json"))
