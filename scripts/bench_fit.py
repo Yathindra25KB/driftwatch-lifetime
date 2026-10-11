@@ -169,6 +169,7 @@ def _random_split_row(cfg: RunConfig, source: Any, meta: dict[str, Any]) -> dict
         "train_first": big["first_slot"],
         "train_last": big["last_slot"],
         "n_rows": big["n_rows"],  # pooled rows of the window
+        "n_malware": None,
         "model": "random-split step (all configured models)",
         "fit_median_s": seconds,
         "fit_max_s": seconds,
