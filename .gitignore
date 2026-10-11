@@ -1,0 +1,37 @@
+# Data and results are never committed: feature files, caches and per-slot
+# predictions stay local. Only the data manifest is tracked (from Phase 2).
+/data/*
+!/data/manifest.json
+/results/
+
+# Python build and environment
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Secrets and environment files
+.env
+.env.*
+secrets/
+*.pem
+*.key
+
+# Claude Code personal files (shared settings live in .claude/settings.json)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

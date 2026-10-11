@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/*.pfx)",
+      "Read(**/id_rsa)",
+      "Read(**/id_ecdsa)",
+      "Read(**/id_ed25519)",
+      "Read(**/.netrc)",
+      "Read(**/.git-credentials)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gh/**)",
+      "Read(//**/.env)",
+      "Read(//**/.env.*)",
+      "Edit(/data/**)",
+      "Edit(/docs/source/**)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "PowerShell(git push *)",
+      "Bash(curl *)",
+      "PowerShell(curl *)",
+      "Bash(wget *)",
+      "PowerShell(wget *)",
+      "PowerShell(Invoke-WebRequest *)",
+      "PowerShell(Invoke-RestMethod *)",
+      "PowerShell(Start-BitsTransfer *)",
+      "PowerShell(curl.exe *)",
+      "PowerShell(wget.exe *)",
+      "Bash(uv publish *)",
+      "PowerShell(uv publish *)",
+      "Bash(twine *)",
+      "PowerShell(twine *)",
+      "Bash(gh repo create *)",
+      "PowerShell(gh repo create *)",
+      "Bash(gh repo edit *)",
+      "PowerShell(gh repo edit *)",
+      "Bash(gh repo delete *)",
+      "PowerShell(gh repo delete *)",
+      "Bash(gh release *)",
+      "PowerShell(gh release *)",
+      "Bash(gh pr create *)",
+      "PowerShell(gh pr create *)",
+      "Bash(gh api *)",
+      "PowerShell(gh api *)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.claude/hooks/**)"
+    ],
+    "allow": [
+      "Bash(uv sync *)",
+      "PowerShell(uv sync *)",
+      "Bash(uv run pytest *)",
+      "PowerShell(uv run pytest *)",
+      "Bash(uv run ruff *)",
+      "PowerShell(uv run ruff *)",
+      "Bash(uv run driftwatch *)",
+      "PowerShell(uv run driftwatch *)",
+      "Bash(uv run python scripts/check_guardrails.py *)",
+      "PowerShell(uv run python scripts/check_guardrails.py *)",
+      "Bash(git status *)",
+      "PowerShell(git status *)",
+      "Bash(git diff *)",
+      "PowerShell(git diff *)",
+      "Bash(git log *)",
+      "PowerShell(git log *)",
+      "Bash(git show *)",
+      "PowerShell(git show *)",
+      "WebFetch(domain:code.claude.com)",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:test.pypi.org)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 15,
+            "command": "uv run -q --project \"$CLAUDE_PROJECT_DIR\" --no-sync python \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.py\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 60,
+            "command": "uv run -q --project \"$CLAUDE_PROJECT_DIR\" --no-sync python \"$CLAUDE_PROJECT_DIR/.claude/hooks/format.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 150,
+            "command": "uv run -q --project \"$CLAUDE_PROJECT_DIR\" --no-sync python \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_gate.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 15,
+            "command": "uv run -q --project \"$CLAUDE_PROJECT_DIR\" --no-sync python \"$CLAUDE_PROJECT_DIR/.claude/hooks/reinject.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
