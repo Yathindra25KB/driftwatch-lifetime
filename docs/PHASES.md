@@ -8,7 +8,7 @@ Status, evidence, commit and the hours the researcher reports, for every phase a
 |---|---|---|---|---|---|---|---|---|
 | 1 | Foundations and governance | 1-2 (12-25 Oct 2026) | 8 | DONE | [CI run 38028624827](https://github.com/Yathindra25KB/Driftwatch-/actions/runs/38028624827) (Linux + Windows green, 258 tests, 45/45 guardrail scenarios each); [guardrail review](reviews/guardrail-review.md); [ADR-0001](DECISIONS/ADR-0001-tooling-and-guardrails.md); [PROTOCOL](PROTOCOL.md) | d634836 | 3 | Done 10 Oct 2026, before week 1; prompt rev 1.2. See "Phase 1 closeout" below |
 | 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | DONE | [inventory](../reports/data_inventory.md); [notes, Q1-Q7, leakage review](../reports/data_inventory_notes.md); [LAMDA card](data_cards/lamda.md); [BODMAS card](data_cards/bodmas.md); [ADR-0004](DECISIONS/ADR-0004-slot-definition.md) (ACCEPTED); [CLAIMS D-01..D-14](CLAIMS.md); `data/manifest.json` | 14da248 | 2 | Done 10 Oct 2026, before week 1. Cap 1.5 GB approved; LAMDA peak 0.87 GB (rebuild 0.93), BODMAS 0.56 GB. Guard allowlist widened (ADR-0001). Cache v2 after leakage review. See "Phase 2 closeout" below |
-| 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | NOT STARTED | | | | Never compress (plan §7) |
+| 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | DONE | [slicer review, 2 passes](reviews/slicer-review.md); [mutation matrix 15/15](../reports/mutation_matrix.md); [slicing run](../reports/slicing_run.md); [window options](../reports/window_options.md); [ADR-0005](DECISIONS/ADR-0005-windows-and-size-gate.md) (ACCEPTED); [ADR-0004 addendum 1](DECISIONS/ADR-0004-slot-definition.md); [CLAIMS W-01..W-07](CLAIMS.md) | 9b8e958 | 3 | Done 11 Oct 2026, before week 3. Canary tested on seeded drift, not the signal-free fixture; real-data canary left to Phase 4 by design. See "Phase 3 closeout" below |
 | 4 | Models, AUT/A-AUT, E0 baselines | 3-4 (26 Oct-8 Nov 2026) | 10 | NOT STARTED | | | | Never compress (plan §7) |
 | 5 | Delay and budget simulator, E1 | 5-8 (9 Nov-6 Dec 2026) | 32 | NOT STARTED | | | | |
 | 6 | Tier 1 grid (E2) and statistics | 9-11 (7-27 Dec 2026) | 24 | NOT STARTED | | | | prereg-v1 tag before first grid result |
@@ -38,7 +38,7 @@ The researcher fills this in weekly (about 20 minutes, plan §5.1 step 9). Compa
 
 | Week | Dates | Hours | Cumulative | 4-week average | Notes |
 |---|---|---|---|---|---|
-| 0 | 10 Oct 2026 (before week 1) | 5 | 5 | | Phase 1 (3 h) and Phase 2 (2 h), researcher-reported |
+| 0 | 10-11 Oct 2026 (before week 1) | 8 | 8 | | Phase 1 (3 h), Phase 2 (2 h) and Phase 3 (3 h), researcher-reported |
 | 1 | 12 Oct - 18 Oct 2026 | | | | |
 | 2 | 19 Oct - 25 Oct 2026 | | | | |
 | 3 | 26 Oct - 01 Nov 2026 | | | | |
@@ -177,3 +177,32 @@ Deviations and notes:
 | uv.lock | `1c7380afb87669761538e9cc8fec08f100a1b94d5e5bf719ca9b61b26745afd0` |
 
 (no configs/*.yaml yet)
+
+## Phase 3 closeout (11 Oct 2026)
+
+| Check | Result |
+|---|---|
+| `uv run pytest -q`; `ruff check .`; `ruff format --check .` | 481 passed; All checks passed!; 112 files already formatted |
+| `uv run python scripts/check_guardrails.py` | 45/45 scenarios passed |
+| HANDOFF check (`check_handoff.py 03`) | 7 items, all exist |
+| Constraints | C1, C2, C3 raise `ConstraintViolation` subclasses (never warnings); tests implement the guide's definitions literally; property tests run against an independent integer-arithmetic oracle |
+| Mutation checks | 15 of 15 deliberate breakages killed by the real suites, baseline 120 tests green ([matrix](../reports/mutation_matrix.md), CLAIMS W-07) |
+| Canary | Planted drift: AUT 0.76-0.79 (true timestamps) to 0.96-0.98 (shuffled), random-split F1 0.96-0.98, 4 seeds. No drift: `NO_GAP`. Leak caught by C2/C1, and by the canary when both are disabled. Limit pinned: leaking 1 of 10 evaluation slots is not seen by the canary alone |
+| Full-dataset slicing | LAMDA 47 windows / 564 evaluation slots, 28.6 s, peak 0.40 GB; BODMAS 2 windows / 24 evaluation slots, 2.9 s, peak 0.69 GB; 0 densified; no C1-C3 violation (CLAIMS W-04) |
+| Leakage review (leakage-reviewer subagent) | Pass 1: 14 findings (0 blocker, 3 major, 11 minor); pass 2: 9 findings (1 major latent, 7 minor, 1 informational). No C1-C3 violation in either pass. All fixed except two carried to Phase 5 (Window object reaches held-back labels; per-row seen-before mask for E0) and one documented as accident-proofing |
+| ADRs | ADR-0005 ACCEPTED by the researcher (LAMDA nT 4, nE 12, stride 3; BODMAS nT 3, nE 6, stride 2; M = 50; cap and flag; sensitivity ratio 5%). ADR-0004 addendum 1 amends item 7 (selectors get only `EvalSlot.public()`) |
+
+Deviations and notes:
+- The committed synthetic fixture has features independent of labels, so the canary movement is tested on seeded in-memory timelines with planted drift (`driftwatch.data.synthetic`). The fixture caches and a built drifting BODMAS-format cache prove the script end to end.
+- The real-data canary was deliberately not run: windows must not be chosen after seeing real AUT. Phase 4 runs `scripts/leakage_canary.py` with the ADR-0005 windows (gate G1).
+- C3 follows the researcher's "cap and flag" choice: slots already below the target ratio keep all rows and are flagged. 31 of the 62 LAMDA headline months are below 10% malware; the ADR states the prevalence spread as a threat to validity.
+- Carried to Phase 5: selectors, policies and monitors take only `OpaqueSlot` and `TrainWindow`, never `Window` or `EvalSlot`; the spy test lands with the first selector; the E0 duplicate mask is built from the simulator's real training pool.
+- Branch `phase-03-time-slicer` is stacked on the unmerged `phase-02-data-ingestion` and `phase-01-foundations`; nothing has been pushed.
+
+### Phase 3 config hashes
+
+| File | SHA-256 |
+|---|---|
+| uv.lock | `1c7380afb87669761538e9cc8fec08f100a1b94d5e5bf719ca9b61b26745afd0` |
+
+(no configs/*.yaml yet; window specs carry their own digest in every slicing manifest)
