@@ -3,7 +3,7 @@
 Scaling policy (ADR-0006): ``StandardScaler`` built inside ``fit`` from the training rows,
 centred only for dense features. Sparse input (LAMDA) is scaled by the standard deviation
 without centring, so it stays sparse. Features with zero variance are left unscaled.
-Dense input is promoted to float64 for stable moments.
+Dense input keeps its float32 dtype (moments are accumulated in float64).
 
 The fit is L2-regularised lbfgs with a fixed iteration cap. A fit that stops at the cap is
 recorded as ``converged = False`` in ``fit_info``, never hidden.
@@ -55,7 +55,10 @@ class LogisticDetector(Detector):
     def _prepare(X: Any) -> Any:
         if sp.issparse(X):
             return X.tocsr()
-        return np.asarray(X, dtype=np.float64)
+        # float32 stays float32: StandardScaler accumulates in float64, and a float64 copy of
+        # a dense BODMAS window would double the peak memory on the 8 GB laptop.
+        arr = np.asarray(X)
+        return arr if arr.dtype in (np.float32, np.float64) else arr.astype(np.float32)
 
     def _fit(self, X: Any, y: np.ndarray) -> dict[str, Any]:
         X = self._prepare(X)

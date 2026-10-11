@@ -113,6 +113,7 @@ def _random_split_f1(
     raw = [*window.train.slots, *(ctx.source.load_slot(r.slot_id) for r in plan.eval)]
     X = _stack([r.X for r in raw])
     y = np.concatenate([r.y for r in raw])
+    del raw  # the pooled matrix is a copy; keep one pooled set in memory, not two
     n_train = sum(len(s) for s in window.train.slots)
     entropy = [seed, zlib.crc32(plan.window_id.encode("utf-8")), _RANDOM_TAG]
     perm = np.random.default_rng(np.random.SeedSequence(entropy)).permutation(len(y))
@@ -121,11 +122,14 @@ def _random_split_f1(
         y[test_idx], spec.target_ratio, seed, f"e0-random:{plan.window_id}"
     )
     test_idx = test_idx[kept]
+    X_train, y_train, X_test, y_test = X[train_idx], y[train_idx], X[test_idx], y[test_idx]
+    del X
     out: dict[int, tuple[float, float]] = {}
     for mi, mspec in enumerate(ctx.cfg.models):
-        det = make_model(mspec, seed).fit(X[train_idx], y[train_idx], f"{plan.window_id}|random")
-        pred = det.decide(det.predict_proba(X[test_idx], f"{plan.window_id}|random"))
-        out[mi] = (score_slot(y[test_idx], pred).f1, float(det.fit_info["fit_seconds"]))
+        key = f"{plan.window_id}|random"
+        det = make_model(mspec, seed).fit(X_train, y_train, key)
+        pred = det.decide(det.predict_proba(X_test, key))
+        out[mi] = (score_slot(y_test, pred).f1, float(det.fit_info["fit_seconds"]))
     return out
 
 
