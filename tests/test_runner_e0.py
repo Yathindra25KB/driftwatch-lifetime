@@ -292,6 +292,42 @@ def test_cli_run_rejects_an_invalid_config(tmp_path: Path) -> None:
     assert cli.main(["run", str(path)]) == 2
 
 
+def test_a_dirty_tree_is_refused_for_an_evidence_run(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import driftwatch.sim.runner as runner
+
+    monkeypatch.setattr(runner, "code_version", lambda repo=None: "abc1234-dirty")
+    source, _ = make_source()
+    cfg = make_config(seeds=[0], e0={"variants": ["rolling"], "random_split": False})
+    with pytest.raises(RuntimeError, match="dirty"):
+        run(cfg, source, tmp_path, repo_root=ROOT, require_clean=True)
+    run(cfg, source, tmp_path, repo_root=ROOT)  # development runs may be dirty
+
+
+def test_the_headline_comparator_has_the_time_aware_class_prior_and_is_c3_checked(finished) -> None:
+    _, _, summary = finished
+    windows, _, _, _ = tables(summary)
+    rolling = windows[windows["variant"].isin(["rolling", "rolling_chow", "sensitivity"])]
+    # same number of malware in the random training set as in the time-aware window
+    assert (rolling["random_n_train_malware"] == rolling["n_train_malware"]).all()
+    assert (rolling["random_achieved_ratio"] <= rolling["ratio"] + 1e-12).all()
+    assert rolling["random_c3_status"].isin(["at_target", "below_target"]).all()
+    assert (rolling["random_n_test"] > 0).all() and (rolling["random_tp"] >= 0).all()
+    # the pooled comparator is stored beside it and may differ in prior
+    assert rolling["f1_random_pooled"].between(0, 1).all()
+    assert rolling["random_pooled_n_train_malware"].notna().all()
+    single = windows[windows["variant"] == "single_run"]
+    assert single["f1_random_split"].isna().all() and single["f1_random_pooled"].isna().all()
+
+
+def test_every_window_row_says_whether_its_aut_is_defined(finished) -> None:
+    _, _, summary = finished
+    windows, _, _, _ = tables(summary)
+    assert windows["aut_defined"].all()  # nE >= 2 everywhere in this config
+    assert windows["aut"].notna().all()
+
+
 def test_a_variant_without_a_window_is_an_error_not_an_empty_result(tmp_path: Path) -> None:
     source, _ = make_source()
     cfg = make_config(
@@ -329,20 +365,22 @@ def test_a_failure_is_recorded_and_raised(monkeypatch: pytest.MonkeyPatch, tmp_p
 # --- the pipeline measures decay (planted drift) -------------------------------------------------
 
 
-def test_planted_drift_puts_aut_below_the_random_split_f1(finished) -> None:
-    _, _, summary = finished
-    windows, _, _, _ = tables(summary)
-    lr = windows[(windows["variant"] == "rolling") & (windows["model"] == "lr")]
-    assert lr["f1_random_split"].notna().all()
-    assert lr["f1_random_split"].mean() - lr["aut"].mean() > 0.05
-
-
-def test_no_drift_leaves_no_gap(tmp_path: Path) -> None:
-    source, _ = make_source(drift=0.0)
+def _gap(drift: float, out: Path) -> float:
+    """Prior-matched random-split F1 minus AUT on a planted-drift timeline (LR, 2 seeds)."""
+    source, _ = make_source(drift=drift)
     cfg = make_config(
-        seeds=[0],
+        seeds=[0, 1],
         model=[{"name": "lr"}],
         e0={"variants": ["rolling"], "random_split": True},
     )
-    windows = pd.read_parquet(run(cfg, source, tmp_path, repo_root=ROOT).dir / "windows.parquet")
-    assert abs(windows["f1_random_split"].mean() - windows["aut"].mean()) < 0.08
+    windows = pd.read_parquet(run(cfg, source, out, repo_root=ROOT).dir / "windows.parquet")
+    assert windows["f1_random_split"].notna().all()
+    return float((windows["f1_random_split"] - windows["aut"]).mean())
+
+
+def test_planted_drift_widens_the_gap_over_a_no_drift_timeline(tmp_path: Path) -> None:
+    """The pipeline sees decay when it is planted and sees none when it is not."""
+    none, drift = _gap(0.0, tmp_path / "none"), _gap(1.0, tmp_path / "drift")
+    assert abs(none) < 0.04
+    assert drift > 0.03
+    assert drift - none > 0.03

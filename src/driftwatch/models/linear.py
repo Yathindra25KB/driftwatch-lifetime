@@ -33,7 +33,7 @@ class LogisticDetector(Detector):
         seed: int,
         threshold: float = DEFAULT_THRESHOLD,
         C: float = 1.0,
-        max_iter: int = 300,
+        max_iter: int = 1000,  # ADR-0006: 300 stopped short of convergence on LAMDA
         tol: float = 1e-4,
         scaling: str = SCALING,
     ) -> None:

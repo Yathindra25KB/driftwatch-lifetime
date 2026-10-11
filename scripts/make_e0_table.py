@@ -56,14 +56,21 @@ def _baseline_rows(
         s = slots[
             (slots["model"] == model) & (slots["variant"] == variant) & (slots["ratio"] == ratio)
         ]
+        g = g[g["aut"].notna()]  # a window with fewer than two evaluation slots has no AUT
+        if g.empty:
+            continue
         by_seed = g.groupby("seed").agg(
             aut_mean=("aut", "mean"),
             aut_std=("aut", _sd),
             f1_random=("f1_random_split", "mean"),
+            f1_pooled=("f1_random_pooled", "mean"),
         )
         a_aut = float(by_seed["aut_mean"].mean())
         f1_random = (
             float(by_seed["f1_random"].mean()) if by_seed["f1_random"].notna().any() else np.nan
+        )
+        f1_pooled = (
+            float(by_seed["f1_pooled"].mean()) if by_seed["f1_pooled"].notna().any() else np.nan
         )
         per_window = g.groupby("train_first")[["aut", "f1_random_split"]].mean()
         low, high = _bootstrap_gap(per_window)
@@ -82,10 +89,12 @@ def _baseline_rows(
                 if by_seed["aut_std"].notna().any()
                 else np.nan,
                 "a_aut_seed_sd": _sd(by_seed["aut_mean"]),
-                "f1_random_split": f1_random,
+                "f1_random_split": f1_random,  # prior-matched comparator (headline)
                 "gap": f1_random - a_aut,
                 "gap_ci_low": low,
                 "gap_ci_high": high,
+                "f1_random_pooled": f1_pooled,  # pool-prior comparator (secondary)
+                "gap_pooled": f1_pooled - a_aut,
                 "f1_first_slot": float(g["f1_first"].mean()),
                 "f1_last_slot": float(g["f1_last"].mean()),
                 "mean_fpr": float(s["fpr"].mean()),
@@ -157,10 +166,40 @@ def canary_table(paths: Iterable[Path]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def _newest_runs(results: Path) -> dict[str, Path]:
+class RunRejected(Exception):
+    """A stored run is not a valid source for the E0 table."""
+
+
+def check_run(directory: Path, config_dir: Path | None = None) -> dict[str, Any]:
+    """Refuse a run that is partial, from a dirty tree, or not the committed E0 config.
+
+    A toy or half-finished run in ``results/`` must never become Table 1.
+    """
+    record = json.loads((Path(directory) / "run.json").read_text(encoding="utf-8"))
+    if record.get("status") != "complete":
+        raise RunRejected(f"{directory}: status {record.get('status')!r}")
+    if str(record.get("code_version", "")).endswith("-dirty"):
+        raise RunRejected(f"{directory}: produced from a dirty tree ({record['code_version']})")
+    cfg = record["config"]
+    if config_dir is not None:
+        path = Path(config_dir) / f"e0_{cfg['dataset']}.yaml"
+        if path.exists():
+            from driftwatch.sim.config import RunConfig
+
+            committed = RunConfig.from_file(path).to_dict()
+            if committed != cfg:
+                raise RunRejected(f"{directory}: its config differs from {path.name}")
+    return record
+
+
+def _newest_runs(results: Path, config_dir: Path | None) -> dict[str, Path]:
     found: dict[str, tuple[float, Path]] = {}
     for record in results.glob("*/run.json"):
-        data = json.loads(record.read_text(encoding="utf-8"))
+        try:
+            data = check_run(record.parent, config_dir)
+        except RunRejected as exc:
+            print(f"skipped: {exc}")
+            continue
         dataset = data["config"]["dataset"]
         mtime = record.stat().st_mtime
         if dataset not in found or mtime > found[dataset][0]:
@@ -176,8 +215,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=ROOT / "reports" / "tables")
     args = parser.parse_args(argv)
 
-    runs = dict(r.split("=", 1) for r in args.run) if args.run else _newest_runs(args.results)
+    config_dir = ROOT / "configs"
+    runs = (
+        dict(r.split("=", 1) for r in args.run)
+        if args.run
+        else _newest_runs(args.results, config_dir)
+    )
     runs = {k: Path(v) for k, v in runs.items()}
+    for directory in runs.values():
+        check_run(directory, config_dir)
     if not runs:
         raise SystemExit(f"no finished run under {args.results}")
     base, per_slot = build_tables(runs)

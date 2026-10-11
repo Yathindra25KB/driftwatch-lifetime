@@ -69,6 +69,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--out", type=Path, help="results root (default: the config's output)")
     run.add_argument("--memory-cap-gb", type=float, default=1.5)
     run.add_argument("--overwrite", action="store_true", help="replace a finished run")
+    run.add_argument(
+        "--require-clean", action="store_true", help="refuse a tree with uncommitted changes"
+    )
     return parser
 
 
@@ -163,6 +166,7 @@ def main(argv: list[str] | None = None) -> int:
                 out_root=args.out,
                 memory_cap_gb=args.memory_cap_gb,
                 overwrite=args.overwrite,
+                require_clean=args.require_clean,
             )
         except (ConfigError, FileExistsError) as exc:
             print(f"driftwatch run: {exc}", file=sys.stderr)

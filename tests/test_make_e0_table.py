@@ -70,6 +70,42 @@ def test_a_aut_is_the_mean_of_per_seed_means_and_std_is_over_windows(tool, run_d
     assert row["a_aut_seed_sd"] == pytest.approx(per_seed_mean.std(ddof=1))
 
 
+def test_pooled_comparator_is_reported_beside_the_headline(tool, run_dir: Path) -> None:
+    base, _ = tool.build_tables({"bodmas": run_dir})
+    row = base[(base["variant"] == "rolling") & (base["model"] == "lr")].iloc[0]
+    assert row["gap_pooled"] == pytest.approx(row["f1_random_pooled"] - row["a_aut_mean"])
+
+
+def test_check_run_rejects_partial_dirty_and_foreign_config_runs(
+    tool, run_dir: Path, tmp_path: Path
+) -> None:
+    import shutil
+
+    record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+
+    def variant(name: str, **changes) -> Path:
+        d = tmp_path / name
+        shutil.copytree(run_dir, d)
+        (d / "run.json").write_text(json.dumps({**record, **changes}), encoding="utf-8")
+        return d
+
+    # the development tree is usually dirty, so pin a clean version for the positive case
+    clean = variant("clean", code_version="abc1234")
+    assert tool.check_run(clean)["status"] == "complete"
+
+    with pytest.raises(tool.RunRejected, match="status"):
+        tool.check_run(variant("partial", status="failed"))
+    with pytest.raises(tool.RunRejected, match="dirty"):
+        tool.check_run(variant("dirty", code_version="abc1234-dirty"))
+    configs = tmp_path / "configs"
+    configs.mkdir()
+    (configs / "e0_bodmas.yaml").write_text(
+        (ROOT / "configs" / "e0_bodmas.yaml").read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    with pytest.raises(tool.RunRejected, match="differs"):  # the toy run is not the E0 config
+        tool.check_run(clean, configs)
+
+
 def test_per_slot_table_covers_every_evaluated_slot(tool, run_dir: Path) -> None:
     _, per_slot = tool.build_tables({"bodmas": run_dir})
     slots = pd.read_parquet(run_dir / "slots.parquet")

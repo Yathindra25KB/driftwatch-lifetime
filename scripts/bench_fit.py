@@ -5,8 +5,10 @@
 For each config it plans every E0 variant (features-free), picks the training window with
 the most rows, loads it once and fits each configured model, plus LightGBM in both profiles,
 several times. It records wall time, peak memory, whether two fits give byte-identical
-probabilities, and the machine (cores, RAM). It prints times and sizes only: no evaluation
-slot is loaded and no score is computed, so nothing here can steer a choice by AUT.
+probabilities, and the machine (cores, RAM). The model rows load training rows only. The
+last row per dataset runs the runner's random-split step (it loads evaluation rows and fits
+both comparators) to measure time and peak memory; its F1 values are discarded unprinted.
+Nothing printed or stored is a score, so nothing here can steer a choice by AUT.
 
 The 60 s rule (guide E2, PROTOCOL section 4): a fit over 60 s means the fast profile, then
 row or feature subsampling, then a smaller grid. ``within_60s`` is judged on the median.
@@ -38,7 +40,7 @@ from driftwatch.data.presets import cached_source
 from driftwatch.data.slicer import plan_slots, plan_windows, slice_windows
 from driftwatch.models import make_model
 from driftwatch.sim.config import RunConfig, package_versions
-from driftwatch.sim.runner import _random_split_f1, _spec_for
+from driftwatch.sim.runner import _random_split, _spec_for
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT_S = 60.0
@@ -161,7 +163,8 @@ def _random_split_row(cfg: RunConfig, source: Any, meta: dict[str, Any]) -> dict
     ctx = SimpleNamespace(cfg=cfg, source=source)
     with MemoryWatchdog(HARD_STOP, interval_s=0.02) as wd:
         t0 = time.perf_counter()
-        _random_split_f1(ctx, window, big["spec"], cfg.seeds[0])  # type: ignore[arg-type]
+        n_mal = int((window.train.y == 1).sum())
+        _random_split(ctx, window, big["spec"], cfg.seeds[0], n_mal)  # type: ignore[arg-type]
         seconds = time.perf_counter() - t0
     return {
         **meta,

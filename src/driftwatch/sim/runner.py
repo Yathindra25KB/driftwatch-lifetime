@@ -105,10 +105,20 @@ def _metric_scores(slot: EvalSlot, public: OpaqueSlot, positions: np.ndarray, pr
     return y_true, score_slot(y_true, pred)
 
 
-def _random_split_f1(
-    ctx: _Ctx, window: Window, spec: WindowSpec, seed: int
-) -> dict[int, tuple[float, float]]:
-    """Model index -> (F1, fit seconds) on a random split of the window's pooled rows."""
+def _random_split(
+    ctx: _Ctx, window: Window, spec: WindowSpec, seed: int, n_train_malware: int
+) -> dict[str, dict[int, dict[str, Any]]]:
+    """Random-split comparators on the window's pooled rows (they violate C1 by design).
+
+    Two draws, both with the time-aware window's training size, both tested on the rest of
+    the pool with malware subsampled to the target ratio (C3, checked):
+
+    - ``matched`` (headline): the training set holds the same number of malware and benign
+      rows as the time-aware window, so the class prior is the same and only time differs.
+    - ``pooled``: a plain random subset of the pool, so its prior is the pool's.
+
+    Returns comparator -> model index -> counts and F1.
+    """
     plan = window.plan
     raw = [*window.train.slots, *(ctx.source.load_slot(r.slot_id) for r in plan.eval)]
     X = _stack([r.X for r in raw])
@@ -117,19 +127,46 @@ def _random_split_f1(
     n_train = sum(len(s) for s in window.train.slots)
     entropy = [seed, zlib.crc32(plan.window_id.encode("utf-8")), _RANDOM_TAG]
     perm = np.random.default_rng(np.random.SeedSequence(entropy)).permutation(len(y))
-    train_idx, test_idx = perm[:n_train], perm[n_train:]
-    kept = constraints.subsample_malware(
-        y[test_idx], spec.target_ratio, seed, f"e0-random:{plan.window_id}"
+    draws = {"pooled": (perm[:n_train], perm[n_train:])}
+    rng = np.random.default_rng(np.random.SeedSequence([*entropy, 1]))
+    malware, benign = np.flatnonzero(y == 1), np.flatnonzero(y == 0)
+    chosen = np.concatenate(
+        [
+            rng.permutation(malware)[:n_train_malware],
+            rng.permutation(benign)[: n_train - n_train_malware],
+        ]
     )
-    test_idx = test_idx[kept]
-    X_train, y_train, X_test, y_test = X[train_idx], y[train_idx], X[test_idx], y[test_idx]
-    del X
-    out: dict[int, tuple[float, float]] = {}
-    for mi, mspec in enumerate(ctx.cfg.models):
-        key = f"{plan.window_id}|random"
-        det = make_model(mspec, seed).fit(X_train, y_train, key)
-        pred = det.decide(det.predict_proba(X_test, key))
-        out[mi] = (score_slot(y_test, pred).f1, float(det.fit_info["fit_seconds"]))
+    held_out = np.ones(len(y), dtype=bool)
+    held_out[chosen] = False
+    draws["matched"] = (np.sort(chosen), np.flatnonzero(held_out))
+
+    out: dict[str, dict[int, dict[str, Any]]] = {}
+    for name, (train_idx, test_idx) in draws.items():
+        kept = constraints.subsample_malware(
+            y[test_idx], spec.target_ratio, seed, f"e0-random-{name}:{plan.window_id}"
+        )
+        c3 = constraints.check_c3(y[test_idx], kept, spec.target_ratio)
+        test_idx = test_idx[kept]
+        X_train, y_train, X_test, y_test = X[train_idx], y[train_idx], X[test_idx], y[test_idx]
+        out[name] = {}
+        for mi, mspec in enumerate(ctx.cfg.models):
+            key = f"{plan.window_id}|random-{name}"
+            det = make_model(mspec, seed).fit(X_train, y_train, key)
+            sc = score_slot(y_test, det.decide(det.predict_proba(X_test, key)))
+            out[name][mi] = {
+                "f1": sc.f1,
+                "fit_seconds": float(det.fit_info["fit_seconds"]),
+                "n_train_malware": int((y_train == 1).sum()),
+                "n_test": sc.n,
+                "n_test_malware": sc.n_malware,
+                "n_test_malware_before": c3.n_malware_before,
+                "achieved_ratio": c3.achieved_ratio,
+                "c3_status": c3.status,
+                "tp": sc.tp,
+                "fp": sc.fp,
+                "fn": sc.fn,
+            }
+        del X_train, y_train, X_test, y_test
     return out
 
 
@@ -191,11 +228,23 @@ def _run_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window: Wi
             ctx.store.add_slot(_slot_row(variant, model, spec, seed, plan.window_id, slot, sc))
             ctx.n_slot_rows += 1
 
-    random = _random_split_f1(ctx, window, spec, seed) if _wants_random(ctx.cfg, variant) else {}
+    random = (
+        _random_split(ctx, window, spec, seed, n_train_mal)
+        if _wants_random(ctx.cfg, variant)
+        else {}
+    )
+    if len(f1s[fitted[0][0]]) < 2:
+        log.warning(
+            "%s: %d evaluation slot(s); AUT is undefined and the window is not counted",
+            plan.window_id,
+            len(f1s[fitted[0][0]]),
+        )
     for mi, det, reused in fitted:
         series = f1s[mi]
         events = drop_events(series)
         info = det.fit_info
+        matched = random.get("matched", {}).get(mi)
+        pooled = random.get("pooled", {}).get(mi)
         ctx.store.add_window(
             {
                 "variant": variant,
@@ -220,8 +269,8 @@ def _run_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window: Wi
                 "n_below_target": below,
                 "n_drop_events": len(events),
                 "n_recovered": sum(e.recovery_slots is not None for e in events),
-                "f1_random_split": random[mi][0] if mi in random else float("nan"),
-                "random_fit_seconds": random[mi][1] if mi in random else float("nan"),
+                "aut_defined": len(series) >= 2,
+                **_random_columns(matched, pooled),
                 "fit_seconds": float(info["fit_seconds"]),
                 "fit_reused": bool(reused),
                 "fit_seed": det.seed,
@@ -243,6 +292,32 @@ def _run_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window: Wi
 
 def _wants_random(cfg: RunConfig, variant: str) -> bool:
     return cfg.random_split and variant != "single_run"
+
+
+def _random_columns(
+    matched: dict[str, Any] | None, pooled: dict[str, Any] | None
+) -> dict[str, Any]:
+    """Window-table columns of the two random-split comparators (NaN when not run)."""
+    nan = float("nan")
+    m, p = matched or {}, pooled or {}
+    return {
+        "f1_random_split": m.get("f1", nan),  # prior-matched: the headline comparator
+        "random_fit_seconds": m.get("fit_seconds", nan),
+        "random_n_train_malware": m.get("n_train_malware"),
+        "random_n_test": m.get("n_test"),
+        "random_n_test_malware": m.get("n_test_malware"),
+        "random_n_test_malware_before": m.get("n_test_malware_before"),
+        "random_achieved_ratio": m.get("achieved_ratio", nan),
+        "random_c3_status": m.get("c3_status"),
+        "random_tp": m.get("tp"),
+        "random_fp": m.get("fp"),
+        "random_fn": m.get("fn"),
+        "f1_random_pooled": p.get("f1", nan),  # pool prior: secondary comparator
+        "random_pooled_fit_seconds": p.get("fit_seconds", nan),
+        "random_pooled_n_train_malware": p.get("n_train_malware"),
+        "random_pooled_n_test": p.get("n_test"),
+        "random_pooled_achieved_ratio": p.get("achieved_ratio", nan),
+    }
 
 
 def _slot_row(
@@ -301,10 +376,17 @@ def run(
     repo_root: Path | str,
     memory_cap_bytes: int = DEFAULT_MEMORY_CAP,
     overwrite: bool = False,
+    require_clean: bool = False,
 ) -> RunSummary:
-    """Run E0 for ``cfg`` on ``source`` and write the result store under ``out_root``."""
+    """Run E0 for ``cfg`` on ``source`` and write the result store under ``out_root``.
+
+    ``require_clean`` refuses a working tree with uncommitted changes: two different dirty
+    trees would otherwise share one config hash. Evidence runs use it.
+    """
     repo = Path(repo_root)
     version = code_version(repo)
+    if require_clean and version.endswith("-dirty"):
+        raise RuntimeError(f"the working tree is dirty ({version}); commit before an evidence run")
     lock = lock_sha256(repo)
     chash = config_hash(cfg.to_dict(), version, lock)
     store = ResultStore(out_root, chash, overwrite=overwrite)
@@ -367,6 +449,7 @@ def run_file(
     repo_root: Path | str | None = None,
     memory_cap_gb: float = 1.5,
     overwrite: bool = False,
+    require_clean: bool = False,
 ) -> RunSummary:
     """Load a YAML config, build its dataset source and run it (``driftwatch run``)."""
     from driftwatch.data.presets import cached_source
@@ -381,4 +464,5 @@ def run_file(
         repo_root=repo,
         memory_cap_bytes=int(memory_cap_gb * 1024**3),
         overwrite=overwrite,
+        require_clean=require_clean,
     )

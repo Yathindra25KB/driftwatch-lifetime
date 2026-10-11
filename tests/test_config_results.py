@@ -75,6 +75,8 @@ def test_yaml_file_loads(tmp_path: Path) -> None:
         ({"ratio": {"target": 1.5}}, "ratio"),
         ({"ratio": {"target": 0.1, "sensitivity": 0.1}}, "sensitivity"),
         ({"window": {"nT": 0, "nE": 6, "stride": 2}}, "window"),
+        ({"window": {"nT": 3, "nE": 1, "stride": 1}}, "window"),  # AUT needs two slots
+        ({"model": [{"name": "lr"}, {"name": "lr", "C": 2.0}]}, "distinct"),
         ({"window": {"nT": 3, "nE": 6}}, "window"),
         ({"slots": {"preset": "week", "min_malware": 50}}, "preset"),
         ({"e0": {"variants": ["rolling", "magic"]}}, "variant"),
@@ -181,6 +183,16 @@ def test_store_writes_tables_and_run_record(tmp_path: Path) -> None:
     assert windows.loc[0, "window_id"] == "w"
     record = json.loads((store.dir / "run.json").read_text(encoding="utf-8"))
     assert record["config_hash"] == "a" * 64 and record["status"] == "complete"
+
+
+def test_overwrite_clears_an_earlier_failure_record(tmp_path: Path) -> None:
+    failed = ResultStore(tmp_path, "c" * 64)
+    failed.fail({"error": "boom"})
+    assert (failed.dir / "run_failed.json").exists()
+    again = ResultStore(tmp_path, "c" * 64, overwrite=True)
+    assert not (again.dir / "run_failed.json").exists()
+    again.finalize({"config_hash": "c" * 64})
+    assert (again.dir / "run.json").exists() and not (again.dir / "run_failed.json").exists()
 
 
 def test_store_refuses_to_overwrite_a_finished_run(tmp_path: Path) -> None:

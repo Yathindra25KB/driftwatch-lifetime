@@ -116,7 +116,7 @@ class RunConfig:
         if set(w) != {"nT", "nE", "stride"}:
             raise ConfigError("window needs exactly nT, nE and stride")
         nT = _int(w["nT"], "window.nT", 1)
-        nE = _int(w["nE"], "window.nE", 1)
+        nE = _int(w["nE"], "window.nE", 2)  # AUT needs at least two evaluation slots
         stride = _int(w["stride"], "window.stride", 1)
 
         r = d.get("ratio") or {}
@@ -145,6 +145,9 @@ class RunConfig:
                 make_model(spec, seed=0)
             except (ValueError, TypeError) as exc:
                 raise ConfigError(str(exc)) from exc
+        names = [m["name"] for m in models]
+        if len(set(names)) != len(names):
+            raise ConfigError(f"model names must be distinct (they key every result row): {names}")
 
         e0 = d.get("e0") or {}
         variants = tuple(e0.get("variants") or ("rolling",))

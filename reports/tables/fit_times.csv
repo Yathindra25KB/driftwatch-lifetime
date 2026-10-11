@@ -1,9 +1,9 @@
 config,dataset,variant,train_first,train_last,n_rows,n_malware,n_features,sparse,model,fit_median_s,fit_max_s,predict_probe_s,deterministic,converged,n_iter,n_trees,within_60s,within_1_5gb,configured,peak_gb
-e0_bodmas,bodmas,rolling,2w:2020-06-01,2w:2020-06-29,17873,6316.0,2381,False,lr,1.305,1.543,0.027,True,True,29.0,,True,True,True,0.86
-e0_bodmas,bodmas,rolling,2w:2020-06-01,2w:2020-06-29,17873,6316.0,2381,False,lgbm-fast,3.469,3.49,0.008,True,,,100.0,True,True,True,0.67
-e0_bodmas,bodmas,rolling,2w:2020-06-01,2w:2020-06-29,17873,6316.0,2381,False,lgbm-default,8.017,8.239,0.008,True,,,100.0,True,True,False,0.67
-e0_bodmas,bodmas,rolling_chow,2w:2020-03-23,2w:2020-04-20,46544,,2381,False,random-split step (all configured models),5.55,5.55,,,,,,True,True,True,1.12
-e0_lamda,lamda,single_run,month:2013-09,month:2013-12,50382,31835.0,4561,True,lr,2.468,2.502,0.002,True,True,325.0,,True,True,True,0.2
-e0_lamda,lamda,single_run,month:2013-09,month:2013-12,50382,31835.0,4561,True,lgbm-fast,1.235,1.241,0.005,True,,,100.0,True,True,True,0.21
-e0_lamda,lamda,single_run,month:2013-09,month:2013-12,50382,31835.0,4561,True,lgbm-default,0.752,0.782,0.005,True,,,100.0,True,True,False,0.27
-e0_lamda,lamda,rolling,month:2019-05,month:2019-08,154703,,4561,True,random-split step (all configured models),6.582,6.582,,,,,,True,True,True,0.42
+e0_bodmas,bodmas,rolling,2w:2020-06-01,2w:2020-06-29,17873,6316.0,2381,False,lr,1.354,1.509,0.029,True,True,29.0,,True,True,True,0.85
+e0_bodmas,bodmas,rolling,2w:2020-06-01,2w:2020-06-29,17873,6316.0,2381,False,lgbm-fast,3.543,3.708,0.008,True,,,100.0,True,True,True,0.57
+e0_bodmas,bodmas,rolling,2w:2020-06-01,2w:2020-06-29,17873,6316.0,2381,False,lgbm-default,8.546,8.735,0.008,True,,,100.0,True,True,False,0.57
+e0_bodmas,bodmas,rolling_chow,2w:2020-03-23,2w:2020-04-20,46544,,2381,False,random-split step (all configured models),11.637,11.637,,,,,,True,True,True,1.37
+e0_lamda,lamda,single_run,month:2013-09,month:2013-12,50382,31835.0,4561,True,lr,2.57,2.888,0.002,True,True,325.0,,True,True,True,0.19
+e0_lamda,lamda,single_run,month:2013-09,month:2013-12,50382,31835.0,4561,True,lgbm-fast,1.232,1.256,0.007,True,,,100.0,True,True,True,0.21
+e0_lamda,lamda,single_run,month:2013-09,month:2013-12,50382,31835.0,4561,True,lgbm-default,0.868,0.92,0.005,True,,,100.0,True,True,False,0.26
+e0_lamda,lamda,rolling,month:2019-05,month:2019-08,154703,,4561,True,random-split step (all configured models),12.408,12.408,,,,,,True,True,True,0.5

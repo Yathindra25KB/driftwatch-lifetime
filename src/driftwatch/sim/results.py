@@ -46,7 +46,13 @@ PREDICTION_SCHEMA = pa.schema(
     ]
 )
 KEY_COLUMNS = ("variant", "model", "ratio", "seed", "window_id", "slot_id")
-_TABLES = ("predictions.parquet", "slots.parquet", "windows.parquet", "run.json")
+_TABLES = (
+    "predictions.parquet",
+    "slots.parquet",
+    "windows.parquet",
+    "run.json",
+    "run_failed.json",  # an overwritten run must not keep an earlier failure beside it
+)
 
 
 class PredictionHasher:
@@ -90,13 +96,12 @@ class ResultStore:
     def __init__(self, root: Path | str, config_hash: str, overwrite: bool = False) -> None:
         self.config_hash = config_hash
         self.dir = Path(root) / config_hash[:16]
-        if (self.dir / "run.json").exists():
-            if not overwrite:
-                raise FileExistsError(
-                    f"{self.dir} already holds a finished run; rerun with overwrite to replace it"
-                )
-            for name in _TABLES:
-                (self.dir / name).unlink(missing_ok=True)
+        if (self.dir / "run.json").exists() and not overwrite:
+            raise FileExistsError(
+                f"{self.dir} already holds a finished run; rerun with overwrite to replace it"
+            )
+        for name in _TABLES:  # leftovers of a failed or replaced run
+            (self.dir / name).unlink(missing_ok=True)
         self.dir.mkdir(parents=True, exist_ok=True)
         self._slots: list[dict[str, Any]] = []
         self._windows: list[dict[str, Any]] = []
