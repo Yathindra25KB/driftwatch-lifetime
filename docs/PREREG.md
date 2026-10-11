@@ -25,12 +25,14 @@ Hypotheses are the build guide's (§5). The primary metrics, contrasts and decis
 
 | Item | Value | Owner |
 |---|---|---|
-| Seeds | 5 for the grid; 10 for headline contrasts (guide §10). Seed values: TBD | Phase 6 |
-| A-AUT windows per dataset (nT, nE, stride) | TBD | ADR-0005 (Phase 3) |
-| Malware ratio | 10% target; one sensitivity ratio: TBD | ADR-0005 (Phase 3) |
-| Slot length, minimum-size gate, gap handling | TBD | ADR-0004 (Phase 2) |
-| Decision threshold, scaling policy, A-AUT window formula | TBD (default fixed 0.5) | ADR-0006 (Phase 4) |
-| Model hyperparameters (LR; LightGBM fast profile) | TBD; recorded here before E0 runs | Phase 4 |
+| Seeds | 5 for the grid; 10 for headline contrasts (guide §10). E0 seeds: 0, 1, 2, 3, 4 (proposed in ADR-0006; grid and headline seed values TBD) | Phase 4 (E0), Phase 6 |
+| A-AUT windows per dataset (nT, nE, stride) | LAMDA 4, 12, 3; BODMAS 3, 6, 2 (months; 2-week slots). Secondary check at Chow's stride min(nT, nE): LAMDA 4, BODMAS 3 | ADR-0005 (accepted), ADR-0006 |
+| Malware ratio | 10% target; sensitivity ratio 5%; cap and flag for slots already below target | ADR-0005 (accepted) |
+| Slot length, minimum-size gate, gap handling | LAMDA calendar month; BODMAS 2 weeks from 2019-08-26; M = 50; gaps never bridged | ADR-0004 (accepted) |
+| Decision threshold, scaling policy, A-AUT window formula | Fixed 0.5, malware when P > 0.5; StandardScaler fitted on the training window (centred only for dense); A-AUT = mean and sample std (ddof 1) of AUT over windows, Chow Eq. 2-4 and 6-8 | ADR-0006 (PROPOSED) |
+| Model hyperparameters (LR; LightGBM fast profile) | **LR:** L2, C 1.0, lbfgs, tol 1e-4, max_iter 1000, no class weights. **LightGBM fast:** 100 trees, learning rate 0.1, 31 leaves, min child samples 20, max_bin 63, colsample_bytree 0.5, subsample 0.8 (every tree), deterministic, col-wise, 4 threads. **LightGBM default (timed only):** library defaults. Fixed before E0 runs; never tuned to chase published numbers | ADR-0006 (PROPOSED); configs/e0_*.yaml |
+| E0 sanity band | Published ranges from the guide, shown beside the E0 table as context and never as a target. Values: [verify], to be supplied by the researcher from guide §9 | Phase 4 |
+| Primary sanity margin | Random-split F1 minus time-aware AUT(F1) at least 0.05 on at least one dataset (RQ1 band) | Phase 4 |
 | Training-pool design (new-label weight, windowing) | TBD | ADR-0007 (Phase 5) |
 | Grid | delay {0,1,2,3}; budget {0.5,1,2,5}% of the evaluated slot; policies never and periodic(3); LR and LightGBM; both datasets | Phase 6 |
 | Exclusion rules | TBD | Phase 6 |

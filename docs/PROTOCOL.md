@@ -75,7 +75,7 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 |---|---|---|
 | Slot length per dataset, minimum-size gate, gap handling | Phase 2 | ADR-0004-slot-definition (ACCEPTED 10 Oct 2026: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50, strict gaps) |
 | nT, nE, stride per dataset; size-gate numbers; ratio policy incl. the sensitivity ratio | Phase 3 | ADR-0005-windows-and-size-gate (ACCEPTED 11 Oct 2026: LAMDA nT 4, nE 12, stride 3; BODMAS nT 3, nE 6, stride 2; M = 50; cap and flag; sensitivity ratio 5%) |
-| Decision threshold (default fixed 0.5 per Phase 4 prompt), scaling policy, A-AUT window formula | Phase 4 | ADR-0006-metrics-threshold-scaling |
+| Decision threshold (default fixed 0.5 per Phase 4 prompt), scaling policy, A-AUT window formula | Phase 4 | ADR-0006-metrics-threshold-scaling (PROPOSED 11 Oct 2026: fixed 0.5; StandardScaler on the training window; sample std over windows; ADR-0005 windows headline, Chow stride secondary) |
 | Training-pool composition, new-label weight, budget base | Phase 5 | ADR-0007-pool-composition-and-budget |
 | Model hyperparameters, seeds, windows, exclusion rules | before E0 / Phase 6 | docs/PREREG.md, tag prereg-v1 |
 
@@ -100,6 +100,7 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 | D15 | Guide §8 vs plan App. C, phase prompts | Config names: `configs/tier1_bodmas.yaml` (guide) vs `configs/e0_*.yaml` … `e5_*.yaml` (plan, prompts). The prompts' names are used. | Phase 4 onward |
 | D16 | Guide §6 vs Phase 10 prompt | The guide allows a small MLP in Tier 3; the Phase 10 prompt has no MLP (E5/E6 only). | Phase 10 |
 | D17 | Guide §3 AUT formula vs TESSERACT arXiv v4 | The arXiv v4 comment (arxiv.org/abs/1807.07838, accessed 2026-10-10) says the published Eq. (4) had an extra 1/N normalisation factor. The guide's `1/(N-1)` form should be checked against v4. | Phase 4 ADR-0006 |
+| D18 | ADR-0005 vs Chow et al. (arXiv 2506.23814v2, Eq. 2-4, 6-8) | The paper advances windows by min(nT, nE); ADR-0005 uses LAMDA 3 (paper: 4) and BODMAS 2 (paper: 3) to align with the 3-slot retrain period (D7). nT > nE does not occur in either dataset. | Phase 4 ADR-0006 (headline ADR-0005; Chow stride reported as a secondary column) |
 
 ## 7. Phase 2 measurements against open differences (no value changed here)
 
