@@ -1,6 +1,6 @@
 # ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters
 
-**Status:** PROPOSED (awaiting the researcher; nothing below was chosen by looking at an AUT)
+**Status:** PROPOSED. Values frozen on 2026-10-11, before any E0 AUT existed, when the researcher delegated the open choices ("do what feels best and logical"): LightGBM `fast`, fixed 0.5 threshold, ADR-0005 headline windows with Chow's stride secondary, sanity band left `[verify]`. Formal acceptance (PROPOSED to ACCEPTED) stays with the researcher at phase closeout; nothing below was chosen by looking at an AUT.
 **Date:** 2026-10-11
 **Deciders:** Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
 **Phase:** 4
