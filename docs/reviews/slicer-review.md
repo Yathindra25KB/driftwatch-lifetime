@@ -31,8 +31,27 @@
 | 13 | minor | A base unit emptied by the filter did not make its slot partial | **Fixed.** The slot is marked partial and is therefore unusable (`test_f13_*`) |
 | 14 | minor | ADR-0005 cited this file before it existed | **Fixed** by this file |
 
+## Pass 2: re-review of the fixes (commit `ee4bcd0`)
+**Reviewer:** leakage-reviewer subagent again, read-only; 142 tests passed on its run. **Verdict: no C1, C2 or C3 violation and no sealed-label problem in the slicer remains unresolved.** All six claimed fixes held and introduced no new leakage path (the public permutation is drawn from the row count only, with entropy independent of the C3 draw). It reported 9 further findings (1 major latent, 7 minor, 1 informational):
+
+| # | Severity | Finding | Disposition (`9b27b58`) |
+|---|---|---|---|
+| P1 | major, latent | `SlotData.public()` still returns the same `PublicSlot` type with dataset ids and class-linked order, and ADR-0004 item 7 and both data cards point Phase 5 at it | **Fixed.** The selector-facing view is a distinct `OpaqueSlot` (no `row_id`, no back-reference); ADR-0004 addendum 1 amends item 7; both data cards corrected; the loader view is documented as loader-level only. Test `test_p2_1_*` |
+| P2 | minor | The opacity test checked linear correlation only; a class-aware regular order would pass | **Fixed.** Metamorphic test: identical counts, different label placement, identical permutation; mutant `public_order_stratified` (correlation about 0, killed only by this test) |
+| P3 | minor | Handles are slot-local; resolving against the wrong slot would silently release other labels | **Fixed.** `resolve(slot_id, handles)` raises on a mismatch or an out-of-range handle |
+| P4 | minor | The public order is a pure function of the seed and slot id, so a consumer that deliberately recomputes it could invert it | **Accepted, documented.** This is accident-proofing, not an adversarial boundary: consumers never import slicer internals, and the Phase 5 spy test enforces the type boundary. A per-run secret would add state for no protection against a deliberate insider |
+| P5 | minor | `window_id` ignored source provenance, so runs with and without the placeholder filter shared ids | **Fixed.** A digest of the source provenance (row filter, length, anchor, exclusions, manifest hash) is part of the id |
+| P6 | minor | `TableSource(exclude=...)` accepted any callable, including one that reads labels | **Fixed.** Only a `RowFilter` is accepted |
+| P7 | minor | Iterating a window twice duplicated manifest rows | **Fixed.** Rows are keyed by (window id, role, slot id) and replaced |
+| P8 | minor | A slicer violation inside the canary exited 1 (same as FAIL); PASS with an AUT above 0.9 exited 0 | **Fixed.** Violation exits 4; PASS with the warning exits 3 |
+| P9 | informational | `EvalSlot` carries no per-row seen-before mask, which the E0 duplicate sensitivity needs | **Carried to Phase 5**, which must build the mask from the simulator's real training pool and give it to the metrics only, not to the public view |
+
 ## Evidence
-- Fast suite after the fixes: 472 passed. Fixes were written test-first; the 12 new regression tests failed on the code as reviewed.
+- Fast suite after the pass-2 fixes: 481 passed. Kill matrix: 15 of 15 mutants killed, baseline 120 tests green (`reports/mutation_matrix.md`, commit `9b27b58`).
+- Real caches after the pass-2 fixes: LAMDA 47 windows and 564 evaluation slots, BODMAS 2 windows and 24 evaluation slots, no C1-C3 violation, nothing densified.
+
+## Evidence (pass 1)
+- Fast suite after the pass-1 fixes: 472 passed. Fixes were written test-first; the 12 new regression tests failed on the code as reviewed.
 - Kill matrix: 14 of 14 mutants killed, baseline green (`reports/mutation_matrix.md`). The two new mutants are `oldest_malware` and `public_ids_are_row_ids`.
 - Real caches after the fixes: LAMDA 47 windows and 564 evaluation slots, BODMAS 2 windows and 24 evaluation slots, no C1-C3 violation, nothing densified, peak 0.36 and 0.65 GB. Window options unchanged.
 
