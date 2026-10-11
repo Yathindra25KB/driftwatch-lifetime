@@ -10,7 +10,8 @@ NO_GAP is inconclusive and exits non-zero: it never counts toward gate G1.
     uv run python scripts/leakage_canary.py bodmas --nT 3 --nE 6
     uv run python scripts/leakage_canary.py lamda --nT 4 --nE 12 --max-windows 3
 
-Exit code: 0 PASS, 1 FAIL, 2 cannot be computed, 3 NO_GAP (inconclusive: not a pass).
+Exit code: 0 PASS, 1 FAIL, 2 cannot be computed, 3 NO_GAP or PASS with an AUT above 0.9
+(inconclusive: needs review, not a pass), 4 the slicer raised a C1-C3 violation.
 
 Limit: the canary sees a leak only when it closes the gap between the time-aware AUT and
 the random-split F1. A small leak that leaves the gap above the band is caught by C1-C3
@@ -31,6 +32,7 @@ import sys
 from pathlib import Path
 
 from driftwatch.data.canary import CanaryError, run_canary
+from driftwatch.data.constraints import ConstraintViolation
 from driftwatch.data.memory import MemoryCapExceeded, MemoryWatchdog
 from driftwatch.data.presets import PRESETS, cached_source
 from driftwatch.data.slicer import WindowSpec
@@ -77,6 +79,10 @@ def main(argv: list[str] | None = None) -> int:
                 min_gap=args.min_gap,
                 min_closure=args.min_closure,
             )
+    except ConstraintViolation as exc:
+        # The slicer itself refused to yield a slot: distinct from a canary FAIL (exit 1).
+        print(f"SLICER VIOLATION {type(exc).__name__}: {exc}", file=sys.stderr)
+        return 4
     except CanaryError as exc:
         print(f"canary cannot be computed: {exc}", file=sys.stderr)
         return 2
@@ -110,6 +116,9 @@ def main(argv: list[str] | None = None) -> int:
     if result.leakage_warning:
         print("  WARNING: time-aware AUT above 0.9: possible leakage (guide section 9)")
     print(f"  wrote {out}")
+    if result.verdict == "PASS" and result.leakage_warning:
+        print("  PASS with a leakage warning needs manual review: exit 3, not a clean pass.")
+        return 3
     return {"PASS": 0, "FAIL": 1, "NO_GAP": 3}[result.verdict]
 
 

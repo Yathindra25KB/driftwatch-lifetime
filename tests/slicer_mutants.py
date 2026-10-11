@@ -184,9 +184,26 @@ def _public_ids_are_row_ids(mp: pytest.MonkeyPatch) -> None:
     """The label-free view hands out true row ids in time order (the reviewed behaviour)."""
 
     def transparent(self):
-        return slicer.PublicSlot(self.dataset, self.ref.slot_id, self.X, self.row_id.copy())
+        return slicer.OpaqueSlot(self.dataset, self.ref.slot_id, self.X, self.row_id.copy())
 
     mp.setattr(slicer.EvalSlot, "public", transparent)
+
+
+def _public_order_stratified(mp: pytest.MonkeyPatch) -> None:
+    """The public order interleaves malware at even spacing: correlation ~0, class inferable."""
+    original = slicer.EvalSlot
+
+    def stratified(**kw):
+        y = np.asarray(kw["y"])
+        n, mal = len(y), np.flatnonzero(y == 1)
+        perm = np.empty(n, dtype=np.int64)
+        taken = np.floor((np.arange(len(mal)) + 0.5) * n / max(len(mal), 1)).astype(np.int64)
+        free = np.setdiff1d(np.arange(n), taken)
+        perm[taken] = mal
+        perm[free] = np.flatnonzero(y == 0)
+        return original(**{**kw, "perm": perm})
+
+    mp.setattr(slicer, "EvalSlot", stratified)
 
 
 def _no_subsampling(mp: pytest.MonkeyPatch) -> None:
@@ -210,5 +227,6 @@ MUTANTS: dict[str, Mutant] = {
         Mutant("no_subsampling", "C3 reaches the target ratio", _no_subsampling),
         Mutant("oldest_malware", "C3 draw is uniform over the slot", _oldest_malware),
         Mutant("public_ids_are_row_ids", "public view is opaque", _public_ids_are_row_ids),
+        Mutant("public_order_stratified", "public order ignores y", _public_order_stratified),
     )
 }

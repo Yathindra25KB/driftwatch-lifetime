@@ -43,7 +43,6 @@ import scipy.sparse as sp
 
 from driftwatch.data import constraints
 from driftwatch.data.constraints import C3Result
-from driftwatch.data.loaders import PublicSlot
 
 log = logging.getLogger(__name__)
 
@@ -266,7 +265,8 @@ def _window_starts(length: int, spec: WindowSpec) -> list[int]:
     return list(range(0, length - (spec.nT + spec.nE) + 1, spec.stride))
 
 
-def plan_windows(planned: list[PlannedSlot], spec: WindowSpec) -> Schedule:
+def plan_windows(planned: list[PlannedSlot], spec: WindowSpec, source_digest: str = "") -> Schedule:
+    """Carve windows from runs of usable slots; ``source_digest`` keys results by source."""
     windows: list[WindowPlan] = []
     skipped_runs: list[SkippedRun] = []
     for segment, run in enumerate(_usable_runs(planned)):
@@ -281,8 +281,10 @@ def plan_windows(planned: list[PlannedSlot], spec: WindowSpec) -> Schedule:
             rest = run[start + spec.nT :]
             evaluation = tuple(p.ref for p in (rest if spec.nE is None else rest[: spec.nE]))
             n_e = "all" if spec.nE is None else spec.nE
-            # The digest keeps results at another ratio, seed or gate from colliding.
-            window_id = f"{spec.digest()}|{train[0].slot_id}|T{spec.nT}|E{n_e}"
+            # Digests keep results at another ratio, seed, gate or source (row filter, anchor,
+            # manifest) from colliding on (window_id, slot_id).
+            head = spec.digest() if not source_digest else f"{spec.digest()}-{source_digest}"
+            window_id = f"{head}|{train[0].slot_id}|T{spec.nT}|E{n_e}"
             windows.append(WindowPlan(window_id, segment, train, evaluation))
     skipped = tuple(p for p in planned if not p.usable)
     return Schedule(tuple(windows), skipped, tuple(skipped_runs))
@@ -347,6 +349,21 @@ class TrainWindow:
 
 
 @dataclass(frozen=True, eq=False)
+class OpaqueSlot:
+    """What a selector, policy or monitor may see of an evaluation slot.
+
+    A distinct type from the loader's ``PublicSlot`` (which keeps the dataset's own row ids
+    and order, and is for loader-level code only), so a type check can tell them apart.
+    There is deliberately no ``row_id`` and no back-reference to the slot.
+    """
+
+    dataset: str
+    slot_id: str
+    X: Any
+    handle: np.ndarray  # 0..n-1 in a seeded, label-independent order
+
+
+@dataclass(frozen=True, eq=False)
 class EvalSlot:
     """One evaluation slot after C3 subsampling, already checked against C1, C2 and C3."""
 
@@ -360,7 +377,7 @@ class EvalSlot:
     perm: np.ndarray  # seeded, label-independent shuffle that defines the public order
     n_seen_in_initial_train: int | None = None
 
-    def public(self) -> PublicSlot:
+    def public(self) -> OpaqueSlot:
         """The label-free view (hard rule 4): features and opaque handles only.
 
         Rows come in a seeded shuffle that depends on ``(seed, slot id)`` and nothing else,
@@ -371,11 +388,22 @@ class EvalSlot:
         """
         X = None if self.X is None else self.X[self.perm]
         handles = np.arange(len(self.perm), dtype=np.int64)
-        return PublicSlot(self.dataset, self.ref.slot_id, X, handles)
+        return OpaqueSlot(self.dataset, self.ref.slot_id, X, handles)
 
-    def resolve(self, handles: Any) -> np.ndarray:
-        """Positions in this slot (indexing ``y``, ``ts``, ``row_id``) of public handles."""
-        return self.perm[np.asarray(handles, dtype=np.int64)]
+    def resolve(self, slot_id: str, handles: Any) -> np.ndarray:
+        """Positions in this slot (indexing ``y``, ``ts``, ``row_id``) of public handles.
+
+        Handles are slot-local, so the slot id they came with must match: resolving a
+        slot's handles against another slot would release the wrong labels.
+        """
+        if slot_id != self.ref.slot_id:
+            raise SlicerError(
+                f"handles from slot {slot_id!r} resolved against slot {self.ref.slot_id!r}"
+            )
+        h = np.asarray(handles, dtype=np.int64)
+        if h.size and (h.min() < 0 or h.max() >= len(self.perm)):
+            raise SlicerError("a handle lies outside the slot")
+        return self.perm[h]
 
 
 def _load(source: SlotSource, planned: dict[str, PlannedSlot], ref: SlotRef) -> SlotRows:
@@ -497,7 +525,7 @@ def slice_windows(
     loaded), which keeps spot checks such as the canary cheap.
     """
     planned = plan_slots(source, spec)
-    schedule = plan_windows(planned, spec)
+    schedule = plan_windows(planned, spec, _source_digest(source))
     for slot in schedule.skipped_slots:
         if slot.skip_reason != SKIP_GAP:
             log.info(
@@ -517,6 +545,11 @@ def slice_windows(
     for position, plan in enumerate(schedule.windows):
         if wanted is None or position in wanted:
             yield _open_window(source, plan, spec, by_id, slicelog)
+
+
+def _source_digest(source: SlotSource) -> str:
+    text = json.dumps(source.provenance(), sort_keys=True, default=str, separators=(",", ":"))
+    return hashlib.sha256(text.encode()).hexdigest()[:8]
 
 
 def count_windows(source: SlotSource, spec: WindowSpec) -> int:
@@ -605,10 +638,19 @@ class SliceLog:
         runs = [] if schedule is None else schedule.skipped_runs
         self.skipped_runs = [dataclasses.asdict(r) for r in runs]
 
+    def _put(self, row: dict[str, Any]) -> None:
+        """Insert or replace by (window_id, role, slot_id): re-iterating never double-counts."""
+        key = (row["window_id"], row["role"], row["slot_id"])
+        for i, old in enumerate(self.window_rows):
+            if (old["window_id"], old["role"], old["slot_id"]) == key:
+                self.window_rows[i] = row
+                return
+        self.window_rows.append(row)
+
     def record_train(self, plan: WindowPlan, train: TrainWindow) -> None:
         for rows in train.slots:
             n_mal = int((rows.y == 1).sum())
-            self.window_rows.append(
+            self._put(
                 {
                     "window_id": plan.window_id,
                     "segment": plan.segment,
@@ -631,7 +673,7 @@ class SliceLog:
 
     def record_eval(self, plan: WindowPlan, slot: EvalSlot) -> None:
         c3 = slot.c3
-        self.window_rows.append(
+        self._put(
             {
                 "window_id": plan.window_id,
                 "segment": plan.segment,

@@ -215,11 +215,12 @@ def test_public_view_carries_only_features_and_opaque_row_ids():
     src = source_for(tl, x=feature_matrix(tl))
     slot = next(next(iter(slice_windows(src, spec()))).eval_slots())
     public = slot.public()
-    assert {f.name for f in fields(public)} == {"dataset", "slot_id", "X", "row_id"}
+    assert {f.name for f in fields(public)} == {"dataset", "slot_id", "X", "handle"}
     assert public.dataset == "synthetic" and public.slot_id == slot.ref.slot_id
     # Handles, not dataset row ids: contiguous, and only the slot can map them back.
-    assert np.array_equal(public.row_id, np.arange(len(slot.y)))
-    assert np.array_equal(np.sort(slot.row_id[slot.resolve(public.row_id)]), np.sort(slot.row_id))
+    assert np.array_equal(public.handle, np.arange(len(slot.y)))
+    back = slot.row_id[slot.resolve(public.slot_id, public.handle)]
+    assert np.array_equal(np.sort(back), np.sort(slot.row_id))
 
 
 def test_feature_rows_follow_the_rows_that_survive_subsampling():

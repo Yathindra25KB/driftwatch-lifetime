@@ -46,5 +46,5 @@
 `uv run driftwatch data download bodmas` (via gdown; a Drive quota error stops the download with manual steps), then `data build bodmas`, then `data verify`.
 - Rows are streamed straight out of the compressed `X.npy` member and written as one float32 `.npy` per ISO week (`data/cache/bodmas/v1/units/YYYY-Www/`), which can be memory-mapped.
 - The cache v2 build peaked at 0.56 GB against the 1.5 GB cap and took 23.4 s; the cache is 1,231.2 MB [measured].
-- The loader's metadata (`family`, `category`, and `ts` through its time of day) reveals the label. Selectors, policies and monitors get `SlotData.public()` only (ADR-0004).
+- The loader's metadata (`family`, `category`, and `ts` through its time of day) reveals the label. Selectors, policies and monitors get the slicer's opaque `EvalSlot.public()` view only (ADR-0004, addendum 1); `SlotData.public()` keeps `row_id`, which is the time rank, and is loader-level only.
 - No normalisation happens at ingestion: scaling is fitted on each training window in later phases.

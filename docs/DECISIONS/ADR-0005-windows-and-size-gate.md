@@ -74,6 +74,6 @@ A BODMAS window needs `nT + nE <= 9` to use the first (9-slot) run at all; `3 + 
 ## Evidence and references
 - `reports/window_options.md`, `reports/tables/window_segments_*.csv`, `reports/tables/window_options_*.csv` (commit 4ce5cba).
 - `reports/slicing_run.md` (full-dataset slicing at commit 4ce5cba).
-- `reports/mutation_matrix.md` (12 of 12 deliberate breakages caught).
-- `docs/reviews/slicer-review.md`.
+- `reports/mutation_matrix.md` (14 of 14 deliberate breakages caught).
+- `docs/reviews/slicer-review.md` (first pass: no C1-C3 violation; interface findings fixed or carried to Phase 5).
 - ADR-0004; PROTOCOL §2, §4, §5, D1, D4, D7; Build Guide §3, §6, §8.

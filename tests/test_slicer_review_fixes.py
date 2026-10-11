@@ -92,12 +92,12 @@ def test_f1_public_row_order_and_handles_carry_no_class_signal():
         n = len(slot.y)
         assert abs(spearman(np.arange(n), slot.y)) > 0.5, "the test has no power: order not linked"
         public = slot.public()
-        assert np.array_equal(np.sort(public.row_id), np.arange(n)), "handles must be 0..n-1"
+        assert np.array_equal(np.sort(public.handle), np.arange(n)), "handles must be 0..n-1"
         position = np.arange(n)
         # Resolve what a selector would query back to labels, as the queue does.
-        y_in_public_order = slot.y[slot.resolve(public.row_id)]
+        y_in_public_order = slot.y[slot.resolve(public.slot_id, public.handle)]
         assert abs(spearman(position, y_in_public_order)) < 0.25
-        assert abs(spearman(public.row_id, y_in_public_order)) < 0.25
+        assert abs(spearman(public.handle, y_in_public_order)) < 0.25
 
 
 def test_f1_public_features_follow_their_handles_and_resolve_to_true_rows():
@@ -110,7 +110,7 @@ def test_f1_public_features_follow_their_handles_and_resolve_to_true_rows():
     )
     slot = next(next(iter(slice_windows(src, spec(nT=2, nE=2)))).eval_slots())
     public = slot.public()
-    true_ids = slot.row_id[slot.resolve(public.row_id)]
+    true_ids = slot.row_id[slot.resolve(public.slot_id, public.handle)]
     assert np.array_equal(public.X[:, 0].astype(np.int64) - 1, true_ids)
     assert not np.shares_memory(public.X, slot.X), "the public view must be an isolated copy"
     public.X[:] = -1.0  # a consumer standardising in place must not touch the scoring features
@@ -131,6 +131,158 @@ def test_f1_public_order_is_seeded_and_is_not_time_order():
     a = public_ids(0)
     assert np.array_equal(a, public_ids(0))
     assert not np.all(np.diff(a) > 0), "the public order is still time order"
+
+
+# --- pass 2, findings 1-3: the selector-facing type is distinct and slot-bound --------------
+
+
+def _linked_window(**kw):
+    table, X = class_linked_table()
+    scheme = FixedWidthScheme(
+        np.datetime64(0, "s").astype("datetime64[ns]"), np.timedelta64(DAY, "s")
+    )
+    src = TableSource(table, scheme, x=X, name="linked")
+    return next(iter(slice_windows(src, spec(nT=2, nE=3, **kw))))
+
+
+def test_p2_1_the_selector_facing_view_is_not_the_loader_view():
+    from driftwatch.data.loaders import PublicSlot
+    from driftwatch.data.slicer import OpaqueSlot
+
+    public = next(_linked_window().eval_slots()).public()
+    assert isinstance(public, OpaqueSlot) and not isinstance(public, PublicSlot)
+    assert not hasattr(public, "row_id"), "no dataset row id may be reachable from the view"
+    assert {f.name for f in __import__("dataclasses").fields(public)} == {
+        "dataset",
+        "slot_id",
+        "X",
+        "handle",
+    }
+
+
+def test_p2_3_handles_resolve_only_against_their_own_slot():
+    from driftwatch.data.slicer import SlicerError
+
+    slots = list(_linked_window().eval_slots())
+    first, second = slots[0], slots[1]
+    handles = first.public().handle[:5]
+    assert len(first.resolve(first.ref.slot_id, handles)) == 5
+    with pytest.raises(SlicerError, match="slot"):
+        second.resolve(first.ref.slot_id, handles)  # another slot's handles
+
+
+def test_p2_2_the_public_order_is_independent_of_label_placement():
+    """Metamorphic: same counts, different placement of malware, same permutation."""
+    scheme = FixedWidthScheme(
+        np.datetime64(0, "s").astype("datetime64[ns]"), np.timedelta64(DAY, "s")
+    )
+    base = build_timeline({k: STANDARD for k in range(6)}, seed=1)
+    other = build_timeline({k: STANDARD for k in range(6)}, seed=2)  # same counts, new placement
+    assert not np.array_equal(base.y, other.y)
+    perms = []
+    for tl in (base, other):
+        src = TableSource(to_table(tl), scheme, name="m")
+        window = next(iter(slice_windows(src, spec())))
+        perms.append([s.perm.copy() for s in window.eval_slots()])
+    for a, b in zip(*perms, strict=True):
+        assert len(a) == len(b) and np.array_equal(a, b)
+
+
+# --- pass 2, findings 5-7: ids, filters and manifest rows -----------------------------------
+
+
+def test_p2_5_window_id_changes_with_the_source_configuration():
+    tl = build_timeline({k: STANDARD for k in range(8)})
+    plain = TableSource(to_table(tl), scheme_for(tl), name="s")
+    drop = RowFilter("drop early rows", lambda m: m["ts"] < pd.Timestamp("1970-01-01"), ("ts",))
+    filtered = TableSource(to_table(tl), scheme_for(tl), name="s", exclude=drop)
+    a = next(iter(slice_windows(plain, spec()))).plan.window_id
+    b = next(iter(slice_windows(filtered, spec()))).plan.window_id
+    assert a != b and a.split("|")[1:] == b.split("|")[1:]  # same slots, different source
+
+
+def test_p2_6_table_sources_accept_only_declared_column_filters():
+    from driftwatch.data.slicer import SlicerError
+
+    tl = build_timeline({k: STANDARD for k in range(4)})
+    with pytest.raises(SlicerError, match="RowFilter"):
+        TableSource(
+            to_table(tl),
+            scheme_for(tl),
+            exclude=lambda t: t["label"] == 1,  # type: ignore[arg-type]
+        )
+
+
+def test_p2_7_iterating_a_window_twice_does_not_duplicate_manifest_rows():
+    tl = build_timeline({k: STANDARD for k in range(6)})
+    src = TableSource(to_table(tl), scheme_for(tl), name="s")
+    log = SliceLog()
+    window = next(iter(slice_windows(src, spec(), log)))
+    list(window.eval_slots())
+    once = len(log.window_rows)
+    list(window.eval_slots())
+    assert len(log.window_rows) == once
+    keys = [(r["window_id"], r["role"], r["slot_id"]) for r in log.window_rows]
+    assert len(keys) == len(set(keys))
+
+
+# --- pass 2, finding 8: canary exit codes ----------------------------------------------------
+
+
+def _load_canary_script():
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "scripts" / "leakage_canary.py"
+    spec_ = importlib.util.spec_from_file_location("leakage_canary_script", path)
+    module = importlib.util.module_from_spec(spec_)
+    spec_.loader.exec_module(module)
+    return module
+
+
+def _fake_source():
+    class Fake:
+        def provenance(self):
+            return {"name": "fake", "kind": "fake"}
+
+    return Fake()
+
+
+def test_p2_8_a_constraint_violation_inside_the_canary_exits_4_not_1(monkeypatch, tmp_path):
+    from driftwatch.data.constraints import C1Violation
+
+    script = _load_canary_script()
+    monkeypatch.setattr(script, "cached_source", lambda *a, **k: _fake_source())
+
+    def boom(*a, **k):
+        raise C1Violation("planted")
+
+    monkeypatch.setattr(script, "run_canary", boom)
+    code = script.main(["bodmas", "--nT", "2", "--nE", "3", "--out", str(tmp_path / "o.json")])
+    assert code == 4
+
+
+def test_p2_8_a_pass_with_the_leakage_warning_is_not_a_clean_exit(monkeypatch, tmp_path):
+    from driftwatch.data.canary import CanaryResult
+
+    script = _load_canary_script()
+    monkeypatch.setattr(script, "cached_source", lambda *a, **k: _fake_source())
+    result = CanaryResult(
+        verdict="PASS",
+        aut_true=0.93,
+        aut_shuffled=0.99,
+        f1_random=0.99,
+        gap=0.06,
+        closure=1.0,
+        leakage_warning=True,
+        n_windows=1,
+        min_gap=0.05,
+        min_closure=0.5,
+        per_window=(),
+    )
+    monkeypatch.setattr(script, "run_canary", lambda *a, **k: result)
+    code = script.main(["bodmas", "--nT", "2", "--nE", "3", "--out", str(tmp_path / "o.json")])
+    assert code == 3
 
 
 # --- finding 2: NO_GAP is inconclusive, not a pass ------------------------------------------

@@ -126,6 +126,13 @@ The researcher chose: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50 with s
   - The BODMAS benign timestamp semantics (Q2) remain a threat to validity for C1 on Windows.
 - **Revisit when:** the researcher rejects a choice; Phase 3 fixes nT/nE or the C3 sensitivity ratio (re-run the gate tables); the LAMDA or BODMAS authors answer Q1 or Q2; or a new dataset version arrives (a new manifest entry, then rerun the inventory and update this ADR by addendum).
 
+## Addendum 1 (Phase 3, 11 Oct 2026): what "label-free view" means for item 7
+Decision 7 named `SlotData.public()` as the view for selectors, policies and monitors. The Phase 3 leakage review (docs/reviews/slicer-review.md, findings 1 and pass-2 finding 1) showed that this view keeps the dataset's own `row_id` and row order: on BODMAS the id is the time rank, and within a day the order is linked to class through midnight benign dates; on LAMDA the id encodes the source file. Item 7 is therefore amended, not reversed:
+- Selectors, policies and monitors receive only `EvalSlot.public()` from the slicer, an `OpaqueSlot`: features in a seeded, label-independent order, and handles `0..n-1`. Handles are slot-local and are resolved only by the label queue and the metrics, with the slot id they came with.
+- `SlotData.public()` and `PublicSlot` stay for loader-level code and must not be handed to selectors, policies or monitors.
+- The Phase 5 spy test must assert this type boundary (sentinel labels that raise on any read).
+No slot, gate or gap decision changes.
+
 ## Evidence and references
 - `reports/data_inventory.md`.
 - Tables: `reports/tables/data_lamda_slots_{month,quarter}.csv`, `data_bodmas_slots_{1w,2w,4w}.csv`, `data_bodmas_benign_days.csv`, `data_*_duplicates_per_slot.csv`.

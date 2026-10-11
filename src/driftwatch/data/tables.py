@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 
-from driftwatch.data.slicer import SlicerError, SlotInfo, SlotRef, SlotRows
+from driftwatch.data.slicer import RowFilter, SlicerError, SlotInfo, SlotRef, SlotRows
 
 NS = "datetime64[ns]"
 
@@ -143,7 +143,11 @@ class TableSource:
             raise SlicerError(f"{id_col} must be unique: row order would not be deterministic")
         if x is not None and x.shape[0] != n:
             raise SlicerError("the feature matrix has a different number of rows than the table")
-        drop = np.zeros(n, dtype=bool) if exclude is None else np.asarray(exclude(table), bool)
+        if exclude is not None and not isinstance(exclude, RowFilter):
+            raise SlicerError(
+                "exclude must be a RowFilter, so that it only sees the columns it declares"
+            )
+        drop = np.zeros(n, dtype=bool) if exclude is None else exclude(table)
         self._row_filter = getattr(exclude, "name", None) if exclude is not None else None
 
         order = np.lexsort((ids, ts.astype("int64")))

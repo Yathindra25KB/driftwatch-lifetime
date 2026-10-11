@@ -93,11 +93,18 @@ def probe_public_view_is_opaque() -> None:
     rf.test_f1_public_features_follow_their_handles_and_resolve_to_true_rows()
 
 
+def probe_public_order_ignores_y() -> None:
+    import test_slicer_review_fixes as rf
+
+    rf.test_p2_2_the_public_order_is_independent_of_label_placement()
+
+
 DETECTORS: dict[str, tuple[Callable[[], None], ...]] = {
     "oldest_malware": (
         lambda: tc.test_the_malware_draw_is_not_biased_toward_early_or_late_rows(0),
     ),
     "public_ids_are_row_ids": (probe_public_view_is_opaque,),
+    "public_order_stratified": (probe_public_order_ignores_y,),
     "shift_boundary": (probe_windows_against_oracle,),
     "shuffle_timestamps": (probe_windows_against_oracle,),
     "leak_one_sample": (probe_windows_against_oracle,),
