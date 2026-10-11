@@ -74,7 +74,7 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 | Value | Fixed in | Record |
 |---|---|---|
 | Slot length per dataset, minimum-size gate, gap handling | Phase 2 | ADR-0004-slot-definition (ACCEPTED 10 Oct 2026: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50, strict gaps) |
-| nT, nE, stride per dataset; size-gate numbers; ratio policy incl. the sensitivity ratio | Phase 3 | ADR-0005-windows-and-size-gate |
+| nT, nE, stride per dataset; size-gate numbers; ratio policy incl. the sensitivity ratio | Phase 3 | ADR-0005-windows-and-size-gate (PROPOSED 11 Oct 2026: LAMDA 4/12/3, BODMAS 3/6/2, M = 50, cap and flag, sensitivity 5%; not yet accepted) |
 | Decision threshold (default fixed 0.5 per Phase 4 prompt), scaling policy, A-AUT window formula | Phase 4 | ADR-0006-metrics-threshold-scaling |
 | Training-pool composition, new-label weight, budget base | Phase 5 | ADR-0007-pool-composition-and-budget |
 | Model hyperparameters, seeds, windows, exclusion rules | before E0 / Phase 6 | docs/PREREG.md, tag prereg-v1 |
