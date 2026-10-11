@@ -1,6 +1,6 @@
 # ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy
 
-**Status:** PROPOSED
+**Status:** ACCEPTED (by the researcher, 11 Oct 2026)
 **Date:** 2026-10-11
 **Deciders:** Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
 **Phase:** 3
@@ -53,7 +53,7 @@ Design constraints, all from the guide and the inventory: K = 3 to 4; nE must co
 
 A BODMAS window needs `nT + nE <= 9` to use the first (9-slot) run at all; `3 + 6` fits exactly.
 
-## Decision (proposed)
+## Decision (accepted by the researcher, 11 Oct 2026, as proposed)
 1. **Ratio policy: cap and flag (option 1A).** Headline target 10%, **sensitivity ratio 5%**. A below-target slot is a valid evaluation slot with its achieved ratio reported; the gate is "at least M malware kept after C3". Every table that reports AUT also reports the per-slot achieved ratio.
 2. **Size gate: M = 50** for both datasets (as ADR-0004), recomputed at each ratio. Training slots use the same gate (the rule is per slot; their rows are not subsampled).
 3. **LAMDA: nT = 4, nE = 12, stride = 3** (months). Sixteen windows in the 62-month run, each with four retrain periods; stride 3 keeps every window's retrain phase aligned with the 3-slot retraining period (D7).
