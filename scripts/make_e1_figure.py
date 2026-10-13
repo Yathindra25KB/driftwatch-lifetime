@@ -97,9 +97,15 @@ def _positions(cells: pd.DataFrame, preds: pd.DataFrame) -> pd.DataFrame:
 
 
 def window_series(run_dir: Path) -> pd.DataFrame:
-    """Per (series, model, window, slot position): F1 averaged over seeds."""
+    """Per (series, model, window, slot position): F1 averaged over seeds.
+
+    ``window_id`` embeds the seed (through the window spec digest), so the same window has a
+    different id under each seed. The window is identified by what follows the digest: its
+    first training slot and its shape.
+    """
     preds = _load(Path(run_dir))
     cells = _positions(_cell_f1(preds), preds)
+    cells["window_id"] = cells["window_id"].str.split("|", n=1).str[1]
     return (
         cells.groupby(["series", "model", "window_id", "slot_position"], as_index=False)["f1"]
         .mean()

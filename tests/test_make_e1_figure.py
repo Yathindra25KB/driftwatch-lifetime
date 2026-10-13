@@ -124,3 +124,20 @@ def test_a_run_without_the_per_slot_series_is_refused(tmp_path: Path) -> None:
     plain = run(cfg, make_source(), tmp_path, repo_root=ROOT)
     with pytest.raises(ValueError, match="random_split"):
         mod.per_slot_table({"toy": plain.dir})
+
+
+def test_a_window_is_counted_once_across_seeds(tmp_path: Path) -> None:
+    """window_id carries the seed through the spec digest; the window is the same window."""
+    mod = load_script()
+    cfg = baseline_config(
+        seeds=[0, 1],
+        e0={"variants": ["rolling"], "random_split": True, "per_slot_random_split": True},
+    )
+    s = run(cfg, make_source(), tmp_path, repo_root=ROOT)
+    preds = pd.read_parquet(s.dir / "predictions.parquet", columns=["seed", "window_id"])
+    per_seed = preds[preds["seed"] == 0]["window_id"].nunique()
+    assert preds["window_id"].nunique() == 2 * per_seed  # ids differ by seed
+    summary = mod.summary_table({"toy": s.dir})
+    assert (summary["n_windows"] == per_seed).all()
+    table = mod.per_slot_table({"toy": s.dir})
+    assert (table["n_windows"] == per_seed).all()
