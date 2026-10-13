@@ -136,3 +136,17 @@ def test_per_slot_random_split_needs_the_random_split_comparator() -> None:
         RunConfig.from_dict(
             cfg(e0={"variants": ["rolling"], "random_split": False, "per_slot_random_split": True})
         )
+
+
+@pytest.mark.parametrize(
+    "name",
+    sorted(p.name for p in (ROOT / "configs").glob("e1_*.yaml"))
+    + sorted(p.name for p in (ROOT / "configs").glob("li_*.yaml")),
+)
+def test_committed_phase_5_configs_parse(name: str) -> None:
+    c = RunConfig.from_file(ROOT / "configs" / name)
+    assert RunConfig.from_dict(c.to_dict()).to_dict() == c.to_dict()
+    if name.startswith("e1_"):
+        assert c.per_slot_random_split and c.random_split and c.policy == "never"
+    elif "_never" not in name:
+        assert c.is_simulation and c.policy == "periodic" and c.delay == 0
