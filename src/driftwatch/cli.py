@@ -63,14 +63,25 @@ def build_parser() -> argparse.ArgumentParser:
     sl.add_argument("--memory-cap-gb", type=float, default=1.5)
     sl.add_argument("--out", type=Path, default=Path("results") / "slicing")
 
-    run = sub.add_parser("run", help="run one YAML config (E0 baseline) and store its results")
-    run.add_argument("config", type=Path, help="a configs/*.yaml file")
+    run = sub.add_parser("run", help="run YAML configs (baseline or simulation), store results")
+    run.add_argument("config", type=Path, nargs="+", help="one or more configs/*.yaml files")
     run.add_argument("--root", type=Path, default=Path("data"), help="data root (default data)")
     run.add_argument("--out", type=Path, help="results root (default: the config's output)")
     run.add_argument("--memory-cap-gb", type=float, default=1.5)
     run.add_argument("--overwrite", action="store_true", help="replace a finished run")
     run.add_argument(
         "--require-clean", action="store_true", help="refuse a tree with uncommitted changes"
+    )
+    run.add_argument(
+        "--resume",
+        action="store_true",
+        help="continue an interrupted run of the same config hash from its finished windows",
+    )
+    run.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="runs in parallel, one thread per run (mind LightGBM n_jobs x workers <= cores)",
     )
     return parser
 
@@ -149,6 +160,43 @@ def _run_data(args: argparse.Namespace) -> int:
     raise AssertionError(args.data_command)
 
 
+def _run_configs(args: argparse.Namespace) -> list:
+    from driftwatch.data.presets import cached_source
+    from driftwatch.sim.config import RunConfig
+    from driftwatch.sim.runner import run_file, run_many
+
+    if len(args.config) == 1 and args.workers == 1:
+        return [
+            run_file(
+                args.config[0],
+                data_root=args.root,
+                out_root=args.out,
+                memory_cap_gb=args.memory_cap_gb,
+                overwrite=args.overwrite,
+                require_clean=args.require_clean,
+                resume=args.resume,
+            )
+        ]
+    jobs = []
+    out_roots = set()
+    for path in args.config:
+        cfg = RunConfig.from_file(path)
+        jobs.append((cfg, cached_source(cfg.dataset, args.root)))
+        out_roots.add(str(args.out if args.out is not None else cfg.output))
+    if len(out_roots) != 1:
+        raise FileExistsError(f"configs write to different roots {sorted(out_roots)}; use --out")
+    return run_many(
+        jobs,
+        out_roots.pop(),
+        repo_root=Path(__file__).resolve().parents[2],
+        workers=args.workers,
+        memory_cap_bytes=int(args.memory_cap_gb * 1024**3),
+        overwrite=args.overwrite,
+        require_clean=args.require_clean,
+        resume=args.resume,
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "data":
@@ -156,28 +204,26 @@ def main(argv: list[str] | None = None) -> int:
         return _run_data(args)
     if args.command == "run":
         from driftwatch.sim.config import ConfigError
-        from driftwatch.sim.runner import run_file
 
         logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
         try:
-            summary = run_file(
-                args.config,
-                data_root=args.root,
-                out_root=args.out,
-                memory_cap_gb=args.memory_cap_gb,
-                overwrite=args.overwrite,
-                require_clean=args.require_clean,
-            )
+            summaries = _run_configs(args)
         except (ConfigError, FileExistsError) as exc:
             print(f"driftwatch run: {exc}", file=sys.stderr)
             return 2
-        print(
-            f"{summary.n_windows} window rows, {summary.n_slot_rows} slot rows, "
-            f"{summary.n_prediction_rows} predictions, {summary.wall_s:.1f} s\n"
-            f"config hash {summary.config_hash}\n"
-            f"predictions sha256 {summary.predictions_sha256}\n"
-            f"results in {summary.dir}"
-        )
+        except RuntimeError as exc:
+            if "dirty" not in str(exc):
+                raise
+            print(f"driftwatch run: {exc}", file=sys.stderr)
+            return 2
+        for summary in summaries:
+            print(
+                f"{summary.n_windows} window rows, {summary.n_slot_rows} slot rows, "
+                f"{summary.n_prediction_rows} predictions, {summary.wall_s:.1f} s\n"
+                f"config hash {summary.config_hash}\n"
+                f"predictions sha256 {summary.predictions_sha256}\n"
+                f"results in {summary.dir}"
+            )
         return 0
     return 0
 

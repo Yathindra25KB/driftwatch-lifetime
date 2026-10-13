@@ -45,3 +45,48 @@ def sealed() -> list[SealedSlot]:
 
 def pick(slot: SealedSlot, handles) -> Selection:
     return Selection(slot_id=slot.slot_id, handles=np.asarray(handles, dtype=np.int64))
+
+
+class Spy:
+    """Array stand-in: records who reads it and refuses anything but indexing and conversion."""
+
+    def __init__(self, arr: np.ndarray, field: str, log: list[tuple[str, str, str]]) -> None:
+        object.__setattr__(self, "_arr", arr)
+        object.__setattr__(self, "_field", field)
+        object.__setattr__(self, "_log", log)
+
+    def _note(self, op: str) -> None:
+        import sys
+
+        caller = sys._getframe(2).f_globals.get("__name__", "?")
+        self._log.append((caller, self._field, op))
+
+    def __getitem__(self, idx):
+        self._note("getitem")
+        return self._arr[idx]
+
+    def __len__(self) -> int:
+        self._note("len")
+        return len(self._arr)
+
+    def __array__(self, dtype=None, copy=None):
+        self._note("array")
+        return np.asarray(self._arr, dtype=dtype)
+
+    def __getattr__(self, name: str):
+        if name in {"__array_struct__", "__array_interface__", "__array_priority__"}:
+            raise AttributeError(name)  # numpy probes these before __array__
+        self._note(f"attr:{name}")
+        raise AssertionError(f"unexpected read of {self._field}.{name}")
+
+
+def spied(slot, log):
+    """An EvalSlot whose y, ts and row_id are spies."""
+    import dataclasses
+
+    return dataclasses.replace(
+        slot,
+        y=Spy(slot.y, "y", log),
+        ts=Spy(slot.ts, "ts", log),
+        row_id=Spy(slot.row_id, "row_id", log),
+    )

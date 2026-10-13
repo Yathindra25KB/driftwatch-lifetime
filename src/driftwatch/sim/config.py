@@ -254,6 +254,8 @@ class RunConfig:
         per_slot = e0.get("per_slot_random_split", False)
         if not isinstance(per_slot, bool):
             raise ConfigError(f"e0.per_slot_random_split must be true or false, got {per_slot!r}")
+        if per_slot and not bool(e0.get("random_split", True)):
+            raise ConfigError("per_slot_random_split needs e0.random_split (the same draw)")
         variants = tuple(e0.get("variants") or ("rolling",))
         for v in variants:
             if v not in VARIANTS:

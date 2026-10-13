@@ -11,12 +11,11 @@ from __future__ import annotations
 
 import ast
 import dataclasses
-import sys
 from pathlib import Path
 
 import numpy as np
 import pytest
-from simstream import N_EVAL, eval_slots, train_window
+from simstream import N_EVAL, Spy, eval_slots, train_window
 
 from driftwatch.data.slicer import OpaqueSlot
 from driftwatch.sim.policies import Periodic
@@ -25,35 +24,6 @@ from driftwatch.sim.queue import LabelQueue, SealedSlot
 from driftwatch.sim.selectors import RandomSelector, selector_rng
 
 SIM = Path(__file__).resolve().parents[1] / "src" / "driftwatch" / "sim"
-
-
-class Spy:
-    """Array stand-in: records who reads it and refuses anything but indexing and conversion."""
-
-    def __init__(self, arr: np.ndarray, field: str, log: list[tuple[str, str, str]]) -> None:
-        object.__setattr__(self, "_arr", arr)
-        object.__setattr__(self, "_field", field)
-        object.__setattr__(self, "_log", log)
-
-    def _note(self, op: str) -> None:
-        caller = sys._getframe(2).f_globals.get("__name__", "?")
-        self._log.append((caller, self._field, op))
-
-    def __getitem__(self, idx):
-        self._note("getitem")
-        return self._arr[idx]
-
-    def __len__(self) -> int:
-        self._note("len")
-        return len(self._arr)
-
-    def __array__(self, dtype=None, copy=None):
-        self._note("array")
-        return np.asarray(self._arr, dtype=dtype)
-
-    def __getattr__(self, name: str):
-        self._note(f"attr:{name}")
-        raise AssertionError(f"unexpected read of {self._field}.{name}")
 
 
 def spied_slots(log):

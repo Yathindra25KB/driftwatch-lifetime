@@ -129,3 +129,10 @@ def test_per_slot_random_split_is_a_flag_of_the_baseline_block() -> None:
         RunConfig.from_dict(
             cfg(e0={"variants": ["rolling"], "random_split": False, "per_slot_random_split": 3})
         )
+
+
+def test_per_slot_random_split_needs_the_random_split_comparator() -> None:
+    with pytest.raises(ConfigError, match="per_slot_random_split"):
+        RunConfig.from_dict(
+            cfg(e0={"variants": ["rolling"], "random_split": False, "per_slot_random_split": True})
+        )

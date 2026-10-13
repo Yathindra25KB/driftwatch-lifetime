@@ -75,7 +75,7 @@ class SealedSlot:
 
     def assert_c1(self, train_ts: np.ndarray) -> None:
         """C1 against the rows a model was trained on, including released labels."""
-        constraints.check_c1(train_ts, self._slot.ts)
+        constraints.check_c1(train_ts, np.asarray(self._slot.ts))
 
     def score(self, pred: np.ndarray) -> Scored:
         """Metric code's door: ``pred`` is in the public (handle) order of this slot."""
