@@ -141,3 +141,63 @@ def test_a_window_is_counted_once_across_seeds(tmp_path: Path) -> None:
     assert (summary["n_windows"] == per_seed).all()
     table = mod.per_slot_table({"toy": s.dir})
     assert (table["n_windows"] == per_seed).all()
+
+
+# --- stats-review additions: achieved ratio, decomposition columns, spread --------------------
+
+
+@pytest.fixture(scope="module")
+def one_seed_run(tmp_path_factory):
+    out = tmp_path_factory.mktemp("e1one")
+    cfg = baseline_config(
+        seeds=[0],
+        e0={"variants": ["rolling"], "random_split": True, "per_slot_random_split": True},
+    )
+    return run(cfg, make_source(), out, repo_root=ROOT)
+
+
+def test_summary_shows_the_ratio_each_series_achieved_and_its_below_target_share(
+    one_seed_run,
+) -> None:
+    mod = load_script()
+    summary = mod.summary_table({"toy": one_seed_run.dir})
+    slots = pd.read_parquet(one_seed_run.dir / "slots.parquet")
+    row = summary.iloc[0]
+    for series in ("time_aware", "random_split"):
+        s = slots[(slots["series"] == series) & (slots["model"] == row["model"])]
+        assert row[f"mean_achieved_ratio_{series}"] == pytest.approx(s["achieved_ratio"].mean())
+        want = (s["c3_status"] == "below_target").mean()
+        assert row[f"share_below_target_{series}"] == pytest.approx(want)
+        assert row[f"mean_n_{series}"] == pytest.approx(s["n"].mean())
+    assert row["n_seeds"] == 1
+
+
+def test_gap_columns_separate_the_comparator_definitions(one_seed_run) -> None:
+    mod = load_script()
+    summary = mod.summary_table({"toy": one_seed_run.dir})
+    windows = pd.read_parquet(one_seed_run.dir / "windows.parquet")
+    preds = pd.read_parquet(one_seed_run.dir / "predictions.parquet")
+    for _, row in summary.iterrows():
+        w = windows[windows["model"] == row["model"]]
+        # E0-style: the window-level pooled comparator F1 minus the time-aware AUT
+        assert row["gap_e0_style"] == pytest.approx((w["f1_random_split"] - w["aut"]).mean())
+        # pooled F1 over the evaluation-slot rows of each window, averaged over windows
+        p = preds[(preds["model"] == row["model"]) & (preds["series"] == "random_split")]
+        pooled = [
+            f1(g["y_true"].to_numpy(), g["pred"].to_numpy())
+            for _, g in p.groupby(p["window_id"].str.split("|", n=1).str[1])
+        ]
+        assert row["random_f1_pooled_eval_rows"] == pytest.approx(np.mean(pooled))
+        assert np.isfinite(row["random_f1_mean_slot"]) and np.isfinite(row["gap_at_target_cells"])
+        assert row["aut_sd_time_aware"] >= 0 and row["gap_sd"] >= 0
+        assert row["n_cells_at_target_both"] > 0
+
+
+def test_the_gap_pairs_windows_by_key_and_refuses_unequal_window_sets(
+    one_seed_run, tmp_path: Path
+) -> None:
+    mod = load_script()
+    w = mod.window_series(one_seed_run.dir)
+    broken = w[~((w["series"] == "random_split") & (w["window_id"] == w["window_id"].iloc[0]))]
+    with pytest.raises(ValueError, match="window"):
+        mod.gap_by_window(broken[broken["model"] == "lr"])

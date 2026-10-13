@@ -95,3 +95,31 @@ def test_the_script_refuses_runs_that_are_not_the_expected_arms(runs, tmp_path: 
         mod.influence_table("toy", low.dir, low.dir, high.dir)
     with pytest.raises(ValueError, match="budget"):
         mod.influence_table("toy", never.dir, high.dir, low.dir)
+
+
+def test_changes_are_split_by_true_class_and_by_window(runs) -> None:
+    mod = load_script()
+    never, low, high = runs
+    row = mod.influence_table("toy", never.dir, low.dir, high.dir).iloc[0]
+    key = ["seed", "window_id", "slot_id", "row_id", "model"]
+    pn = pd.read_parquet(never.dir / "predictions.parquet", columns=[*key, "pred", "y_true"])
+    ph = pd.read_parquet(high.dir / "predictions.parquet", columns=[*key, "pred"])
+    m = pn.merge(ph, on=key, suffixes=("_n", "_h"))
+    slots = pd.read_parquet(high.dir / "slots.parquet")
+    first = slots[slots["retrained"]].groupby("window_id")["slot_index"].min()
+    pos = slots[["window_id", "slot_id", "slot_index"]].drop_duplicates(["window_id", "slot_id"])
+    m = m.merge(pos, on=["window_id", "slot_id"])
+    m = m[m["slot_index"] >= m["window_id"].map(first)]
+    changed = m["pred_n"] != m["pred_h"]
+    pos_rows, neg_rows = m["y_true"] == 1, m["y_true"] == 0
+    assert row["n_malware_scored_high"] == int(pos_rows.sum())
+    assert row["share_changed_never_vs_high_malware"] == pytest.approx(
+        changed[pos_rows].sum() / pos_rows.sum()
+    )
+    assert row["share_changed_never_vs_high_benign"] == pytest.approx(
+        changed[neg_rows].sum() / neg_rows.sum()
+    )
+    key_w = m["window_id"].str.split("|", n=1).str[1]
+    per_window = changed.groupby(key_w).mean()
+    assert row["window_share_min_never_vs_high"] == pytest.approx(per_window.min())
+    assert row["window_share_max_never_vs_high"] == pytest.approx(per_window.max())

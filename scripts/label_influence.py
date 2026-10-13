@@ -58,7 +58,8 @@ def _first_refit(run_dir: Path) -> pd.Series:
 
 
 def _predictions(run_dir: Path) -> pd.DataFrame:
-    p = pd.read_parquet(run_dir / "predictions.parquet", columns=[*KEY, "series", "pred"])
+    cols = [*KEY, "series", "pred", "y_true"]
+    p = pd.read_parquet(run_dir / "predictions.parquet", columns=cols)
     return p[p["series"] == "time_aware"].drop(columns="series")
 
 
@@ -70,7 +71,7 @@ def influence_table(dataset: str, never: Path, low: Path, high: Path) -> pd.Data
     m = _predictions(never).rename(columns={"pred": "pred_never"})
     for tag, d in (("low", low), ("high", high)):
         m = m.merge(
-            _predictions(d).rename(columns={"pred": f"pred_{tag}"}),
+            _predictions(d).drop(columns="y_true").rename(columns={"pred": f"pred_{tag}"}),
             on=KEY,
             how="inner",
             validate="1:1",
@@ -105,6 +106,30 @@ def influence_table(dataset: str, never: Path, low: Path, high: Path) -> pd.Data
         def share(c: int, n: int) -> float:
             return c / n if n else float("nan")
 
+        def split(
+            changed: pd.Series, after: pd.Series, label: int, g: pd.DataFrame = g
+        ) -> tuple[int, float]:
+            """Rows of one true class scored after the arm's first refit, and the changed share."""
+            sel = after & (g["y_true"] == label)
+            n = int(sel.sum())
+            return n, share(int(changed[sel].sum()), n)
+
+        window_key = g["window_id"].str.split("|", n=1).str[1]  # the seed is in the id
+        ch_nh = g["pred_never"] != g["pred_high"]
+        per_window = ch_nh[ah].groupby(window_key[ah]).mean()
+        class_cols: dict[str, float] = {}
+        for tag, ch, after in (
+            ("never_vs_low", g["pred_never"] != g["pred_low"], al),
+            ("never_vs_high", ch_nh, ah),
+            ("low_vs_high", g["pred_low"] != g["pred_high"], ae),
+        ):
+            n_mal, s_mal = split(ch, after, 1)
+            n_ben, s_ben = split(ch, after, 0)
+            class_cols[f"n_malware_scored_{tag.split('_vs_')[1]}"] = n_mal
+            class_cols[f"share_changed_{tag}_malware"] = s_mal
+            class_cols[f"share_changed_{tag}_benign"] = s_ben
+            del n_ben
+
         rows.append(
             {
                 "dataset": dataset,
@@ -132,6 +157,9 @@ def influence_table(dataset: str, never: Path, low: Path, high: Path) -> pd.Data
                     wh[wh["model"] == model]["n_arrived_final"].mean()
                 ),
                 "mean_initial_pool_rows": float(wh[wh["model"] == model]["n_train_rows"].mean()),
+                **class_cols,
+                "window_share_min_never_vs_high": float(per_window.min()),
+                "window_share_max_never_vs_high": float(per_window.max()),
             }
         )
     return pd.DataFrame(rows)
