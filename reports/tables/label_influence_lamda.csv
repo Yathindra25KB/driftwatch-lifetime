@@ -1,0 +1,3 @@
+dataset,model,n_windows,n_seeds,delay,budget_pct_low,budget_pct_high,n_scored_low,n_scored_high,n_scored_either,n_changed_never_vs_low,share_changed_never_vs_low,n_changed_never_vs_high,share_changed_never_vs_high,n_changed_low_vs_high,share_changed_low_vs_high,mean_labels_arrived_low,mean_labels_arrived_high,mean_initial_pool_rows
+lamda,lgbm,48,3,0,0.5,5.0,1872651,1872651,1872651,13284,0.007093686971037316,18554,0.00990787925780084,17856,0.009535145630445822,239.3125,2392.9375,29422.0625
+lamda,lr,48,3,0,0.5,5.0,1872651,1872651,1872651,16451,0.0087848723547527,39449,0.021065857973535912,34700,0.018529880901460016,239.3125,2392.9375,29422.0625
