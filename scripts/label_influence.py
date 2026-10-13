@@ -109,7 +109,9 @@ def influence_table(dataset: str, never: Path, low: Path, high: Path) -> pd.Data
             {
                 "dataset": dataset,
                 "model": model,
-                "n_windows": int(g["window_id"].nunique()),
+                "n_windows": int(
+                    g["window_id"].str.split("|", n=1).str[1].nunique()
+                ),  # seed is in the id
                 "n_seeds": int(g["seed"].nunique()),
                 "delay": cfg_h["delay"],
                 "budget_pct_low": cfg_l["budget_pct"],
