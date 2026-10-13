@@ -33,7 +33,7 @@ Hypotheses are the build guide's (§5). The primary metrics, contrasts and decis
 | Model hyperparameters (LR; LightGBM fast profile) | **LR:** L2, C 1.0, lbfgs, tol 1e-4, max_iter 1000, no class weights. **LightGBM fast:** 100 trees, learning rate 0.1, 31 leaves, min child samples 20, max_bin 63, colsample_bytree 0.5, subsample 0.8 (every tree), deterministic, col-wise, 4 threads. **LightGBM default (timed only):** library defaults. Fixed before E0 runs; never tuned to chase published numbers | ADR-0006 (PROPOSED); configs/e0_*.yaml |
 | E0 sanity band | Published ranges from the guide, shown beside the E0 table as context and never as a target. Values: [verify], to be supplied by the researcher from guide §9 | Phase 4 |
 | Primary sanity margin | Random-split F1 minus time-aware AUT(F1) at least 0.05 on at least one dataset (RQ1 band) | Phase 4 |
-| Training-pool design (new-label weight, windowing) | TBD | ADR-0007 (Phase 5) |
+| Training-pool design (new-label weight, windowing) | New-label weight 1; no truncation (researcher, 11 Oct 2026); pool = initial window plus arrived labels. Proposed in ADR-0007, accepted when the researcher accepts it | ADR-0007 (Phase 5) |
 | Grid | delay {0,1,2,3}; budget {0.5,1,2,5}% of the evaluated slot; policies never and periodic(3); LR and LightGBM; both datasets | Phase 6 |
 | Exclusion rules | TBD | Phase 6 |
 | Failure rule | Failures are logged with their reason, never silently rerun; no cell is dropped, rerun or re-seeded because its result looks wrong. | fixed |

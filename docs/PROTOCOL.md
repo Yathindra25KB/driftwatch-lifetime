@@ -76,7 +76,7 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 | Slot length per dataset, minimum-size gate, gap handling | Phase 2 | ADR-0004-slot-definition (ACCEPTED 10 Oct 2026: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50, strict gaps) |
 | nT, nE, stride per dataset; size-gate numbers; ratio policy incl. the sensitivity ratio | Phase 3 | ADR-0005-windows-and-size-gate (ACCEPTED 11 Oct 2026: LAMDA nT 4, nE 12, stride 3; BODMAS nT 3, nE 6, stride 2; M = 50; cap and flag; sensitivity ratio 5%) |
 | Decision threshold (default fixed 0.5 per Phase 4 prompt), scaling policy, A-AUT window formula | Phase 4 | ADR-0006-metrics-threshold-scaling (PROPOSED 11 Oct 2026: fixed 0.5; StandardScaler on the training window; sample std over windows; ADR-0005 windows headline, Chow stride secondary) |
-| Training-pool composition, new-label weight, budget base | Phase 5 | ADR-0007-pool-composition-and-budget |
+| Training-pool composition, new-label weight, budget base, retrain anchor | Phase 5 | ADR-0007-pool-composition-and-budget (PROPOSED 13 Oct 2026: pool = initial window + arrived labels, weight 1, no truncation [researcher's choice, 11 Oct]; budget = percentage of the evaluated slot after C3; retrain before evaluation slots 3, 6, 9, ... from the first evaluation slot) |
 | Model hyperparameters, seeds, windows, exclusion rules | before E0 / Phase 6 | docs/PREREG.md, tag prereg-v1 |
 
 ## 6. Differences and ambiguities (listed, not resolved)
@@ -85,11 +85,11 @@ These are not in section 6, but section 6 depends on them. Each row names its so
 |---|---|---|---|
 | D1 | Guide §6 vs plan §3 item 5 | §6 trains once on the first K = 3–4 slots and then steps through the rest. A-AUT needs rolling train/test windows. The plan turns each rolling window into an independent simulation (nT = K, nE, stride). | Phase 3 ADR |
 | D2 | Guide §6 vs §2 | §6 measures delay in **slots** (d ∈ {0,1,2,3}). §2 promises "how much AUT(F1) you lose per **month** of label delay", and §3 motivates 1–3 months from the EMBER2024 challenge set. If BODMAS slots are weeks, a slot is not a month. | Phase 2 ADR, Phase 6 reporting |
-| D3 | Guide §6 vs Phase 5 prompt | Budget is a "percentage of the slot" (§6) or "of the evaluated slot" (Phase 5). Not stated: whether the base is counted before or after C3 malware subsampling. | Phase 5 ADR |
+| D3 | Guide §6 vs Phase 5 prompt | Budget is a "percentage of the slot" (§6) or "of the evaluated slot" (Phase 5). Not stated: whether the base is counted before or after C3 malware subsampling. **Proposed in ADR-0007:** after C3 (the slot the selector sees); count is `floor(pct/100 * n + 1/2)`. | Phase 5 ADR-0007 (PROPOSED) |
 | D4 | Guide §6 | "One sensitivity check at another ratio": the second ratio is not given. | Phase 3 ADR |
 | D5 | Guide §6 vs Phase 4 prompt | §6 says only "a fixed decision threshold". The value 0.5 and the rule that a tuned threshold may use only the final training slot come from the Phase 4 prompt. | Phase 4 ADR |
 | D6 | Guide §6 | Recovery time refers to "a drop event", but a drop event is defined only under monitor quality, and only "for example" (0.05 below the trailing 3-slot mean). The Phase 9 prompt makes that definition firm for monitor scoring. Whether recovery time uses the same definition is unstated. | Phase 4 ADR |
-| D7 | Guide §6 | "Retrain every 3 slots": the anchor (window start vs first evaluation slot) is unstated. | Phase 5 |
+| D7 | Guide §6 | "Retrain every 3 slots": the anchor (window start vs first evaluation slot) is unstated. **Proposed in ADR-0007:** before scoring evaluation slots 3, 6, 9, ... counted from the first evaluation slot; an event with no newly arrived label is logged as a no-op. | Phase 5 ADR-0007 (PROPOSED) |
 | D8 | Guide §5, §6 vs plan §3 item 6 | The 20% calibration slice is a sandbox value. The plan sets it as default 20% and ablates {0, 10, 20, 40}% [estimate]. | Phase 8 addendum |
 | D9 | Guide §6 box vs plan §3 item 7 | The guide marks LAMDA's timestamp granularity and feature dimension [verify]. The plan reports year_month, 4,561 int8 features, no 2015 and a provided 80/20 split to ignore [verified by the plan]. | Phase 2 re-measures |
 | D10 | Guide §6 vs plan §3 item 11 | BODMAS "Aug 2019 to Sep 2020" is described as about 13 months, but can be up to 14. | Phase 2 re-measures |
