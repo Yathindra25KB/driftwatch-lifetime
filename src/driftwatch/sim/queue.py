@@ -40,6 +40,24 @@ class Scored:
     scores: SlotScores
 
 
+def _frozen(public: OpaqueSlot) -> OpaqueSlot:
+    """Make the cached public view read-only.
+
+    The same arrays back every consumer and the scoring door, so an in-place edit (a shuffle
+    of the handles, a write into the features) would silently pair predictions with the
+    wrong labels. The slicer builds both arrays fresh per call, so freezing them here does
+    not touch the evaluation slot itself.
+    """
+    public.handle.setflags(write=False)
+    X = public.X
+    if hasattr(X, "indptr"):  # CSR
+        for part in (X.data, X.indices, X.indptr):
+            part.setflags(write=False)
+    elif X is not None:
+        X.setflags(write=False)
+    return public
+
+
 class SealedSlot:
     """An evaluation slot whose true labels are reachable only by the queue and metric code."""
 
@@ -47,7 +65,7 @@ class SealedSlot:
 
     def __init__(self, slot: EvalSlot) -> None:
         self._slot = slot
-        self._public = slot.public()
+        self._public = _frozen(slot.public())
 
     @property
     def slot_id(self) -> str:

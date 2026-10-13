@@ -42,30 +42,38 @@ def runs(tmp_path_factory):
     return never, low, high
 
 
-def test_counts_match_a_direct_comparison_of_the_stored_predictions(runs, tmp_path: Path) -> None:
+def _first_refit(run_dir: Path) -> pd.Series:
+    slots = pd.read_parquet(run_dir / "slots.parquet")
+    return slots[slots["retrained"]].groupby("window_id")["slot_index"].min()
+
+
+def test_counts_use_each_arms_own_first_refit_and_denominator(runs) -> None:
     mod = load_script()
     never, low, high = runs
     table = mod.influence_table("toy", never.dir, low.dir, high.dir)
     assert set(table["model"]) == {"lr"}
     row = table.iloc[0]
 
-    p = {
-        k: pd.read_parquet(r.dir / "predictions.parquet") for k, r in zip("nlh", runs, strict=True)
-    }
     key = ["seed", "window_id", "slot_id", "row_id", "model"]
-    m = p["n"].merge(p["h"], on=key, suffixes=("_n", "_h"))
-    slots = pd.read_parquet(runs[2].dir / "slots.parquet")
-    first = slots[slots["retrain_event"]].groupby("window_id")["slot_index"].min()
-    cut = m["window_id"].map(first)
-    slot_idx = m.merge(
-        slots[["window_id", "slot_id", "slot_index"]].drop_duplicates(),
-        on=["window_id", "slot_id"],
-        how="left",
-    )["slot_index"]
-    after = slot_idx.to_numpy() >= cut.to_numpy()
-    want = int((m["pred_n"] != m["pred_h"])[after].sum())
-    assert row["n_changed_never_vs_high"] == want
-    assert row["n_scored_after_first_retrain"] == int(after.sum())
+    cols = [*key, "pred"]
+    p = {
+        k: pd.read_parquet(r.dir / "predictions.parquet", columns=cols)
+        for k, r in zip(("n", "l", "h"), runs, strict=True)
+    }
+    m = p["n"].merge(p["l"], on=key, suffixes=("_n", "_l")).merge(p["h"], on=key)
+    m = m.rename(columns={"pred": "pred_h"})
+    slots = pd.read_parquet(high.dir / "slots.parquet")[["window_id", "slot_id", "slot_index"]]
+    m = m.merge(slots.drop_duplicates(), on=["window_id", "slot_id"])
+    fl, fh = _first_refit(low.dir), _first_refit(high.dir)
+    after_l = m["slot_index"].to_numpy() >= m["window_id"].map(fl).to_numpy()
+    after_h = m["slot_index"].to_numpy() >= m["window_id"].map(fh).to_numpy()
+    either = after_l | after_h
+    assert row["n_scored_low"] == int(after_l.sum())
+    assert row["n_scored_high"] == int(after_h.sum())
+    assert row["n_scored_either"] == int(either.sum())
+    assert row["n_changed_never_vs_low"] == int((m["pred_n"] != m["pred_l"])[after_l].sum())
+    assert row["n_changed_never_vs_high"] == int((m["pred_n"] != m["pred_h"])[after_h].sum())
+    assert row["n_changed_low_vs_high"] == int((m["pred_l"] != m["pred_h"])[either].sum())
     assert 0 <= row["share_changed_never_vs_high"] <= 1
 
 
@@ -76,7 +84,7 @@ def test_the_table_has_no_aut_or_f1_and_reports_the_labels_that_arrived(runs) ->
     for col in table.columns:
         assert "aut" not in col.lower() and "f1" not in col.lower(), col
     assert (table["mean_labels_arrived_high"] > table["mean_labels_arrived_low"]).all()
-    assert (table["n_changed_never_vs_low"] <= table["n_scored_after_first_retrain"]).all()
+    assert (table["n_changed_never_vs_low"] <= table["n_scored_low"]).all()
     assert np.isfinite(table["share_changed_low_vs_high"]).all()
 
 

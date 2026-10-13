@@ -145,3 +145,18 @@ def test_only_the_queue_module_reads_slot_labels() -> None:
             continue
         text = path.read_text(encoding="utf-8")
         assert "_slot.y" not in text and "slot.y[" not in text, path.name
+
+
+def test_the_cached_public_view_is_read_only_so_a_selector_cannot_reorder_scoring() -> None:
+    slot = SealedSlot(eval_slots()[0])
+    pub = slot.public()
+    with pytest.raises(ValueError):
+        pub.handle[:] = pub.handle[::-1]  # an in-place shuffle would re-pair scores and labels
+    X = pub.X
+    parts = (X.data, X.indices, X.indptr) if hasattr(X, "indptr") else (X,)
+    for part in parts:
+        with pytest.raises(ValueError):
+            part[...] = 0
+    # scoring is unaffected by any attempt
+    pred = np.zeros(slot.n, dtype=np.int8)
+    assert slot.score(pred).scores.n == slot.n

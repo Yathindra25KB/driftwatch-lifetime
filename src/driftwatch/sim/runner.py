@@ -109,8 +109,17 @@ class InitialModelCache:
         self._key_locks: dict[str, threading.Lock] = {}
 
     @staticmethod
-    def key(dataset: str, train_key: str, model_spec: dict[str, Any], seed: int | None) -> str:
-        body = json.dumps([dataset, train_key, model_spec, seed], sort_keys=True, default=str)
+    def key(
+        dataset: str,
+        train_key: str,
+        model_spec: dict[str, Any],
+        seed: int | None,
+        rows_digest: str = "",
+    ) -> str:
+        """``rows_digest`` binds the key to the training rows, not only to their slot ids."""
+        body = json.dumps(
+            [dataset, train_key, model_spec, seed, rows_digest], sort_keys=True, default=str
+        )
         return hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
 
     def get_or_fit(self, key: str, fit: Callable[[], Detector]) -> tuple[Detector, bool]:
@@ -336,16 +345,31 @@ def _per_slot_writer(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, windo
 # --- initial fits ----------------------------------------------------------------------------
 
 
+def _rows_digest(train: Any) -> str:
+    """Digest of the training rows' ids, labels and feature values (not just slot ids)."""
+    h = hashlib.sha256()
+    h.update(np.ascontiguousarray(train.row_id, dtype=np.int64).tobytes())
+    h.update(np.ascontiguousarray(train.y, dtype=np.int8).tobytes())
+    X = train.X
+    if hasattr(X, "indptr"):  # CSR: values, column indices, row pointers
+        for part in (X.data, X.indices, X.indptr):
+            h.update(np.ascontiguousarray(part).tobytes())
+    else:
+        h.update(np.ascontiguousarray(X).tobytes())
+    return h.hexdigest()[:20]
+
+
 def _initial_detectors(
     ctx: _Ctx, window: Window, seed: int, train_key: str
 ) -> list[tuple[int, Detector, bool]]:
     """One fitted detector per configured model on the window's raw training rows."""
     train = window.train
+    rows = _rows_digest(train)
     fitted: list[tuple[int, Detector, bool]] = []
     for mi, mspec in enumerate(ctx.cfg.models):
         det = make_model(mspec, seed)
         key = InitialModelCache.key(
-            ctx.cfg.dataset, train_key, mspec, seed if det.seed_sensitive else None
+            ctx.cfg.dataset, train_key, mspec, seed if det.seed_sensitive else None, rows
         )
 
         def fit(d: Detector = det) -> Detector:
@@ -482,7 +506,7 @@ def _run_sim_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window
             released = st.queue.release(s)  # labels queried in slot s - 1 - d arrive now
             st.pool.add(released)
             st.n_released += len(released)
-            st.pool.assert_c1(slot)  # C1 with the released rows in the pool
+            slot.assert_c1(st.pool.ts)  # C1 with the released rows in the pool
             event = st.policy.should_retrain(s)
             n_new = st.pool.n_new_since_fit
             fit_seconds = 0.0
@@ -517,6 +541,11 @@ def _run_sim_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window
             n_pool = st.pool.n
             # spend the budget now; the labels come back through the queue after the delay
             selection = st.selector.select(public, n_budget, selector_rng(seed, public.slot_id))
+            if len(selection.handles) > n_budget:
+                raise ValueError(
+                    f"selector {st.selector.name!r} returned {len(selection.handles)} handles "
+                    f"for a budget of {n_budget} in slot {slot.slot_id}"
+                )
             receipt = st.queue.query(s, slot, selection)
             st.n_queried += receipt.n_queried
             st.n_ignored += receipt.n_ignored
@@ -843,6 +872,12 @@ def run_many(
     """
     if workers < 1:
         raise ValueError(f"workers must be at least 1, got {workers}")
+    seen: set[str] = set()
+    for cfg, _ in jobs:
+        canon = json.dumps(cfg.to_dict(), sort_keys=True)
+        if canon in seen:
+            raise ValueError(f"two jobs have the same configuration ({cfg.name!r}): one result dir")
+        seen.add(canon)
     cache = kwargs.pop("cache", None) or InitialModelCache()
 
     def one(job: tuple[RunConfig, SlotSource]) -> RunSummary:

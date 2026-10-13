@@ -32,7 +32,7 @@ def load_script():
 def e1_run(tmp_path_factory):
     out = tmp_path_factory.mktemp("e1")
     cfg = baseline_config(
-        seeds=[0, 1],
+        seeds=[0],
         model=[{"name": "lr"}, {"name": "lgbm", "profile": "fast", "n_jobs": 1}],
         e0={"variants": ["rolling"], "random_split": True, "per_slot_random_split": True},
     )

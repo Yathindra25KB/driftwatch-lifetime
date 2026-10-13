@@ -62,9 +62,9 @@ def test_pool_c1_holds_against_every_later_slot_and_raises_if_violated() -> None
     for r in released_after(0, {0: [0, 1], 1: [2]}):
         pool.add(r)
     slots = sealed()
-    pool.assert_c1(slots[2])  # slot 2 is later than every pooled row
+    slots[2].assert_c1(pool.ts)  # slot 2 is later than every pooled row
     with pytest.raises(C1Violation):
-        pool.assert_c1(slots[0])  # a label queried in slot 0 is not older than slot 0
+        slots[0].assert_c1(pool.ts)  # a label queried in slot 0 is not older than slot 0
 
 
 def test_sparse_features_stay_sparse() -> None:

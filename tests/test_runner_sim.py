@@ -285,8 +285,9 @@ def test_cache_key_is_a_subhash_of_dataset_window_model_and_seed() -> None:
 # --- sealing at the runner level --------------------------------------------------------------
 
 
+@pytest.mark.parametrize("per_slot", [False, True])
 def test_the_runner_never_reads_a_label_outside_the_queue_module(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, per_slot: bool
 ) -> None:
     log: list[tuple[str, str, str]] = []
     real = runner.slice_windows
@@ -303,7 +304,8 @@ def test_the_runner_never_reads_a_label_outside_the_queue_module(
             yield window
 
     monkeypatch.setattr(runner, "slice_windows", spying)
-    go(make_config(delay=1), tmp_path)
+    e0 = {"variants": ["rolling"], "random_split": per_slot, "per_slot_random_split": per_slot}
+    go(make_config(delay=1, e0=e0), tmp_path)
     assert log, "no label reads were recorded"
     assert {caller for caller, _, _ in log} == {"driftwatch.sim.queue"}
 
@@ -356,3 +358,86 @@ def test_cli_runs_several_configs_in_threads_and_rejects_resume_on_a_dirty_tree(
     assert len(list(out.iterdir())) == 2
     monkeypatch.setattr(runner, "code_version", lambda repo=None: "abc-dirty")
     assert cli.main(["run", paths[0], "--out", str(tmp_path / "o2"), "--resume"]) == 2
+
+
+# --- review fixes (Phase 5 leakage review) ---------------------------------------------------
+
+
+def test_sources_with_the_same_shape_but_different_rows_do_not_share_an_initial_model(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Same dataset name, slot ids and window shape, different content: one cache, two fits."""
+    monkeypatch.setitem(models_pkg._REGISTRY, "counting", CountingDetector)
+    CountingDetector.fits = []
+    cache = InitialModelCache()
+    cfg = make_config(delay=0, model=[{"name": "counting"}], policy="never")
+    run(cfg, make_source(seed=0), tmp_path / "a", repo_root=ROOT, cache=cache)
+    n_first = len(CountingDetector.fits)
+    run(cfg, make_source(seed=1), tmp_path / "b", repo_root=ROOT, cache=cache)
+    assert len(CountingDetector.fits) == 2 * n_first
+
+
+def test_c1_is_asserted_in_the_loop_when_a_released_row_is_not_older_than_the_slot(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import dataclasses
+
+    from driftwatch.data.constraints import C1Violation
+    from driftwatch.sim.queue import LabelQueue
+
+    real = LabelQueue.release
+
+    def late(self, slot_index):
+        rel = real(self, slot_index)
+        if len(rel) == 0:
+            return rel
+        return dataclasses.replace(rel, ts=rel.ts + np.timedelta64(3650, "D"))
+
+    monkeypatch.setattr(LabelQueue, "release", late)
+    with pytest.raises(C1Violation):
+        go(make_config(delay=0), tmp_path)
+
+
+def test_a_retrain_fits_exactly_the_initial_window_plus_the_labels_that_arrived(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setitem(models_pkg._REGISTRY, "counting", CountingDetector)
+    CountingDetector.fits = []
+    s = go(make_config(delay=1, model=[{"name": "counting"}], budget_pct=5.0), tmp_path)
+    windows, slots, _, _ = tables(s)
+    expected = []
+    for wid, w in slots.groupby("window_id"):
+        w = w.sort_values("slot_index").reset_index(drop=True)
+        n_train = int(windows[windows["window_id"] == wid]["n_train_rows"].iloc[0])
+        expected.append(n_train)  # the initial fit
+        expected += [int(n) for n in w[w["retrained"]]["n_pool"]]  # every refit
+        # the pool is the initial window plus exactly what had been released by then
+        for _, row in w[w["retrained"]].iterrows():
+            released_so_far = int(w[w["slot_index"] <= row["slot_index"]]["n_released"].sum())
+            assert row["n_pool"] == n_train + released_so_far
+    assert sorted(CountingDetector.fits) == sorted(expected)
+
+
+def test_a_selector_that_spends_more_than_the_budget_is_refused(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from driftwatch.sim.selectors import Selection
+
+    class Greedy:
+        name = "random"
+
+        def select(self, public, n, rng, scores=None):
+            return Selection(public.slot_id, public.handle)  # ignores n: queries the whole slot
+
+    monkeypatch.setattr(runner, "make_selector", lambda name: Greedy())
+    with pytest.raises(ValueError, match="budget"):
+        go(make_config(delay=0, budget_pct=1.0), tmp_path)
+
+
+def test_two_runs_with_one_config_hash_are_refused_in_run_many(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="same configuration"):
+        run_many(
+            [(make_config(), make_source()), (make_config(), make_source())],
+            tmp_path,
+            repo_root=ROOT,
+        )

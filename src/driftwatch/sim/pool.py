@@ -21,7 +21,7 @@ import numpy as np
 from driftwatch.data.slicer import TrainWindow, _stack
 
 if TYPE_CHECKING:
-    from driftwatch.sim.queue import Released, SealedSlot
+    from driftwatch.sim.queue import Released
 
 
 class TrainingPool:
@@ -104,7 +104,3 @@ class TrainingPool:
     def row_id(self) -> np.ndarray:
         """Initial and arrived row ids (for the seen-before mask, which only metrics use)."""
         return np.concatenate([self._initial_row_id, self.arrived_row_id])
-
-    def assert_c1(self, slot: SealedSlot) -> None:
-        """C1 stays an assertion: every pooled row is strictly older than the slot scored."""
-        slot.assert_c1(self.ts)

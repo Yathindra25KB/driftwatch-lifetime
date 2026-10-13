@@ -1,8 +1,9 @@
 """The label queue is the only place a delay exists (hard rule 3, .claude/rules/sim.md).
 
 A label queried in evaluation slot t is usable from slot t + 1 + d (d = 0 means the next slot).
-A label whose release slot falls at or after the window's last slot has no slot left to be used
-in, so it is ignored and counted. Nothing is lost or duplicated in between.
+A label whose release index t + 1 + d is >= the number of evaluation slots has no slot left to
+be used in, so it is ignored and counted (a release at the last slot index is still
+delivered). Nothing is lost or duplicated in between.
 
 These are code-behaviour checks on a seeded synthetic stream; none of it is evidence.
 """

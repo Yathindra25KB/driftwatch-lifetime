@@ -41,6 +41,13 @@ KEYS = ["dataset", "model", "variant", "ratio"]
 N_BOOT = 2000
 
 
+def _time_aware(slots: pd.DataFrame) -> pd.DataFrame:
+    """Keep the time-aware rows: an E1 run also stores per-slot random-split comparator rows."""
+    if "series" not in slots.columns:
+        return slots
+    return slots[slots["series"] == "time_aware"]
+
+
 def _block_bootstrap_gap(per_window: pd.DataFrame, block_len: int) -> tuple[float, float]:
     """95% interval of the mean gap over windows by moving-block bootstrap (time order)."""
     d = (per_window["f1_random_split"] - per_window["aut"]).dropna().to_numpy()
@@ -154,7 +161,7 @@ def build_tables(run_dirs: dict[str, Path]) -> tuple[pd.DataFrame, pd.DataFrame]
     per_slot: list[pd.DataFrame] = []
     for dataset, directory in run_dirs.items():
         windows = pd.read_parquet(Path(directory) / "windows.parquet")
-        slots = pd.read_parquet(Path(directory) / "slots.parquet")
+        slots = _time_aware(pd.read_parquet(Path(directory) / "slots.parquet"))
         config = json.loads((Path(directory) / "run.json").read_text(encoding="utf-8"))["config"]
         base.extend(_baseline_rows(dataset, windows, slots, config))
         agg = (
@@ -180,7 +187,7 @@ def repeats_table(run_dirs: dict[str, Path]) -> pd.DataFrame:
     """Evaluated rows that repeat a feature vector of their training window (time-aware path)."""
     rows = []
     for dataset, directory in run_dirs.items():
-        s = pd.read_parquet(Path(directory) / "slots.parquet")
+        s = _time_aware(pd.read_parquet(Path(directory) / "slots.parquet"))
         s = s[(s["variant"] == "rolling") & (s["model"] == s["model"].iloc[0])]
         s = s[s["seed"] == s["seed"].min()]
         n, seen = int(s["n"].sum()), s["n_seen_in_initial_train"]
