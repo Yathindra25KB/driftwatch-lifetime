@@ -61,9 +61,10 @@ def test_yaml_file_loads(tmp_path: Path) -> None:
     [
         ({"surprise": 1}, "unknown"),
         ({"policy": "periodic"}, "policy"),
-        ({"delay": 2}, "later phase"),
-        ({"budget_pct": 1.0}, "later phase"),
-        ({"selector": "random"}, "later phase"),
+        ({"delay": 2}, "selector"),
+        ({"budget_pct": 1.0}, "selector"),
+        ({"selector": "random"}, "delay"),
+        ({"nonconf": "logit"}, "later phase"),
         ({"seeds": []}, "seeds"),
         ({"seeds": [0, 0]}, "seeds"),
         ({"seeds": 5}, "seeds"),

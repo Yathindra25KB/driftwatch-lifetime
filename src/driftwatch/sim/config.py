@@ -2,9 +2,15 @@
 
 Keys follow plan Appendix C (``.claude/rules/configs.md``): dataset, slots, window
 (nT, nE, stride), ratio, seeds, model, policy, selector, delay, budget_pct, nonconf, pool,
-monitors, output. Phase 4 runs only the never-retrain baseline (E0), so ``policy`` must be
-``never`` and the keys that belong to later phases must be absent or null: a config cannot
-ask for something this code does not do. ``e0`` lists the variants to run.
+monitors, output. A config either describes the Phase 4 baseline (``selector``, ``delay`` and
+``budget_pct`` null, ``policy: never``) or a simulation (Phase 5: all three set; ``policy``
+never or periodic). ``nonconf`` and ``monitors`` belong to later phases and must be null, as
+must monitor-triggered retraining: a config cannot ask for something this code does not do.
+``e0`` lists the window variants to run (the key keeps its Phase 4 name so that E0 hashes stay
+valid) and, in a simulation, the same variants apply.
+
+E0 configs hash exactly as they did in Phase 4: ``to_dict`` emits the simulation keys only
+when they are set.
 
 The config hash covers every config value, the code version (git commit, ``-dirty`` when
 the tree has uncommitted changes) and the lock file, so a changed config, change of code or
@@ -28,8 +34,12 @@ from driftwatch.models import make_model
 DATASETS = ("lamda", "bodmas")
 PRESETS = ("adr-0004",)
 VARIANTS = ("rolling", "rolling_chow", "sensitivity", "single_run")
-POLICIES = ("never",)
-LATER_PHASE_KEYS = ("selector", "delay", "budget_pct", "nonconf", "pool", "monitors")
+POLICIES = ("never", "periodic")
+SELECTORS = ("random",)
+LATER_PHASE_KEYS = ("nonconf", "monitors")
+SIM_KEYS = ("selector", "delay", "budget_pct", "pool")
+DEFAULT_PERIOD = 3  # PROTOCOL.md: retrain every 3 slots
+DEFAULT_CALIBRATION = 0.20  # PROTOCOL.md D8
 TOP_KEYS = {
     "name",
     "dataset",
@@ -41,6 +51,7 @@ TOP_KEYS = {
     "policy",
     "e0",
     "output",
+    *SIM_KEYS,
     *LATER_PHASE_KEYS,
 }
 PACKAGES = (
@@ -66,6 +77,80 @@ def _int(value: Any, what: str, minimum: int) -> int:
     return value
 
 
+def _policy(raw: Any) -> tuple[str, int | None]:
+    """(name, period): ``policy`` is a name or ``{name, period}``; period only for periodic."""
+    if isinstance(raw, dict):
+        if set(raw) - {"name", "period"}:
+            raise ConfigError(f"policy takes only name and period, got {sorted(raw)}")
+        name, period = raw.get("name"), raw.get("period")
+    else:
+        name, period = raw, None
+    if name == "monitor":
+        raise ConfigError("monitor-triggered retraining is implemented in Phase 9")
+    if name not in POLICIES:
+        raise ConfigError(f"policy must be one of {POLICIES}, got {name!r}")
+    if name == "never":
+        if period is not None:
+            raise ConfigError("policy never takes no period")
+        return name, None
+    if period is None:
+        return name, DEFAULT_PERIOD
+    return name, _int(period, "policy.period", 1)
+
+
+def _simulation(d: dict[str, Any]) -> dict[str, Any] | None:
+    """Simulation fields, or ``None`` for a baseline config. All of them or none."""
+    selector, delay, budget = d.get("selector"), d.get("delay"), d.get("budget_pct")
+    present = {k: d.get(k) is not None for k in ("selector", "delay", "budget_pct")}
+    if not any(present.values()):
+        if d.get("pool") is not None:
+            raise ConfigError("pool needs selector, delay and budget_pct (a simulation config)")
+        return None
+    missing = [k for k, ok in present.items() if not ok]
+    if missing:
+        raise ConfigError(f"a simulation config needs selector, delay and budget_pct; no {missing}")
+
+    if isinstance(selector, dict):
+        if set(selector) - {"name", "calibration_fraction"}:
+            raise ConfigError(f"selector takes only name and calibration_fraction: {selector}")
+        name, calibration = selector.get("name"), selector.get("calibration_fraction")
+    else:
+        name, calibration = selector, None
+    if name in ("uncertainty", "credibility"):
+        raise ConfigError(f"selector {name!r} needs the conformal layer (Phase 8)")
+    if name not in SELECTORS:
+        raise ConfigError(f"selector must be one of {SELECTORS}, got {name!r}")
+    if calibration is None:
+        calibration = DEFAULT_CALIBRATION
+    if isinstance(calibration, bool) or not isinstance(calibration, int | float):
+        raise ConfigError(f"calibration_fraction must be a number, got {calibration!r}")
+    if not 0.0 <= float(calibration) <= 1.0:
+        raise ConfigError(f"calibration_fraction must lie in [0, 1], got {calibration!r}")
+
+    delay = _int(delay, "delay", 0)
+    if isinstance(budget, bool) or not isinstance(budget, int | float) or not 0 < budget <= 100:
+        raise ConfigError(f"budget_pct must be a percentage in (0, 100], got {budget!r}")
+
+    pool = d.get("pool") or {}
+    if set(pool) - {"new_label_weight", "truncation"}:
+        raise ConfigError(f"pool takes only new_label_weight and truncation, got {sorted(pool)}")
+    weight, truncation = pool.get("new_label_weight", 1.0), pool.get("truncation", "none")
+    if isinstance(weight, bool) or weight != 1.0:
+        raise ConfigError(
+            f"pool.new_label_weight is fixed at 1 by ADR-0007 (no free parameter), got {weight!r}"
+        )
+    if truncation != "none":
+        raise ConfigError(f"pool.truncation is fixed at none by ADR-0007, got {truncation!r}")
+    return {
+        "selector": name,
+        "calibration_fraction": float(calibration),
+        "delay": delay,
+        "budget_pct": float(budget),
+        "pool_new_label_weight": 1.0,
+        "pool_truncation": "none",
+    }
+
+
 @dataclass(frozen=True)
 class RunConfig:
     name: str
@@ -83,6 +168,18 @@ class RunConfig:
     variants: tuple[str, ...]
     random_split: bool
     output: str
+    per_slot_random_split: bool = False
+    policy_period: int | None = None
+    selector: str | None = None
+    calibration_fraction: float | None = None
+    delay: int | None = None
+    budget_pct: float | None = None
+    pool_new_label_weight: float | None = None
+    pool_truncation: str | None = None
+
+    @property
+    def is_simulation(self) -> bool:
+        return self.selector is not None
 
     # -- parsing -----------------------------------------------------------------------------
 
@@ -101,9 +198,13 @@ class RunConfig:
             raise ConfigError(f"unknown key(s) in config: {unknown}; allowed {sorted(TOP_KEYS)}")
         for key in LATER_PHASE_KEYS:
             if d.get(key) is not None:
-                raise ConfigError(f"{key!r} belongs to a later phase and must be null in E0")
-        if d.get("policy") not in POLICIES:
-            raise ConfigError(f"policy must be one of {POLICIES}, got {d.get('policy')!r}")
+                raise ConfigError(f"{key!r} belongs to a later phase and must be null")
+        policy, period = _policy(d.get("policy"))
+        sim = _simulation(d)
+        if policy == "periodic" and sim is None:
+            raise ConfigError(
+                "policy periodic needs selector, delay and budget_pct (a simulation config)"
+            )
         if d.get("dataset") not in DATASETS:
             raise ConfigError(f"dataset must be one of {DATASETS}, got {d.get('dataset')!r}")
 
@@ -150,6 +251,9 @@ class RunConfig:
             raise ConfigError(f"model names must be distinct (they key every result row): {names}")
 
         e0 = d.get("e0") or {}
+        per_slot = e0.get("per_slot_random_split", False)
+        if not isinstance(per_slot, bool):
+            raise ConfigError(f"e0.per_slot_random_split must be true or false, got {per_slot!r}")
         variants = tuple(e0.get("variants") or ("rolling",))
         for v in variants:
             if v not in VARIANTS:
@@ -171,15 +275,21 @@ class RunConfig:
             sensitivity_ratio=None if sens is None else float(sens),
             seeds=tuple(int(s) for s in seeds),
             models=tuple(dict(m) for m in models),
-            policy=d["policy"],
+            policy=policy,
             variants=variants,
             random_split=bool(e0.get("random_split", True)),
             output=str(d.get("output") or "results/e0"),
+            per_slot_random_split=per_slot,
+            policy_period=period,
+            **(sim or {}),
         )
 
     def to_dict(self) -> dict[str, Any]:
         """The canonical form: what is hashed, logged and re-parsed."""
-        return {
+        e0: dict[str, Any] = {"variants": list(self.variants), "random_split": self.random_split}
+        if self.per_slot_random_split:
+            e0["per_slot_random_split"] = True
+        out: dict[str, Any] = {
             "name": self.name,
             "dataset": self.dataset,
             "slots": {"preset": self.preset, "min_malware": self.min_malware},
@@ -188,9 +298,23 @@ class RunConfig:
             "seeds": list(self.seeds),
             "model": [dict(m) for m in self.models],
             "policy": self.policy,
-            "e0": {"variants": list(self.variants), "random_split": self.random_split},
+            "e0": e0,
             "output": self.output,
         }
+        if self.policy == "periodic":
+            out["policy"] = {"name": "periodic", "period": self.policy_period}
+        if self.is_simulation:
+            out["selector"] = {
+                "name": self.selector,
+                "calibration_fraction": self.calibration_fraction,
+            }
+            out["delay"] = self.delay
+            out["budget_pct"] = self.budget_pct
+            out["pool"] = {
+                "new_label_weight": self.pool_new_label_weight,
+                "truncation": self.pool_truncation,
+            }
+        return out
 
 
 # --- hashes and environment ---------------------------------------------------------------
