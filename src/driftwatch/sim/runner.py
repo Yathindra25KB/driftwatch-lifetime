@@ -40,8 +40,6 @@ from driftwatch.data import constraints
 from driftwatch.data.cache import code_version
 from driftwatch.data.memory import MemoryWatchdog
 from driftwatch.data.slicer import (
-    EvalSlot,
-    OpaqueSlot,
     SlotSource,
     Window,
     WindowSpec,
@@ -53,6 +51,7 @@ from driftwatch.metrics.slot import SlotScores, drop_events, score_slot
 from driftwatch.models import make_model
 from driftwatch.models.base import Detector
 from driftwatch.sim.config import RunConfig, config_hash, lock_sha256, package_versions
+from driftwatch.sim.queue import SealedSlot
 from driftwatch.sim.results import PredictionHasher, ResultStore
 
 log = logging.getLogger(__name__)
@@ -97,12 +96,6 @@ def _spec_for(cfg: RunConfig, variant: str, seed: int) -> WindowSpec:
     if variant == "single_run":
         return WindowSpec(cfg.nT, None, 1, cfg.target_ratio, **common)
     raise ValueError(variant)
-
-
-def _metric_scores(slot: EvalSlot, public: OpaqueSlot, positions: np.ndarray, pred: np.ndarray):
-    """The only place true labels are read: handles resolve to positions, then to labels."""
-    y_true = slot.y[positions]
-    return y_true, score_slot(y_true, pred)
 
 
 def _random_split(
@@ -194,21 +187,21 @@ def _run_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window: Wi
     fnrs: dict[int, list[float]] = {mi: [] for mi, _, _ in fitted}
     ratios: list[float] = []
     below = 0
-    for slot in window.eval_slots():
+    for eval_slot in window.eval_slots():
+        slot = SealedSlot(eval_slot)  # the one door to true labels (sim/queue.py)
         public = slot.public()
-        positions = slot.resolve(public.slot_id, public.handle)
         ratios.append(slot.c3.achieved_ratio)
         below += int(slot.c3.status == "below_target")
         for mi, det, _ in fitted:
             proba = det.predict_proba(public.X, train_key)
             pred = det.decide(proba)
-            y_true, sc = _metric_scores(slot, public, positions, pred)
+            scored = slot.score(pred)
+            y_true, sc, row_id = scored.y_true, scored.scores, scored.row_id
             f1s[mi].append(sc.f1)
             fprs[mi].append(sc.fpr)
             fnrs[mi].append(sc.fnr)
             model = det.name
             cell = f"{variant}|{model}|{spec.target_ratio}|{seed}"
-            row_id = slot.row_id[positions]
             ctx.write(
                 {
                     "variant": variant,
@@ -326,7 +319,7 @@ def _slot_row(
     spec: WindowSpec,
     seed: int,
     window_id: str,
-    slot: EvalSlot,
+    slot: SealedSlot,
     sc: SlotScores,
 ) -> dict[str, Any]:
     c3 = slot.c3
