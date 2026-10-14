@@ -10,7 +10,7 @@ Status, evidence, commit and the hours the researcher reports, for every phase a
 | 2 | Data ingestion and data cards | 1-2 (12-25 Oct 2026) | 10 | DONE | [inventory](../reports/data_inventory.md); [notes, Q1-Q7, leakage review](../reports/data_inventory_notes.md); [LAMDA card](data_cards/lamda.md); [BODMAS card](data_cards/bodmas.md); [ADR-0004](DECISIONS/ADR-0004-slot-definition.md) (ACCEPTED); [CLAIMS D-01..D-14](CLAIMS.md); `data/manifest.json` | 14da248 | 2 | Done 10 Oct 2026, before week 1. Cap 1.5 GB approved; LAMDA peak 0.87 GB (rebuild 0.93), BODMAS 0.56 GB. Guard allowlist widened (ADR-0001). Cache v2 after leakage review. See "Phase 2 closeout" below |
 | 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | DONE | [slicer review, 2 passes](reviews/slicer-review.md); [mutation matrix 15/15](../reports/mutation_matrix.md); [slicing run](../reports/slicing_run.md); [window options](../reports/window_options.md); [ADR-0005](DECISIONS/ADR-0005-windows-and-size-gate.md) (ACCEPTED); [ADR-0004 addendum 1](DECISIONS/ADR-0004-slot-definition.md); [CLAIMS W-01..W-07](CLAIMS.md) | 9b8e958 | 3 | Done 11 Oct 2026, before week 3. Canary tested on seeded drift, not the signal-free fixture; real-data canary left to Phase 4 by design. See "Phase 3 closeout" below |
 | 4 | Models, AUT/A-AUT, E0 baselines | 3-4 (26 Oct-8 Nov 2026) | 10 | DONE | [G1 evidence](../reports/G1.md); [E0 report](../reports/e0_baselines.md); [tables](../reports/tables/e0_baselines.csv); [fit times](../reports/tables/fit_times.csv); [ADR-0006](DECISIONS/ADR-0006-metrics-threshold-scaling.md) (PROPOSED); [CLAIMS E-01..E-12, M-01, M-02, B-01..B-05, T-01](CLAIMS.md) | 57e2003 | 2 (reported as under 3) | Done 11 Oct 2026, before week 3. G1 criteria met on LAMDA; BODMAS AUT above 0.90 left as an open alarm; ADR-0006 awaits acceptance; guide sanity band `[verify]`. See "Phase 4 closeout" below |
-| 5 | Delay and budget simulator, E1 | 5-8 (9 Nov-6 Dec 2026) | 32 | NOT STARTED | | | | |
+| 5 | Delay and budget simulator, E1 | 5-8 (9 Nov-6 Dec 2026) | 32 | DONE | [G2 evidence](../reports/G2.md); [ADR-0007](DECISIONS/ADR-0007-pool-composition-and-budget.md) (PROPOSED); [E1 figure](../reports/figures/e1_random_vs_time.png); [E1 tables](../reports/tables/e1_summary.csv); [label influence](../reports/tables/label_influence_lamda.csv); [chapters 2, 5, 6](../report/ch06_method.md); [CLAIMS S-01..S-06, E-13..E-21](CLAIMS.md) | a5c8604 | 3 to 6 (reported) | Done 13 Oct 2026, before week 5. G2 criteria met except: ADR-0007 not accepted (researcher), second leakage-review pass did not complete (usage limit). Open: which comparator carries RQ1; parallel runs do not fit the 1.5 GiB cap. See "Phase 5 closeout" below |
 | 6 | Tier 1 grid (E2) and statistics | 9-11 (7-27 Dec 2026) | 24 | NOT STARTED | | | | prereg-v1 tag before first grid result |
 | 7 | Tier 1 write-up and reproduction | 13-14 (4-17 Jan 2027) | 18 | NOT STARTED | | | | Week 12 is buffer |
 | 8 | Conformal layer and selection (E3) | 15-17 (18 Jan-7 Feb 2027) | 23 | NOT STARTED | | | | prereg-v2 |
@@ -240,3 +240,47 @@ Deviations and notes:
 | uv.lock | `2c5a7dfa5000f370ed1b4c1bba4c86c689a18a5bcce570be8b996fddddbca00e` |
 
 Run config hashes (code version, config and lock file): BODMAS `608f15e1a6628732eb71e3e2fc1bac3ede1c704f874649b320fd1f9abc9b7957`, LAMDA `613c0f98e507a8ad9d2ea70d340da5107aeb3820c773d46083d4ba167395341f`.
+
+## Phase 5 closeout (13 Oct 2026)
+
+| Check | Result |
+|---|---|
+| `uv run pytest -q`; `ruff check .`; `ruff format --check .` | 815 passed, 1 deselected, 84 s; All checks passed!; 160 files already formatted |
+| `uv run python scripts/check_guardrails.py` | 45/45 scenarios passed |
+| HANDOFF check (`check_handoff.py 5`) | 14 items, all exist |
+| Queue, spy, regression, determinism, resume | [S-01..S-06](CLAIMS.md): d in {0,1,2,3} with property tests; spy at component and runner level; fixture ordering; three deliberate breakages caught; a BODMAS arm killed at 3 of 18 units resumed to the identical predictions hash |
+| Evidence runs (clean commit 2bd12d6, `--require-clean`) | Label influence: LAMDA and BODMAS, never / 0.5% / 5%, 3 seeds; E1: both datasets, five seeds, per-slot matched comparator ([E-13..E-19](CLAIMS.md)). Longest refit 9.9 s |
+| Memory | BODMAS E1 peak 1.47 GiB (98.2% of the 1.5 GiB cap); two BODMAS arms in two threads crossed the cap ([E-20](CLAIMS.md)) |
+| Leakage review (leakage-reviewer subagent) | Pass 1: no temporal leak; 2 major (latent cache-key hazard, ADR-0007 not yet written), 5 minor, 6 informational. Fixed with tests in `0117287` and later, except three carried (feature-vector hashes through queue and pool; calibration share not yet consumed; `code_version` ignores untracked files). **Pass 2 did not complete (API usage limit); rerun on `b3ff456..HEAD`** |
+| Stats review (stats-reviewer subagent) | 1 blocker (comparator choice moves the RQ1 verdict), 5 major, 4 minor, 2 informational: achieved-ratio, decomposition and spread columns added, class split and per-arm denominators added, "modest" wording removed, run log and CLAIMS rows written |
+| Gate G2 | Evidence in [reports/G2.md](../reports/G2.md). **Not decided by Claude** |
+| ADRs | ADR-0007 PROPOSED; new-label weight 1 and no truncation are the researcher's choices (11 Oct 2026), the other rules await acceptance |
+
+Deviations and notes:
+- **Branch.** `phase-05-simulator-e1` is cut from `phase-04-models-e0` (Phase 4 is not merged); nothing has been pushed.
+- **E0 path moved onto the sealed door.** The E0 loop now scores through `SealedSlot`; E0 predictions are unchanged (E-16 reproduces the A-AUT of E-02 and E-03 to four decimals, and E0's window-level gap is reproduced from the E1 window table).
+- **Config schema.** `selector`, `delay`, `budget_pct`, `pool` and `policy: periodic` are open; `nonconf`, `monitors` and monitor-triggered retraining stay refused. Weight other than 1 and any truncation are refused by ADR-0007. E0 configs hash as before.
+- **Store.** Per-unit checkpoints with `--resume` (needs a clean tree); predictions carry `series`, `policy`, `selector`, `delay`, `budget_pct`.
+- **Parallelism.** `run_many` and `--workers` exist and are tested; at the approved cap they cannot be used on BODMAS (G2, Open decision B).
+- **Failed and superseded runs.** Three BODMAS diagnostic runs at 716608f failed on the memory cap; three at fa614c3 were superseded after leakage-review code changes and give an identical table; listed in ADR-0007 and [E-21](CLAIMS.md). Directories under `results/li/` and `results/resume_check/` can be deleted by the researcher.
+- **Chapters.** Drafts of chapters 2, 5 and 6; sources retrieved 13 Oct 2026; descriptions from search summaries are marked `[verify]`; new references are listed in the chapters, not added to `paper/references.bib`.
+- **Not done.** Uncertainty and credibility selectors, conformal layer, monitors (Phases 8 and 9); a stratified within-slot comparator; a noise-floor arm for the label-influence diagnostic; a seen-before mask from the real pool.
+- **Environment.** `C:` was at 100% during the closeout and 291 tests errored once on temporary files; a rerun on the same tree passed. Free space on `C:` before the next long run.
+
+### Phase 5 config hashes
+
+| File | SHA-256 |
+|---|---|
+| configs/e0_bodmas.yaml | `36bc82c2a4c11421cc926dcb5781961ca42cfac63ea407df0f1eefbf565ca0d5` |
+| configs/e0_lamda.yaml | `114dd2337c82dea1fadfdad7c180396dbb4912c833526aeefbe1fdac456954d2` |
+| configs/e1_bodmas.yaml | `a1677b3162b1f3070bfedd52621f0837131ea1183855cd86a3c403644d72bce5` |
+| configs/e1_lamda.yaml | `f55e605dd645c625b0e62caacf675f8d142bb030ab214520a2de8ddf6015476d` |
+| configs/li_bodmas_b0.5.yaml | `ca077fd06a0332232da946ff41915183f7d4a99f77308c5a9f33caf1da6def20` |
+| configs/li_bodmas_b5.yaml | `79e2a06f22082633d6324ec09bfee8dcd8c7e05ebee2331ff2eacf2761c0b24f` |
+| configs/li_bodmas_never.yaml | `12592db8311419b049284352ffcceae0731368e24460e732e1d6a09c6c74da36` |
+| configs/li_lamda_b0.5.yaml | `f1e2ce49c04fb1ee8b106e50d5eb92c8befb283f19d0e787a18957fce69749db` |
+| configs/li_lamda_b5.yaml | `cae058f1d6eddcd619b88b8923f8f65f67a14f0bcf30f79f34816674e5b6d2ef` |
+| configs/li_lamda_never.yaml | `3b94e93bb5b95eafdf07b033d6270d1bfb92a3088d37017ffc0cbf7e7945dc44` |
+| uv.lock | `2c5a7dfa5000f370ed1b4c1bba4c86c689a18a5bcce570be8b996fddddbca00e` |
+
+Run config hashes (code version, config and lock file; commit 2bd12d6): E1 BODMAS `45ea4054625ca8253d5d27f51a40f36c5057348c20ac5c15b4c5c1070a25b122`, E1 LAMDA `df138cc96fa9162219b70318b7179da382baf257d3e253a4b536b3b15de44e42`; label influence BODMAS never `ed348555adec05b60a97e5066b3ea149fd8ae44a42e3915d2c7df91509cf1636`, 0.5% `8076e24d690b20ad…` (see CLAIMS E-13, E-14 for the 16-digit run directories).
