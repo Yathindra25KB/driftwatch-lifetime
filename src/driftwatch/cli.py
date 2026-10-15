@@ -88,7 +88,12 @@ def build_parser() -> argparse.ArgumentParser:
     rp = sub.add_parser("reproduce", help="rebuild a stored table from the data and compare")
     rp.add_argument("table", choices=("table1",), help="table1 = E0 baselines on BODMAS")
     rp.add_argument("--smoke", action="store_true", help="tiny run on the synthetic fixture")
-    rp.add_argument("--data-root", type=Path, default=Path("data"), help="data root")
+    rp.add_argument(
+        "--data-root",
+        type=Path,
+        default=Path("data/reproduce"),
+        help="data root of the reproduction (its own root; data/manifest.json is only read)",
+    )
     rp.add_argument("--out", type=Path, default=Path("reports/reproduction"))
     rp.add_argument("--work-dir", type=Path, help="results and fixture caches go here")
     rp.add_argument("--tolerance", type=float, default=0.002, help="absolute, per numeric cell")

@@ -129,3 +129,29 @@ def test_cli_exit_codes(tmp_path: Path, monkeypatch, capsys) -> None:
     monkeypatch.setattr(reproduce, "_ensure_bodmas", need_manual)
     assert cli.main(["reproduce", "table1", "--allow-dirty", "--out", str(tmp_path / "o2")]) == 3
     assert "by hand" in capsys.readouterr().err
+
+
+def test_downloaded_raw_files_are_compared_with_the_committed_manifest(tmp_path: Path) -> None:
+    import hashlib
+
+    from driftwatch.data.cache import Layout
+
+    root = tmp_path / "data"
+    raw = root / "raw" / "bodmas"
+    raw.mkdir(parents=True)
+    (raw / "a.csv").write_bytes(b"alpha")
+    (raw / "SOURCE.json").write_text('{"downloaded_utc": "later"}', encoding="utf-8")
+    manifest = tmp_path / "manifest.json"
+    files = {
+        "raw/bodmas/a.csv": {"bytes": 5, "sha256": hashlib.sha256(b"alpha").hexdigest()},
+        "raw/bodmas/SOURCE.json": {"bytes": 1, "sha256": "not-the-same"},  # a download log
+    }
+    manifest.write_text(
+        json.dumps({"datasets": {"bodmas": {"source": {"files": files}}}}), encoding="utf-8"
+    )
+    log: list[str] = []
+    reproduce._check_raw_against_committed_manifest(Layout(root), manifest, log)
+    assert "byte for byte" in log[0]
+    (raw / "a.csv").write_bytes(b"alphb")  # an upstream file changed
+    with pytest.raises(reproduce.ReproductionError, match="hash differs raw/bodmas/a.csv"):
+        reproduce._check_raw_against_committed_manifest(Layout(root), manifest, [])

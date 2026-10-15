@@ -146,7 +146,53 @@ def smoke_config(output: str | None = None) -> RunConfig:
     return RunConfig.from_dict(d)
 
 
-def _ensure_bodmas(data_root: Path, memory_cap_bytes: int, log: list[str]) -> None:
+def _check_raw_against_committed_manifest(layout: Any, committed: Path, log: list[str]) -> None:
+    """The downloaded raw files must equal, byte for byte, the ones the stored Table 1 used.
+
+    ``SOURCE.json`` is the download log (it carries a timestamp) and is not compared.
+    """
+    import hashlib
+
+    if not committed.exists():
+        log.append(f"no committed manifest at {committed}: raw files not compared")
+        return
+    entry = json.loads(committed.read_text(encoding="utf-8"))["datasets"].get("bodmas", {})
+    files = entry.get("source", {}).get("files", {})
+    bad = []
+    for rel, rec in sorted(files.items()):
+        if rel.endswith("SOURCE.json"):
+            continue
+        path = layout.root / rel
+        if not path.exists():
+            bad.append(f"missing {rel}")
+            continue
+        if path.stat().st_size != rec["bytes"]:
+            bad.append(f"size differs {rel}")
+            continue
+        h = hashlib.sha256()
+        with path.open("rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+        if h.hexdigest() != rec["sha256"]:
+            bad.append(f"hash differs {rel}")
+    if bad:
+        raise ReproductionError(
+            "the downloaded BODMAS files differ from the ones the stored table used: "
+            + "; ".join(bad)
+            + ". The upstream files may have changed: report it, do not overwrite the manifest."
+        )
+    log.append(f"{len(files) - 1} raw files equal the committed manifest (byte for byte)")
+
+
+def _ensure_bodmas(
+    data_root: Path, memory_cap_bytes: int, log: list[str], committed_manifest: Path | None = None
+) -> None:
+    """Make a verified BODMAS cache under ``data_root``.
+
+    A root of its own (default ``data/reproduce``, untracked) keeps the tracked
+    ``data/manifest.json`` and the working tree clean, so the evidence run can require a
+    clean tree; the raw files are compared with the committed manifest instead.
+    """
     from driftwatch.data import download
     from driftwatch.data.build import build_dataset
     from driftwatch.data.cache import Layout
@@ -158,6 +204,8 @@ def _ensure_bodmas(data_root: Path, memory_cap_bytes: int, log: list[str]) -> No
         return
     log.append("BODMAS cache missing or not verified: fetching through the manifest")
     download.download_bodmas(layout, manual=False)  # may raise ManualDownloadRequired
+    if committed_manifest is not None:
+        _check_raw_against_committed_manifest(layout, committed_manifest, log)
     build_dataset("bodmas", layout, memory_cap_bytes=memory_cap_bytes)
     problems = verify(layout, ("bodmas",))
     if problems:
@@ -167,7 +215,7 @@ def _ensure_bodmas(data_root: Path, memory_cap_bytes: int, log: list[str]) -> No
 def reproduce_table1(
     *,
     repo_root: Path | str,
-    data_root: Path | str = "data",
+    data_root: Path | str = "data/reproduce",
     out_dir: Path | str = "reports/reproduction",
     work_dir: Path | str | None = None,
     tolerance: float = DEFAULT_TOLERANCE,
@@ -202,7 +250,7 @@ def reproduce_table1(
         reference = Path(stored_table) if stored_table else repo / SMOKE_GOLDEN
     else:
         root = Path(data_root)
-        _ensure_bodmas(root, cap, notes)
+        _ensure_bodmas(root, cap, notes, repo / "data" / "manifest.json")
         cfg = RunConfig.from_file(repo / "configs" / "e0_bodmas.yaml")
         from driftwatch.data.presets import cached_source
 
