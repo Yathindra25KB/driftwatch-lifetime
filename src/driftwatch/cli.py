@@ -266,9 +266,13 @@ def _run_reproduce(args: argparse.Namespace) -> int:
 def _run_grid(args: argparse.Namespace) -> int:
     from driftwatch.data.presets import cached_source
     from driftwatch.sim import grid
+    from driftwatch.sim.grid_e3 import load_spec
 
-    spec = grid.GridSpec.from_file(args.spec)
-    default_out = Path(spec.output) if not args.smoke else Path("results/e2_smoke") / spec.dataset
+    spec = load_spec(args.spec)
+    smoke_root = "e3_smoke" if spec.name.startswith("e3") else "e2_smoke"
+    default_out = (
+        Path(spec.output) if not args.smoke else Path("results") / smoke_root / spec.dataset
+    )
     out = args.out if args.out is not None else default_out
     if args.status:
         report = grid.status(spec, out)

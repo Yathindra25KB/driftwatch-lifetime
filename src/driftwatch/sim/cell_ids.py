@@ -32,10 +32,51 @@ def periodic_id(
     return f"{dataset}/periodic-d{delay}-b{budget:g}-{seed_tag(seeds)}-{variant_tag(variants)}"
 
 
+def e3_cell_id(
+    ds: str,
+    selector: str,
+    delay: int,
+    budget: float,
+    fraction: float,
+    score: str,
+    seeds: Sequence[int],
+) -> str:
+    return f"{ds}/e3-{selector}-d{delay}-b{budget:g}-r{fraction:g}-{score}-{seed_tag(seeds)}"
+
+
+def planned_ids_e3(spec: dict[str, Any]) -> list[str]:
+    """Cell ids of an E3 spec, in the order ``E3Spec.cells`` expands them."""
+    g = spec["grid"]
+    ds = spec["dataset"]
+    frac = float(g.get("calibration_fraction", 0.20))
+    score = str(g.get("score", "probability"))
+    ids = []
+    for sel in g["selectors"]:
+        for d in g["delay"]:
+            for b in g["budget_pct"]:
+                ids.append(e3_cell_id(ds, sel, int(d), float(b), frac, score, g["seeds"]))
+    if g.get("extra_seeds"):
+        for sel in g["selectors"]:
+            for d in g["delay"]:
+                for b in g["budget_pct"]:
+                    ids.append(e3_cell_id(ds, sel, int(d), float(b), frac, score, g["extra_seeds"]))
+    a = g.get("anchor") or {}
+    if a:
+        sel = a.get("selector", "credibility")
+        d, b = int(a.get("delay", 0)), float(a.get("budget_pct", g["budget_pct"][0]))
+        for r in a.get("reserved", []):
+            ids.append(e3_cell_id(ds, sel, d, b, float(r), score, g["seeds"]))
+        if a.get("score_comparison"):
+            ids.append(e3_cell_id(ds, sel, d, b, frac, str(a["score_comparison"]), g["seeds"]))
+    return ids
+
+
 def planned_ids(spec: dict[str, Any]) -> list[str]:
     """Every cell id a grid spec (the parsed YAML mapping) plans, in expansion order."""
     g = spec["grid"]
     ds = spec["dataset"]
+    if "selectors" in g:
+        return planned_ids_e3(spec)
     variants = tuple(spec.get("e0", {}).get("variants") or ("rolling",))
     never = g["never"]
     never_variants = never.get("variants") or ("rolling",)

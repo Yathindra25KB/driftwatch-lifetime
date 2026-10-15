@@ -95,6 +95,8 @@ class _State:
     n_retrains: int = 0
     n_noop_retrains: int = 0
     n_fallback_random: int = 0
+    n_arrived_train: int = 0
+    n_arrived_train_malware: int = 0
     retrain_seconds: float = 0.0
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -188,6 +190,8 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                     n_new_cal = len(cal_rows)
                 train_rows = released if nc["calibration_in_pool"] else released.take(~to_cal)
                 st.pool.add(train_rows)
+                st.n_arrived_train += len(train_rows)
+                st.n_arrived_train_malware += int((train_rows.y == 1).sum())
             st.n_released += len(released)
             slot.assert_c1(st.pool.ts)  # C1 with the released rows in the pool
             n_seen_pool = slot.n_seen_in(st.pool.fv_hash)
@@ -277,6 +281,8 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                     "n_pool": n_pool,
                     "n_pool_new_labels": n_pool - n_train_rows,
                     "n_seen_in_pool": n_seen_pool,
+                    "n_arrived_train": st.n_arrived_train,
+                    "n_arrived_train_malware": st.n_arrived_train_malware,
                     "retrain_event": bool(event),
                     "retrained": bool(refit),
                     "n_ignored_after_end": receipt.n_ignored,

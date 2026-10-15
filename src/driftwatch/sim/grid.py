@@ -74,11 +74,17 @@ class Cell:
     budget_pct: float | None
     seeds: tuple[int, ...]
     variants: tuple[str, ...]
+    selector: str | None = None  # E3 only
+    calibration_fraction: float | None = None  # E3 only
+    score: str | None = None  # E3 only
 
     @property
-    def shape(self) -> tuple[str, int | None, float | None, tuple[str, ...]]:
+    def shape(self) -> tuple:
         """What costs the same per unit: arm, delay, budget, variants (seeds excluded)."""
-        return (self.arm, self.delay, self.budget_pct, self.variants)
+        return (
+            self.arm, self.delay, self.budget_pct, self.variants,
+            self.selector, self.calibration_fraction, self.score,
+        )  # fmt: skip
 
 
 def _seed_list(value: Any, what: str) -> tuple[int, ...]:
