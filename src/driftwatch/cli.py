@@ -85,6 +85,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="runs in parallel, one thread per run (mind LightGBM n_jobs x workers <= cores)",
     )
 
+    rp = sub.add_parser("reproduce", help="rebuild a stored table from the data and compare")
+    rp.add_argument("table", choices=("table1",), help="table1 = E0 baselines on BODMAS")
+    rp.add_argument("--smoke", action="store_true", help="tiny run on the synthetic fixture")
+    rp.add_argument("--data-root", type=Path, default=Path("data"), help="data root")
+    rp.add_argument("--out", type=Path, default=Path("reports/reproduction"))
+    rp.add_argument("--work-dir", type=Path, help="results and fixture caches go here")
+    rp.add_argument("--tolerance", type=float, default=0.002, help="absolute, per numeric cell")
+    rp.add_argument("--memory-cap-gb", type=float, default=1.5)
+    rp.add_argument(
+        "--allow-dirty", action="store_true", help="development only: run on a dirty tree"
+    )
+    rp.add_argument(
+        "--write-reference", action="store_true", help="smoke only: (re)write the golden table"
+    )
+
     gr = sub.add_parser("grid", help="run the pre-registered delay x budget grid (E2), by cell")
     gr.add_argument("spec", type=Path, help="a grid spec such as configs/e2_lamda.yaml")
     gr.add_argument("--chunk", help="i/n: run the i-th of n cost-balanced chunks of cells")
@@ -214,6 +229,40 @@ def _run_configs(args: argparse.Namespace) -> list:
     )
 
 
+def _run_reproduce(args: argparse.Namespace) -> int:
+    """Exit codes: 0 match, 1 mismatch, 2 cannot run, 3 manual data download needed."""
+    from driftwatch.data.download import ManualDownloadRequired
+    from driftwatch.sim.reproduce import ReproductionError, reproduce_table1
+
+    repo = Path(__file__).resolve().parents[2]
+    try:
+        report = reproduce_table1(
+            repo_root=repo,
+            data_root=args.data_root,
+            out_dir=args.out,
+            work_dir=args.work_dir,
+            tolerance=args.tolerance,
+            smoke=args.smoke,
+            memory_cap_gb=args.memory_cap_gb,
+            require_clean=not args.allow_dirty,
+            write_reference=args.write_reference,
+        )
+    except ManualDownloadRequired as exc:
+        print(exc, file=sys.stderr)
+        return 3
+    except (ReproductionError, RuntimeError, FileNotFoundError) as exc:
+        print(f"driftwatch reproduce: {exc}", file=sys.stderr)
+        return 2
+    print(
+        f"{report['verdict']}: {report['rows_compared']} rows, max |diff| "
+        f"{report['max_abs_diff']:.6f} (tolerance {report['tolerance_abs']}), "
+        f"{report['total_wall_s']:.0f} s total ({report['run_wall_s']:.0f} s run)"
+    )
+    for problem in report["problems"][:10]:
+        print(f"  {problem}", file=sys.stderr)
+    return 0 if report["verdict"] == "MATCH" else 1
+
+
 def _run_grid(args: argparse.Namespace) -> int:
     from driftwatch.data.presets import cached_source
     from driftwatch.sim import grid
@@ -312,6 +361,9 @@ def main(argv: list[str] | None = None) -> int:
                 f"results in {summary.dir}"
             )
         return 0
+    if args.command == "reproduce":
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+        return _run_reproduce(args)
     if args.command == "grid":
         from driftwatch.sim.config import ConfigError
         from driftwatch.sim.grid import CodeVersionMismatch, GridError
