@@ -138,7 +138,7 @@ def numbers(text: str) -> list[str]:
     t = re.sub(r"\|\s*\d+\s*(?=\|)", "|", t)  # a table cell that is only a chapter or row number
     t = re.sub(r"\b[Ss]ections?\s+\d+(?:\.\d+)*", " ", t)  # references to sections
     t = re.sub(r"\b[Cc]hapters?\s+\d+(?:\s*(?:to|and|-)\s*\d+)?", " ", t)
-    t = re.sub(r"\b(?:Table|Figure|Eq\.?|Appendix)\s+\d+", " ", t)
+    t = re.sub(r"\b(?:Table|Figure|Eq\.?|Appendix|Tier|Phase|Gate|Week|Step)\s+\d+", " ", t)
     found = []
     for tok in NUMBER_RE.findall(t):
         bare = tok.rstrip("%")
