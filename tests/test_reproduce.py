@@ -86,6 +86,7 @@ def test_missing_columns_are_reported() -> None:
     assert not cmp.ok and any("columns missing" in p for p in cmp.problems)
 
 
+@pytest.mark.slow
 def test_smoke_reproduction_matches_the_committed_golden(tmp_path: Path) -> None:
     report = reproduce_table1(
         repo_root=ROOT, smoke=True, out_dir=tmp_path / "out", work_dir=tmp_path / "work",
@@ -98,6 +99,7 @@ def test_smoke_reproduction_matches_the_committed_golden(tmp_path: Path) -> None
     assert "lock_sha256" in written and "packages" in written
 
 
+@pytest.mark.slow
 def test_a_changed_reference_is_reported_as_a_mismatch(tmp_path: Path) -> None:
     ref = tmp_path / "golden.csv"
     shutil.copy(ROOT / "tests" / "golden" / "table1_smoke.csv", ref)
@@ -112,6 +114,7 @@ def test_a_changed_reference_is_reported_as_a_mismatch(tmp_path: Path) -> None:
     assert report["max_abs_diff"] == pytest.approx(0.05, abs=1e-6)
 
 
+@pytest.mark.slow
 def test_cli_exit_codes(tmp_path: Path, monkeypatch, capsys) -> None:
     args = ["reproduce", "table1", "--smoke", "--allow-dirty", "--out", str(tmp_path / "o"),
             "--work-dir", str(tmp_path / "w")]  # fmt: skip

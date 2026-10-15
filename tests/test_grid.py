@@ -201,6 +201,7 @@ def test_chunk_syntax(bad) -> None:
     assert grid.parse_chunk("2/11") == (2, 11)
 
 
+@pytest.mark.slow
 def test_units_count_windows_seeds_and_models() -> None:
     spec = small_spec()
     cells = {c.role: c for c in spec.cells() if c.role in {"never", "chow"}}
@@ -218,6 +219,7 @@ def run_small(tmp_path: Path, runner=plain_runner, **kw):
 
 
 @pytest.mark.slow
+@pytest.mark.slow
 def test_driver_runs_all_cells_and_records_them(tmp_path: Path) -> None:
     results = run_small(tmp_path)
     spec = small_spec()
@@ -231,6 +233,7 @@ def test_driver_runs_all_cells_and_records_them(tmp_path: Path) -> None:
     assert {r["event"] for r in rows} == {"started", "complete"}
 
 
+@pytest.mark.slow
 @pytest.mark.slow
 def test_interrupted_grid_resumes_without_rerunning_finished_cells(tmp_path: Path) -> None:
     calls: list[str] = []
@@ -246,6 +249,7 @@ def test_interrupted_grid_resumes_without_rerunning_finished_cells(tmp_path: Pat
     assert calls == [] and {r.status for r in again} == {"skipped"}
 
 
+@pytest.mark.slow
 def test_failure_is_logged_with_its_reason_and_the_next_cell_runs(tmp_path: Path) -> None:
     spec = small_spec()
     bad = spec.cells()[2].cell_id.split("/", 1)[1]
@@ -273,6 +277,7 @@ def test_failure_is_logged_with_its_reason_and_the_next_cell_runs(tmp_path: Path
     assert grid.status(spec, tmp_path)["counts"] == {"complete": len(spec.cells())}
 
 
+@pytest.mark.slow
 def test_memory_failures_are_marked_infrastructure(tmp_path: Path) -> None:
     def oom(cfg, src, out, **kw):
         raise MemoryError("memory cap exceeded (synthetic)")
@@ -282,6 +287,7 @@ def test_memory_failures_are_marked_infrastructure(tmp_path: Path) -> None:
     assert failed and all(e["infrastructure"] for e in failed)
 
 
+@pytest.mark.slow
 def test_a_grid_is_refused_across_code_versions(tmp_path: Path) -> None:
     spec = small_spec()
     ledger = Ledger(tmp_path / "ledger.jsonl")
@@ -291,6 +297,7 @@ def test_a_grid_is_refused_across_code_versions(tmp_path: Path) -> None:
         run_small(tmp_path)
 
 
+@pytest.mark.slow
 @pytest.mark.slow
 def test_invalidated_cells_are_rerun_and_the_reason_is_kept(tmp_path: Path) -> None:
     spec = small_spec()
@@ -307,6 +314,7 @@ def test_invalidated_cells_are_rerun_and_the_reason_is_kept(tmp_path: Path) -> N
 
 
 @pytest.mark.slow
+@pytest.mark.slow
 def test_chunk_ledgers_are_separate_files_and_merge_in_status(tmp_path: Path) -> None:
     spec = small_spec()
     n = 2
@@ -320,6 +328,7 @@ def test_chunk_ledgers_are_separate_files_and_merge_in_status(tmp_path: Path) ->
     assert grid.status(spec, tmp_path)["counts"] == {"complete": len(spec.cells())}
 
 
+@pytest.mark.slow
 def test_fit_over_the_limit_stops_the_chunk_and_is_flagged(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(grid, "_max_fit_seconds", lambda d: 61.0)
     results = run_small(tmp_path)
@@ -331,6 +340,7 @@ def test_fit_over_the_limit_stops_the_chunk_and_is_flagged(tmp_path: Path, monke
 # --- smoke ------------------------------------------------------------------------------------
 
 
+@pytest.mark.slow
 @pytest.mark.slow
 def test_smoke_runs_one_seed_one_window_per_cost_shape(tmp_path: Path) -> None:
     spec = small_spec()
@@ -418,6 +428,7 @@ def test_cli_run_refuses_a_grid_spec(tmp_path: Path, capsys) -> None:
 
 
 @pytest.mark.slow
+@pytest.mark.slow
 def test_smoke_events_never_complete_a_real_cell(tmp_path: Path) -> None:
     spec = small_spec()
     grid.run_grid(
@@ -432,6 +443,7 @@ def test_smoke_events_never_complete_a_real_cell(tmp_path: Path) -> None:
     assert len(full) == len(spec.cells())
 
 
+@pytest.mark.slow
 def test_adopting_a_directory_checks_what_it_is(tmp_path: Path) -> None:
     spec = small_spec()
     cell = next(c for c in spec.cells() if c.arm == "periodic")
@@ -457,6 +469,7 @@ def test_cell_config_hash_does_not_depend_on_the_output_root() -> None:
     assert spec.config(cell, smoke=True).to_dict()["output"].startswith("unused-smoke/")
 
 
+@pytest.mark.slow
 def test_a_moved_code_version_stops_the_grid(tmp_path: Path) -> None:
     spec = small_spec()
     cell = spec.cells()[0]
@@ -468,6 +481,7 @@ def test_a_moved_code_version_stops_the_grid(tmp_path: Path) -> None:
         )  # fmt: skip
 
 
+@pytest.mark.slow
 def test_a_completed_cell_under_another_config_is_refused(tmp_path: Path) -> None:
     spec = small_spec()
     cell = spec.cells()[0]

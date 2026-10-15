@@ -141,9 +141,14 @@ def built_data(tmp_path_factory: pytest.TempPathFactory) -> Path:
 # Tests that build a whole synthetic grid (a module-scoped run of 27 or 28 cells) are marked
 # slow: they are excluded from the fast suite and run with `uv run pytest -m slow` (and in CI).
 SLOW_FIXTURES = {"grid_root", "e3_root"}
+# End-to-end E0-era runs (each builds and runs a whole synthetic experiment): the same code
+# paths are exercised in the fast suite by the simulator tests, and these run with `-m slow`,
+# in CI and at every phase closeout.
+SLOW_MODULES = {"test_runner_e0.py", "test_make_e0_table.py", "test_compare_runs.py"}
 
 
 def pytest_collection_modifyitems(config, items) -> None:
     for item in items:
-        if SLOW_FIXTURES & set(getattr(item, "fixturenames", ())):
+        in_slow_module = Path(str(item.fspath)).name in SLOW_MODULES
+        if in_slow_module or SLOW_FIXTURES & set(getattr(item, "fixturenames", ())):
             item.add_marker(pytest.mark.slow)

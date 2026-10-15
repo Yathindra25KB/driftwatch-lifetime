@@ -296,7 +296,7 @@ Hours are the researcher's to report; none are recorded here.
 | E2 grid, BODMAS | 27 of 27 cells complete, 0 failed, all at code version c26aa5f, 1.2 h of machine time, longest fit 14.0 s, peak 1.38 GiB (CLAIMS E-23) |
 | E2 grid, LAMDA | running (9 of 27 complete at 20:53, 0 failed, longest fit 21.6 s, peak 0.95 GiB) from the frozen worktree `E:\DriftWatch-grid`; about 25 min per cell |
 | Leakage canary on the final code | LAMDA PASS, BODMAS NO_GAP, identical to Phase 4 (CLAIMS E-22) |
-| Tests | 967 fast tests pass in 114 s and 22 slow tests pass with `-m slow`; ruff clean; guardrails 45 of 45 |
+| Tests | 917 fast tests pass in 81 s (with the grid running in the background) and 72 slow tests pass with `-m slow` (the whole-grid synthetic tests, the E0-era end-to-end modules and the driver and E3 run tests; CI runs them); ruff clean; guardrails 45 of 45 |
 | Reviews | leakage-reviewer second pass: no temporal leak, 12 findings fixed or documented (ADR-0008); stats-reviewer on the analysis code: 14 findings fixed or documented ([review](reviews/stats-review-e2.md)); a second stats pass on the final tables is still to do |
 
 ### To finish Phase 6 (when the LAMDA ledger shows 27 complete)

@@ -42,6 +42,7 @@ def slots(summary) -> pd.DataFrame:
     return pd.read_parquet(summary.dir / "slots.parquet")
 
 
+@pytest.mark.slow
 def test_every_arm_spends_exactly_the_budget_and_the_same_reserved_slice(tmp_path: Path) -> None:
     tables = {
         name: slots(go(cfg(name), tmp_path / name))
@@ -60,6 +61,7 @@ def test_every_arm_spends_exactly_the_budget_and_the_same_reserved_slice(tmp_pat
     assert pred["uncertainty"] != pred["random"] or pred["credibility"] != pred["random"]
 
 
+@pytest.mark.slow
 def test_only_holdout_and_random_slice_rows_reach_the_calibration_buffer(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -76,6 +78,7 @@ def test_only_holdout_and_random_slice_rows_reach_the_calibration_buffer(
     assert set(seen) == {"holdout", "random_slice"}  # nothing a selector chose, ever
 
 
+@pytest.mark.slow
 def test_a_router_that_sends_selected_rows_to_calibration_fails(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -85,6 +88,7 @@ def test_a_router_that_sends_selected_rows_to_calibration_fails(
         go(cfg("credibility"), tmp_path)
 
 
+@pytest.mark.slow
 def test_the_zero_reserved_share_is_the_named_trap_and_does_feed_selected_rows(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -108,6 +112,7 @@ def test_the_zero_reserved_share_is_the_named_trap_and_does_feed_selected_rows(
     assert (s["n_queried"] == s["n_budget"].clip(upper=s["n"])).all()
 
 
+@pytest.mark.slow
 def test_calibration_labels_arrive_through_the_queue_after_the_delay(tmp_path: Path) -> None:
     fast = slots(go(cfg("random", delay=0), tmp_path / "d0"))
     slow = slots(go(cfg("random", delay=3), tmp_path / "d3"))
@@ -122,6 +127,7 @@ def test_calibration_labels_arrive_through_the_queue_after_the_delay(tmp_path: P
         assert first == 1 + d  # queried at slot 0, usable from slot 0 + 1 + d
 
 
+@pytest.mark.slow
 def test_calibration_rows_are_not_training_rows_and_the_initial_fit_leaves_a_holdout(
     tmp_path: Path,
 ) -> None:
@@ -143,6 +149,7 @@ def test_calibration_rows_are_not_training_rows_and_the_initial_fit_leaves_a_hol
     assert int(w["n_train_rows"].iloc[0]) < int(wfull["n_train_rows"].iloc[0])
 
 
+@pytest.mark.slow
 def test_credibility_falls_back_to_random_when_no_calibration_exists_and_says_so(
     tmp_path: Path,
 ) -> None:
@@ -153,6 +160,7 @@ def test_credibility_falls_back_to_random_when_no_calibration_exists_and_says_so
     assert t["set_coverage"].isna().all() and t["cal_skipped_total"].max() >= 1
 
 
+@pytest.mark.slow
 def test_the_conformal_diagnostics_are_logged_and_in_range(tmp_path: Path) -> None:
     t = slots(go(cfg("credibility"), tmp_path))
     ok = t.dropna(subset=["set_coverage"])
@@ -161,6 +169,7 @@ def test_the_conformal_diagnostics_are_logged_and_in_range(tmp_path: Path) -> No
     assert (ok["cal_class0"] >= NONCONF["min_per_class"]).all()
 
 
+@pytest.mark.slow
 def test_same_config_and_seed_reproduce_the_same_predictions(tmp_path: Path) -> None:
     a = go(cfg("credibility"), tmp_path / "a")
     b = go(cfg("credibility"), tmp_path / "b")
