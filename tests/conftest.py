@@ -144,7 +144,20 @@ SLOW_FIXTURES = {"grid_root", "e3_root"}
 # End-to-end E0-era runs (each builds and runs a whole synthetic experiment): the same code
 # paths are exercised in the fast suite by the simulator tests, and these run with `-m slow`,
 # in CI and at every phase closeout.
-SLOW_MODULES = {"test_runner_e0.py", "test_make_e0_table.py", "test_compare_runs.py"}
+SLOW_MODULES = {
+    "test_runner_e0.py",
+    "test_make_e0_table.py",
+    "test_compare_runs.py",
+    # whole-dataset slicing, cache builds and canary scripts on the built fixture: each module
+    # builds caches or runs a script end to end; the slicer's own unit and property tests
+    # (test_slicer*.py, test_constraints.py) stay in the fast suite
+    "test_slicing_run.py",
+    "test_data_build.py",
+    "test_data_review.py",
+    "test_leakage_canary.py",
+    "test_slicer_review_fixes.py",
+    "test_make_e1_figure.py",
+}
 
 
 def pytest_collection_modifyitems(config, items) -> None:
