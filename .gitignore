@@ -13,6 +13,8 @@ dist/
 *.egg-info/
 
 # Tool caches
+.cache/
+.pytest-tmp/
 .pytest_cache/
 .ruff_cache/
 .hypothesis/
@@ -25,6 +27,9 @@ htmlcov/
 secrets/
 *.pem
 *.key
+
+# Claude Code session state moved off the system drive (memory, transcripts): never committed
+.claude-state/
 
 # Claude Code personal files (shared settings live in .claude/settings.json)
 .claude/settings.local.json

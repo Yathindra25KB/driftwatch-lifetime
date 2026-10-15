@@ -38,6 +38,9 @@ build-backend = "uv_build"
 [tool.uv]
 # Never build the environment on a system, conda or Anaconda interpreter.
 python-preference = "only-managed"
+# Keep uv's package cache next to the project (the development drive), not on the system
+# drive. A relative path is resolved from the directory uv is run in, i.e. the repo root.
+cache-dir = ".cache/uv"
 
 [tool.uv.build-backend]
 # Distribution name is driftwatch-lifetime (ADR-0003); the import name stays driftwatch.
@@ -56,7 +59,8 @@ known-first-party = ["driftwatch"]
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["tests"]
-addopts = ["--strict-markers", "-m", "not slow"]
+# Test temp files live under the repo (on the development drive); pytest recreates it per run.
+addopts = ["--strict-markers", "-m", "not slow", "--basetemp=.pytest-tmp"]
 markers = ["slow: long-running tests; excluded by default, run with `uv run pytest -m slow`"]
 
 [dependency-groups]
