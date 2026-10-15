@@ -37,6 +37,6 @@ Recent papers evaluate large language models for malicious-code analysis. Exampl
 ## 4.6 What to verify before this chapter is used
 
 1. Open each arXiv paper named above and check the quoted statistic against the paper, not the abstract summary.
-2. Replace the search-summary sources in 4.4 and 4.5 with the papers themselves, or drop them.
+2. Replace the search-summary sources in the sections on adversaries and on language models with the papers themselves, or drop them.
 3. Add a 2025 or 2026 survey on problem-space attacks and defenses if one exists; the search of 2026-10-15 found none.
 4. Decide whether this chapter should be shortened to a page for the VISTAS report (the guide allows compressing chapters 2 to 4 first).
