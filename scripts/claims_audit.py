@@ -133,6 +133,7 @@ def numbers(text: str) -> list[str]:
     t = re.sub(r"\]\([^)]*\)", "]", t)  # link targets
     t = DATE_RE.sub(" ", t)
     t = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", " ", t)  # ISO dates
+    t = re.sub(r"\bADR-\d{4}\b|\bprereg-v\d+\b|\baddendum-v\d+\b", " ", t)  # record names
     t = re.sub(r"\[[A-Z]{1,2}-\d{2,3}\]", " ", t)  # the claim tags themselves
     t = ID_RE.sub(" ", t)
     t = re.sub(r"(?m)^\s*(?:[-*]\s+)?\d+[.)]\s", " ", t)  # list item numbers

@@ -1,6 +1,6 @@
 # Chapter 8: Discussion and limitations (partial draft)
 
-> Status: partial draft written by Claude Code in Phase 7 for the researcher to rewrite and defend. It is partial on purpose: the Tier 1 results of chapter 7 must be read first, and the paragraphs that interpret them are marked **[researcher: write after chapter 7]**. The limits below were written before the results (`docs/PREREG.md`, "Known limits") and are not softened by them. No number is stated here without a claim id. Target length: about 6 pages.
+> Status: partial draft written by Claude Code in Phase 7 for the researcher to rewrite and defend. It is partial on purpose: the Tier 1 results of chapter 7 must be read first, and the paragraphs that interpret them are marked **[researcher: write after chapter 7]**. The limits below were written before the results (`docs/PREREG.md`, "Known limits") and are not softened by them. No number is stated here without a claim id. Target length: six pages.
 
 ## 8.1 What was measured
 
