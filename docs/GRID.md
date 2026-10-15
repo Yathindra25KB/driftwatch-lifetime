@@ -67,3 +67,17 @@ uv run python scripts/make_figures.py
 ```
 
 Both read stored results only (no model fits). Two runs produce byte-identical outputs.
+
+## E3 (selection under delay)
+
+`configs/e3_bodmas.yaml` and `configs/e3_lamda.yaml` are E3 grid specs (a `grid:` block with `selectors`). They use the same driver, ledger, chunks, smoke mode and resume as E2; each dataset expands into 28 cells (12 main at seeds 0 to 4, the same 12 at seeds 5 to 9, 3 reserved-slice ablation cells, 1 centroid-score cell). The registration is `docs/prereg/addendum-v2.md` (tag `prereg-v2`); run from a frozen worktree at that tag:
+
+```bash
+git worktree add --detach ../DriftWatch-e3 prereg-v2
+cd ../DriftWatch-e3
+uv run driftwatch grid configs/e3_bodmas.yaml --smoke                       # timing only
+uv run driftwatch grid configs/e3_bodmas.yaml --out ../DriftWatch/results/e3/bodmas
+uv run python scripts/make_e3.py --results results/e3                        # tables and figure
+```
+
+LAMDA E3 runs seeds 0 to 4 first; the seeds 5 to 9 cells are run only if the researcher's hours allow (drop the `extra_seeds` key to skip them). E3 numbers are comparable only within E3 (ADR-0009).
