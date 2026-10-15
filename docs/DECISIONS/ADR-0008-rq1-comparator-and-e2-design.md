@@ -1,6 +1,6 @@
 # ADR-0008: RQ1 primary comparator and the E2 grid design
 
-**Status:** PROPOSED. The researcher chose the RQ1 comparator, the local sequential compute plan and the BODMAS geometry on 2026-10-15 (Phase 6 planning session). The remaining rules were proposed by Claude Code and take effect when this ADR is accepted together with the PREREG diff.
+**Status:** ACCEPTED by the researcher on 2026-10-15, together with the PREREG diff and its two estimates (equivalence margin 0.01 AUT, RQ1 band 0.05). The researcher chose the RQ1 comparator, the local sequential compute plan and the BODMAS geometry in the Phase 6 planning session; the remaining rules were proposed by Claude Code.
 **Date:** 2026-10-15
 **Deciders:** Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
 **Phase:** 6
