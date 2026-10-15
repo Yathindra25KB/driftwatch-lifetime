@@ -25,6 +25,13 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 SURFACE, INK, MUTED = "#ffffff", "#1b1f24", "#5f6b76"
 ACCENT, ACCENT2, ACCENT3 = "#c2410c", "#1d4ed8", "#4d7c0f"
+VERDICT_COLOR = {
+    "detected": ACCENT,
+    "detected_within_margin": "#a16207",
+    "reversed": "#b91c1c",
+    "equivalent": ACCENT3,
+    "not_detected": MUTED,
+}
 DELAYS = (0, 1, 2, 3)
 BUDGETS = (0.5, 1.0, 2.0, 5.0)
 DATASETS = ("lamda", "bodmas")
@@ -82,7 +89,20 @@ def heatmap(aaut: pd.DataFrame, dataset: str, path: Path) -> bool:
                         j, i, f"{grid[i, j]:.3f}\n±{sd[i, j]:.3f}",
                         ha="center", va="center", fontsize=8, color=INK,
                     )  # fmt: skip
-        ax.set_xticks(range(len(BUDGETS)), [f"{b:g}%" for b in BUDGETS])
+        counts = {}
+        for b in BUDGETS:
+            r = per[(per["delay"] == 0) & (per["budget_pct"] == b)]
+            counts[b] = float(r["labels_per_slot"].iloc[0]) if len(r) else float("nan")
+        ax.set_xticks(
+            range(len(BUDGETS)),
+            [
+                f"{b:g}%\n(about {counts[b]:.0f} labels/slot)"
+                if counts[b] == counts[b]
+                else f"{b:g}%"
+                for b in BUDGETS
+            ],
+            fontsize=8,
+        )
         ax.set_yticks(range(len(DELAYS)), [f"d={d}" for d in DELAYS])
         ax.set_xlabel("analyst budget (% of the evaluated slot)", color=MUTED)
         ax.set_ylabel("label delay (slots)", color=MUTED)
@@ -165,14 +185,22 @@ def contrasts(table: pd.DataFrame, path: Path) -> bool:
     for ds, model in strata:
         for cid in ids:
             r = t[(t["dataset"] == ds) & (t["model"] == model) & (t["contrast"] == cid)]
-            if r.empty:
+            if r.empty or r.iloc[0].get("status") == "not_computed":
+                labels.append(f"{ds} {model} {cid} (not computed)")
+                ticks.append(y)
                 y += 1
                 continue
             r = r.iloc[0]
-            color = ACCENT if r["detected"] else MUTED
+            color = VERDICT_COLOR.get(str(r.get("verdict")), MUTED)
             ax.plot([r["ci_low"], r["ci_high"]], [y, y], color=color, linewidth=2)
             ax.plot([r["estimate"]], [y], "o", color=color)
-            labels.append(f"{ds} {model} {cid}")
+            n_plus, n_minus = r.get("labels_per_slot_plus"), r.get("labels_per_slot_minus")
+            counts = (
+                f" ({n_plus:.0f} vs {n_minus:.0f} labels/slot)"
+                if pd.notna(n_plus) and pd.notna(n_minus) and n_plus != n_minus
+                else (f" ({n_plus:.0f} labels/slot)" if pd.notna(n_plus) else "")
+            )
+            labels.append(f"{ds} {model} {cid}{counts}")
             ticks.append(y)
             y += 1
         y += 0.5
@@ -181,8 +209,12 @@ def contrasts(table: pd.DataFrame, path: Path) -> bool:
         ax.axvline(edge, color=MUTED, linewidth=0.6, linestyle=":")
     ax.set_yticks(ticks, labels, fontsize=8)
     ax.invert_yaxis()
-    ax.set_xlabel("A-AUT difference (10 seeds; 95% two-stage bootstrap interval; dotted = +-0.01)",
-                  color=MUTED, fontsize=8)  # fmt: skip
+    ax.set_xlabel(
+        "A-AUT difference (10 seeds; 95% two-stage bootstrap interval; dotted = +-0.01).\n"
+        "orange = detected, olive = detected inside the margin, red = reversed, "
+        "green = equivalent, grey = not detected",
+        color=MUTED, fontsize=7,
+    )  # fmt: skip
     ax.grid(axis="x", alpha=0.25)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)

@@ -37,13 +37,14 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from driftwatch.metrics import grid_tables as gt  # noqa: E402
 from driftwatch.metrics import stats  # noqa: E402
+from driftwatch.sim.cell_ids import planned_ids_from_file  # noqa: E402
 
 DATASETS = ("lamda", "bodmas")
 
 
 def _write(df: pd.DataFrame, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(path, index=False, float_format="%.6f", lineterminator="\n")
+    df.to_csv(path, index=False, float_format="%.8f", lineterminator="\n")
 
 
 def build(
@@ -51,6 +52,7 @@ def build(
     e1_root: Path | None,
     datasets: tuple[str, ...] = DATASETS,
     n_boot: int = stats.N_BOOT,
+    spec_dir: Path | None = None,
 ) -> dict[str, pd.DataFrame]:
     parts: dict[str, list[pd.DataFrame]] = {
         k: []
@@ -63,7 +65,11 @@ def build(
         root = results / ds
         if not (root / "ledger.jsonl").exists() and not list(root.glob("ledger*.jsonl")):
             continue
-        col = gt.collect(root, ds)
+        planned: list[str] = []
+        spec_file = (spec_dir or ROOT / "configs") / f"e2_{ds}.yaml"
+        if spec_file.exists():
+            planned = planned_ids_from_file(spec_file)
+        col = gt.collect(root, ds, planned=planned)
         parts["ledger"].append(gt.ledger_table(col))
         if not col.arms:
             continue
@@ -83,10 +89,9 @@ def build(
             parts["rq1"].append(gt.rq1_table(run_dir, ds, n_boot=n_boot))
     out = {k: (pd.concat(v, ignore_index=True) if v else pd.DataFrame()) for k, v in parts.items()}
     c = out["contrasts"]
-    if not c.empty:  # one Holm family per seed set across datasets and models
-        c["wilcoxon_p_holm"] = float("nan")
-        for _, idx in c.groupby("seed_set").groups.items():
-            c.loc[idx, "wilcoxon_p_holm"] = stats.holm(c.loc[idx, "wilcoxon_p"].tolist())
+    if not c.empty:  # the registered family: datasets x models x 4, fixed size
+        models = sorted(c["model"].unique())
+        out["contrasts"] = gt.add_holm(c, list(datasets), models)
     return out
 
 
