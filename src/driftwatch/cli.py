@@ -6,6 +6,7 @@ Phase 2 adds `data download|build|verify|inventory`, Phase 3 `data slice` and Ph
 """
 
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
@@ -83,6 +84,22 @@ def build_parser() -> argparse.ArgumentParser:
         default=1,
         help="runs in parallel, one thread per run (mind LightGBM n_jobs x workers <= cores)",
     )
+
+    gr = sub.add_parser("grid", help="run the pre-registered delay x budget grid (E2), by cell")
+    gr.add_argument("spec", type=Path, help="a grid spec such as configs/e2_lamda.yaml")
+    gr.add_argument("--chunk", help="i/n: run the i-th of n cost-balanced chunks of cells")
+    gr.add_argument("--smoke", action="store_true", help="1 seed, 1 window; prints timing only")
+    gr.add_argument("--status", action="store_true", help="planned against complete and failed")
+    gr.add_argument("--root", type=Path, default=Path("data"), help="data root (default data)")
+    gr.add_argument("--out", type=Path, help="results root (default: the spec's output)")
+    gr.add_argument("--memory-cap-gb", type=float, default=1.5)
+    gr.add_argument(
+        "--allow-code-change", metavar="REASON", help="accept cells from another commit"
+    )
+    gr.add_argument(
+        "--retry-failed", metavar="REASON", help="rerun failed cells; logged as a retry"
+    )
+    gr.add_argument("--target-chunk-hours", type=float, default=1.0, help="smoke: chunk size")
     return parser
 
 
@@ -197,6 +214,76 @@ def _run_configs(args: argparse.Namespace) -> list:
     )
 
 
+def _run_grid(args: argparse.Namespace) -> int:
+    from driftwatch.data.presets import cached_source
+    from driftwatch.sim import grid
+
+    spec = grid.GridSpec.from_file(args.spec)
+    default_out = Path(spec.output) if not args.smoke else Path("results/e2_smoke") / spec.dataset
+    out = args.out if args.out is not None else default_out
+    if args.status:
+        report = grid.status(spec, out)
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
+    chunk = grid.parse_chunk(args.chunk) if args.chunk else None
+    source = cached_source(spec.dataset, args.root)
+    repo = Path(__file__).resolve().parents[2]
+    results = grid.run_grid(
+        spec,
+        source,
+        out,
+        repo_root=repo,
+        chunk=chunk,
+        smoke=args.smoke,
+        require_clean=not args.smoke,  # smoke measures time and is never evidence
+        memory_cap_bytes=int(args.memory_cap_gb * 1024**3),
+        allow_code_change=args.allow_code_change,
+        retry_reason=args.retry_failed,
+        on_cell=lambda r: print(
+            f"{r.cell_id}: {r.status}" + (f" {r.wall_s:.0f} s" if r.wall_s else "")
+        ),
+    )
+    failed = [r for r in results if r.status == "failed"]
+    if args.smoke:
+        _print_extrapolation(spec, source, results, args.target_chunk_hours)
+    for r in failed:
+        print(f"FAILED {r.cell_id}: {r.reason}", file=sys.stderr)
+    return 1 if failed or any(r.stop for r in results) else 0
+
+
+def _print_extrapolation(spec, source, results, target_hours: float) -> None:
+    """Timing only: seconds per unit by cell shape, then the planned grid in hours and chunks."""
+    import math
+
+    from driftwatch.sim import grid
+
+    cells, units, _ = grid.plan(spec, source)
+    smoke_secs = {r.cell_id: r.wall_s for r in results if r.wall_s and r.units}
+    smoke_units = {r.cell_id: r.units for r in results if r.wall_s and r.units}
+    est = grid.extrapolate(spec, smoke_secs, units, smoke_units)
+    print()
+    print("smoke timing (seconds per window x seed x model unit)")
+    for cid, s in sorted(smoke_secs.items()):
+        print(f"  {cid:60s} {s / smoke_units[cid]:7.2f} s/unit  ({smoke_units[cid]} units)")
+    print()
+    print("extrapolation to the full grid")
+    for cid, secs in sorted(est["per_cell_s"].items()):
+        print(f"  {cid:60s} {units[cid]:5d} units  {secs / 3600:6.2f} h")
+    total = est["total_s"]
+    n_chunks = max(1, math.ceil(total / (target_hours * 3600)))
+    parts = grid.assign_chunks(est["per_cell_s"], n_chunks)
+    print()
+    print(
+        f"total {total / 3600:.2f} h over {len(cells)} cells; "
+        f"{n_chunks} chunks of about {target_hours:g} h:"
+    )
+    for i, part in enumerate(parts, 1):
+        hours = sum(est["per_cell_s"][c] for c in part) / 3600
+        print(f"  --chunk {i}/{n_chunks}: {len(part)} cells, {hours:.2f} h")
+    if est["unmeasured"]:
+        print(f"unmeasured cells (no smoke cell of their shape): {est['unmeasured']}")
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "data":
@@ -225,6 +312,21 @@ def main(argv: list[str] | None = None) -> int:
                 f"results in {summary.dir}"
             )
         return 0
+    if args.command == "grid":
+        from driftwatch.sim.config import ConfigError
+        from driftwatch.sim.grid import CodeVersionMismatch, GridError
+
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+        try:
+            return _run_grid(args)
+        except (ConfigError, GridError, CodeVersionMismatch, ValueError) as exc:
+            print(f"driftwatch grid: {exc}", file=sys.stderr)
+            return 2
+        except RuntimeError as exc:
+            if "dirty" not in str(exc):
+                raise
+            print(f"driftwatch grid: {exc}", file=sys.stderr)
+            return 2
     return 0
 
 

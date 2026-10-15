@@ -781,6 +781,7 @@ def run(
     require_clean: bool = False,
     resume: bool = False,
     cache: InitialModelCache | None = None,
+    max_windows: int | None = None,
 ) -> RunSummary:
     """Run ``cfg`` on ``source`` and write the result store under ``out_root``.
 
@@ -788,7 +789,14 @@ def run(
     trees would otherwise share one config hash. Evidence runs use it. ``resume`` continues
     an interrupted run of the same config hash from its finished units; it needs a clean tree
     for the same reason, and refuses a run that already finished.
+
+    ``max_windows`` runs only the first windows of each variant and seed (the grid's smoke
+    mode, which measures time). It is recorded in ``run.json`` and is never part of an
+    evidence run: the grid driver writes smoke results to their own root.
     """
+    if max_windows is not None and max_windows < 1:
+        raise ValueError(f"max_windows must be at least 1, got {max_windows}")
+    only = range(max_windows) if max_windows is not None else None
     repo = Path(repo_root)
     version = code_version(repo)
     if (require_clean or resume) and version.endswith("-dirty"):
@@ -807,7 +815,7 @@ def run(
                 for seed in cfg.seeds:
                     spec = _spec_for(cfg, variant, seed)
                     n_units = 0
-                    for window in slice_windows(source, spec):
+                    for window in slice_windows(source, spec, only=only):
                         unit = f"{variant}|{seed}|{window.plan.window_id}"
                         n_units += 1
                         if store.begin_unit(unit):
@@ -849,6 +857,7 @@ def run(
         "memory": watchdog.as_record(),
         "wall_s": round(wall, 2),
         "resumed": bool(resume),
+        "max_windows": max_windows,
     }
     directory = store.finalize(record)
     return RunSummary(

@@ -1,0 +1,45 @@
+# E2 on LAMDA (Android): delay x budget grid, never and periodic(3) retraining (RQ2).
+# A grid spec: `driftwatch grid configs/e2_lamda.yaml`; each cell expands into an ordinary run config.
+# Never edit this file after it has produced stored results: copy it to a new name.
+name: e2_lamda
+dataset: lamda
+slots:
+  preset: adr-0004        # LAMDA calendar months
+  min_malware: 50         # size gate M (ADR-0004, ADR-0005)
+window:
+  nT: 4                   # ADR-0005
+  nE: 12
+  stride: 3
+ratio:
+  target: 0.10            # C3 headline (ADR-0005)
+  sensitivity: 0.05
+model:
+  - name: lr
+    C: 1.0
+    max_iter: 1000
+    tol: 0.0001
+    scaling: standard(with_mean=dense_only)
+    threshold: 0.5
+  - name: lgbm
+    profile: fast
+    n_jobs: 4
+    threshold: 0.5
+e0:
+  variants: [rolling]     # ADR-0005 windows are the headline; Chow stride is a secondary cell set
+  random_split: false
+output: results/e2/lamda
+grid:
+  delay: [0, 1, 2, 3]                 # slots (PROTOCOL section 2)
+  budget_pct: [0.5, 1.0, 2.0, 5.0]    # percent of the evaluated slot after C3 (ADR-0007)
+  policy: {name: periodic, period: 3}
+  selector: {name: random, calibration_fraction: 0.20}
+  seeds: [0, 1, 2, 3, 4]
+  headline:                           # the pre-registered contrasts again with 10 seeds in all
+    seeds: [5, 6, 7, 8, 9]
+    cells: [[0, 1.0], [0, 5.0], [3, 1.0], [3, 5.0], [0, 0.5], [0, 2.0]]
+  chow:                               # secondary check at Chow's stride (PREREG)
+    seeds: [0, 1, 2, 3, 4]
+    cells: [[0, 1.0], [0, 5.0], [3, 1.0], [3, 5.0]]
+  never:                              # one run per (dataset, model, window, seed)
+    seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    variants: [rolling, rolling_chow]

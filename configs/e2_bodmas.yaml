@@ -1,0 +1,47 @@
+# E2 on BODMAS (Windows PE): delay x budget grid, never and periodic(3) retraining (RQ2).
+# A grid spec: `driftwatch grid configs/e2_bodmas.yaml`; each cell expands into an ordinary run config.
+# Never edit this file after it has produced stored results: copy it to a new name.
+# Known limit (PREREG): nE = 6 with a 3-slot period gives one useful refit per window, and at
+# delay 3 periodic equals never by construction.
+name: e2_bodmas
+dataset: bodmas
+slots:
+  preset: adr-0004        # BODMAS 2-week slots from 2019-08-26, placeholder-dated benign rows excluded
+  min_malware: 50         # size gate M (ADR-0004, ADR-0005)
+window:
+  nT: 3                   # ADR-0005
+  nE: 6
+  stride: 2
+ratio:
+  target: 0.10            # C3 headline (ADR-0005)
+  sensitivity: 0.05
+model:
+  - name: lr
+    C: 1.0
+    max_iter: 1000
+    tol: 0.0001
+    scaling: standard(with_mean=dense_only)
+    threshold: 0.5
+  - name: lgbm
+    profile: fast
+    n_jobs: 4
+    threshold: 0.5
+e0:
+  variants: [rolling]
+  random_split: false
+output: results/e2/bodmas
+grid:
+  delay: [0, 1, 2, 3]
+  budget_pct: [0.5, 1.0, 2.0, 5.0]
+  policy: {name: periodic, period: 3}
+  selector: {name: random, calibration_fraction: 0.20}
+  seeds: [0, 1, 2, 3, 4]
+  headline:
+    seeds: [5, 6, 7, 8, 9]
+    cells: [[0, 1.0], [0, 5.0], [3, 1.0], [3, 5.0], [0, 0.5], [0, 2.0]]
+  chow:
+    seeds: [0, 1, 2, 3, 4]
+    cells: [[0, 1.0], [0, 5.0], [3, 1.0], [3, 5.0]]
+  never:
+    seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    variants: [rolling, rolling_chow]

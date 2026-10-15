@@ -1,6 +1,6 @@
 # ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator's queue rules
 
-**Status:** PROPOSED. The two pool choices (new-label weight 1, no truncation) were made by the researcher on 2026-10-11, before any simulator run existed. The remaining rules (budget base, retrain anchor, calibration slice, after-window labels, memory and parallelism) are proposed by Claude Code and take effect when the researcher accepts this ADR. Nothing below was chosen by looking at AUT. Formal acceptance (PROPOSED to ACCEPTED) is the researcher's.
+**Status:** ACCEPTED by the researcher on 2026-10-15, as written, before any grid run (answer given in the Phase 6 planning session; the rules below are unchanged). The two pool choices (new-label weight 1, no truncation) were made by the researcher on 2026-10-11, before any simulator run existed. The remaining rules (budget base, retrain anchor, calibration slice, after-window labels, memory and parallelism) are proposed by Claude Code and take effect when the researcher accepts this ADR. Nothing below was chosen by looking at AUT. Formal acceptance (PROPOSED to ACCEPTED) is the researcher's.
 **Date:** 2026-10-13
 **Deciders:** Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
 **Phase:** 5
