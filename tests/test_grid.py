@@ -217,6 +217,7 @@ def run_small(tmp_path: Path, runner=plain_runner, **kw):
     )
 
 
+@pytest.mark.slow
 def test_driver_runs_all_cells_and_records_them(tmp_path: Path) -> None:
     results = run_small(tmp_path)
     spec = small_spec()
@@ -230,6 +231,7 @@ def test_driver_runs_all_cells_and_records_them(tmp_path: Path) -> None:
     assert {r["event"] for r in rows} == {"started", "complete"}
 
 
+@pytest.mark.slow
 def test_interrupted_grid_resumes_without_rerunning_finished_cells(tmp_path: Path) -> None:
     calls: list[str] = []
 
@@ -289,6 +291,7 @@ def test_a_grid_is_refused_across_code_versions(tmp_path: Path) -> None:
         run_small(tmp_path)
 
 
+@pytest.mark.slow
 def test_invalidated_cells_are_rerun_and_the_reason_is_kept(tmp_path: Path) -> None:
     spec = small_spec()
     run_small(tmp_path)
@@ -303,6 +306,7 @@ def test_invalidated_cells_are_rerun_and_the_reason_is_kept(tmp_path: Path) -> N
     assert grid.status(spec, tmp_path)["counts"] == {"complete": len(spec.cells())}
 
 
+@pytest.mark.slow
 def test_chunk_ledgers_are_separate_files_and_merge_in_status(tmp_path: Path) -> None:
     spec = small_spec()
     n = 2
@@ -327,6 +331,7 @@ def test_fit_over_the_limit_stops_the_chunk_and_is_flagged(tmp_path: Path, monke
 # --- smoke ------------------------------------------------------------------------------------
 
 
+@pytest.mark.slow
 def test_smoke_runs_one_seed_one_window_per_cost_shape(tmp_path: Path) -> None:
     spec = small_spec()
     cells, _, _ = grid.plan(spec, source(), smoke=True)
@@ -412,6 +417,7 @@ def test_cli_run_refuses_a_grid_spec(tmp_path: Path, capsys) -> None:
 # --- review hardening (leakage review, Phase 6) -----------------------------------------------
 
 
+@pytest.mark.slow
 def test_smoke_events_never_complete_a_real_cell(tmp_path: Path) -> None:
     spec = small_spec()
     grid.run_grid(

@@ -136,3 +136,14 @@ def build_fixture_caches(root: Path) -> Path:
 def built_data(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """A data root with both datasets cached from the fixture (read-only for tests)."""
     return build_fixture_caches(tmp_path_factory.mktemp("built") / "data")
+
+
+# Tests that build a whole synthetic grid (a module-scoped run of 27 or 28 cells) are marked
+# slow: they are excluded from the fast suite and run with `uv run pytest -m slow` (and in CI).
+SLOW_FIXTURES = {"grid_root", "e3_root"}
+
+
+def pytest_collection_modifyitems(config, items) -> None:
+    for item in items:
+        if SLOW_FIXTURES & set(getattr(item, "fixturenames", ())):
+            item.add_marker(pytest.mark.slow)
