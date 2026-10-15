@@ -20,7 +20,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-from driftwatch.models.base import DEFAULT_THRESHOLD, Detector
+from driftwatch.models.base import DEFAULT_THRESHOLD, Detector, NotFittedError
 
 SCALING = "standard(with_mean=dense_only)"
 
@@ -79,3 +79,9 @@ class LogisticDetector(Detector):
 
     def _score(self, X: Any) -> np.ndarray:
         return self.clf_.predict_proba(self.scaler_.transform(self._prepare(X)))[:, 1]
+
+    def feature_space(self, X: Any) -> Any:
+        """Standardised features, with the scaler fitted on the training window."""
+        if self.fitted_window_id is None:
+            raise NotFittedError(f"{self.name} has not been fitted")
+        return self.scaler_.transform(self._prepare(X))

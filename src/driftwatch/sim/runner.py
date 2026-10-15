@@ -360,10 +360,14 @@ def _rows_digest(train: Any) -> str:
 
 
 def _initial_detectors(
-    ctx: _Ctx, window: Window, seed: int, train_key: str
+    ctx: _Ctx, window: Window, seed: int, train_key: str, train: Any = None
 ) -> list[tuple[int, Detector, bool]]:
-    """One fitted detector per configured model on the window's raw training rows."""
-    train = window.train
+    """One fitted detector per configured model on the window's raw training rows.
+
+    ``train`` replaces the window's training rows (E3 fits on the window minus its
+    time-ordered calibration hold-out); the cache key binds to the rows actually used.
+    """
+    train = window.train if train is None else train
     rows = _rows_digest(train)
     fitted: list[tuple[int, Detector, bool]] = []
     for mi, mspec in enumerate(ctx.cfg.models):
@@ -829,8 +833,13 @@ def run(
                         if store.begin_unit(unit):
                             _replay(ctx)
                         else:
-                            fn = _run_sim_window if cfg.is_simulation else _run_window
-                            fn(ctx, variant, spec, seed, window)
+                            if cfg.nonconf is not None:
+                                from driftwatch.sim import runner_e3  # noqa: PLC0415
+
+                                runner_e3.run_window(ctx, variant, spec, seed, window)
+                            else:
+                                fn = _run_sim_window if cfg.is_simulation else _run_window
+                                fn(ctx, variant, spec, seed, window)
                         store.end_unit()
                     if n_units == 0:
                         raise RuntimeError(

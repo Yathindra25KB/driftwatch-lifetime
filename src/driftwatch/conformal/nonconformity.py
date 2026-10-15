@@ -49,6 +49,7 @@ class CentroidScore:
     """Distance to the class centroid, centroids from the training pool of one window."""
 
     name = "centroid"
+    CHUNK = 4096  # rows transformed at a time
 
     def __init__(self, transform: Callable[[Any], Any] | None = None) -> None:
         self._transform = transform
@@ -62,12 +63,20 @@ class CentroidScore:
             raise ValueError("features and labels do not line up")
         if not ((y == 0).any() and (y == 1).any()):
             raise ValueError("a centroid needs at least one training row of each class")
-        Z = self._apply(X)
-        cents = []
-        for c in (0, 1):
-            m = Z[np.flatnonzero(y == c)].mean(axis=0)
-            cents.append(np.asarray(m, dtype=np.float64).ravel())
-        self.centroids_ = np.vstack(cents)
+        # chunked: the transformed matrix of a whole window may not fit next to the model
+        sums = [None, None]
+        counts = [0, 0]
+        for lo in range(0, X.shape[0], self.CHUNK):
+            Z = self._apply(X[lo : lo + self.CHUNK])
+            yc = y[lo : lo + self.CHUNK]
+            for c in (0, 1):
+                idx = np.flatnonzero(yc == c)
+                if len(idx) == 0:
+                    continue
+                part = np.asarray(Z[idx].sum(axis=0), dtype=np.float64).ravel()
+                sums[c] = part if sums[c] is None else sums[c] + part
+                counts[c] += len(idx)
+        self.centroids_ = np.vstack([sums[c] / counts[c] for c in (0, 1)])
         self._c_sq = (self.centroids_**2).sum(axis=1)
         self.window_id = window_id
         return self

@@ -97,6 +97,14 @@ class Detector(ABC):
             raise RuntimeError(f"{self.name} returned scores of shape {p.shape}")
         return p
 
+    def feature_space(self, X: Any) -> Any:
+        """The features as the model sees them (scaled for linear models, raw otherwise).
+
+        Used by the centroid nonconformity score; it applies only what was fitted on the
+        training window and reads no label.
+        """
+        return X
+
     def decide(self, proba: np.ndarray) -> np.ndarray:
         """Malware (1) when P(malware) is strictly above the fixed threshold."""
         return (np.asarray(proba) > self.threshold).astype(np.int8)
