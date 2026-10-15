@@ -55,25 +55,31 @@ def window_key(window_id: pd.Series) -> pd.Series:
     return window_id.str.split("|", n=1).str[1]
 
 
+OPTIONAL_KEYS = ("series", "variant")  # kept as keys when the table has them
+
+
 def f1_per_slot(preds: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
     """Per-slot F1 per (model, seed, window, slot) from stored labels and decisions.
 
-    ``preds`` needs ``model, seed, window_id, slot_id, y_true, pred``; ``order`` maps
-    ``(window_id, slot_id)`` to ``slot_index`` (from the slot table), which fixes the time order.
+    ``preds`` needs ``model, seed, window_id, slot_id, y_true, pred`` (and may carry
+    ``series`` and ``variant``, which are kept as keys); ``order`` maps ``(window_id,
+    slot_id)`` to ``slot_index`` (from the slot table), which fixes the time order.
     """
+    extra = [c for c in OPTIONAL_KEYS if c in preds.columns]
     flag = pd.DataFrame(
         {
             "model": preds["model"].to_numpy(),
             "seed": preds["seed"].to_numpy(),
             "window_id": preds["window_id"].to_numpy(),
             "slot_id": preds["slot_id"].to_numpy(),
+            **{c: preds[c].to_numpy() for c in extra},
             "tp": ((preds["y_true"] == 1) & (preds["pred"] == 1)).to_numpy(np.int64),
             "fp": ((preds["y_true"] == 0) & (preds["pred"] == 1)).to_numpy(np.int64),
             "fn": ((preds["y_true"] == 1) & (preds["pred"] == 0)).to_numpy(np.int64),
         }
     )
-    keys = ["model", "seed", "window_id", "slot_id"]
-    g = flag.groupby(keys, sort=False)[["tp", "fp", "fn"]].sum().reset_index()
+    keys = ["model", "seed", "window_id", "slot_id", *extra]
+    g = flag.groupby(keys, sort=False, observed=True)[["tp", "fp", "fn"]].sum().reset_index()
     denom = 2 * g["tp"] + g["fp"] + g["fn"]
     g["f1"] = (2 * g["tp"] / denom.where(denom > 0)).fillna(0.0)
     g = g.merge(
@@ -84,7 +90,7 @@ def f1_per_slot(preds: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
     )
     if g["slot_index"].isna().any():
         raise ValueError("stored predictions hold slots that the slot table does not list")
-    g["window_key"] = window_key(g["window_id"])
+    g["window_key"] = window_key(g["window_id"].astype(str))
     return g
 
 
@@ -96,11 +102,25 @@ class AutMatrix:
     n_windows_undefined: int  # windows with fewer than two evaluation slots (excluded)
 
 
-def aut_matrix(f1_cells: pd.DataFrame, model: str) -> AutMatrix:
-    """AUT of each (window, seed) from per-slot F1 in time order; undefined windows are counted."""
+def aut_matrix(
+    f1_cells: pd.DataFrame,
+    model: str,
+    *,
+    series: str | None = "time_aware",
+    variant: str | None = None,
+) -> AutMatrix:
+    """AUT of each (window, seed) from per-slot F1 in time order; undefined windows are counted.
+
+    ``series`` (default the time-aware series) and ``variant`` select rows when the table
+    carries those columns; a table without a ``series`` column is taken as one series.
+    """
     c = f1_cells[f1_cells["model"] == model]
+    if series is not None and "series" in c.columns:
+        c = c[c["series"] == series]
+    if variant is not None and "variant" in c.columns:
+        c = c[c["variant"] == variant]
     if c.empty:
-        raise ValueError(f"no per-slot F1 for model {model!r}")
+        raise ValueError(f"no per-slot F1 for model {model!r}, series {series!r}, {variant!r}")
     rows: dict[tuple[str, int], float] = {}
     undefined: set[str] = set()
     for (wkey, seed), g in c.groupby(["window_key", "seed"], sort=False):
