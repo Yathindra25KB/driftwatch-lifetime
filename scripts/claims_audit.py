@@ -135,6 +135,7 @@ def numbers(text: str) -> list[str]:
     t = re.sub(r"\[[A-Z]{1,2}-\d{2,3}\]", " ", t)  # the claim tags themselves
     t = ID_RE.sub(" ", t)
     t = re.sub(r"(?m)^\s*(?:[-*]\s+)?\d+[.)]\s", " ", t)  # list item numbers
+    t = re.sub(r"\|\s*\d+\s*(?=\|)", "|", t)  # a table cell that is only a chapter or row number
     t = re.sub(r"\b[Ss]ections?\s+\d+(?:\.\d+)*", " ", t)  # references to sections
     t = re.sub(r"\b[Cc]hapters?\s+\d+(?:\s*(?:to|and|-)\s*\d+)?", " ", t)
     t = re.sub(r"\b(?:Table|Figure|Eq\.?|Appendix)\s+\d+", " ", t)
