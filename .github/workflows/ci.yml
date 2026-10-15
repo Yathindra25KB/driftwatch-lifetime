@@ -31,6 +31,8 @@ jobs:
         run: uv run --frozen pytest -q
       - name: Guardrail demonstration
         run: uv run --frozen python scripts/check_guardrails.py
+      - name: Reproduce Table 1 (smoke, synthetic fixture)
+        run: uv run --frozen driftwatch reproduce table1 --smoke --out reports/reproduction
 
   windows-smoke:
     name: windows-smoke
@@ -47,3 +49,5 @@ jobs:
         run: uv run --frozen pytest -q
       - name: Guardrail demonstration
         run: uv run --frozen python scripts/check_guardrails.py
+      - name: Reproduce Table 1 (smoke, synthetic fixture)
+        run: uv run --frozen driftwatch reproduce table1 --smoke --out reports/reproduction
