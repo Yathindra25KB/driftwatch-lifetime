@@ -188,6 +188,21 @@ class GridSpec:
             never_variants=tuple(never.get("variants") or ("rolling",)),
             output=str(d.get("output") or "results/e2"),
         )
+        need_seeds = set(seeds) | set(h_seeds) | set(spec.chow_seeds)
+        if not need_seeds <= set(spec.never_seeds):
+            raise GridError(
+                "grid.never.seeds must cover every seed of the periodic cells, so every "
+                "contrast has a never arm to pair with; missing "
+                f"{sorted(need_seeds - set(spec.never_seeds))}"
+            )
+        need_variants = set(spec.base.get("e0", {}).get("variants") or ("rolling",))
+        if spec.chow_cells:
+            need_variants.add("rolling_chow")
+        if not need_variants <= set(spec.never_variants):
+            raise GridError(
+                "grid.never.variants must include "
+                f"{sorted(need_variants - set(spec.never_variants))}"
+            )
         # validate by expanding every cell once (fails here, not after hours of compute)
         for cell in spec.cells():
             spec.config(cell)
@@ -241,8 +256,9 @@ class GridSpec:
         e0["variants"] = list(cell.variants)
         e0.setdefault("random_split", False)
         d["e0"] = e0
-        if output is not None:
-            d["output"] = output
+        rel = cell.cell_id.split("/", 1)[1]
+        # relative and machine independent, so the hash does not depend on --out or the host
+        d["output"] = output or f"{self.output}{'-smoke' if smoke else ''}/{rel}"
         if cell.arm == "never":
             d.update({"policy": "never", "selector": None, "delay": None, "budget_pct": None})
         else:
@@ -348,16 +364,22 @@ class Ledger:
                 rows.append(json.loads(line))
         return rows
 
-    def state(self, cell_ids: Iterable[str] = ()) -> dict[str, CellState]:
-        return fold_events(self.events(), cell_ids)
+    def state(self, cell_ids: Iterable[str] = (), *, smoke: bool = False) -> dict[str, CellState]:
+        return fold_events(self.events(), cell_ids, smoke=smoke)
 
 
 def fold_events(
-    rows: Iterable[dict[str, Any]], cell_ids: Iterable[str] = ()
+    rows: Iterable[dict[str, Any]], cell_ids: Iterable[str] = (), *, smoke: bool = False
 ) -> dict[str, CellState]:
-    """The state of every cell from its events, in the order given."""
+    """The state of every cell from its events, in the order given.
+
+    Smoke events and real events never mix: a smoke run (one seed, one window) is not a
+    finished cell, and the real driver must not see it as one.
+    """
     out = {c: CellState(c) for c in cell_ids}
     for row in rows:
+        if bool(row.get("smoke")) != smoke:
+            continue
         st = out.setdefault(row["cell_id"], CellState(row["cell_id"]))
         ev = row["event"]
         if ev == "started":
@@ -456,11 +478,22 @@ def run_cell(
     retry_reason: str | None = None,
     state: CellState | None = None,
     runner: Callable[..., Any] = run,
+    pinned_version: str | None = None,
 ) -> CellResult:
-    """Run one cell (or skip it when the ledger says it is complete)."""
-    cfg = spec.config(cell, smoke=smoke, output=str(out_root))
+    """Run one cell (or skip it when the ledger says it is complete).
+
+    ``pinned_version`` is the code version read once when the grid started: if HEAD or the
+    tree moved since, the cell is refused (the modules in memory are the old ones).
+    """
+    cfg = spec.config(cell, smoke=smoke)
     version = code_version(repo_root)
-    st = state or ledger.state([cell.cell_id])[cell.cell_id]
+    if pinned_version is not None and version != pinned_version:
+        raise CodeVersionMismatch(
+            f"the code version moved from {pinned_version} to {version} during the grid; "
+            "modules are loaded once, so later cells would be labelled with code that did not run"
+        )
+    st = state or ledger.state([cell.cell_id], smoke=smoke)[cell.cell_id]
+    chash = config_hash(cfg.to_dict(), version, lock_sha256(repo_root))
     if st.status == "complete":
         if st.code_version != version and not allow_code_change:
             raise CodeVersionMismatch(
@@ -468,6 +501,16 @@ def run_cell(
                 "a grid is run on one commit (use --allow-code-change with a reason, then "
                 "mark the affected cells invalidated)"
             )
+        if st.code_version == version and st.config_hash != chash:
+            raise GridError(
+                f"{cell.cell_id} was completed under another configuration at this commit "
+                f"({st.config_hash} against {chash}); the spec changed after results existed"
+            )
+        if allow_code_change and st.code_version != version:
+            ledger.append(
+                "flag", cell.cell_id, flag=f"accepted_other_code_version:{allow_code_change}",
+                previous_version=st.code_version, code_version=version,
+            )  # fmt: skip
         return CellResult(cell.cell_id, "skipped", st.wall_s, 0, Path(st.dir) if st.dir else None)
     if st.status == "failed" and not retry_reason:
         return CellResult(cell.cell_id, "failed-kept", None, 0, None, st.reason)
@@ -475,7 +518,6 @@ def run_cell(
         raise RuntimeError(f"the working tree is dirty ({version}); commit before a grid run")
     if st.status == "failed" and retry_reason:
         ledger.append("retry", cell.cell_id, reason=retry_reason, previous=st.reason)
-    chash = config_hash(cfg.to_dict(), version, lock_sha256(repo_root))
     ledger.append(
         "started", cell.cell_id, code_version=version, config_hash=chash, smoke=smoke,
         seeds=list(cfg.seeds), variants=list(cfg.variants), delay=cell.delay,
@@ -486,7 +528,7 @@ def run_cell(
         summary = runner(
             cfg, source, out_root / cell.cell_id.split("/", 1)[1],
             repo_root=repo_root, memory_cap_bytes=memory_cap_bytes,
-            cache=cache, max_windows=max_windows,
+            cache=cache, max_windows=max_windows, pinned_version=version,
             # an invalidated cell is recomputed from scratch; otherwise continue a partial run
             **({"overwrite": True} if st.status == "invalidated" else {"resume": not smoke}),
         )  # fmt: skip
@@ -494,6 +536,16 @@ def run_cell(
         # the run finished earlier but the ledger line was lost: adopt it, do not recompute
         d = out_root / cell.cell_id.split("/", 1)[1] / chash[:16]
         record = json.loads((d / "run.json").read_text(encoding="utf-8"))
+        if (
+            record.get("status") != "complete"
+            or record.get("config_hash") != chash
+            or record.get("max_windows") != max_windows
+        ):
+            reason = f"existing run directory {d} is not a finished run of this cell"
+            ledger.append(
+                "failed", cell.cell_id, reason=reason, code_version=version, config_hash=chash
+            )
+            return CellResult(cell.cell_id, "failed", None, 0, None, reason)
         ledger.append(
             "complete", cell.cell_id, code_version=version, config_hash=chash, dir=str(d),
             wall_s=record.get("wall_s"), adopted=True,
@@ -616,7 +668,8 @@ def run_grid(
     cells, _, _ = plan(spec, source, chunk=chunk, smoke=smoke)
     ledger = ledger_for(out, chunk)
     # the ledger is the progress record: planned cells are written once, before any run
-    known = fold_events(merged_ledger_events(out), [c.cell_id for c in cells])
+    known = fold_events(merged_ledger_events(out), [c.cell_id for c in cells], smoke=smoke)
+    pinned = code_version(repo)  # read once: modules are loaded once, labels must not drift
     cache = InitialModelCache()  # initial models are shared by cells: same rows, same seed
     results: list[CellResult] = []
     for cell in cells:
@@ -626,6 +679,7 @@ def run_grid(
             max_windows=(max_windows or 1) if smoke else max_windows,
             require_clean=require_clean, allow_code_change=allow_code_change,
             retry_reason=retry_reason, state=known[cell.cell_id], runner=runner,
+            pinned_version=pinned,
         )  # fmt: skip
         results.append(res)
         if on_cell is not None:

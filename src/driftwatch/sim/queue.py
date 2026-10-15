@@ -87,6 +87,16 @@ class SealedSlot:
     def n(self) -> int:
         return len(self._public.handle)
 
+    def n_seen_in(self, pool_fv_hash: np.ndarray | None) -> int | None:
+        """Rows of this slot whose feature vector is already in the training pool.
+
+        A count only: the hashes stay inside the slot. ``None`` when either side carries no
+        hashes (a synthetic source without them).
+        """
+        if pool_fv_hash is None or self._slot.fv_hash is None:
+            return None
+        return int(np.isin(self._slot.fv_hash, pool_fv_hash).sum())
+
     def public(self) -> OpaqueSlot:
         """The label-free view (the same object every call, so scoring order is stable)."""
         return self._public
@@ -111,6 +121,7 @@ class SealedSlot:
             y=np.asarray(self._slot.y[positions]),
             ts=np.asarray(self._slot.ts[positions]),
             row_id=np.asarray(self._slot.row_id[positions]),
+            fv_hash=None if self._slot.fv_hash is None else self._slot.fv_hash[positions],
         )
 
 
@@ -120,6 +131,7 @@ class _Rows:
     y: np.ndarray
     ts: np.ndarray
     row_id: np.ndarray
+    fv_hash: np.ndarray | None = None
 
 
 @dataclass(frozen=True, eq=False)
@@ -132,6 +144,7 @@ class Released:
     ts: np.ndarray
     row_id: np.ndarray
     queried_in: np.ndarray  # evaluation-slot index each row was queried in
+    fv_hash: np.ndarray | None = None  # feature-vector hashes (for the pool's seen-before count)
 
     def __len__(self) -> int:
         return len(self.y)
@@ -197,6 +210,9 @@ class LabelQueue:
             np.concatenate([rows.ts for _, rows in batches]),
             np.concatenate([rows.row_id for _, rows in batches]),
             np.concatenate([np.full(len(rows.y), t, dtype=np.int64) for t, rows in batches]),
+            None
+            if any(rows.fv_hash is None for _, rows in batches)
+            else np.concatenate([rows.fv_hash for _, rows in batches]),
         )
 
     def query(self, slot_index: int, slot: SealedSlot, selection: Selection) -> QueryReceipt:

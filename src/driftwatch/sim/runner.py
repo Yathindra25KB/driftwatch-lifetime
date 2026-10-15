@@ -507,6 +507,9 @@ def _run_sim_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window
             st.pool.add(released)
             st.n_released += len(released)
             slot.assert_c1(st.pool.ts)  # C1 with the released rows in the pool
+            # repeats of a vector the pool already holds (initial rows and arrived labels):
+            # a count of the metric side, taken before this slot's own query
+            n_seen_pool = slot.n_seen_in(st.pool.fv_hash)
             event = st.policy.should_retrain(s)
             n_new = st.pool.n_new_since_fit
             fit_seconds = 0.0
@@ -559,6 +562,7 @@ def _run_sim_window(ctx: _Ctx, variant: str, spec: WindowSpec, seed: int, window
                     "n_released": len(released),
                     "n_pool": n_pool,
                     "n_pool_new_labels": n_pool - n_train_rows,
+                    "n_seen_in_pool": n_seen_pool,
                     "retrain_event": bool(event),
                     "retrained": bool(refit),
                     "n_ignored_after_end": receipt.n_ignored,
@@ -782,6 +786,7 @@ def run(
     resume: bool = False,
     cache: InitialModelCache | None = None,
     max_windows: int | None = None,
+    pinned_version: str | None = None,
 ) -> RunSummary:
     """Run ``cfg`` on ``source`` and write the result store under ``out_root``.
 
@@ -798,9 +803,12 @@ def run(
         raise ValueError(f"max_windows must be at least 1, got {max_windows}")
     only = range(max_windows) if max_windows is not None else None
     repo = Path(repo_root)
-    version = code_version(repo)
-    if (require_clean or resume) and version.endswith("-dirty"):
-        raise RuntimeError(f"the working tree is dirty ({version}); commit before an evidence run")
+    version = pinned_version or code_version(repo)
+    if (require_clean or resume) and (version.endswith("-dirty") or version == "unknown"):
+        raise RuntimeError(
+            f"the working tree is dirty or not a git checkout ({version}); "
+            "commit before an evidence run"
+        )
     lock = lock_sha256(repo)
     chash = config_hash(cfg.to_dict(), version, lock)
     store = ResultStore(out_root, chash, overwrite=overwrite, resume=resume)

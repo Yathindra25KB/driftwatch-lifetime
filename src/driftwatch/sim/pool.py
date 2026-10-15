@@ -30,6 +30,8 @@ class TrainingPool:
         self._initial_y = initial.y
         self._initial_ts = initial.ts
         self._initial_row_id = initial.row_id
+        self._initial_fv = initial.fv_hash
+        self._parts_fv: list[np.ndarray | None] = []
         self._parts_X: list[Any] = []
         self._parts_y: list[np.ndarray] = []
         self._parts_ts: list[np.ndarray] = []
@@ -63,6 +65,7 @@ class TrainingPool:
         self._parts_ts.append(released.ts)
         self._parts_row_id.append(released.row_id)
         self._parts_queried_in.append(released.queried_in)
+        self._parts_fv.append(released.fv_hash)
         self._n_new += len(released)
         self._cache = None
 
@@ -99,6 +102,14 @@ class TrainingPool:
         if not self._parts_queried_in:
             return np.empty(0, dtype=np.int64)
         return np.concatenate(self._parts_queried_in)
+
+    @property
+    def fv_hash(self) -> np.ndarray | None:
+        """Feature-vector hashes of the pool (initial and arrived), for a count only."""
+        parts = [self._initial_fv, *self._parts_fv]
+        if any(p is None for p in parts):
+            return None
+        return np.concatenate(parts)
 
     @property
     def row_id(self) -> np.ndarray:

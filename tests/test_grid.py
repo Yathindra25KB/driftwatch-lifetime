@@ -69,7 +69,7 @@ def small_spec() -> GridSpec:
             seeds=[0],
             headline={"seeds": [1], "cells": [[0, 1.0]]},
             chow={"seeds": [0], "cells": [[0, 5.0]]},
-            never={"seeds": [0, 1], "variants": ["rolling"]},
+            never={"seeds": [0, 1], "variants": ["rolling", "rolling_chow"]},
         )
     )
 
@@ -204,7 +204,7 @@ def test_chunk_syntax(bad) -> None:
 def test_units_count_windows_seeds_and_models() -> None:
     spec = small_spec()
     cells = {c.role: c for c in spec.cells() if c.role in {"never", "chow"}}
-    assert grid.cell_units(cells["never"], 2, {"rolling": 6}) == 6 * 2 * 2
+    assert grid.cell_units(cells["never"], 2, {"rolling": 6, "rolling_chow": 4}) == (6 + 4) * 2 * 2
     assert grid.cell_units(cells["chow"], 2, {"rolling_chow": 4}) == 4 * 1 * 2
 
 
@@ -407,3 +407,74 @@ def test_cli_run_refuses_a_grid_spec(tmp_path: Path, capsys) -> None:
     spec_path.write_text(yaml.safe_dump(spec_dict()), encoding="utf-8")
     assert cli.main(["run", str(spec_path)]) == 2
     assert "grid" in capsys.readouterr().err
+
+
+# --- review hardening (leakage review, Phase 6) -----------------------------------------------
+
+
+def test_smoke_events_never_complete_a_real_cell(tmp_path: Path) -> None:
+    spec = small_spec()
+    grid.run_grid(
+        spec, source(), tmp_path, repo_root=ROOT, smoke=True, require_clean=False,
+        runner=plain_runner,
+    )  # fmt: skip
+    # the same root: the smoke ledger lines must not count as finished cells
+    assert grid.status(spec, tmp_path)["counts"] == {"planned": len(spec.cells())}
+    results = run_small(tmp_path)
+    assert all(r.status == "complete" for r in results)
+    full = [r for r in results if r.status == "complete"]
+    assert len(full) == len(spec.cells())
+
+
+def test_adopting_a_directory_checks_what_it_is(tmp_path: Path) -> None:
+    spec = small_spec()
+    cell = next(c for c in spec.cells() if c.arm == "periodic")
+    cfg = spec.config(cell)
+    # a one-window smoke result sitting where the full cell will be written: same config hash
+    # (single seed), so the runner finds a finished directory
+    src = source()
+    out = tmp_path / cell.cell_id.split("/", 1)[1]
+    run(cfg, src, out, repo_root=ROOT, max_windows=1)
+    ledger = Ledger(tmp_path / "ledger.jsonl")
+    res = grid.run_cell(
+        spec, cell, src, tmp_path, ledger, repo_root=ROOT, cache=grid.InitialModelCache(),
+        require_clean=False, runner=plain_runner,
+    )  # fmt: skip
+    assert res.status == "failed" and "not a finished run of this cell" in (res.reason or "")
+
+
+def test_cell_config_hash_does_not_depend_on_the_output_root() -> None:
+    spec = small_spec()
+    cell = spec.cells()[1]
+    a = spec.config(cell).to_dict()
+    assert a["output"].startswith("unused/") and "periodic" in a["output"]
+    assert spec.config(cell, smoke=True).to_dict()["output"].startswith("unused-smoke/")
+
+
+def test_a_moved_code_version_stops_the_grid(tmp_path: Path) -> None:
+    spec = small_spec()
+    cell = spec.cells()[0]
+    with pytest.raises(grid.CodeVersionMismatch, match="moved"):
+        grid.run_cell(
+            spec, cell, source(), tmp_path, Ledger(tmp_path / "l.jsonl"), repo_root=ROOT,
+            cache=grid.InitialModelCache(), require_clean=False, runner=plain_runner,
+            pinned_version="0000000",
+        )  # fmt: skip
+
+
+def test_a_completed_cell_under_another_config_is_refused(tmp_path: Path) -> None:
+    spec = small_spec()
+    cell = spec.cells()[0]
+    version = grid.code_version(ROOT)
+    Ledger(tmp_path / "ledger.jsonl").append(
+        "complete", cell.cell_id, code_version=version, config_hash="not-this-one", dir="d"
+    )
+    with pytest.raises(GridError, match="another configuration"):
+        run_small(tmp_path)
+
+
+def test_never_arm_must_cover_the_seeds_and_variants_of_every_contrast() -> None:
+    with pytest.raises(GridError, match="never.seeds"):
+        GridSpec.from_dict(spec_dict(never={"seeds": [0], "variants": ["rolling", "rolling_chow"]}))
+    with pytest.raises(GridError, match="never.variants"):
+        GridSpec.from_dict(spec_dict(never={"seeds": [0, 1, 2, 3], "variants": ["rolling"]}))
