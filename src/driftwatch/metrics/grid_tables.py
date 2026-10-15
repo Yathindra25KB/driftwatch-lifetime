@@ -3,18 +3,30 @@
 Reads the grid's ledger and, for every complete cell, ``predictions.parquet`` (per-slot F1
 is recomputed from stored labels and decisions and checked against the slot table),
 ``slots.parquet`` and ``run.json``. Nothing is fitted and no model code is imported: the
-only simulator module read is the ledger, which holds no model code.
+only simulator modules read are the ledger and the cell-id helper, which hold no model code.
 
 The contrasts, units and decision rules are those of docs/PREREG.md (prereg-v1) and are
 implemented in :mod:`driftwatch.metrics.stats`. All values are descriptive of the stored
 runs; every number that reaches a report must have a row in docs/CLAIMS.md first.
+
+Reading rules built into the columns (statistics review, Phase 6):
+
+- ``role`` says what a row is: ``primary`` (10 seeds, registered), ``seed_robustness`` (the
+  same contrast on seeds 0-4, nested in the 10-seed set, not a replication),
+  ``chow_secondary``, ``descriptive``;
+- ``verdict`` is one of ``detected``, ``detected_within_margin``, ``reversed``,
+  ``equivalent`` (interval inside the margin), ``not_detected``, ``not_computed``;
+- a contrast whose arms are missing is a row with ``status = not_computed`` and its reason,
+  never a silent omission;
+- the seed-level Wilcoxon p-value is conditional on the realised windows and measures
+  subsample noise only; it is a supporting check, not a second test.
 """
 
 from __future__ import annotations
 
 import json
 import math
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -30,11 +42,16 @@ from driftwatch.sim.ledger import fold_events, merged_ledger_events
 MARGIN = 0.01  # practical-equivalence margin (PREREG, estimate confirmed 15 Oct 2026)
 BAND = 0.05  # RQ1 band (PREREG)
 SEED_SETS = {"0-4": tuple(range(5)), "0-9": tuple(range(10))}
-HEADLINE_DELAYS = (0, 3)
-HEADLINE_BUDGETS = (1.0, 5.0)
 BUDGETS = (0.5, 1.0, 2.0, 5.0)
 DELAYS = (0, 1, 2, 3)
 PRED_COLUMNS = ["series", "variant", "model", "seed", "window_id", "slot_id", "y_true", "pred"]
+PRIMARY = (
+    ("C-D1", "d=0 minus d=3, B=1%, periodic", ("periodic", 0, 1.0), ("periodic", 3, 1.0), 3),
+    ("C-D2", "d=0 minus d=3, B=5%, periodic", ("periodic", 0, 5.0), ("periodic", 3, 5.0), 3),
+    ("C-P", "periodic (d=0, B=5%) minus never", ("periodic", 0, 5.0), ("never", None, None), None),
+    ("C-B", "B=5% minus B=0.5%, d=0, periodic", ("periodic", 0, 5.0), ("periodic", 0, 0.5), None),
+)
+FAMILY_SIZE_PER_STRATUM = len(PRIMARY)
 
 ArmKey = tuple[str, str, str, "int | None", "float | None"]  # variant, model, policy, delay, budget
 
@@ -48,19 +65,63 @@ class Collected:
     dataset: str
     arms: dict[ArmKey, pd.DataFrame] = field(default_factory=dict)  # windows x seeds AUT
     f1: dict[ArmKey, pd.DataFrame] = field(default_factory=dict)  # per-slot F1 cells
-    counts: dict[ArmKey, dict[str, float]] = field(default_factory=dict)
+    counts_blocks: dict[ArmKey, list[tuple[frozenset[int], dict[str, float]]]] = field(
+        default_factory=dict
+    )  # label counts per seed block (a block is one finished cell)
     undefined: dict[ArmKey, int] = field(default_factory=dict)
-    geometry: dict[str, dict[str, int]] = field(default_factory=dict)  # variant -> nE, stride
+    geometry: dict[str, dict[str, int]] = field(default_factory=dict)  # variant -> nT, nE, stride
+    period: int = 3
     cells: list[dict[str, Any]] = field(default_factory=list)  # ledger summary rows
     models: list[str] = field(default_factory=list)
+    code_versions: set[str] = field(default_factory=set)
+
+    # -- counts ------------------------------------------------------------------------------
+
+    def counts_for(self, key: ArmKey, seeds: Iterable[int]) -> dict[str, float]:
+        """Label counts of an arm over exactly the blocks whose seeds lie inside ``seeds``.
+
+        Blocks are weighted by their number of (seed, window) cells, so a "0-4" row reports
+        the 0-4 block only and a "0-9" row both blocks.
+        """
+        want = set(seeds)
+        parts = [
+            (c, c.get("n_cells", 1.0)) for s, c in self.counts_blocks.get(key, []) if s <= want
+        ]
+        if not parts:
+            return {}
+        total = sum(w for _, w in parts)
+        names = {k for c, _ in parts for k in c}
+        out = {}
+        for k in names:
+            vals = [(c[k], w) for c, w in parts if k in c and not math.isnan(c[k])]
+            out[k] = sum(v * w for v, w in vals) / sum(w for _, w in vals) if vals else float("nan")
+        out["n_cells"] = total
+        return out
+
+    @property
+    def n_refit_events(self) -> int:
+        """Retrain events per window (before slots p, 2p, ... inside the evaluation slots)."""
+        nE = self.geometry.get("rolling", {}).get("nE", 0)
+        return max(0, (nE - 1) // self.period)
+
+    @property
+    def delay_axis_note(self) -> str:
+        if self.n_refit_events <= 1:
+            return (
+                "single refit per window: the delay axis is a delay in one refit, "
+                "and periodic at d >= period equals never by construction"
+            )
+        return ""
 
 
 # --- loading ----------------------------------------------------------------------------------
 
 
-def _policy_name(cfg: Mapping[str, Any]) -> str:
+def _policy(cfg: Mapping[str, Any]) -> tuple[str, int]:
     p = cfg.get("policy")
-    return p["name"] if isinstance(p, dict) else str(p)
+    if isinstance(p, dict):
+        return str(p["name"]), int(p.get("period") or 3)
+    return str(p), 3
 
 
 def _variant_geometry(cfg: Mapping[str, Any], variant: str) -> dict[str, int]:
@@ -117,52 +178,63 @@ def _label_counts(slots: pd.DataFrame, windows: pd.DataFrame, model: str, varian
             noop_retrains_per_window=float(
                 (per_ws["retrain_event"].sum() - per_ws["retrained"].sum()).mean()
             ),
-            pool_final_mean=float(s.groupby(["seed", "window_id"])["n_pool"].max().mean()),
-            n_seen_in_pool_share=float(
-                s["n_seen_in_pool"].sum() / s["n"].sum()
-                if s["n_seen_in_pool"].notna().any()
-                else np.nan
-            ),
+            pool_final_mean=float(per_ws["n_pool"].max().mean()),
         )
-    out["n_seen_initial_share"] = float(
-        s["n_seen_in_initial_train"].sum() / s["n"].sum()
-        if s["n_seen_in_initial_train"].notna().any()
-        else np.nan
-    )
+        if s["n_seen_in_pool"].notna().any():
+            out["n_seen_in_pool_share"] = float(s["n_seen_in_pool"].sum() / s["n"].sum())
+    if s["n_seen_in_initial_train"].notna().any():
+        out["n_seen_initial_share"] = float(s["n_seen_in_initial_train"].sum() / s["n"].sum())
     out["mean_achieved_ratio"] = float(s["achieved_ratio"].mean())
     out["share_below_target"] = float((s["c3_status"] == "below_target").mean())
     out["windows_rows"] = float(len(w))
     return out
 
 
-def collect(root: Path | str, dataset: str, *, ledger_root: Path | str | None = None) -> Collected:
-    """Every complete cell under ``root`` as AUT matrices per arm (seed blocks joined)."""
+def collect(
+    root: Path | str,
+    dataset: str,
+    *,
+    ledger_root: Path | str | None = None,
+    planned: Sequence[str] = (),
+    allow_mixed_versions: bool = False,
+) -> Collected:
+    """Every complete cell under ``root`` as AUT matrices per arm (seed blocks joined).
+
+    ``planned`` lists the planned cell ids, so that a cell the ledger never saw appears in
+    the ledger table as ``planned``. Cells completed at different code versions are an
+    error unless ``allow_mixed_versions`` (a reviewed rerun after a fix).
+    """
     root = Path(root)
     events = merged_ledger_events(ledger_root or root)
-    state = fold_events(events)
+    state = fold_events(events, planned)
     col = Collected(dataset)
     blocks: dict[ArmKey, list[pd.DataFrame]] = {}
     f1_blocks: dict[ArmKey, list[pd.DataFrame]] = {}
     for cell_id in sorted(state):
         st = state[cell_id]
-        row = {
-            "cell_id": cell_id,
-            "status": st.status,
-            "code_version": st.code_version,
-            "config_hash": st.config_hash,
-            "wall_s": st.wall_s,
-            "max_fit_s": st.max_fit_s,
-            "peak_gb": st.peak_gb,
-            "flags": ";".join(st.flags),
-            "reason": st.reason,
-            "attempts": st.attempts,
-        }
-        col.cells.append(row)
+        col.cells.append(
+            {
+                "cell_id": cell_id,
+                "status": st.status,
+                "code_version": st.code_version,
+                "config_hash": st.config_hash,
+                "wall_s": st.wall_s,
+                "max_fit_s": st.max_fit_s,
+                "peak_gb": st.peak_gb,
+                "flags": ";".join(st.flags),
+                "reason": st.reason,
+                "attempts": st.attempts,
+            }
+        )
         if st.status != "complete" or not st.dir:
             continue
+        if st.code_version:
+            col.code_versions.add(st.code_version)
         d = load_cell(Path(st.dir))
         cfg = d["config"]
-        policy = _policy_name(cfg)
+        policy, period = _policy(cfg)
+        if policy == "periodic":
+            col.period = period
         delay = cfg.get("delay")
         budget = cfg.get("budget_pct")
         for variant in cfg["e0"]["variants"]:
@@ -176,12 +248,18 @@ def collect(root: Path | str, dataset: str, *, ledger_root: Path | str | None = 
                 f1_blocks.setdefault(key, []).append(
                     sel[["seed", "window_key", "slot_index", "f1"]].copy()
                 )
-                counts = _label_counts(d["slots"], d["windows"], model, variant)
-                prev = col.counts.get(key)
-                col.counts[key] = counts if prev is None else {**prev, **counts}
+                seeds = frozenset(int(s) for s in m.values.columns)
+                col.counts_blocks.setdefault(key, []).append(
+                    (seeds, _label_counts(d["slots"], d["windows"], model, variant))
+                )
                 if model not in col.models:
                     col.models.append(model)
         del d
+    if len(col.code_versions) > 1 and not allow_mixed_versions:
+        raise GridDataError(
+            f"{dataset}: cells were completed at several code versions "
+            f"{sorted(col.code_versions)}; a contrast must not mix them (review the ledger)"
+        )
     for key, parts in blocks.items():
         seeds = [s for p in parts for s in p.columns]
         if len(set(seeds)) != len(seeds):
@@ -195,7 +273,11 @@ def collect(root: Path | str, dataset: str, *, ledger_root: Path | str | None = 
     return col
 
 
-# --- tables -----------------------------------------------------------------------------------
+# --- helpers ----------------------------------------------------------------------------------
+
+
+def _sort_key(k: ArmKey):
+    return (k[0], k[1], k[2], -1 if k[3] is None else k[3], -1 if k[4] is None else k[4])
 
 
 def _seed_cols(frame: pd.DataFrame, seeds: Iterable[int]) -> pd.DataFrame | None:
@@ -203,27 +285,52 @@ def _seed_cols(frame: pd.DataFrame, seeds: Iterable[int]) -> pd.DataFrame | None
     return frame[want] if all(s in frame.columns for s in want) else None
 
 
+def _arm(col: Collected, variant: str, model: str, policy: str, delay, budget):
+    return col.arms.get((variant, model, policy, delay, budget))
+
+
+def _queried(col: Collected, variant: str, model: str, arm: tuple, seeds) -> float:
+    """Mean labels queried per slot (the registered unit uses queries, not the allowance)."""
+    policy, delay, budget = arm
+    if policy == "never":
+        return 0.0
+    c = col.counts_for((variant, model, policy, delay, budget), seeds)
+    return float(c.get("labels_queried_per_slot", math.nan))
+
+
+def verdict(est: stats.Estimate, *, margin: float = MARGIN) -> str:
+    """Three-way reading of a registered contrast (hypothesised direction: positive)."""
+    if est.high < 0.0:
+        return "reversed"
+    if est.low > 0.0:
+        return "detected_within_margin" if est.high <= margin else "detected"
+    if est.low >= -margin and est.high <= margin:
+        return "equivalent"
+    return "not_detected"
+
+
+# --- tables -----------------------------------------------------------------------------------
+
+
 def aaut_table(col: Collected) -> pd.DataFrame:
-    """A-AUT per arm and seed set: mean and std over windows, seed spread, label counts."""
+    """A-AUT per arm and seed set: mean and std over windows, seed spread, label counts.
+
+    ``a_aut_std`` follows E0 (the std over windows is taken per seed, then averaged over
+    seeds) so that it is comparable with Table 1; ``a_aut_std_seed_averaged`` is the std over
+    windows of the seed-averaged AUT.
+    """
     rows = []
-    for key in sorted(
-        col.arms,
-        key=lambda k: (
-            k[0],
-            k[1],
-            k[2],
-            -1 if k[3] is None else k[3],
-            -1 if k[4] is None else k[4],
-        ),
-    ):
+    for key in sorted(col.arms, key=_sort_key):
         variant, model, policy, delay, budget = key
         frame = col.arms[key]
         for name, seeds in SEED_SETS.items():
             sub = _seed_cols(frame, seeds)
             if sub is None:
                 continue
-            win = sub.mean(axis=1)  # AUT per window, averaged over seeds
-            c = col.counts.get(key, {})
+            win = sub.mean(axis=1)
+            per_seed_std = sub.std(axis=0, ddof=1) if len(sub) > 1 else None
+            c = col.counts_for(key, seeds)
+            never = policy == "never"
             rows.append(
                 {
                     "dataset": col.dataset,
@@ -233,39 +340,37 @@ def aaut_table(col: Collected) -> pd.DataFrame:
                     "delay": delay,
                     "budget_pct": budget,
                     "seed_set": name,
+                    "role": "descriptive",
                     "n_windows": int(len(win)),
                     "n_seeds": int(sub.shape[1]),
                     "a_aut_mean": float(win.mean()),
-                    "a_aut_std": float(win.std(ddof=1)) if len(win) > 1 else math.nan,
+                    "a_aut_std": float(per_seed_std.mean())
+                    if per_seed_std is not None
+                    else math.nan,
+                    "a_aut_std_seed_averaged": float(win.std(ddof=1)) if len(win) > 1 else math.nan,
                     "seed_sd": float(sub.mean(axis=0).std(ddof=1))
                     if sub.shape[1] > 1
                     else math.nan,
                     "windows_undefined": col.undefined.get(key, 0),
-                    "labels_per_slot": c.get(
-                        "labels_budget_per_slot", 0.0 if policy == "never" else math.nan
-                    ),
-                    "labels_per_window": c.get(
-                        "labels_queried_per_window", 0.0 if policy == "never" else math.nan
-                    ),
+                    "labels_per_slot": 0.0 if never else c.get("labels_queried_per_slot", math.nan),
+                    "labels_per_window": 0.0
+                    if never
+                    else c.get("labels_queried_per_window", math.nan),
                     "retrains_per_window": c.get("retrains_per_window", 0.0),
                     "mean_achieved_ratio": c.get("mean_achieved_ratio", math.nan),
                     "share_below_target": c.get("share_below_target", math.nan),
+                    "delay_axis_note": col.delay_axis_note if not never else "",
                 }
             )
     return pd.DataFrame(rows)
 
 
-def _arm(
-    col: Collected, variant: str, model: str, policy: str, delay, budget
-) -> pd.DataFrame | None:
-    return col.arms.get((variant, model, policy, delay, budget))
-
-
-def _labels(col: Collected, variant: str, model: str, policy: str, delay, budget) -> float:
-    if policy == "never":
-        return 0.0
-    c = col.counts.get((variant, model, policy, delay, budget), {})
-    return float(c.get("labels_budget_per_slot", math.nan))
+def _not_computed(col: Collected, cid, desc, model, variant, seed_set, role, reason) -> dict:
+    return {
+        "dataset": col.dataset, "model": model, "variant": variant, "contrast": cid,
+        "description": desc, "seed_set": seed_set, "role": role, "status": "not_computed",
+        "reason": reason, "verdict": "not_computed",
+    }  # fmt: skip
 
 
 def _row(
@@ -278,53 +383,48 @@ def _row(
     plus: tuple,
     minus: tuple,
     *,
+    role: str,
     delay_units: int | None = None,
     n_boot: int = stats.N_BOOT,
-) -> dict[str, Any] | None:
+) -> dict[str, Any]:
     a = _arm(col, variant, model, *plus)
     b = _arm(col, variant, model, *minus)
     if a is None or b is None:
-        return None
+        gone = [str(x) for x, arm in ((plus, a), (minus, b)) if arm is None]
+        return _not_computed(col, cid, desc, model, variant, seed_set, role,
+                             "arm not complete: " + "; ".join(gone))  # fmt: skip
     seeds = list(SEED_SETS[seed_set])
-    if any(s not in a.columns or s not in b.columns for s in seeds):
-        return None
+    short = [s for s in seeds if s not in a.columns or s not in b.columns]
+    if short:
+        return _not_computed(col, cid, desc, model, variant, seed_set, role,
+                             f"seeds {short} missing from an arm")  # fmt: skip
     arrays, windows, used = stats.align_arms({"a": a, "b": b}, seeds=seeds)
     bl = block_len(col.geometry[variant])
     est = stats.difference(arrays, "a", "b", block_len=bl, n_boot=n_boot)
     p = stats.wilcoxon_p(stats.seed_paired_means(arrays, "a", "b"))
-    n_plus = _labels(col, variant, model, *plus)
-    n_minus = _labels(col, variant, model, *minus)
+    n_plus = _queried(col, variant, model, plus, seeds)
+    n_minus = _queried(col, variant, model, minus, seeds)
     d_labels = n_plus - n_minus
     row: dict[str, Any] = {
-        "dataset": col.dataset,
-        "model": model,
-        "variant": variant,
-        "contrast": cid,
-        "description": desc,
-        "seed_set": seed_set,
-        "n_windows": len(windows),
-        "n_seeds": len(used),
-        "block_len": bl,
-        "estimate": est.point,
-        "ci_low": est.low,
-        "ci_high": est.high,
-        "wilcoxon_p": p,
-        "min_wilcoxon_p": stats.min_wilcoxon_p(len(used)),
-        "labels_per_slot_plus": n_plus,
-        "labels_per_slot_minus": n_minus,
-        "detected": bool(est.low > 0.0),
-        "excludes_zero": bool(est.excludes_zero()),
-        "within_margin": bool(est.low >= -MARGIN and est.high <= MARGIN),
-        "half_width": est.half_width,
-    }
+        "dataset": col.dataset, "model": model, "variant": variant, "contrast": cid,
+        "description": desc, "seed_set": seed_set, "role": role, "status": "computed",
+        "reason": "", "n_windows": len(windows), "n_seeds": len(used), "block_len": bl,
+        "block_len_effective": stats.effective_block(bl, len(windows)),
+        "window_stage_coarse": stats.window_stage_is_coarse(bl, len(windows)),
+        "estimate": est.point, "ci_low": est.low, "ci_high": est.high,
+        "boot_mean_minus_point": est.boot_mean - est.point,
+        "half_width": est.half_width, "verdict": verdict(est),
+        "detected": bool(est.low > 0.0), "within_margin": bool(
+            est.low >= -MARGIN and est.high <= MARGIN
+        ),
+        "seed_level_wilcoxon_p": p, "min_wilcoxon_p": stats.min_wilcoxon_p(len(used)),
+        "labels_per_slot_plus": n_plus, "labels_per_slot_minus": n_minus,
+        "delay_axis_note": col.delay_axis_note if delay_units else "",
+    }  # fmt: skip
     if delay_units:
         per = stats.scale(est, 1.0 / delay_units)
-        row.update(
-            unit="AUT lost per slot of delay",
-            unit_value=per.point,
-            unit_low=per.low,
-            unit_high=per.high,
-        )
+        row.update(unit="AUT lost per slot of delay", unit_value=per.point,
+                   unit_low=per.low, unit_high=per.high)  # fmt: skip
     elif d_labels and not math.isnan(d_labels) and d_labels > 0:
         per = stats.scale(est, 100.0 / d_labels)
         row.update(
@@ -337,61 +437,54 @@ def _row(
     return row
 
 
-def contrasts_table(col: Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFrame:
-    """The four pre-registered primary contrasts per model and seed set (Holm added later)."""
+def contrasts_table(
+    col: Collected, *, models: Sequence[str] | None = None, n_boot: int = stats.N_BOOT
+) -> pd.DataFrame:
+    """One row per registered contrast, model and seed set (``not_computed`` if an arm is missing).
+
+    Holm is added by :func:`add_holm` over the fixed family of the whole study.
+    """
     rows = []
-    for model in col.models:
+    for model in models or col.models:
         for ss in SEED_SETS:
-            spec = [
-                (
-                    "C-D1",
-                    "d=0 minus d=3, B=1%, periodic",
-                    ("periodic", 0, 1.0),
-                    ("periodic", 3, 1.0),
-                    3,
-                ),
-                (
-                    "C-D2",
-                    "d=0 minus d=3, B=5%, periodic",
-                    ("periodic", 0, 5.0),
-                    ("periodic", 3, 5.0),
-                    3,
-                ),
-                (
-                    "C-P",
-                    "periodic (d=0, B=5%) minus never",
-                    ("periodic", 0, 5.0),
-                    ("never", None, None),
-                    None,
-                ),
-                (
-                    "C-B",
-                    "B=5% minus B=0.5%, d=0, periodic",
-                    ("periodic", 0, 5.0),
-                    ("periodic", 0, 0.5),
-                    None,
-                ),
-            ]
-            for cid, desc, plus, minus, du in spec:
-                r = _row(
-                    col, cid, desc, model, "rolling", ss, plus, minus, delay_units=du, n_boot=n_boot
-                )
-                if r:
-                    rows.append(r)
-    df = pd.DataFrame(rows)
-    if df.empty:
-        return df
-    df["wilcoxon_p_holm"] = np.nan
-    for _ss, idx in df.groupby("seed_set").groups.items():
-        df.loc[idx, "wilcoxon_p_holm"] = stats.holm(df.loc[idx, "wilcoxon_p"].tolist())
-    return df
+            role = "primary" if ss == "0-9" else "seed_robustness"
+            for cid, desc, plus, minus, du in PRIMARY:
+                rows.append(_row(col, cid, desc, model, "rolling", ss, plus, minus,
+                                 role=role, delay_units=du, n_boot=n_boot))  # fmt: skip
+    return pd.DataFrame(rows)
 
 
-def secondary_table(col: Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFrame:
-    """Delay slopes per budget (5 seeds) and budget gains per 100 labels at d=0 (10 seeds)."""
+def add_holm(df: pd.DataFrame, datasets: Sequence[str], models: Sequence[str]) -> pd.DataFrame:
+    """Holm step-down over the registered family (datasets x models x 4), fixed size.
+
+    A contrast that was not computed enters with p = 1, so a partial grid cannot shrink the
+    family. Only the 10-seed primary rows are adjusted: 5 seeds cannot go below 0.0625.
+    """
+    out = df.copy()
+    out["seed_level_wilcoxon_p_holm"] = np.nan
+    prim = out[(out["role"] == "primary")]
+    expected = [(d, m, c[0]) for d in datasets for m in models for c in PRIMARY]
+    ps = []
+    for d, m, c in expected:
+        r = prim[(prim["dataset"] == d) & (prim["model"] == m) & (prim["contrast"] == c)]
+        ok = len(r) == 1 and r["status"].iloc[0] == "computed"
+        ps.append(float(r["seed_level_wilcoxon_p"].iloc[0]) if ok else 1.0)
+    adj = dict(zip(expected, stats.holm(ps), strict=True))
+    for idx, r in prim.iterrows():
+        k = (r["dataset"], r["model"], r["contrast"])
+        if k in adj and r["status"] == "computed":
+            out.loc[idx, "seed_level_wilcoxon_p_holm"] = adj[k]
+    out["family_size"] = len(expected)
+    return out
+
+
+def secondary_table(
+    col: Collected, *, models: Sequence[str] | None = None, n_boot: int = stats.N_BOOT
+) -> pd.DataFrame:
+    """Delay slopes per budget (5 seeds) and budget steps and concavity at d=0 (10 seeds)."""
     rows: list[dict[str, Any]] = []
-    for model in col.models:
-        bl = block_len(col.geometry["rolling"])
+    for model in models or col.models:
+        bl = block_len(col.geometry.get("rolling", {"nE": 1, "stride": 1}))
         for b in BUDGETS:
             cells = {f"d{d}": _arm(col, "rolling", model, "periodic", d, b) for d in DELAYS}
             if any(v is None for v in cells.values()):
@@ -404,24 +497,16 @@ def secondary_table(col: Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFra
             lost = stats.scale(sl, -1.0)
             rows.append(
                 {
-                    "dataset": col.dataset,
-                    "model": model,
-                    "kind": "delay_slope",
-                    "budget_pct": b,
-                    "delay": None,
-                    "seed_set": "0-4",
-                    "n_windows": len(windows),
-                    "estimate": sl.point,
-                    "ci_low": sl.low,
-                    "ci_high": sl.high,
-                    "unit": "AUT per slot of delay (negative = loses)",
-                    "unit_value": lost.point,
-                    "unit_low": lost.low,
-                    "unit_high": lost.high,
-                    "labels_per_slot": _labels(col, "rolling", model, "periodic", 0, b),
+                    "dataset": col.dataset, "model": model, "kind": "delay_slope",
+                    "role": "descriptive", "budget_pct": b, "delay": None, "seed_set": "0-4",
+                    "n_windows": len(windows), "n_seeds": len(used),
+                    "estimate": sl.point, "ci_low": sl.low, "ci_high": sl.high,
+                    "unit": "AUT lost per slot of delay (positive = AUT falls)",
+                    "unit_value": lost.point, "unit_low": lost.low, "unit_high": lost.high,
+                    "labels_per_slot": _queried(col, "rolling", model, ("periodic", 0, b), seeds),
+                    "delay_axis_note": col.delay_axis_note,
                 }
-            )
-        # budget steps at d = 0 with the 10-seed headline cells
+            )  # fmt: skip
         names = {b: f"b{b:g}" for b in BUDGETS}
         cells = {names[b]: _arm(col, "rolling", model, "periodic", 0, b) for b in BUDGETS}
         if any(v is None for v in cells.values()):
@@ -433,10 +518,9 @@ def secondary_table(col: Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFra
             continue
         rs = stats.resample_means(arrays, bl, n_boot=n_boot)
         pt = stats.arm_means(arrays)
-        n = {b: _labels(col, "rolling", model, "periodic", 0, b) for b in BUDGETS}
-        steps = [(0.5, 1.0), (1.0, 2.0), (2.0, 5.0)]
-        gains = {}
-        for lo, hi in steps:
+        n = {b: _queried(col, "rolling", model, ("periodic", 0, b), seeds) for b in BUDGETS}
+        gains: dict[tuple[float, float], tuple[float, np.ndarray]] = {}
+        for lo, hi in [(0.5, 1.0), (1.0, 2.0), (2.0, 5.0)]:
             dn = n[hi] - n[lo]
             if not dn > 0:  # budgets that round to one count have no per-label unit
                 continue
@@ -446,112 +530,70 @@ def secondary_table(col: Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFra
             gains[(lo, hi)] = (point, samp)
             rows.append(
                 {
-                    "dataset": col.dataset,
-                    "model": model,
-                    "kind": "budget_step",
-                    "budget_pct": f"{lo:g}->{hi:g}",
-                    "delay": 0,
-                    "seed_set": "0-9",
-                    "n_windows": len(windows),
-                    "estimate": point,
-                    "ci_low": e.low,
-                    "ci_high": e.high,
+                    "dataset": col.dataset, "model": model, "kind": "budget_step",
+                    "role": "descriptive", "budget_pct": f"{lo:g}->{hi:g}", "delay": 0,
+                    "seed_set": "0-9", "n_windows": len(windows), "n_seeds": len(used),
+                    "estimate": point, "ci_low": e.low, "ci_high": e.high,
                     "unit": "AUT gained per 100 extra labels per slot",
-                    "unit_value": point,
-                    "unit_low": e.low,
-                    "unit_high": e.high,
-                    "labels_per_slot": dn,
+                    "unit_value": point, "unit_low": e.low, "unit_high": e.high,
+                    "labels_lo": n[lo], "labels_hi": n[hi], "labels_per_slot": dn,
+                    "delay_axis_note": "",
                 }
-            )
-        if (0.5, 1.0) not in gains or (2.0, 5.0) not in gains:
-            continue
-        first, last = gains[(0.5, 1.0)], gains[(2.0, 5.0)]
-        e = stats.estimate(first[0] - last[0], first[1] - last[1])
-        rows.append(
-            {
-                "dataset": col.dataset,
-                "model": model,
-                "kind": "budget_concavity",
-                "budget_pct": "gain(0.5->1) minus gain(2->5)",
-                "delay": 0,
-                "seed_set": "0-9",
-                "n_windows": len(windows),
-                "estimate": e.point,
-                "ci_low": e.low,
-                "ci_high": e.high,
-                "unit": "AUT per 100 labels (positive = diminishing returns)",
-                "unit_value": e.point,
-                "unit_low": e.low,
-                "unit_high": e.high,
-                "labels_per_slot": math.nan,
-            }
-        )
+            )  # fmt: skip
+        if (0.5, 1.0) in gains and (2.0, 5.0) in gains:
+            first, last = gains[(0.5, 1.0)], gains[(2.0, 5.0)]
+            e = stats.estimate(first[0] - last[0], first[1] - last[1])
+            rows.append(
+                {
+                    "dataset": col.dataset, "model": model, "kind": "budget_concavity",
+                    "role": "descriptive", "budget_pct": "gain(0.5->1) minus gain(2->5)",
+                    "delay": 0, "seed_set": "0-9", "n_windows": len(windows),
+                    "n_seeds": len(used), "estimate": e.point, "ci_low": e.low,
+                    "ci_high": e.high,
+                    "unit": "AUT per 100 labels (positive = diminishing returns)",
+                    "unit_value": e.point, "unit_low": e.low, "unit_high": e.high,
+                    "labels_lo": n[0.5], "labels_hi": n[5.0], "labels_per_slot": math.nan,
+                    "delay_axis_note": "",
+                }
+            )  # fmt: skip
     return pd.DataFrame(rows)
 
 
-def chow_table(col: Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFrame:
+def chow_table(
+    col: Collected, *, models: Sequence[str] | None = None, n_boot: int = stats.N_BOOT
+) -> pd.DataFrame:
     """The delay contrasts and periodic-minus-never at Chow's stride (seeds 0-4)."""
     rows = []
-    for model in col.models:
-        spec = [
-            ("C-D1", "d=0 minus d=3, B=1%", ("periodic", 0, 1.0), ("periodic", 3, 1.0), 3),
-            ("C-D2", "d=0 minus d=3, B=5%", ("periodic", 0, 5.0), ("periodic", 3, 5.0), 3),
-            (
-                "C-P",
-                "periodic (d=0, B=5%) minus never",
-                ("periodic", 0, 5.0),
-                ("never", None, None),
-                None,
-            ),
-        ]
-        for cid, desc, plus, minus, du in spec:
-            r = _row(
-                col,
-                cid,
-                desc,
-                model,
-                "rolling_chow",
-                "0-4",
-                plus,
-                minus,
-                delay_units=du,
-                n_boot=n_boot,
-            )
-            if r:
-                rows.append(r)
+    for model in models or col.models:
+        for cid, desc, plus, minus, du in PRIMARY[:3]:
+            rows.append(_row(col, cid, desc, model, "rolling_chow", "0-4", plus, minus,
+                             role="chow_secondary", delay_units=du, n_boot=n_boot))  # fmt: skip
     return pd.DataFrame(rows)
 
 
 def labels_table(col: Collected) -> pd.DataFrame:
-    """Absolute query counts, arrivals and retrains per arm (no model fits, no AUT)."""
+    """Absolute query counts, arrivals and retrains per arm and seed block (no AUT)."""
     rows = []
-    for (variant, model, policy, delay, budget), c in sorted(
-        col.counts.items(),
-        key=lambda kv: (kv[0][0], kv[0][1], kv[0][2], kv[0][3] or -1, kv[0][4] or -1),
-    ):
-        rows.append(
-            {
-                "dataset": col.dataset,
-                "variant": variant,
-                "model": model,
-                "policy": policy,
-                "delay": delay,
-                "budget_pct": budget,
-                **c,
-            }
-        )
+    for key in sorted(col.counts_blocks, key=_sort_key):
+        variant, model, policy, delay, budget = key
+        for seeds, c in col.counts_blocks[key]:
+            rows.append(
+                {"dataset": col.dataset, "variant": variant, "model": model, "policy": policy,
+                 "delay": delay, "budget_pct": budget,
+                 "seeds": f"{min(seeds)}-{max(seeds)}", **c}
+            )  # fmt: skip
     return pd.DataFrame(rows)
 
 
 def recovery_table(col: Collected) -> pd.DataFrame:
     """Drop events and recovery time per arm: descriptive (PREREG, D6)."""
     rows = []
-    for key in sorted(col.f1, key=lambda k: (k[0], k[1], k[2], k[3] or -1, k[4] or -1)):
+    for key in sorted(col.f1, key=_sort_key):
         variant, model, policy, delay, budget = key
         events = recovered = 0
         recs: list[int] = []
         n_series = 0
-        for (_, _), g in col.f1[key].groupby(["seed", "window_key"], sort=False):
+        for _, g in col.f1[key].groupby(["seed", "window_key"], sort=False):
             series = g.sort_values("slot_index")["f1"].to_numpy()
             n_series += 1
             for ev in drop_events(series):
@@ -561,25 +603,21 @@ def recovery_table(col: Collected) -> pd.DataFrame:
                     recs.append(ev.recovery_slots)
         rows.append(
             {
-                "dataset": col.dataset,
-                "variant": variant,
-                "model": model,
-                "policy": policy,
-                "delay": delay,
-                "budget_pct": budget,
+                "dataset": col.dataset, "variant": variant, "model": model, "policy": policy,
+                "delay": delay, "budget_pct": budget, "role": "descriptive",
                 "n_series": n_series,
                 "drop_events_per_series": events / n_series if n_series else math.nan,
                 "share_recovered": recovered / events if events else math.nan,
                 "mean_recovery_slots": float(np.mean(recs)) if recs else math.nan,
             }
-        )
+        )  # fmt: skip
     return pd.DataFrame(rows)
 
 
 def per_slot_table(col: Collected) -> pd.DataFrame:
     """Mean F1 per slot position over windows and seeds, with the range over windows."""
     rows = []
-    for key in sorted(col.f1, key=lambda k: (k[0], k[1], k[2], k[3] or -1, k[4] or -1)):
+    for key in sorted(col.f1, key=_sort_key):
         variant, model, policy, delay, budget = key
         if variant != "rolling":
             continue
@@ -591,18 +629,11 @@ def per_slot_table(col: Collected) -> pd.DataFrame:
         g = by_w.groupby("position")["f1"].agg(["mean", "min", "max"]).reset_index()
         for _, r in g.iterrows():
             rows.append(
-                {
-                    "dataset": col.dataset,
-                    "model": model,
-                    "policy": policy,
-                    "delay": delay,
-                    "budget_pct": budget,
-                    "slot_position": int(r["position"]),
-                    "mean_f1": float(r["mean"]),
-                    "min_f1": float(r["min"]),
-                    "max_f1": float(r["max"]),
-                }
-            )
+                {"dataset": col.dataset, "model": model, "policy": policy, "delay": delay,
+                 "budget_pct": budget, "slot_position": int(r["position"]),
+                 "mean_f1": float(r["mean"]), "min_f1": float(r["min"]),
+                 "max_f1": float(r["max"])}
+            )  # fmt: skip
     return pd.DataFrame(rows)
 
 
@@ -618,10 +649,14 @@ def ledger_table(col: Collected) -> pd.DataFrame:
 def rq1_table(
     run_dir: Path | str, dataset: str, *, n_boot: int = stats.N_BOOT, band: float = BAND
 ) -> pd.DataFrame:
-    """Per-slot matched gap (primary) and the E0 window-level gap (secondary), with intervals."""
+    """Per-slot matched gap (primary) and the E0 window-level gap (secondary), with intervals.
+
+    The E0 window-level comparator is the prior-matched random-split F1 of the pooled window
+    (``f1_random_split`` of the window table) minus the time-aware AUT, as in Table 1 and
+    CLAIMS E-19. Its predictions are not stored, so it comes from the window table.
+    """
     d = load_rq1_run(Path(run_dir))
-    cfg = d["config"]
-    geom = _variant_geometry(cfg, "rolling")
+    geom = _variant_geometry(d["config"], "rolling")
     bl = block_len(geom)
     rows = []
     for model in sorted(d["f1"]["model"].unique()):
@@ -644,9 +679,9 @@ def rq1_table(
         w = d["windows"]
         w = w[(w["model"] == model) & (w["variant"] == "rolling")].copy()
         w["window_key"] = stats.window_key(w["window_id"].astype(str))
-        pooled = w.pivot(index="window_key", columns="seed", values="f1_random_pooled")
-        ta_aligned = ta.values.reindex(pooled.index)[pooled.columns]
-        arr, wins, sds = stats.align_arms({"e0": pooled, "ta": ta_aligned})
+        win = w.pivot(index="window_key", columns="seed", values="f1_random_split")
+        ta_aligned = ta.values.reindex(win.index)[win.columns]
+        arr, wins, sds = stats.align_arms({"e0": win, "ta": ta_aligned})
         est0 = stats.difference(arr, "e0", "ta", block_len=bl, n_boot=n_boot)
         rows.append(
             _rq1_row(
@@ -658,19 +693,13 @@ def rq1_table(
 
 def _rq1_row(dataset, model, comparator, est, n_w, n_s, bl, band) -> dict[str, Any]:
     return {
-        "dataset": dataset,
-        "model": model,
-        "comparator": comparator,
-        "n_windows": n_w,
-        "n_seeds": n_s,
-        "block_len": bl,
-        "gap": est.point,
-        "ci_low": est.low,
-        "ci_high": est.high,
-        "band": band,
+        "dataset": dataset, "model": model, "comparator": comparator, "n_windows": n_w,
+        "n_seeds": n_s, "block_len": bl, "gap": est.point, "ci_low": est.low,
+        "ci_high": est.high, "band": band,
         "point_at_or_above_band": bool(est.point >= band),
         "lower_at_or_above_band": bool(est.low >= band),
-    }
+        "role": "primary" if "primary" in comparator else "secondary",
+    }  # fmt: skip
 
 
 def load_rq1_run(run_dir: Path) -> dict[str, Any]:

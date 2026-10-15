@@ -478,3 +478,12 @@ def test_never_arm_must_cover_the_seeds_and_variants_of_every_contrast() -> None
         GridSpec.from_dict(spec_dict(never={"seeds": [0], "variants": ["rolling", "rolling_chow"]}))
     with pytest.raises(GridError, match="never.variants"):
         GridSpec.from_dict(spec_dict(never={"seeds": [0, 1, 2, 3], "variants": ["rolling"]}))
+
+
+def test_a_transient_unknown_code_version_is_retried(monkeypatch) -> None:
+    answers = iter(["unknown", "unknown", "abc1234"])
+    monkeypatch.setattr(grid, "code_version", lambda repo: next(answers))
+    monkeypatch.setattr(grid.time, "sleep", lambda s: None)
+    assert grid.stable_code_version(ROOT) == "abc1234"
+    monkeypatch.setattr(grid, "code_version", lambda repo: "unknown")
+    assert grid.stable_code_version(ROOT, tries=3) == "unknown"  # never believed, never invented

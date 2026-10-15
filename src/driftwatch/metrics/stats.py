@@ -40,6 +40,16 @@ N_BOOT = 10_000
 LEVEL = 0.95
 
 
+def effective_block(block_len: int, n_windows: int) -> int:
+    """The block length actually used: it cannot exceed the number of windows."""
+    return int(min(max(block_len, 1), n_windows))
+
+
+def window_stage_is_coarse(block_len: int, n_windows: int) -> bool:
+    """True when fewer than two blocks fit: the window stage then has few distinct draws."""
+    return n_windows < 2 * effective_block(block_len, n_windows)
+
+
 def block_length(n_eval: int, stride: int) -> int:
     """Windows that share an evaluation slot: ``ceil(nE / stride)``, at least 1."""
     if n_eval < 1 or stride < 1:
@@ -225,6 +235,7 @@ class Estimate:
     point: float
     low: float
     high: float
+    boot_mean: float = float("nan")  # mean of the replicates: a centring diagnostic
 
     @property
     def half_width(self) -> float:
@@ -236,7 +247,7 @@ class Estimate:
 
 def estimate(point: float, samples: np.ndarray, level: float = LEVEL) -> Estimate:
     low, high = interval(samples, level)
-    return Estimate(float(point), low, high)
+    return Estimate(float(point), low, high, float(np.mean(samples)))
 
 
 def difference(
@@ -274,7 +285,7 @@ def scale(est: Estimate, factor: float) -> Estimate:
         low, high = est.high * factor, est.low * factor
     else:
         low, high = est.low * factor, est.high * factor
-    return Estimate(est.point * factor, low, high)
+    return Estimate(est.point * factor, low, high, est.boot_mean * factor)
 
 
 def seed_paired_means(arms: Mapping[str, np.ndarray], plus: str, minus: str) -> np.ndarray:

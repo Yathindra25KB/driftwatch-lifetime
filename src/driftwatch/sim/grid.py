@@ -326,6 +326,21 @@ def parse_chunk(text: str) -> tuple[int, int]:
 # --- driver -----------------------------------------------------------------------------------
 
 
+def stable_code_version(repo: Path | str, *, tries: int = 5, wait_s: float = 1.0) -> str:
+    """``code_version``, read again when git answers "unknown" for a moment.
+
+    A first grid run was stopped by one unreadable ``git rev-parse`` while the main working
+    tree was busy. "unknown" is never a real version, so it is retried before it is believed.
+    """
+    version = code_version(Path(repo))
+    for _ in range(tries - 1):
+        if version != "unknown":
+            break
+        time.sleep(wait_s)
+        version = code_version(Path(repo))
+    return version
+
+
 class CodeVersionMismatch(RuntimeError):
     """A ledger holds cells run on another code version."""
 
@@ -400,7 +415,7 @@ def run_cell(
     tree moved since, the cell is refused (the modules in memory are the old ones).
     """
     cfg = spec.config(cell, smoke=smoke)
-    version = code_version(repo_root)
+    version = stable_code_version(repo_root)
     if pinned_version is not None and version != pinned_version:
         raise CodeVersionMismatch(
             f"the code version moved from {pinned_version} to {version} during the grid; "
@@ -583,7 +598,7 @@ def run_grid(
     ledger = ledger_for(out, chunk)
     # the ledger is the progress record: planned cells are written once, before any run
     known = fold_events(merged_ledger_events(out), [c.cell_id for c in cells], smoke=smoke)
-    pinned = code_version(repo)  # read once: modules are loaded once, labels must not drift
+    pinned = stable_code_version(repo)  # read once: modules are loaded once, labels must not drift
     cache = InitialModelCache()  # initial models are shared by cells: same rows, same seed
     results: list[CellResult] = []
     for cell in cells:
