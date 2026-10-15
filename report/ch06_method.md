@@ -85,7 +85,7 @@ One YAML file describes one run; the run is identified by a hash of the configur
 - **Short windows on BODMAS.** With six evaluation slots and a retraining period of three, a window has one useful retraining event (before slot 3). At `d = 3` no label queried in slots 0 to 2 has arrived by then, so periodic retraining equals never retraining on BODMAS at `d = 3` (shown in `tests/test_runner_sim.py`). Delay contrasts on BODMAS are therefore limited by construction (ADR-0005 window geometry), and results must be read with that in mind. [verify against the final ADR-0007 wording]
 - **Comparator.** E0's random-split comparator was not matched per slot. E1 uses a per-slot matched comparator (section 6.8) and E0 numbers are not reused for RQ1 attribution.
 - **Memory.** Runs are limited to the researcher-approved cap; parallel runs share it.
-- **Not implemented yet:** the conformal layer, drift monitors, uncertainty and credibility selectors, monitor-triggered retraining (Phases 8 and 9).
+- **Not implemented yet:** drift monitors and monitor-triggered retraining (Phase 9). The conformal layer and the uncertainty and credibility selectors exist as code (section 6.11) and have not produced results.
 
 ## 6.8 The E1 comparator
 
@@ -102,3 +102,24 @@ The figure shows F1 per evaluation slot for both series, from stored predictions
 - The pool mixes C3-subsampled and raw rows (section 6.5).
 - Random selection draws about the base rate of malware, so at small budgets few malware labels arrive; selection that targets uncertain or drifting samples is a Phase 8 question.
 - Seeds are not independent replicates for the logistic model (it ignores the seed); they differ only in the C3 draw, the selector draw and the comparator split. [verify before any seed-based interval is written]
+
+## 6.10 The grid, its ledger and the statistics (Phase 6)
+
+The delay-by-budget grid (E2) is run by one command, `driftwatch grid`, from a grid file that is a run config plus a `grid:` block (`docs/GRID.md`). Each dataset expands into 27 runs: 16 periodic cells over four delays and four budgets, six headline cells repeated with further seeds, four cells at Chow's window stride, and one never-retrain run [P-15]. The never run is made once per dataset because it does not depend on delay or budget; a test pins that its predictions equal those of a simulation with policy never at any delay and budget.
+
+- **One cell, one run, one hash.** A cell expands into an ordinary run config with scalar delay and budget; its hash covers the config, the code version and the lock file. A cell's results are one directory with the predictions, slot table, window table and run record.
+- **Ledger.** Progress is an append-only JSON-lines file: started, complete (with directory, wall time, longest fit, peak memory), failed (with the reason), retry, invalidated. A completed cell is skipped, a failed cell is kept as failed and is never rerun because of what its result looks like, and a ledger that holds cells of another commit is refused. The commit is read once when the grid starts and pinned: modules are loaded once, so a cell must not be labelled with code that did not run.
+- **Frozen worktree.** The grid ran from a git worktree at the registered commit, so that work on the main tree could not change the code version mid-grid.
+- **Smoke grid.** A one-seed, one-window run of every cost shape prints timing only and an extrapolation to the full grid in hours and chunks; it writes to its own root and is never read as a result.
+- **Statistics.** Windows are resampled in blocks, then seeds within windows; arms of a contrast share the same indices; the contrasts, units and decision rule are those of the registration (chapter 3). The tables are rebuilt from stored predictions and checked against the slot table; two runs of the table and figure scripts give byte-identical outputs, and the scripts import no model code.
+
+## 6.11 The conformal layer and selection (Phase 8; no results yet)
+
+E3 (RQ3) adds a calibration set and two selectors behind the same selector interface. Nothing here has produced a result; the registration (`docs/prereg/addendum-v2.md`, a draft until its tag exists) fixes the values before any run.
+
+- **Mondrian p-values.** For class `c`, the p-value of a sample is `(1 + #{calibration samples of class c with score >= s_c(x)}) / (n_c + 1)`; the credibility of a sample is the p-value of its predicted class. Hand-worked examples, a uniformity check over fresh calibration sets and a demonstration that a calibration set made of selected samples inflates the p-values are tests (`tests/test_conformal.py`).
+- **Scores.** One minus the model's probability of the class, or the distance to the class centroid in the detector's feature space; the centroids come from the current training pool only.
+- **Calibration data.** The initial calibration set is a time-ordered hold-out of the initial window that the model was not fitted on; later calibration labels come only from a random reserved slice of each slot's budget and arrive through the label queue, so the delay applies to them. A sample that a selector chose never enters the calibration buffer, and a test fails if one does (ADR-0009).
+- **Equal labels spent.** In every slot every arm spends the same number of labels: the reserved slice plus the selector's choice; the runner asserts the equality.
+- **Recalibration.** Scores are recomputed under the model in force in every slot in which calibration rows arrived or the model was refitted, with a minimum number of rows per class; below it the previous calibration is kept and the skip is counted. A credibility selector with no calibration falls back to random for that slot and says so.
+
