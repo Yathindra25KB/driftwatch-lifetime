@@ -1,6 +1,6 @@
 # DriftWatch pre-registration
 
-**Status: LOCKED by the annotated git tag `prereg-v1`** (written in Phase 1, finalised in Phase 6 and tagged before the first E2 grid result). While the tag exists the registered version of this file is `git show prereg-v1:docs/PREREG.md`; changes go only into `docs/prereg/addendum-vN.md`.
+**Status: registered by the annotated git tag `prereg-v1`; UNLOCKED only until that tag exists** (written in Phase 1, finalised in Phase 6, tagged before the first E2 grid result). The tag, not this line, is the lock: the registered version of this file is `git show prereg-v1:docs/PREREG.md`, and changes go only into `docs/prereg/addendum-vN.md`.
 
 ## How the lock works
 
