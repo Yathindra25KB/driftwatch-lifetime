@@ -101,7 +101,117 @@ def test_the_interface_accepts_a_score_driven_selector() -> None:
     assert sel.handles.tolist() == [len(pub.handle) - 1, len(pub.handle) - 2, len(pub.handle) - 3]
 
 
-def test_make_selector_knows_random_only_for_now() -> None:
-    assert make_selector("random").name == "random"
-    with pytest.raises(ValueError, match="uncertainty"):
-        make_selector("uncertainty")
+def test_make_selector_knows_the_three_arms_and_refuses_others() -> None:
+    # Phase 8 adds the score-driven selectors behind the same interface
+    assert [make_selector(n).name for n in ("random", "uncertainty", "credibility")] == [
+        "random",
+        "uncertainty",
+        "credibility",
+    ]
+    with pytest.raises(ValueError, match="unknown selector"):
+        make_selector("oracle")
+
+
+# --- Phase 8: score-driven selectors and the reserved random slice ----------------------------
+
+
+def test_uncertainty_picks_the_probabilities_closest_to_one_half() -> None:
+    pub = sealed()[0].public()
+    n = len(pub.handle)
+    proba = np.linspace(0.0, 1.0, n)  # row i has P = i / (n - 1)
+    sel = make_selector("uncertainty").select(pub, 4, np.random.default_rng(0), scores=proba)
+    expect = np.argsort(np.abs(proba - 0.5), kind="stable")[:4]
+    assert sorted(sel.handles.tolist()) == sorted(expect.tolist())
+
+
+def test_credibility_picks_the_lowest_p_values_and_ties_follow_the_seed() -> None:
+    pub = sealed()[0].public()
+    n = len(pub.handle)
+    cred = np.full(n, 0.5)
+    cred[[3, 7, 11]] = 0.01
+    first = make_selector("credibility").select(pub, 5, np.random.default_rng(1), scores=cred)
+    assert {3, 7, 11} <= set(first.handles.tolist()) and len(first.handles) == 5
+    again = make_selector("credibility").select(pub, 5, np.random.default_rng(1), scores=cred)
+    assert first.handles.tolist() == again.handles.tolist()  # same seed, same tie order
+    assert set(first.handles.tolist()[:3]) == {3, 7, 11}  # the lowest values come first
+
+
+def test_score_selectors_need_scores_and_finite_values() -> None:
+    pub = sealed()[0].public()
+    with pytest.raises(ValueError, match="needs"):
+        make_selector("credibility").select(pub, 3, np.random.default_rng(0))
+    bad = np.full(len(pub.handle), np.nan)
+    with pytest.raises(ValueError, match="finite"):
+        make_selector("uncertainty").select(pub, 3, np.random.default_rng(0), scores=bad)
+
+
+def test_exclusion_is_respected_by_every_selector() -> None:
+    from driftwatch.sim.selectors import select_with_reserved_slice  # noqa: F401
+
+    pub = sealed()[0].public()
+    n = len(pub.handle)
+    exclude = np.zeros(n, dtype=bool)
+    exclude[: n // 2] = True
+    scores = np.linspace(0, 1, n)
+    for name in ("random", "uncertainty", "credibility"):
+        sel = make_selector(name).select(
+            pub, n, np.random.default_rng(0), scores=scores, exclude=exclude
+        )
+        assert len(sel.handles) == n - n // 2 and (sel.handles >= n // 2).all()
+
+
+@pytest.mark.parametrize("name", ["random", "uncertainty", "credibility"])
+def test_every_arm_spends_the_same_budget_and_tags_the_reserved_slice(name: str) -> None:
+    from driftwatch.sim.selectors import (
+        ORIGIN_RANDOM,
+        ORIGIN_SELECTED,
+        select_with_reserved_slice,
+        selector_rng,
+    )
+
+    pub = sealed()[0].public()
+    n = len(pub.handle)
+    scores = np.random.default_rng(5).uniform(size=n)
+    sel = select_with_reserved_slice(
+        make_selector(name), pub, 20, 4, seed=3, rng=selector_rng(3, pub.slot_id), scores=scores
+    )
+    assert len(sel.handles) == 20 and len(set(sel.handles.tolist())) == 20  # equal labels spent
+    assert (sel.origin == ORIGIN_RANDOM).sum() == 4 and (sel.origin == ORIGIN_SELECTED).sum() == 16
+    reserved = sel.handles[sel.origin == ORIGIN_RANDOM]
+    # the reserved slice is the same draw whatever the selector or the scores
+    other = select_with_reserved_slice(
+        make_selector("random"), pub, 20, 4, seed=3, rng=selector_rng(3, pub.slot_id)
+    )
+    assert reserved.tolist() == other.handles[other.origin == ORIGIN_RANDOM].tolist()
+
+
+def test_the_reserved_slice_does_not_depend_on_the_scores() -> None:
+    from driftwatch.sim.selectors import ORIGIN_RANDOM, select_with_reserved_slice, selector_rng
+
+    pub = sealed()[0].public()
+    n = len(pub.handle)
+    a = np.random.default_rng(1).uniform(size=n)
+    b = 1.0 - a
+    kw = dict(seed=0, rng=selector_rng(0, pub.slot_id))
+    sa = select_with_reserved_slice(make_selector("credibility"), pub, 12, 3, scores=a, **kw)
+    sb = select_with_reserved_slice(make_selector("credibility"), pub, 12, 3, scores=b, **kw)
+    assert (
+        sa.handles[sa.origin == ORIGIN_RANDOM].tolist()
+        == sb.handles[sb.origin == ORIGIN_RANDOM].tolist()
+    )
+    assert set(sa.handles.tolist()) != set(sb.handles.tolist())  # the selected part follows scores
+
+
+def test_zero_reserved_share_and_oversized_budget() -> None:
+    from driftwatch.sim.selectors import ORIGIN_SELECTED, select_with_reserved_slice, selector_rng
+
+    pub = sealed()[0].public()
+    n = len(pub.handle)
+    s0 = select_with_reserved_slice(
+        make_selector("random"), pub, 9, 0, seed=0, rng=selector_rng(0, pub.slot_id)
+    )
+    assert (s0.origin == ORIGIN_SELECTED).all() and len(s0.handles) == 9
+    big = select_with_reserved_slice(
+        make_selector("random"), pub, n + 50, 5, seed=0, rng=selector_rng(0, pub.slot_id)
+    )
+    assert len(big.handles) == n

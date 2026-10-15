@@ -95,13 +95,24 @@ def test_new_keys_change_the_hash_and_equal_configs_agree() -> None:
         ({**SIM, "delay": True}, "delay"),
         ({**SIM, "budget_pct": 0}, "budget_pct"),
         ({**SIM, "budget_pct": 101}, "budget_pct"),
-        ({**SIM, "selector": "uncertainty"}, "Phase 8"),
+        ({**SIM, "selector": "uncertainty"}, "needs a nonconf block"),
         ({**SIM, "selector": "oracle"}, "selector"),
         ({**SIM, "selector": {"name": "random", "calibration_fraction": 1.5}}, "calibration"),
         ({**SIM, "pool": {"new_label_weight": 5.0, "truncation": "none"}}, "ADR-0007"),
         ({**SIM, "pool": {"new_label_weight": 1.0, "truncation": "last-3"}}, "ADR-0007"),
         ({**SIM, "pool": {"new_label_weight": 1.0, "surprise": 1}}, "pool"),
-        ({**SIM, "nonconf": "logit"}, "later phase"),
+        ({**SIM, "nonconf": "logit"}, "nonconf takes only"),
+        ({**SIM, "nonconf": {"score": "logit"}}, "nonconf.score"),
+        ({**SIM, "nonconf": {"holdout_fraction": 1.5}}, "holdout_fraction"),
+        ({**SIM, "nonconf": {"min_per_class": 20, "buffer_size": 10}}, "buffer_size"),
+        (
+            {**SIM, "selector": {"name": "random", "calibration_fraction": 0.0}, "nonconf": {}},
+            "exchangeability trap",
+        ),
+        (
+            {**SIM, "nonconf": {"trap_selected_calibration": True}},
+            "only applies with calibration_fraction 0",
+        ),
         ({**SIM, "monitors": ["mmd"]}, "later phase"),
         ({"policy": {"name": "periodic", "period": 0}, **SIM}, "period"),
         ({"policy": {"name": "never", "period": 3}, **SIM}, "period"),
@@ -150,3 +161,39 @@ def test_committed_phase_5_configs_parse(name: str) -> None:
         assert c.per_slot_random_split and c.random_split and c.policy == "never"
     elif "_never" not in name:
         assert c.is_simulation and c.policy == "periodic" and c.delay == 0
+
+
+# --- Phase 8: the conformal layer in the config -------------------------------------------------
+
+
+def test_nonconf_block_parses_hashes_and_leaves_e2_hashes_alone() -> None:
+    plain = RunConfig.from_dict(cfg(**SIM, policy="periodic"))
+    assert "nonconf" not in plain.to_dict()  # emitted only when set: E0 to E2 hashes unchanged
+    conf = RunConfig.from_dict(
+        cfg(
+            **{**SIM, "selector": {"name": "credibility", "calibration_fraction": 0.2}},
+            policy="periodic",
+            nonconf={},
+        )
+    )
+    n = conf.to_dict()["nonconf"]
+    assert n == {
+        "score": "probability",
+        "holdout_fraction": 0.2,
+        "min_per_class": 20,
+        "buffer_size": 1000,
+        "calibration_in_pool": False,
+        "trap_selected_calibration": False,
+    }
+    assert RunConfig.from_dict(conf.to_dict()).to_dict() == conf.to_dict()  # round trip
+
+
+def test_the_zero_reserved_share_is_a_named_trap() -> None:
+    conf = RunConfig.from_dict(
+        cfg(
+            **{**SIM, "selector": {"name": "credibility", "calibration_fraction": 0.0}},
+            policy="periodic",
+            nonconf={"trap_selected_calibration": True},
+        )
+    )
+    assert conf.nonconf is not None and conf.nonconf["trap_selected_calibration"] is True

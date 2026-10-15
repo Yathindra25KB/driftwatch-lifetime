@@ -35,8 +35,17 @@ DATASETS = ("lamda", "bodmas")
 PRESETS = ("adr-0004",)
 VARIANTS = ("rolling", "rolling_chow", "sensitivity", "single_run")
 POLICIES = ("never", "periodic")
-SELECTORS = ("random",)
-LATER_PHASE_KEYS = ("nonconf", "monitors")
+SELECTORS = ("random", "uncertainty", "credibility")
+SCORES = ("probability", "centroid")
+NONCONF_KEYS = {
+    "score",
+    "holdout_fraction",
+    "min_per_class",
+    "buffer_size",
+    "calibration_in_pool",
+    "trap_selected_calibration",
+}
+LATER_PHASE_KEYS = ("monitors",)
 SIM_KEYS = ("selector", "delay", "budget_pct", "pool")
 DEFAULT_PERIOD = 3  # PROTOCOL.md: retrain every 3 slots
 DEFAULT_CALIBRATION = 0.20  # PROTOCOL.md D8
@@ -52,6 +61,7 @@ TOP_KEYS = {
     "e0",
     "output",
     *SIM_KEYS,
+    "nonconf",
     *LATER_PHASE_KEYS,
 }
 PACKAGES = (
@@ -105,6 +115,8 @@ def _simulation(d: dict[str, Any]) -> dict[str, Any] | None:
     if not any(present.values()):
         if d.get("pool") is not None:
             raise ConfigError("pool needs selector, delay and budget_pct (a simulation config)")
+        if d.get("nonconf") is not None:
+            raise ConfigError("nonconf needs selector, delay and budget_pct (a simulation config)")
         return None
     missing = [k for k, ok in present.items() if not ok]
     if missing:
@@ -116,8 +128,6 @@ def _simulation(d: dict[str, Any]) -> dict[str, Any] | None:
         name, calibration = selector.get("name"), selector.get("calibration_fraction")
     else:
         name, calibration = selector, None
-    if name in ("uncertainty", "credibility"):
-        raise ConfigError(f"selector {name!r} needs the conformal layer (Phase 8)")
     if name not in SELECTORS:
         raise ConfigError(f"selector must be one of {SELECTORS}, got {name!r}")
     if calibration is None:
@@ -148,6 +158,49 @@ def _simulation(d: dict[str, Any]) -> dict[str, Any] | None:
         "budget_pct": float(budget),
         "pool_new_label_weight": 1.0,
         "pool_truncation": "none",
+        "nonconf": _nonconf(d.get("nonconf"), name, float(calibration)),
+    }
+
+
+def _nonconf(raw: Any, selector: str, calibration: float) -> dict[str, Any] | None:
+    """The conformal layer's settings (E3), or ``None`` for E0 to E2 configs.
+
+    Score-driven selectors need it; the random arm of E3 carries it too, so that every arm
+    shares the same hold-out, reserved slice and calibration rule (equal labels spent).
+    """
+    if raw is None:
+        if selector in ("uncertainty", "credibility"):
+            raise ConfigError(f"selector {selector!r} needs a nonconf block (conformal layer)")
+        return None
+    if not isinstance(raw, dict) or set(raw) - NONCONF_KEYS:
+        raise ConfigError(f"nonconf takes only {sorted(NONCONF_KEYS)}, got {raw!r}")
+    score = raw.get("score", "probability")
+    if score not in SCORES:
+        raise ConfigError(f"nonconf.score must be one of {SCORES}, got {score!r}")
+    frac = raw.get("holdout_fraction", 0.20)
+    if isinstance(frac, bool) or not isinstance(frac, int | float) or not 0.0 < frac < 1.0:
+        raise ConfigError(f"nonconf.holdout_fraction must lie in (0, 1), got {frac!r}")
+    min_pc = _int(raw.get("min_per_class", 20), "nonconf.min_per_class", 1)
+    size = _int(raw.get("buffer_size", 1000), "nonconf.buffer_size", 2 * min_pc)
+    in_pool = raw.get("calibration_in_pool", False)
+    trap = raw.get("trap_selected_calibration", False)
+    for key, val in (("calibration_in_pool", in_pool), ("trap_selected_calibration", trap)):
+        if not isinstance(val, bool):
+            raise ConfigError(f"nonconf.{key} must be true or false, got {val!r}")
+    if calibration == 0.0 and not trap:
+        raise ConfigError(
+            "a reserved slice of 0 leaves only selected samples to calibrate on; that is the "
+            "exchangeability trap and has to be asked for: nonconf.trap_selected_calibration: true"
+        )
+    if trap and calibration != 0.0:
+        raise ConfigError("trap_selected_calibration only applies with calibration_fraction 0")
+    return {
+        "score": score,
+        "holdout_fraction": float(frac),
+        "min_per_class": min_pc,
+        "buffer_size": size,
+        "calibration_in_pool": in_pool,
+        "trap_selected_calibration": trap,
     }
 
 
@@ -176,6 +229,7 @@ class RunConfig:
     budget_pct: float | None = None
     pool_new_label_weight: float | None = None
     pool_truncation: str | None = None
+    nonconf: dict[str, Any] | None = None
 
     @property
     def is_simulation(self) -> bool:
@@ -316,6 +370,8 @@ class RunConfig:
                 "new_label_weight": self.pool_new_label_weight,
                 "truncation": self.pool_truncation,
             }
+            if self.nonconf is not None:  # emitted only when set: E0 to E2 hashes are unchanged
+                out["nonconf"] = dict(self.nonconf)
         return out
 
 

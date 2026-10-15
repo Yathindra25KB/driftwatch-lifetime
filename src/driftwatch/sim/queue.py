@@ -122,6 +122,7 @@ class SealedSlot:
             ts=np.asarray(self._slot.ts[positions]),
             row_id=np.asarray(self._slot.row_id[positions]),
             fv_hash=None if self._slot.fv_hash is None else self._slot.fv_hash[positions],
+            origin=selection.origin,
         )
 
 
@@ -132,6 +133,7 @@ class _Rows:
     ts: np.ndarray
     row_id: np.ndarray
     fv_hash: np.ndarray | None = None
+    origin: np.ndarray | None = None  # per row: "random_slice" or "selected" (E3), else None
 
 
 @dataclass(frozen=True, eq=False)
@@ -145,9 +147,28 @@ class Released:
     row_id: np.ndarray
     queried_in: np.ndarray  # evaluation-slot index each row was queried in
     fv_hash: np.ndarray | None = None  # feature-vector hashes (for the pool's seen-before count)
+    origin: np.ndarray | None = None  # how each row was chosen (E3); None when not tracked
 
     def __len__(self) -> int:
         return len(self.y)
+
+    def take(self, mask: np.ndarray) -> Released:
+        """The rows where ``mask`` is true (for example the calibration rows of a release)."""
+        m = np.asarray(mask, dtype=bool)
+        if m.shape != (len(self),):
+            raise ValueError("mask must have one entry per released row")
+        if len(self) == 0:
+            return self
+        return Released(
+            self.slot_index,
+            self.X[m],
+            self.y[m],
+            self.ts[m],
+            self.row_id[m],
+            self.queried_in[m],
+            None if self.fv_hash is None else self.fv_hash[m],
+            None if self.origin is None else self.origin[m],
+        )
 
 
 @dataclass(frozen=True)
@@ -213,6 +234,9 @@ class LabelQueue:
             None
             if any(rows.fv_hash is None for _, rows in batches)
             else np.concatenate([rows.fv_hash for _, rows in batches]),
+            None
+            if any(rows.origin is None for _, rows in batches)
+            else np.concatenate([rows.origin for _, rows in batches]),
         )
 
     def query(self, slot_index: int, slot: SealedSlot, selection: Selection) -> QueryReceipt:

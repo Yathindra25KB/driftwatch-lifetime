@@ -37,6 +37,12 @@ class Selection:
 
     slot_id: str
     handles: np.ndarray
+    origin: np.ndarray | None = None  # per handle: ORIGIN_RANDOM or ORIGIN_SELECTED (E3)
+
+
+ORIGIN_RANDOM = "random_slice"  # the reserved random slice: the only calibration data
+ORIGIN_SELECTED = "selected"  # chosen by the selector: never calibration data
+_RESERVE_TAG = 0x52455356  # separates the reserved-slice draw from the selector's draw
 
 
 class Selector(Protocol):
@@ -48,6 +54,7 @@ class Selector(Protocol):
         n: int,
         rng: np.random.Generator,
         scores: np.ndarray | None = None,
+        exclude: np.ndarray | None = None,
     ) -> Selection: ...
 
 
@@ -79,6 +86,21 @@ def selector_rng(seed: int, slot_id: str) -> np.random.Generator:
     return np.random.default_rng(np.random.SeedSequence(entropy))
 
 
+def reserved_rng(seed: int, slot_id: str) -> np.random.Generator:
+    """The reserved-slice draw depends on ``(seed, slot id)`` only, never on scores."""
+    entropy = [seed, zlib.crc32(slot_id.encode("utf-8")), _RESERVE_TAG]
+    return np.random.default_rng(np.random.SeedSequence(entropy))
+
+
+def _eligible(n_rows: int, exclude: np.ndarray | None) -> np.ndarray:
+    if exclude is None:
+        return np.ones(n_rows, dtype=bool)
+    e = np.asarray(exclude, dtype=bool)
+    if e.shape != (n_rows,):
+        raise ValueError("exclude must have one entry per public row")
+    return ~e
+
+
 class RandomSelector:
     """Uniform selection without replacement."""
 
@@ -90,17 +112,109 @@ class RandomSelector:
         n: int,
         rng: np.random.Generator,
         scores: np.ndarray | None = None,
+        exclude: np.ndarray | None = None,
     ) -> Selection:
         del scores  # random selection is score-blind
         if n < 0:
             raise ValueError(f"n must be non-negative, got {n}")
         order = rng.permutation(len(public.handle))
+        ok = _eligible(len(public.handle), exclude)
+        order = order[ok[order]]
         return Selection(public.slot_id, public.handle[order[: min(n, len(order))]])
+
+
+class _ScoreSelector:
+    """Take the ``n`` eligible rows with the lowest priority value; ties by a seeded shuffle."""
+
+    name = "score"
+    needs = "scores"
+
+    def _priority(self, scores: np.ndarray) -> np.ndarray:  # lower = chosen first
+        raise NotImplementedError
+
+    def select(
+        self,
+        public: OpaqueSlot,
+        n: int,
+        rng: np.random.Generator,
+        scores: np.ndarray | None = None,
+        exclude: np.ndarray | None = None,
+    ) -> Selection:
+        if n < 0:
+            raise ValueError(f"n must be non-negative, got {n}")
+        if scores is None:
+            raise ValueError(f"selector {self.name!r} needs {self.needs}")
+        s = np.asarray(scores, dtype=np.float64)
+        if s.shape != (len(public.handle),) or not np.isfinite(s).all():
+            raise ValueError("scores must be finite and have one entry per public row")
+        prio = self._priority(s)
+        ok = _eligible(len(public.handle), exclude)
+        shuffle = rng.permutation(len(public.handle))  # tie-break: seeded, label-free
+        cand = shuffle[ok[shuffle]]
+        order = cand[np.argsort(prio[cand], kind="stable")]
+        return Selection(public.slot_id, public.handle[order[: min(n, len(order))]])
+
+
+class UncertaintySelector(_ScoreSelector):
+    """The rows whose P(malware) is closest to 0.5."""
+
+    name = "uncertainty"
+    needs = "the model's P(malware) per row"
+
+    def _priority(self, scores: np.ndarray) -> np.ndarray:
+        return np.abs(scores - 0.5)
+
+
+class CredibilitySelector(_ScoreSelector):
+    """The rows with the lowest conformal p-value of their predicted class."""
+
+    name = "credibility"
+    needs = "the credibility per row"
+
+    def _priority(self, scores: np.ndarray) -> np.ndarray:
+        return scores
+
+
+def select_with_reserved_slice(
+    selector: Selector,
+    public: OpaqueSlot,
+    n_budget: int,
+    n_calibration: int,
+    seed: int,
+    rng: np.random.Generator,
+    scores: np.ndarray | None = None,
+) -> Selection:
+    """Spend ``n_budget`` labels: a random reserved slice first, the selector gets the rest.
+
+    The reserved rows are a uniform draw that depends on ``(seed, slot id)`` only, so they are
+    the same for every selector and every score; they are the only rows tagged as calibration
+    data. The rest is chosen by ``selector`` from the other rows. The total is exactly
+    ``min(n_budget, rows)``, so every arm spends the same number of labels.
+    """
+    n_rows = len(public.handle)
+    n_budget = min(int(n_budget), n_rows)
+    n_cal = min(max(int(n_calibration), 0), n_budget)
+    order = reserved_rng(seed, public.slot_id).permutation(n_rows)
+    reserved = order[:n_cal]
+    exclude = np.zeros(n_rows, dtype=bool)
+    exclude[reserved] = True
+    chosen = selector.select(public, n_budget - n_cal, rng, scores, exclude)
+    handles = np.concatenate([public.handle[reserved], chosen.handles])
+    origin = np.array(
+        [ORIGIN_RANDOM] * n_cal + [ORIGIN_SELECTED] * len(chosen.handles), dtype=object
+    )
+    if len(handles) != n_budget or len(np.unique(handles)) != len(handles):
+        raise ValueError(
+            "the reserved slice and the selection must be disjoint and fill the budget"
+        )
+    return Selection(public.slot_id, handles, origin)
 
 
 def make_selector(name: str) -> Selector:
     if name == "random":
         return RandomSelector()
-    if name in {"uncertainty", "credibility"}:
-        raise ValueError(f"selector {name!r} needs the conformal layer (Phase 8)")
+    if name == "uncertainty":
+        return UncertaintySelector()
+    if name == "credibility":
+        return CredibilitySelector()
     raise ValueError(f"unknown selector {name!r}")
