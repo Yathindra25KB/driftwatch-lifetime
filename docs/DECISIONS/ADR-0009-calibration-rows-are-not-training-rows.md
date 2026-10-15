@@ -1,6 +1,6 @@
 # ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out
 
-**Status:** PROPOSED. It needs the researcher's decision before `docs/prereg/addendum-v2.md` is tagged. Claude Code recommends option A.
+**Status:** ACCEPTED by the researcher on 2026-10-15: option A (calibration rows never train), without the sensitivity cell of option C. It is registered with `docs/prereg/addendum-v2.md`.
 **Date:** 2026-10-15
 **Deciders:** Yathindra (researcher, decides); Claude Code (engineering lead, proposes)
 **Phase:** 8

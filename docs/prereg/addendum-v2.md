@@ -1,12 +1,14 @@
 # Pre-registration addendum v2: RQ3, selection under delay (E3)
 
-**Status: DRAFT for the researcher's approval. It becomes the registered addendum only when the annotated tag `prereg-v2` exists on the commit that contains it, and that tag must predate the first E3 result (the first file under `results/e3/`).** The tag is created by the researcher's go and is never moved or deleted.
+**Status: registered by the annotated git tag `prereg-v2`; UNLOCKED only until that tag exists.** The tag, not this line, is the lock. It predates the first E3 result (the first file under `results/e3/`), and was created on the researcher's go of 15 Oct 2026, who approved the addendum as written, with ADR-0009 option A. It is never moved or deleted.
 
 Scope: this addendum adds RQ3 to `docs/PREREG.md` (tag `prereg-v1`) and changes nothing registered there. Everything not stated here (windows, ratio, threshold, models, the two-stage bootstrap, the decision rule, the exclusion and failure rules, units) is as registered in v1.
 
 ## What was known when this was written
 
-E2 had not finished (the BODMAS cells were partly complete and LAMDA had not started). **No E2 result had been read and no E3 run existed.** The E3 code was tested on synthetic streams only. If E2 results are read before this addendum is tagged, that must be stated here and in the CLAIMS ledger.
+**The E2 BODMAS grid had finished (27 of 27 cells) and its tables had been read before this tag: the contrasts there are at most 0.003 A-AUT, which is within the registered known limit of that geometry (CLAIMS E-23; the numbers themselves enter the ledger with the final tables).** The E2 LAMDA grid was still running and none of its cells had been read. No E3 run existed; the E3 code was tested on synthetic streams only. The BODMAS E2 reading did not change any value in this addendum (every constant below was written before it), but a reader should know the BODMAS E3 interaction is registered after that reading.
+
+Researcher decisions of 15 Oct 2026 recorded here: ADR-0009 option A; the tag is created before E2 LAMDA finishes and before G3, so that BODMAS E3 can run in the idle hours; LAMDA E3 runs seeds 0 to 4 first and seeds 5 to 9 only if hours allow.
 
 ## Hypothesis (guide, RQ3)
 
