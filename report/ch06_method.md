@@ -113,9 +113,9 @@ The delay-by-budget grid (E2) is run by one command, `driftwatch grid`, from a g
 - **Smoke grid.** A one-seed, one-window run of every cost shape prints timing only and an extrapolation to the full grid in hours and chunks; it writes to its own root and is never read as a result.
 - **Statistics.** Windows are resampled in blocks, then seeds within windows; arms of a contrast share the same indices; the contrasts, units and decision rule are those of the registration (chapter 3). The tables are rebuilt from stored predictions and checked against the slot table; two runs of the table and figure scripts give byte-identical outputs, and the scripts import no model code.
 
-## 6.11 The conformal layer and selection (Phase 8; no results yet)
+## 6.11 The conformal layer and selection (Phase 8)
 
-E3 (RQ3) adds a calibration set and two selectors behind the same selector interface. Nothing here has produced a result; the registration (`docs/prereg/addendum-v2.md`, a draft until its tag exists) fixes the values before any run.
+E3 (RQ3) adds a calibration set and two selectors behind the same selector interface. The registration (`docs/prereg/addendum-v2.md`, locked by tag `prereg-v2`) fixed the values before any run; the results are in chapter 7, section 7.5.
 
 - **Mondrian p-values.** For class `c`, the p-value of a sample is `(1 + #{calibration samples of class c with score >= s_c(x)}) / (n_c + 1)`; the credibility of a sample is the p-value of its predicted class. Hand-worked examples, a uniformity check over fresh calibration sets and a demonstration that a calibration set made of selected samples inflates the p-values are tests (`tests/test_conformal.py`).
 - **Scores.** One minus the model's probability of the class, or the distance to the class centroid in the detector's feature space; the centroids come from the current training pool only.

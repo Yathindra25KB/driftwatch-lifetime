@@ -106,7 +106,7 @@ def figure(contrasts: pd.DataFrame, path: Path) -> bool:
                 ax.errorbar(
                     t["delay"], t["estimate"],
                     yerr=[t["estimate"] - t["ci_low"], t["ci_high"] - t["estimate"]],
-                    color=color, marker="o", capsize=3, label=sel,
+                    color=color, marker="o", capsize=3, label=sel, linestyle="none",
                 )  # fmt: skip
             ax.axhline(0, color=INK, linewidth=0.8)
             for edge in (-0.01, 0.01):
@@ -122,7 +122,8 @@ def figure(contrasts: pd.DataFrame, path: Path) -> bool:
     handles, labels = axes[0][0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=2, frameon=False)
     fig.text(0.01, 0.005, "5 seeds, 95% two-stage bootstrap interval; dotted = +-0.01; at equal "
-             "labels spent. BODMAS at delay 3: no label has arrived at the refit.",
+             "labels spent; two delays only, no decay shape implied. BODMAS at delay 3: no "
+             "label has arrived at the refit.",
              color=MUTED, fontsize=7)  # fmt: skip
     fig.tight_layout(rect=(0, 0.06, 1, 1))
     path.parent.mkdir(parents=True, exist_ok=True)
