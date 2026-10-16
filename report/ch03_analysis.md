@@ -20,7 +20,7 @@ The unit of data is the **window**: a few training slots followed by a few evalu
 
 A **contrast** is a difference of A-AUT between two arms that differ in one condition. The registered primary contrasts, for each dataset and each model [P-07]:
 
-| Id | Question | Plus arm minus minus arm |
+| Id | Question | Plus arm minus minus arm [P-07] |
 |---|---|---|
 | C-D1 | What does late labelling cost at a small budget? | periodic, delay 0, 1% **minus** periodic, delay 3, 1% |
 | C-D2 | The same at a larger budget | periodic, delay 0, 5% **minus** periodic, delay 3, 5% |
@@ -44,7 +44,7 @@ The two stages count within-window variation twice, so the interval is wider tha
 
 An A-AUT difference of 0.02 is hard to interpret on its own. The report also states each contrast in the unit a practitioner would use [P-09]:
 
-- **AUT lost per slot of delay**: the delay contrast divided by the three slots between the two delays, and, as a second estimate, the least-squares slope of A-AUT over the four delays at a fixed budget.
+- **AUT lost per slot of delay**: the delay contrast divided by the three slots between the two delays, and, as a second estimate, the least-squares slope of A-AUT over the four delays at a fixed budget. [P-09]
 - **AUT gained per 100 extra labels per slot**: the difference of A-AUT divided by the difference in the mean number of labels bought per slot, times 100. The report gives the absolute counts on both sides, so the unit can be checked.
 
 The unit of C-P is the same, with the never arm at zero labels.

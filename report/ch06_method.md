@@ -8,7 +8,7 @@ The experiments need one instrument that can answer a single question many times
 
 Terms used in this chapter.
 
-- **Slot**: a fixed calendar interval. One calendar month for LAMDA, two weeks for BODMAS (ADR-0004, PROTOCOL.md section 2).
+- **Slot**: a fixed calendar interval. One calendar month for LAMDA, two weeks for BODMAS (ADR-0004, PROTOCOL.md section 2). [P-02]
 - **Window**: `nT` consecutive training slots followed by `nE` evaluation slots (ADR-0005). The model is trained on the first part and used on the second.
 - **C1, C2, C3**: the three TESSERACT constraints, implemented as assertions that raise (hard rule 2). C1: every training sample is older than every evaluation sample. C2: each evaluation slot holds malware and benign samples from its own time window. C3: each evaluation slot is brought to the target malware ratio by seeded subsampling of malware only (pendlebury2019tesseract).
 - **Delay `d`**: the number of whole slots a requested label takes to arrive, beyond the next slot (section 6.3).
@@ -33,7 +33,7 @@ Terms used in this chapter.
   +------------------------------------------------------------------------------------------+
 ```
 
-The order inside a slot is the stream order: a slot is scored (step 3) before any label queried in that slot exists (step 5), and a label queried in slot `s` cannot be released earlier than slot `s + 1`.
+The order inside a slot is the stream order: a slot is scored (step 3) before any label queried in that slot exists (step 5), and a label queried in slot `s` cannot be released earlier than slot `s + 1`. [S-01]
 
 ## 6.3 The label queue and the delay rule
 
@@ -48,7 +48,7 @@ The order inside a slot is the stream order: a slot is scored (step 3) before an
                                                  Q4 and Q5 would arrive at slots 6 and 7: ignored
 ```
 
-Rules, all enforced by tests (`tests/test_queue_delay.py`, including property-based tests for `d` in {0, 1, 2, 3}):
+Rules, all enforced by tests (`tests/test_queue_delay.py`, including property-based tests for `d` in {0, 1, 2, 3}): [S-01]
 
 1. A queried label is released exactly once, at slot `t + 1 + d`, never earlier.
 2. A label whose release slot is at or after the last slot of the window has no slot left to inform. It is **ignored and counted** (`n_ignored_after_end`). A window is an independent run; nothing carries into the next window.
@@ -59,13 +59,13 @@ The held-back labels are *sealed*. `SealedSlot` wraps the evaluation slot so tha
 
 ## 6.4 Budget and selection
 
-The budget for a slot is a percentage of the **evaluated slot after C3 subsampling**, because that is the slot the selector can see. The number of labels is `floor(pct / 100 * n + 1/2)`, capped at the slot size; both the percentage and the absolute count are stored with every slot row. The settings are 0.5, 1, 2 and 5 percent (PROTOCOL.md section 2).
+The budget for a slot is a percentage of the **evaluated slot after C3 subsampling**, because that is the slot the selector can see. The number of labels is `floor(pct / 100 * n + 1/2)`, capped at the slot size; both the percentage and the absolute count are stored with every slot row. The settings are 0.5, 1, 2 and 5 percent (PROTOCOL.md section 2). [P-05]
 
-Selection is behind a small interface, `select(public_slot, n, rng, scores=None)`. Phase 5 has one selector, uniform random selection without replacement. Its random generator depends on the seed and the slot identity only, so a small budget selects a subset of the rows a larger budget selects: comparisons across budgets are paired. Uncertainty and credibility selectors (Phase 8) use the same call through the optional `scores` argument; they do not exist yet. A reserved random calibration slice (a share of the budget, default 20 percent) is a configuration parameter that is stored and logged but has no effect until the conformal layer exists. [Phase 8 not yet implemented.]
+Selection is behind a small interface, `select(public_slot, n, rng, scores=None)`. Phase 5 has one selector, uniform random selection without replacement. Its random generator depends on the seed and the slot identity only, so a small budget selects a subset of the rows a larger budget selects: comparisons across budgets are paired. Uncertainty and credibility selectors (Phase 8) use the same call through the optional `scores` argument; they do not exist yet. A reserved random calibration slice (a share of the budget, default 20 percent) is a configuration parameter that is stored and logged but has no effect until the conformal layer exists. [Phase 8 not yet implemented.] [P-05]
 
 ## 6.5 Retraining and the training pool
 
-A retraining policy decides *when*. Phase 5 has two: **never**, and **periodic**, which fires before scoring evaluation slots 3, 6, 9, ... counted from the first evaluation slot of the window (decision D7, ADR-0007). A scheduled event with no new label since the last fit is logged as a no-op and does not refit. A monitor-triggered policy exists only as an interface that raises `NotImplementedError` until Phase 9.
+A retraining policy decides *when*. Phase 5 has two: **never**, and **periodic**, which fires before scoring evaluation slots 3, 6, 9, ... counted from the first evaluation slot of the window (decision D7, ADR-0007). A scheduled event with no new label since the last fit is logged as a no-op and does not refit. A monitor-triggered policy exists only as an interface that raises `NotImplementedError` until Phase 9. [P-16]
 
 The pool a retraining fits on is **the initial training window plus every label that has arrived**, each row weighted once, never truncated (ADR-0007; chosen by the researcher before any grid run, and not by looking at AUT). Three consequences are stated up front. First, arrived rows are C3-subsampled evaluation rows (close to the target malware ratio), while the initial rows are raw, so the pool mixes two class priors; this is a property of the design, not a defect to be tuned away. Second, with weight 1 and a budget of at most 5 percent per slot, arrived labels are a small share of the pool; a diagnostic that counts how many decisions change after retraining (not AUT) is reported next to the design for that reason (`scripts/label_influence.py`; numbers in docs/CLAIMS.md E-13 to E-15). It counts changed decisions only, has no noise-floor comparison, and says nothing yet about detection quality. Third, scalers and any thresholds are fitted on the current pool only (hard rule 5); the threshold is fixed at 0.5 (ADR-0006).
 
@@ -73,9 +73,9 @@ C1 is re-asserted for every scored slot against the whole pool, including releas
 
 ## 6.6 Runs, determinism and resumption
 
-One YAML file describes one run; the run is identified by a hash of the configuration, the code version and the lock file (hard rule 6). Per-row predictions are stored, so every table and figure is regenerated from stored predictions.
+One YAML file describes one run; the run is identified by a hash of the configuration, the code version and the lock file (hard rule 6). Per-row predictions are stored, so every table and figure is regenerated from stored predictions. [S-05]
 
-- **Determinism.** The same configuration and seed give identical per-slot predictions (`tests/test_runner_sim.py`). C3 draws, public shuffles and selector draws are each seeded from the seed and the slot identity.
+- **Determinism.** The same configuration and seed give identical per-slot predictions (`tests/test_runner_sim.py`). C3 draws, public shuffles and selector draws are each seeded from the seed and the slot identity. [S-05]
 - **Resumption.** The unit of work is one window of one seed of one variant. A finished unit is checkpointed and marked done last; a run that is killed can be resumed (`--resume`), skips finished units, and writes tables identical to an uninterrupted run with no duplicate rows. Resuming needs a clean working tree, so the same hash cannot mix code states.
 - **Initial-model cache.** The initial model for a (dataset, training window, model, seed) is fitted once and shared across runs in the same process; the seed is part of the key only for models that use it.
 - **Parallelism** is across runs, one thread per run, never inside a run. On the 8 GB development machine this is bounded by memory, not by cores: the approved memory cap is per process, so two concurrent BODMAS runs exceed it (section 6.7).
