@@ -38,7 +38,7 @@ Everything below is from stored runs; chapter 7 of the report has the full table
 
 **Limits that apply to every sentence above:** the effects are small (hundredths of A-AUT, against standard deviations over windows of 0.05 to 0.07 [E-28]); BODMAS has one useful retraining event per window, so its delay numbers measure a delay in one refit, and at delay 3 periodic retraining equals never retraining there by construction [P-12]; LAMDA's 16 windows are about four independent blocks and seeds are draws of the subsample, not replicates of a model, so intervals are wide (by design; coverage was not measured beyond a synthetic check); all runs are on one machine.
 
-**E3 (selection under delay)** was registered separately (`docs/prereg/addendum-v2.md`). Its results are in chapter 7 once the ledger rows exist; E3 numbers are comparable only within E3 (ADR-0009).
+**E3 (selection under delay)** was registered separately (`docs/prereg/addendum-v2.md`) and its numbers are comparable only within E3 (ADR-0009). On LAMDA (seeds 0 to 4, 16 windows) the advantage of uncertainty or credibility selection over random selection at equal labels is 0.0105 to 0.0194 A-AUT with no delay and 0.0019 to 0.0096 after a delay of three slots; the interaction is positive in all eight rows, 0.0064 to 0.0116 [E-42, E-43]. The advantage is not separated from the change in class mix of the labels that selection brings in [E-47]. On BODMAS the delay-3 advantage is zero by construction, so its interaction (0.0030 to 0.0079) is not a test of shrinkage [E-41]. Chapter 7 section 7.5 has the limits, including a trap arm whose accuracy is confounded with not retraining.
 
 ## Where things are
 | Path | Contents |

@@ -169,18 +169,21 @@ def _arms(col: E3Collected, keys: Sequence[ArmKey], seeds: Sequence[int]):
 def check_equal_labels(col: E3Collected) -> list[str]:
     """Arms compared at the same (delay, budget) must have queried the same labels per slot."""
     problems = []
-    by_cond: dict[tuple, dict[str, float]] = {}
-    for key in col.slots:
-        model, sel, d, b, frac, score = key
-        if frac == 0.0 or score != "probability":
-            continue
-        by_cond.setdefault((model, d, b), {})[sel] = _diag(col, key, range(5)).get(
-            "labels_per_slot", math.nan
+    index = ["seed", "window_key", "slot_id"]
+    by_cond: dict[tuple, list[tuple[ArmKey, pd.Series]]] = {}
+    for key, parts in col.slots.items():
+        s = pd.concat(parts, ignore_index=True)
+        by_cond.setdefault((key[0], key[2], key[3]), []).append(
+            (key, s.set_index(index)["n_queried"])
         )
-    for cond, per in by_cond.items():
-        vals = [v for v in per.values() if not math.isnan(v)]
-        if vals and max(vals) - min(vals) > 1e-9:
-            problems.append(f"{cond}: labels per slot differ across selectors {per}")
+    for cond, arms in by_cond.items():
+        # every arm (selector, reserved share, score) is compared per seed, window and slot with
+        # every other arm on the slots they share
+        base_key, base = arms[0]
+        for key, q in arms[1:]:
+            both = base.index.intersection(q.index)
+            if len(both) and (base.loc[both] != q.loc[both]).any():
+                problems.append(f"{cond}: labels per slot differ between {base_key} and {key}")
     return problems
 
 
