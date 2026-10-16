@@ -33,7 +33,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-import pyarrow.parquet as pq
 
 from driftwatch.metrics import stats
 from driftwatch.metrics.slot import drop_events
@@ -139,13 +138,12 @@ def load_cell(run_dir: Path) -> dict[str, Any]:
     run_dir = Path(run_dir)
     record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
     cfg = record["config"]
-    preds = pq.read_table(run_dir / "predictions.parquet", columns=PRED_COLUMNS).to_pandas()
-    preds = preds[preds["series"] == "time_aware"]
     slots = pd.read_parquet(run_dir / "slots.parquet")
     slots = slots[slots["series"] == "time_aware"] if "series" in slots.columns else slots
     order = slots[["window_id", "slot_id", "slot_index"]].drop_duplicates()
-    cells = stats.f1_per_slot(preds, order)
-    del preds
+    cells = stats.f1_per_slot_from_file(
+        run_dir / "predictions.parquet", order, PRED_COLUMNS, series="time_aware"
+    )
     keys = ["model", "seed", "window_id", "slot_id", "variant"]
     chk = cells.merge(
         slots[[*keys, "f1"]].assign(window_id=lambda d: d["window_id"].astype(str)),
@@ -705,10 +703,9 @@ def _rq1_row(dataset, model, comparator, est, n_w, n_s, bl, band) -> dict[str, A
 def load_rq1_run(run_dir: Path) -> dict[str, Any]:
     """An E1 run: both series from stored predictions, the slot and window tables."""
     record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
-    preds = pq.read_table(run_dir / "predictions.parquet", columns=PRED_COLUMNS).to_pandas()
     slots = pd.read_parquet(run_dir / "slots.parquet")
     order = slots[["window_id", "slot_id", "slot_index"]].drop_duplicates()
-    cells = stats.f1_per_slot(preds, order)
+    cells = stats.f1_per_slot_from_file(run_dir / "predictions.parquet", order, PRED_COLUMNS)
     return {
         "record": record,
         "config": record["config"],

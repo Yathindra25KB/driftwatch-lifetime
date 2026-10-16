@@ -68,12 +68,11 @@ def window_key(window_id: pd.Series) -> pd.Series:
 OPTIONAL_KEYS = ("series", "variant")  # kept as keys when the table has them
 
 
-def f1_per_slot(preds: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
-    """Per-slot F1 per (model, seed, window, slot) from stored labels and decisions.
+def slot_counts(preds: pd.DataFrame) -> pd.DataFrame:
+    """tp, fp, fn per (model, seed, window, slot) of one block of stored predictions.
 
-    ``preds`` needs ``model, seed, window_id, slot_id, y_true, pred`` (and may carry
-    ``series`` and ``variant``, which are kept as keys); ``order`` maps ``(window_id,
-    slot_id)`` to ``slot_index`` (from the slot table), which fixes the time order.
+    Blocks of one run can be counted separately and added (:func:`finish_counts` sums
+    duplicates), so a table of tens of millions of rows never has to be in memory at once.
     """
     extra = [c for c in OPTIONAL_KEYS if c in preds.columns]
     flag = pd.DataFrame(
@@ -89,7 +88,13 @@ def f1_per_slot(preds: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
         }
     )
     keys = ["model", "seed", "window_id", "slot_id", *extra]
-    g = flag.groupby(keys, sort=False, observed=True)[["tp", "fp", "fn"]].sum().reset_index()
+    return flag.groupby(keys, sort=False, observed=True)[["tp", "fp", "fn"]].sum().reset_index()
+
+
+def finish_counts(counts: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
+    """Per-slot F1 from summed counts, with the slot order and window key attached."""
+    keys = [c for c in counts.columns if c not in ("tp", "fp", "fn")]
+    g = counts.groupby(keys, sort=False, observed=True)[["tp", "fp", "fn"]].sum().reset_index()
     denom = 2 * g["tp"] + g["fp"] + g["fn"]
     g["f1"] = (2 * g["tp"] / denom.where(denom > 0)).fillna(0.0)
     g = g.merge(
@@ -102,6 +107,39 @@ def f1_per_slot(preds: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("stored predictions hold slots that the slot table does not list")
     g["window_key"] = window_key(g["window_id"].astype(str))
     return g
+
+
+def f1_per_slot(preds: pd.DataFrame, order: pd.DataFrame) -> pd.DataFrame:
+    """Per-slot F1 per (model, seed, window, slot) from stored labels and decisions.
+
+    ``preds`` needs ``model, seed, window_id, slot_id, y_true, pred`` (and may carry
+    ``series`` and ``variant``, which are kept as keys); ``order`` maps ``(window_id,
+    slot_id)`` to ``slot_index`` (from the slot table), which fixes the time order.
+    """
+    return finish_counts(slot_counts(preds), order)
+
+
+def f1_per_slot_from_file(
+    path: object,
+    order: pd.DataFrame,
+    columns: Sequence[str],
+    *,
+    series: str | None = None,
+    batch_rows: int = 1_000_000,
+) -> pd.DataFrame:
+    """:func:`f1_per_slot` over a parquet file read in batches (bounded memory)."""
+    import pyarrow.parquet as pq
+
+    parts = []
+    for batch in pq.ParquetFile(path).iter_batches(batch_size=batch_rows, columns=list(columns)):
+        df = batch.to_pandas()
+        if series is not None:
+            df = df[df["series"] == series]
+        if len(df):
+            parts.append(slot_counts(df))
+    if not parts:
+        raise ValueError(f"{path}: no predictions" + (f" of series {series!r}" if series else ""))
+    return finish_counts(pd.concat(parts, ignore_index=True), order)
 
 
 @dataclass(frozen=True)

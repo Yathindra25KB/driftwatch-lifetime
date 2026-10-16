@@ -244,3 +244,43 @@ def test_align_arms_rejects_missing_cells() -> None:
     a = pd.DataFrame([[0.5, np.nan]], index=["w1"], columns=[0, 1])
     with pytest.raises(ValueError, match="missing AUT"):
         stats.align_arms({"a": a})
+
+
+def test_reading_predictions_in_batches_gives_the_same_f1(tmp_path) -> None:
+    rng = np.random.default_rng(0)
+    n = 200
+    df = pd.DataFrame(
+        {
+            "series": "time_aware",
+            "variant": "rolling",
+            "model": rng.choice(["lr", "lgbm"], n),
+            "seed": rng.integers(0, 3, n),
+            "window_id": rng.choice(["h|month:2019-01|T2|E3", "h|month:2019-02|T2|E3"], n),
+            "slot_id": rng.choice(["a", "b", "c"], n),
+            "y_true": rng.integers(0, 2, n).astype("int8"),
+            "pred": rng.integers(0, 2, n).astype("int8"),
+        }
+    )
+    order = pd.DataFrame(
+        [
+            (w, s, i)
+            for i, (w, s) in enumerate(
+                (w, s) for w in ["h|month:2019-01|T2|E3", "h|month:2019-02|T2|E3"] for s in "abc"
+            )
+        ],
+        columns=["window_id", "slot_id", "slot_index"],
+    )
+    path = tmp_path / "p.parquet"
+    df.to_parquet(path, index=False)
+    whole = stats.f1_per_slot(df, order)
+    batched = stats.f1_per_slot_from_file(path, order, list(df.columns), batch_rows=7)
+    keys = ["model", "seed", "window_id", "slot_id", "series", "variant"]
+    a = whole.sort_values(keys).reset_index(drop=True)
+    b = batched.sort_values(keys).reset_index(drop=True)
+    pd.testing.assert_frame_equal(
+        a[keys + ["tp", "fp", "fn", "f1"]], b[keys + ["tp", "fp", "fn", "f1"]]
+    )
+    only = stats.f1_per_slot_from_file(path, order, list(df.columns), series="time_aware")
+    assert len(only) == len(whole)
+    with pytest.raises(ValueError, match="no predictions"):
+        stats.f1_per_slot_from_file(path, order, list(df.columns), series="random_split")

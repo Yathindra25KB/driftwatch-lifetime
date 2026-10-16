@@ -1,0 +1,9 @@
+dataset,model,comparator,n_windows,n_seeds,block_len,gap,ci_low,ci_high,band,point_at_or_above_band,lower_at_or_above_band,role
+lamda,lgbm,per-slot matched (primary),16,5,4,0.04030562,0.02402511,0.04812661,0.05000000,False,False,primary
+lamda,lgbm,E0 window-level (secondary),16,5,4,0.13688322,0.09091412,0.15950570,0.05000000,True,True,secondary
+lamda,lr,per-slot matched (primary),16,5,4,0.02947528,-0.01249162,0.07676559,0.05000000,False,False,primary
+lamda,lr,E0 window-level (secondary),16,5,4,0.15226881,0.09880947,0.17592640,0.05000000,True,True,secondary
+bodmas,lgbm,per-slot matched (primary),6,5,3,0.00574228,0.00132387,0.00735902,0.05000000,False,False,primary
+bodmas,lgbm,E0 window-level (secondary),6,5,3,-0.00020485,-0.00822845,0.00676606,0.05000000,False,False,secondary
+bodmas,lr,per-slot matched (primary),6,5,3,0.03542861,0.02707783,0.03954244,0.05000000,False,False,primary
+bodmas,lr,E0 window-level (secondary),6,5,3,0.02822081,0.01352258,0.03819114,0.05000000,False,False,secondary
