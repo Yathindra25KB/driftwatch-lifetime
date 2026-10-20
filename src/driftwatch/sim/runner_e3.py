@@ -126,7 +126,9 @@ def _matched_source(ctx: Any) -> dict[str, Any]:
         return ctx.extra["matched"]
     import pandas as pd  # noqa: PLC0415
 
-    root = Path(ctx.cfg.policy_source)
+    src = str(ctx.cfg.policy_source)
+    # "sibling:<cell>" is the grid's form: the source cell sits next to this cell's output
+    root = ctx.store.dir.parent.parent / src[8:] if src.startswith("sibling:") else Path(src)
     runs = [p.parent for p in root.glob("*/run.json")]
     done = [r for r in runs if json.loads((r / "run.json").read_text("utf-8"))["status"]
             == "complete"]  # fmt: skip

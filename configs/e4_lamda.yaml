@@ -1,0 +1,52 @@
+# E4 on LAMDA (Android): drift monitors and retraining policies, reduced grid
+# (docs/prereg/addendum-v3.md). A grid spec: `driftwatch grid configs/e4_lamda.yaml`, run
+# without chunks (a matched cell reads its sibling monitor cell). Never edit this file after
+# it has produced stored results: copy it to a new name.
+# Every arm uses the random selector on the E3 conformal path, so labels spent are equal by
+# construction; E4 numbers compare with the E3 random arm, never with E2 absolutes.
+# LAMDA has three periodic refit events per window: the informative dataset for timing.
+name: e4_lamda
+dataset: lamda
+slots:
+  preset: adr-0004
+  min_malware: 50
+window:
+  nT: 4
+  nE: 12
+  stride: 3
+ratio:
+  target: 0.10
+  sensitivity: 0.05
+model:
+  - name: lr
+    C: 1.0
+    max_iter: 1000
+    tol: 0.0001
+    scaling: standard(with_mean=dense_only)
+    threshold: 0.5
+  - name: lgbm
+    profile: fast
+    n_jobs: 4
+    threshold: 0.5
+e0:
+  variants: [rolling]
+  random_split: false
+output: results/e4/lamda
+nonconf:                       # as E3 (addendum v2, ADR-0009)
+  score: probability
+  holdout_fraction: 0.20
+  min_per_class: 20
+  buffer_size: 1000
+  calibration_in_pool: false
+grid:
+  policies:
+    never: {observe: [ks, mmd, domain_clf, p_uniformity]}   # primary monitor quality
+    periodic: {period: 3}
+    monitor: {triggers: [ks, mmd, domain_clf, p_uniformity], min_gap: 2}
+    matched: true                # matched-retrains control for every monitor cell
+  delay: [0, 3]
+  budget_pct: 1.0
+  calibration_fraction: 0.20
+  seeds: [0, 1, 2, 3, 4]
+  extra_seeds: []                # seeds 5 to 9 only on the researcher's go (addendum v3)
+  monitor_cache: results/e4/lamda/monitor_cache

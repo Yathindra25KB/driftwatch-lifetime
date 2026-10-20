@@ -161,10 +161,13 @@ class E3Spec:
 
 
 def load_spec(path: Path | str):
-    """The spec of a grid file: an E3 spec when its grid block has ``selectors``, else E2."""
+    """The spec of a grid file: E4 with ``policies``, E3 with ``selectors``, else E2."""
     from driftwatch.sim.grid import GridSpec
+    from driftwatch.sim.grid_e4 import E4Spec
 
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if isinstance(data, dict) and isinstance(data.get("grid"), dict) and "policies" in data["grid"]:
+        return E4Spec.from_dict(data)
     if (
         isinstance(data, dict)
         and isinstance(data.get("grid"), dict)

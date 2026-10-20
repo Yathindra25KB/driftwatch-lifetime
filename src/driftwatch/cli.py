@@ -274,7 +274,7 @@ def _run_grid(args: argparse.Namespace) -> int:
     from driftwatch.sim.grid_e3 import load_spec
 
     spec = load_spec(args.spec)
-    smoke_root = "e3_smoke" if spec.name.startswith("e3") else "e2_smoke"
+    smoke_root = next((f"{e}_smoke" for e in ("e3", "e4") if spec.name.startswith(e)), "e2_smoke")
     default_out = (
         Path(spec.output) if not args.smoke else Path("results") / smoke_root / spec.dataset
     )

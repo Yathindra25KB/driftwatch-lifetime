@@ -44,6 +44,45 @@ def e3_cell_id(
     return f"{ds}/e3-{selector}-d{delay}-b{budget:g}-r{fraction:g}-{score}-{seed_tag(seeds)}"
 
 
+def e4_cell_id(ds: str, arm: str, delay: int | None, budget: float, seeds: Sequence[int]) -> str:
+    """``arm`` is never, periodic, monitor-<name> or matched-<name>; never has no delay."""
+    d = "" if delay is None else f"-d{delay}"
+    return f"{ds}/e4-{arm}{d}-b{budget:g}-{seed_tag(seeds)}"
+
+
+E4_MONITORS = ("ks", "mmd", "domain_clf", "p_uniformity")
+
+
+def e4_arms(g: dict[str, Any]) -> list[tuple[str, int | None]]:
+    """(arm, delay) of an E4 grid block, in expansion order: never, periodic, monitors, matched.
+
+    Every monitor cell comes before every matched cell, so a matched cell's source exists
+    when the grid reaches it.
+    """
+    p = g["policies"]
+    delays = [int(d) for d in g["delay"]]
+    arms: list[tuple[str, int | None]] = []
+    if "never" in p:
+        arms.append(("never", None))
+    if "periodic" in p:
+        arms += [("periodic", d) for d in delays]
+    triggers = list((p.get("monitor") or {}).get("triggers") or [])
+    arms += [(f"monitor-{t}", d) for t in triggers for d in delays]
+    if p.get("matched"):
+        arms += [(f"matched-{t}", d) for t in triggers for d in delays]
+    return arms
+
+
+def planned_ids_e4(spec: dict[str, Any]) -> list[str]:
+    """Cell ids of an E4 spec, in the order ``E4Spec.cells`` expands them."""
+    g = spec["grid"]
+    ds, b = spec["dataset"], float(g["budget_pct"])
+    ids = [e4_cell_id(ds, arm, d, b, g["seeds"]) for arm, d in e4_arms(g)]
+    if g.get("extra_seeds"):
+        ids += [e4_cell_id(ds, arm, d, b, g["extra_seeds"]) for arm, d in e4_arms(g)]
+    return ids
+
+
 def planned_ids_e3(spec: dict[str, Any]) -> list[str]:
     """Cell ids of an E3 spec, in the order ``E3Spec.cells`` expands them."""
     g = spec["grid"]
@@ -75,6 +114,8 @@ def planned_ids(spec: dict[str, Any]) -> list[str]:
     """Every cell id a grid spec (the parsed YAML mapping) plans, in expansion order."""
     g = spec["grid"]
     ds = spec["dataset"]
+    if "policies" in g:
+        return planned_ids_e4(spec)
     if "selectors" in g:
         return planned_ids_e3(spec)
     variants = tuple(spec.get("e0", {}).get("variants") or ("rolling",))
