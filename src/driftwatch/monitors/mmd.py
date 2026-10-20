@@ -5,8 +5,10 @@ embedding, so the representation is (ADR-0010): a TruncatedSVD projection fitted
 labels, on the window's proper training rows, plus the logit of the malware probability under
 the model in force. Both sides (the reference sample and the current slot) are scored by the
 same model, so a refit changes the representation of both. Columns are standardised with the
-reference sample's mean and standard deviation; the kernel bandwidth is the median pairwise
-distance within the reference sample (median heuristic).
+pooled sample's mean and standard deviation and the kernel bandwidth is the median pairwise
+distance in the pooled sample (median heuristic): both are invariant under the permutations,
+which keeps the permutation test exact under no drift (a reference-only standardisation was
+replaced before any E4 run; ADR-0010).
 
 Per slot: ``n_sub`` rows per side, the biased MMD^2 estimate, and ``n_perm`` seeded
 permutations of the pooled rows; ``p = (1 + #{perm >= observed}) / (n_perm + 1)``.
@@ -45,12 +47,13 @@ def mmd_permutation(
     """(biased MMD^2, permutation p-value) of two samples of row vectors."""
     z = np.vstack([a, b])
     n, m = len(a), len(b)
+    # standardisation and bandwidth from the pooled sample: both are then invariant under
+    # the permutations, which keeps the permutation test exact under no drift
+    mu, sd = z.mean(axis=0), z.std(axis=0)
+    z = (z - mu) / np.where(sd > 0, sd, 1.0)
     sq = (z * z).sum(axis=1)
     d2 = np.maximum(sq[:, None] + sq[None, :] - 2.0 * z @ z.T, 0.0)
-    ref_d2 = d2[:n, :n][np.triu_indices(n, 1)]
-    med = float(np.median(ref_d2)) if ref_d2.size else 0.0
-    if med <= 0.0:
-        med = float(np.median(d2[np.triu_indices(n + m, 1)])) or 1.0
+    med = float(np.median(d2[np.triu_indices(n + m, 1)])) or 1.0
     K = np.exp(-d2 / med)  # exp(-d^2 / (2 sigma^2)) with sigma^2 = median(d^2) / 2
 
     def weights(first: np.ndarray) -> np.ndarray:
@@ -95,8 +98,6 @@ class MMD:
         ci = subsample_index(view.X.shape[0], self.n_sub, rng_cur)
         ref = self._embed(state, state.ref_X[ri], np.asarray(view.ref_proba)[ri])
         cur = self._embed(state, view.X[ci], np.asarray(view.proba)[ci])
-        mu, sd = ref.mean(axis=0), ref.std(axis=0)
-        sd = np.where(sd > 0, sd, 1.0)
         rng = rng_for(state.seed, state.window_key, "mmd-perm", state.ref_slot, view.slot_id)
-        stat, p = mmd_permutation((ref - mu) / sd, (cur - mu) / sd, self.n_perm, rng)
+        stat, p = mmd_permutation(ref, cur, self.n_perm, rng)
         return make_alarm(self.name, view, state, self.alpha, stat, p, len(ri), len(ci))
