@@ -18,3 +18,5 @@ Reviewer: stats-reviewer subagent, read-only, 16 Oct 2026, on `reports/tables/e3
 | 12 | minor | Chapter 6 section 6.11 was stale. | Updated. |
 
 Verdict (reviewer): the numbers and decision words reproduce from the stored tables; the main exposure was interpretive (the LAMDA rows labelled as robustness, verdict words used against a margin as large as the effects). Items 1 to 7 were to be fixed before the text is cited; they are. No third pass has been run on the revised text.
+
+Update, 20 Oct 2026: LAMDA seeds 5 to 9 were run on the researcher's go, so finding 1 no longer applies to the Main cells; the ten-seed LAMDA rows are the registered primary rows (CLAIMS E-42, section 7.5 rewritten). The text of that paragraph was revised after this review and has not had a further independent pass.

@@ -294,7 +294,7 @@ Hours reported by the researcher on 20 Oct 2026: 10 h for Phases 6 to 8 together
 | Branches | `phase-06-grid-e2` (from phase-05), `phase-07-tier1-writeup` (merges phase-06), `phase-08-conformal-e3` (from phase-07; carries all the work, head 6e16222 plus this entry). Pushed to `origin` with the researcher's go; no pull requests; tags `prereg-v1` and `prereg-v2` are local only (not authorised to push) |
 | Registered | tag `prereg-v1` on c26aa5f (15 Oct 2026, before any E2 result); tag `prereg-v2` on f38858e (before any E3 result); ADR-0006, ADR-0007, ADR-0008, ADR-0009 ACCEPTED; G1 PASS and G2 PASS recorded as the researcher's decisions |
 | E2 grid | 54 of 54 cells complete (27 per dataset), 0 failed, code version c26aa5f; tables `reports/tables/e2_*.csv`, figures `reports/figures/e2_*.png`, regenerate byte for byte (CLAIMS E-26 to E-39); cell config hashes in `reports/tables/e2_ledger.csv` |
-| E3 grid | BODMAS 28 of 28 complete (Main cells seeds 0 to 9); LAMDA 16 of 16 complete with seeds 0 to 4 only; the 12 LAMDA seeds-5-to-9 cells are planned and not run; code version f38858e; tables `reports/tables/e3_*.csv`, figure `reports/figures/e3_selection.png` (CLAIMS E-40 to E-47); cell config hashes in `reports/tables/e3_ledger.csv` |
+| E3 grid | BODMAS 28 of 28 complete and LAMDA 28 of 28 complete (Main cells seeds 0 to 9; the LAMDA seeds 5 to 9 cells were added on 20 Oct 2026); none failed; code version f38858e; tables `reports/tables/e3_*.csv`, figure `reports/figures/e3_selection.png` (CLAIMS E-40 to E-47); cell config hashes in `reports/tables/e3_ledger.csv` |
 | Gate evidence | `reports/G3.md` written; the decision is the researcher's |
 | Claims audit | PASS (`reports/claims_audit.md`) |
 | Tests | 839 fast tests pass in about 43 s; the E3 slow modules pass (13 tests); ruff clean; guardrails 45 of 45 |
@@ -306,7 +306,7 @@ Hours reported by the researcher on 20 Oct 2026: 10 h for Phases 6 to 8 together
 1. Gate G3 (see `reports/G3.md`), and whether the chapter drafts count as "core chapters exist".
 2. Hours for Phases 6, 7 and 8.
 3. The E3 trap arm (confounded with not retraining) and the hold-out cut that deviates from ADR-0004 item 8: rerun under an addendum, or keep the recorded caveats.
-4. Whether to run the LAMDA E3 seeds 5 to 9 (12 cells, about 4 machine-hours).
+4. LAMDA E3 seeds 5 to 9: done on 20 Oct 2026 (decided by the researcher).
 5. Whether to push the tags and open pull requests.
 6. The `[verify]` markers in chapters 2, 4 and 5 (including "Li et al., NDSS 2025").
 

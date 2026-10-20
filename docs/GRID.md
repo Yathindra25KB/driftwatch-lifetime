@@ -82,4 +82,4 @@ uv run driftwatch grid configs/e3_bodmas.yaml --out ../DriftWatch/results/e3/bod
 uv run python scripts/make_e3.py --results results/e3                        # tables and figure
 ```
 
-LAMDA E3 runs seeds 0 to 4 first; the seeds 5 to 9 cells are run only if the researcher's hours allow (drop the `extra_seeds` key to skip them). E3 numbers are comparable only within E3 (ADR-0009).
+LAMDA E3 ran seeds 0 to 4 first and the seeds 5 to 9 cells afterwards (20 Oct 2026, on the researcher's go; drop the `extra_seeds` key to skip them). E3 numbers are comparable only within E3 (ADR-0009).
