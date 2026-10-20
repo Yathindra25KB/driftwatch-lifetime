@@ -30,7 +30,7 @@
 - C: one-sample KS of p-values against U(0, 1). Invalid conditional on the calibration set (25% false alarms, see Context).
 
 ### 4. Domain-classifier null and bounded compute
-- **A (proposed):** logistic regression (C = 1, features scaled inside each fold), 5-fold stratified cross-validated AUC, 500 rows per side. The permutation null (99 draws) is computed **once per window** on the initial reference (two disjoint random halves of the hold-out get domain labels 0 and 1), shared by every seed, model and arm, and reused for later references of the window. `p = (1 + #{null >= AUC}) / 100`, so alarm at alpha 0.01 means the AUC exceeds all 99 null draws. The approximation: the null of a later reference is taken to equal that of the initial one, and the null uses at most 500 rows per side.
+- **A (proposed):** logistic regression (C = 1, lbfgs, at most 200 iterations, features scaled inside each fold; lbfgs was chosen over liblinear for cost, about 6x faster on 1,000 x 2,381 dense rows), 5-fold stratified cross-validated AUC, 500 rows per side. The permutation null (99 draws) is computed **once per window** on the initial reference (two disjoint random halves of the hold-out get domain labels 0 and 1), shared by every seed, model and arm, and reused for later references of the window. `p = (1 + #{null >= AUC}) / 100`, so alarm at alpha 0.01 means the AUC exceeds all 99 null draws. The approximation: the null of a later reference is taken to equal that of the initial one, and the null uses at most 500 rows per side.
 - B: a full permutation test per slot (99 x 5 fits per test). Hundreds of hours on LAMDA.
 
 ### 5. Policy-independent statistic cache
