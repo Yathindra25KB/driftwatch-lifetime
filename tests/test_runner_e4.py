@@ -5,6 +5,7 @@ Synthetic stream only (never evidence).
 
 from __future__ import annotations
 
+import dataclasses
 from pathlib import Path
 
 import numpy as np
@@ -37,8 +38,9 @@ def cfg(policy, *, delay: int = 0, names=ALL, cache=None, nE: int = 6, **over) -
     )
 
 
-def go(config: RunConfig, out: Path, rows: int = 400):
-    return run(config, make_source(n_slots=14, rows=rows), out, repo_root=ROOT)
+def go(config: RunConfig, out: Path, rows: int = 400, version: str | None = None):
+    src = make_source(n_slots=14, rows=rows)
+    return run(config, src, out, repo_root=ROOT, pinned_version=version)
 
 
 def slots(summary) -> pd.DataFrame:
@@ -136,6 +138,56 @@ def test_matched_arm_has_the_source_refit_count_spread_evenly_and_equal_labels(
     )
     w = pd.read_parquet(m.dir / "windows.parquet")
     assert w["matched_source_hash"].notna().all() and "matched_k" in w.columns
+    got = w.merge(k_src.rename("k").reset_index(), on=keys)
+    assert len(got) and (got["matched_k_source"] == got["k"]).all()
+    assert (got["matched_refit_shortfall"] == got["k"] - got["n_retrains"]).all()
+
+
+def test_matched_arm_refuses_a_source_with_other_settings(tmp_path: Path) -> None:
+    src_out = tmp_path / "src"
+    go(cfg({"name": "monitor", "trigger": "ks"}, names=["ks"]), src_out)
+    with pytest.raises(RuntimeError, match="delay"):
+        go(cfg({"name": "matched", "trigger": "ks", "source": str(src_out)}, delay=2,
+               names=["ks"]), tmp_path / "m")  # fmt: skip
+    with pytest.raises(RuntimeError, match="another monitor"):
+        go(cfg({"name": "matched", "trigger": "mmd", "source": str(src_out)},
+               names=["ks"]), tmp_path / "m2")  # fmt: skip
+
+
+def test_a_dirty_tree_writes_no_disk_cache(tmp_path: Path) -> None:
+    cache = tmp_path / "cache"
+    go(cfg("never", names=["ks"], cache=str(cache)), tmp_path / "a", version="abc-dirty")
+    assert not list(cache.rglob("*.json"))
+
+
+def test_monitor_outputs_do_not_depend_on_the_labels_the_runner_holds(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Label invariance: permute every label the scoring and release doors hand out.
+
+    The never arm does not refit, so its monitors depend on features and a fixed model only.
+    If any label (scored y_true, released y) reached a monitor, its columns would change.
+    """
+    names = list(MONITORS)
+    plain = slots(go(cfg("never", names=names), tmp_path / "plain"))
+    rng = np.random.default_rng(0)
+    score, take = queue_mod.SealedSlot.score, queue_mod.SealedSlot._take
+
+    def permuted_score(self, pred):
+        s = score(self, pred)
+        y = rng.permutation(s.y_true)
+        return queue_mod.Scored(y, s.row_id, queue_mod.score_slot(y, pred))
+
+    def permuted_take(self, selection):
+        r = take(self, selection)
+        return dataclasses.replace(r, y=rng.permutation(r.y))
+
+    monkeypatch.setattr(queue_mod.SealedSlot, "score", permuted_score)
+    monkeypatch.setattr(queue_mod.SealedSlot, "_take", permuted_take)
+    shuffled = slots(go(cfg("never", names=names), tmp_path / "shuffled"))
+    assert not np.allclose(plain["f1"], shuffled["f1"])  # the labels really moved
+    cols = [f"{k}_{n}" for n in names for k in ("alarm", "decided", "stat", "p")]
+    pd.testing.assert_frame_equal(plain[cols], shuffled[cols])
 
 
 def test_matched_arm_refuses_a_missing_source(tmp_path: Path) -> None:
@@ -147,12 +199,14 @@ def test_matched_arm_refuses_a_missing_source(tmp_path: Path) -> None:
 @pytest.mark.slow
 def test_disk_cache_is_reused_and_changes_no_statistic(tmp_path: Path) -> None:
     cache = tmp_path / "cache"
-    a = slots(go(cfg("never", names=["ks", "domain_clf"], cache=str(cache)), tmp_path / "a"))
+    clean = "0123abc"  # a committed version: a dirty tree gets no disk cache
+    a = slots(go(cfg("never", names=["ks", "domain_clf"], cache=str(cache)), tmp_path / "a",
+                 version=clean))  # fmt: skip
     files = list(cache.rglob("*.json"))
     assert files
     before = {f: f.stat().st_mtime_ns for f in files}
     b = slots(go(cfg({"name": "periodic", "period": 3}, names=["ks", "domain_clf"],
-                     cache=str(cache)), tmp_path / "b"))  # fmt: skip
+                     cache=str(cache)), tmp_path / "b", version=clean))  # fmt: skip
     nocache = slots(go(cfg("never", names=["ks", "domain_clf"]), tmp_path / "c"))
     cols = ["p_ks", "stat_ks", "p_domain_clf", "stat_domain_clf"]
     pd.testing.assert_frame_equal(a[cols], nocache[cols])

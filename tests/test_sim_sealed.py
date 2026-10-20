@@ -165,10 +165,21 @@ def test_the_cached_public_view_is_read_only_so_a_selector_cannot_reorder_scorin
 MONITORS = SIM.parent / "monitors"
 
 
+def all_imports(path: Path) -> list[tuple[str, tuple[str, ...]]]:
+    """Every import in the file, including ones inside functions (lazy imports)."""
+    found = []
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.ImportFrom):
+            found.append((node.module or "", tuple(a.name for a in node.names)))
+        elif isinstance(node, ast.Import):
+            found.extend((a.name, ()) for a in node.names)
+    return found
+
+
 @pytest.mark.parametrize("path", sorted(MONITORS.glob("*.py")), ids=lambda p: p.name)
 def test_monitors_cannot_import_label_holders_or_metric_code(path: Path) -> None:
     """Hard rule 4 for E4: a monitor imports no queue, slicer, runner or metric module."""
-    for mod, names in toplevel_imports(path):
+    for mod, names in all_imports(path):
         assert mod not in FORBIDDEN_MODULES, f"{path.name} imports {mod}"
         assert not mod.startswith(("driftwatch.sim", "driftwatch.data", "driftwatch.metrics")), (
             f"{path.name} imports {mod}"
@@ -177,6 +188,6 @@ def test_monitors_cannot_import_label_holders_or_metric_code(path: Path) -> None
 
 
 def test_the_runner_side_of_the_monitors_imports_no_label_holder() -> None:
-    for mod, names in toplevel_imports(SIM / "monitoring.py"):
+    for mod, names in all_imports(SIM / "monitoring.py"):
         assert mod not in FORBIDDEN_MODULES, mod
         assert not FORBIDDEN_NAMES & set(names), names

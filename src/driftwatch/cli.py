@@ -268,6 +268,17 @@ def _run_reproduce(args: argparse.Namespace) -> int:
     return 0 if report["verdict"] == "MATCH" else 1
 
 
+REGISTRATION_TAGS = {"e4": "prereg-v3"}  # grids that may not produce evidence before their tag
+
+
+def _tag_exists(repo: Path, tag: str) -> bool:
+    import subprocess
+
+    out = subprocess.run(["git", "-C", str(repo), "tag", "-l", tag], capture_output=True,
+                         text=True, check=False)  # fmt: skip
+    return out.returncode == 0 and out.stdout.strip() == tag
+
+
 def _run_grid(args: argparse.Namespace) -> int:
     from driftwatch.data.presets import cached_source
     from driftwatch.sim import grid
@@ -284,8 +295,13 @@ def _run_grid(args: argparse.Namespace) -> int:
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
     chunk = grid.parse_chunk(args.chunk) if args.chunk else None
-    source = cached_source(spec.dataset, args.root)
     repo = Path(__file__).resolve().parents[2]
+    tag = REGISTRATION_TAGS.get(spec.name.split("_", 1)[0])
+    if tag and not args.smoke and not _tag_exists(repo, tag):
+        msg = f"{spec.name}: evidence cells need the registration tag {tag} first"
+        print(msg + " (docs/PREREG.md, step 3); smoke runs measure time only", file=sys.stderr)
+        return 2
+    source = cached_source(spec.dataset, args.root)
     results = grid.run_grid(
         spec,
         source,

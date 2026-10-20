@@ -321,6 +321,11 @@ class RunConfig:
         mon = _monitors(d.get("monitors"))
         if mon and (sim is None or sim["nonconf"] is None):
             raise ConfigError("monitors need a simulation config with a nonconf block")
+        if "p_uniformity" in mon.get("monitors", ()) and sim["nonconf"]["calibration_in_pool"]:
+            raise ConfigError(
+                "p_uniformity compares slot scores with calibration scores; with "
+                "calibration_in_pool those are in-sample scores of the refitted model"
+            )
         if policy in ("monitor", "matched") and sim is not None and sim["nonconf"] is None:
             raise ConfigError(f"policy {policy} needs a nonconf block (the conformal path)")
         if policy == "monitor" and policy_extras["policy_trigger"] not in mon.get("monitors", ()):

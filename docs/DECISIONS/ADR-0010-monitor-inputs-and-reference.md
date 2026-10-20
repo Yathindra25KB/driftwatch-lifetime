@@ -44,6 +44,8 @@
 - Under delay, rule R keeps the reference older than the latest data, so monitors tend to alarm more at `d = 3`. This is part of what E4 measures, not a defect.
 - The p-uniformity monitor adapts to drift as reserved-slice rows arrive; under delay its calibration set is staler.
 - The domain-classifier null is approximate for later references; its validity is checked on synthetic no-drift streams only.
+- After a refit, the reference slot's sample can contain a few rows that are training rows of the model in force (about 0.8% of the slot at B = 1%). Their score logit in MMD is in-sample. The effect is about 2 of 200 rows and is accepted, not corrected (leakage review, Phase 9, note 8).
+- The disk cache is keyed by window, hold-out fraction and a digest of the data source's provenance, under the code version. A dirty or unknown code version writes no disk cache (leakage review, finding 2).
 - To revisit only through a new addendum: any threshold, sample size, k, component count or reference rule.
 
 ## Evidence and references

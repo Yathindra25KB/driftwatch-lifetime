@@ -59,6 +59,7 @@ class E4Collected:
         self.dataset = dataset
         self.arms: dict[ArmKey, pd.DataFrame] = {}  # AUT (window x seed)
         self.slots: dict[ArmKey, pd.DataFrame] = {}  # slot rows with F1 and alarm columns
+        self.windows: dict[ArmKey, pd.DataFrame] = {}  # window rows (refits, matched k)
         self.geometry: dict[str, int] = {}
         self.cells: list[dict[str, Any]] = []
         self.models: list[str] = []
@@ -96,6 +97,7 @@ def collect(
             s = d["slots"][d["slots"]["model"] == model].copy()
             s["window_key"] = _wid(s["window_id"])
             col.slots[key] = s
+            col.windows[key] = d["windows"][d["windows"]["model"] == model].copy()
             if model not in col.models:
                 col.models.append(model)
         del d
@@ -188,7 +190,19 @@ def _contrast(col, model, plus: ArmKey, minus: ArmKey, family: str, monitor: str
         "refits_per_window_minus": float(pw_m["refits"].mean()),
         "labels_per_window_plus": float(pw_p["labels"].mean()),
         "labels_per_window_minus": float(pw_m["labels"].mean()),
+        **_shortfall(col.windows.get(minus)),
     }  # fmt: skip
+
+
+def _shortfall(windows: pd.DataFrame | None) -> dict[str, Any]:
+    """For a matched arm: windows whose control made fewer refits than its source monitor."""
+    if windows is None or "matched_refit_shortfall" not in windows.columns:
+        return {}
+    short = windows["matched_refit_shortfall"].astype(float)
+    return {
+        "matched_shortfall_window_share": float((short > 0).mean()),
+        "matched_shortfall_mean": float(short.mean()),
+    }
 
 
 def contrasts_table(col: E4Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataFrame:

@@ -22,6 +22,7 @@ True labels are used here only through the queue (released rows) and the metric 
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -117,6 +118,12 @@ def _own_scores(st: _State):
     return fn
 
 
+_MATCHED_SAME = (  # config keys a matched arm must share with its source monitor run
+    "dataset", "slots", "window", "ratio", "model", "e0", "selector", "delay", "budget_pct",
+    "pool", "nonconf",
+)  # fmt: skip
+
+
 def _matched_source(ctx: Any) -> dict[str, Any]:
     """Refit counts and queries per slot of the finished monitor run a matched arm copies.
 
@@ -138,6 +145,12 @@ def _matched_source(ctx: Any) -> dict[str, Any]:
             "run its monitor cell first"
         )
     record = json.loads((done[0] / "run.json").read_text("utf-8"))
+    mine, theirs = ctx.cfg.to_dict(), record["config"]
+    differ = [k for k in _MATCHED_SAME if mine.get(k) != theirs.get(k)]
+    if differ:  # a control is only a control of the arm it copies
+        raise RuntimeError(f"matched source {root} differs from this arm in {differ}")
+    if (theirs.get("policy") or {}).get("trigger") != ctx.cfg.policy_trigger:
+        raise RuntimeError(f"matched source {root} was triggered by another monitor")
     slots = pd.read_parquet(
         done[0] / "slots.parquet",
         columns=["variant", "window_id", "seed", "model", "slot_id", "retrained", "n_queried"],
@@ -160,8 +173,18 @@ def _policy_for(ctx: Any, variant: str, seed: int, window_id: str, model: str, n
         if key not in src["counts"]:
             raise RuntimeError(f"matched source has no arm {key}; it is incomplete or different")
         k = int(src["counts"][key])
-        return Scheduled(even_schedule(k, 1 + int(cfg.delay), n_eval - 1))
+        # the first slot a label can be used in comes from the queue (the delay rule lives there)
+        first = LabelQueue(delay=cfg.delay, n_slots=n_eval).release_slot(0)  # type: ignore[arg-type]
+        return Scheduled(even_schedule(k, first, n_eval - 1))
     return make_policy(cfg.policy, cfg.policy_period or 3)
+
+
+def _source_digest(ctx: Any) -> str:
+    """A digest of the data source's provenance (dataset build, slots, exclusions), once per run."""
+    if "source_digest" not in ctx.extra:
+        body = json.dumps(ctx.source.provenance(), sort_keys=True, default=str)
+        ctx.extra["source_digest"] = hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
+    return ctx.extra["source_digest"]
 
 
 def _fit_score(st: _State, nc: dict[str, Any]) -> None:
@@ -194,7 +217,9 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
     mon_win: WindowMonitoring | None = None
     if cfg.monitors:
         window_key = f"{variant}|{plan.window_id}"
-        cache = MonitorCache(cache_path(cfg.monitor_cache, ctx.version, window_key))
+        # the disk cache is keyed by everything a cached statistic depends on besides the pair
+        identity = f"{window_key}|holdout{nc['holdout_fraction']}|{_source_digest(ctx)}"
+        cache = MonitorCache(cache_path(cfg.monitor_cache, ctx.version, identity))
         mon_win = WindowMonitoring(cfg.monitors, seed, window_key, cache)
         mon_win.start(proper.X, proper.y, X_hold)  # initial window only (training rows)
     states: dict[int, _State] = {}
@@ -409,7 +434,12 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                     f"matched arm spent {st.queried_per_slot} labels per slot, its source "
                     f"{source_queried} ({plan.window_id}, seed {seed}, {st.det.name})"
                 )
-            st.extra["matched_k"] = len(st.policy.slots)
+            k_source = int(src["counts"][(variant, plan.window_id, seed, st.det.name)])
+            st.extra["matched_k"] = len(st.policy.slots)  # scheduled events (capped at the slots)
+            st.extra["matched_k_source"] = k_source
+            # refits the control could not make (no new label at an event, or too few slots);
+            # reported so that M-C is never read as matched when it is not
+            st.extra["matched_refit_shortfall"] = k_source - st.n_retrains
             st.extra["matched_source_hash"] = src["config_hash"]
     if mon_win is not None:
         mon_win.cache.save()

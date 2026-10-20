@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import time
 from collections.abc import Callable
@@ -39,6 +40,7 @@ from driftwatch.monitors.base import (
     reference_sample,
 )
 
+log = logging.getLogger(__name__)
 Scorer = Callable[[Any], np.ndarray]
 
 
@@ -62,10 +64,19 @@ class MonitorCache:
         self._n_loaded = len(self.data)
 
 
-def cache_path(cache_dir: str | None, version: str, window_key: str) -> Path | None:
+def cache_path(cache_dir: str | None, version: str, identity: str) -> Path | None:
+    """Where a window's statistics persist, or ``None`` (memory only).
+
+    ``identity`` names everything a cached statistic depends on besides the slot pair (window,
+    hold-out fraction, data source digest). A dirty or unknown code version gets no disk
+    cache: its statistics could come from code that is not committed anywhere.
+    """
     if cache_dir is None:
         return None
-    digest = hashlib.sha256(window_key.encode("utf-8")).hexdigest()[:20]
+    if version.endswith("-dirty") or version in ("", "unknown"):
+        log.warning("code version %r: monitor statistics are not cached on disk", version)
+        return None
+    digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20]
     return Path(cache_dir) / version / f"{digest}.json"
 
 

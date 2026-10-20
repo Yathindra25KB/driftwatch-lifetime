@@ -122,3 +122,17 @@ def test_the_e4_grid_runs_end_to_end_with_matched_cells_reading_their_siblings(
         b = pd.read_parquet(by_id[c.cell_id].dir / "slots.parquet")
         pd.testing.assert_series_equal(a.groupby(keys)["n_queried"].sum(),
                                        b.groupby(keys)["n_queried"].sum())  # fmt: skip
+
+
+def test_cli_refuses_e4_evidence_cells_before_the_registration_tag(
+    tmp_path: Path, capsys, monkeypatch
+) -> None:
+    from driftwatch import cli
+
+    monkeypatch.setattr(cli, "_tag_exists", lambda repo, tag: False)
+    path = CONFIGS / "e4_bodmas.yaml"
+    assert cli.main(["grid", str(path), "--out", str(tmp_path / "r")]) == 2
+    assert "prereg-v3" in capsys.readouterr().err
+    assert not (tmp_path / "r").exists()
+    # the status view stays available before the tag
+    assert cli.main(["grid", str(path), "--status", "--out", str(tmp_path / "r")]) == 0

@@ -245,3 +245,15 @@ def test_monitor_and_matched_policies_round_trip_and_label_their_arm() -> None:
 def test_monitors_key_is_emitted_only_when_set() -> None:
     conf = RunConfig.from_dict(cfg(**SIM, policy="periodic", nonconf={}))
     assert "monitors" not in conf.to_dict() and conf.policy_label == "periodic"
+
+
+def test_p_uniformity_refuses_calibration_rows_in_the_pool() -> None:
+    with pytest.raises(ConfigError, match="in-sample"):
+        RunConfig.from_dict(
+            cfg(
+                **SIM,
+                policy="never",
+                nonconf={"calibration_in_pool": True},
+                monitors={"names": ["p_uniformity"]},
+            )
+        )

@@ -5,7 +5,7 @@
 # Every arm uses the random selector on the E3 conformal path, so labels spent are equal by
 # construction; E4 numbers compare with the E3 random arm, never with E2 absolutes.
 # Known limit (addendum v3): periodic(3) has one useful refit per window (nE = 6); monitors can
-# refit from slot 1 at delay 0, so M-P here is partly a "more refits" contrast; M-C isolates
+# refit from slot 2 (min_gap 2), so M-P here is partly a "more refits" contrast; M-C isolates
 # timing.
 name: e4_bodmas
 dataset: bodmas

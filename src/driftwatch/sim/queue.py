@@ -199,6 +199,10 @@ class LabelQueue:
         self.n_released = 0
         self.n_ignored = 0
 
+    def release_slot(self, query_slot: int) -> int:
+        """The slot from which a label queried at ``query_slot`` is usable (the delay rule)."""
+        return query_slot + 1 + self._delay
+
     @property
     def n_pending(self) -> int:
         return self.n_queued - self.n_released - self.n_ignored
@@ -258,7 +262,7 @@ class LabelQueue:
         self._queried.add(slot_index)
         n = len(rows.y)
         self.n_queued += n
-        release_slot = slot_index + 1 + self._delay
+        release_slot = self.release_slot(slot_index)
         if release_slot >= self._n_slots:
             self.n_ignored += n
             return QueryReceipt(n, None, n)
