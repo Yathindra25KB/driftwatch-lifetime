@@ -123,3 +123,32 @@ E3 (RQ3) adds a calibration set and two selectors behind the same selector inter
 - **Equal labels spent.** In every slot every arm spends the same number of labels: the reserved slice plus the selector's choice; the runner asserts the equality.
 - **Recalibration.** Scores are recomputed under the model in force in every slot in which calibration rows arrived or the model was refitted, with a minimum number of rows per class; below it the previous calibration is kept and the skip is counted. A credibility selector with no calibration falls back to random for that slot and says so.
 
+## 6.12 Drift monitors and monitor-triggered retraining (Phase 9)
+
+E4 (RQ4) asks whether retraining when a drift monitor alarms does better than retraining every three slots. The registration (`docs/prereg/addendum-v3.md`, locked by tag `prereg-v3` before any E4 result) and ADR-0010 fixed every value below. The results are in chapter 7.
+
+- **One alarm interface.** A *drift monitor* looks at one evaluation slot after it has been scored and decides whether that slot looks unlike a *reference*: data the model in force already knows. Every monitor is called as `update(slot view, state) -> alarm`. The slot view holds:
+  - the slot's features;
+  - the model's malware probabilities;
+  - the features of the calibration rows that have already arrived.
+
+  It has no label field. A test permutes every label that the runner holds and finds the monitors' outputs unchanged. Another test fails if a monitor module imports anything that holds labels.
+- **The four monitors.** Each tests at a significance level of 0.01 per slot, on seeded samples of a few hundred rows per side.
+  - *KS:* a two-sample Kolmogorov-Smirnov test on each of the 20 features that best separate the classes in the initial training window, with a Holm correction over the 20 tests.
+  - *MMD:* maximum mean discrepancy with a Gaussian kernel and a permutation threshold. The detectors have no learned embedding, so the input is a 16-dimensional SVD projection of the features plus the model's score.
+  - *Domain classifier:* a logistic regression asked to tell the reference from the slot, scored by cross-validated AUC against a permutation null computed once per window.
+  - *p-uniformity:* compares the slot's label-free conformal scores with those of the calibration rows, which tests whether the conformal p-values have stayed uniform.
+- **Reference.** At first the reference is the newest part of the initial window. After a refit it becomes the newest slot whose labels were in the training pool at that refit. Under a label delay of `d` slots, that is at most `s − 1 − d`, so the reference is older than the latest data. This is intended, not a defect.
+- **Policy.** An alarm on slot `s` causes a retrain before slot `s + 1`, provided at least two slots have passed since the last refit. If no new label has arrived, the event is logged as a no-op. An alarm is never carried forward.
+- **Matched comparisons.** Every arm uses random selection with the same seeded draws, so every arm spends the same labels in every slot; the tables check this. A second control matches the number of retrains: it refits as often as the monitor arm did in each window, at evenly spaced slots chosen without looking at data. Monitor-triggered retraining is compared with periodic retraining (matched labels) and with this control (matched retrains, which isolates timing). The control knows each window's refit count in advance, which favours it, so this comparison is conservative for the monitor.
+- **Monitor quality.** A *drop event* is a slot whose F1 falls at least 0.05 below the mean of the three slots before it, the same definition as for recovery time. An alarm detects a drop if it comes within two slots of it. From these:
+  - *alarm precision* is the share of alarms that detect a drop;
+  - *alarm recall* is the share of drops detected;
+  - *detection delay* is the number of slots from drop to alarm.
+
+  True labels enter only this scoring, never a monitor. The primary reading comes from the never-retrain arm, where all four monitors observe without acting.
+- **Bounded compute.** The statistics that do not depend on the model (KS and the domain classifier) are cached per window and shared across arms. A cached value equals a freshly computed one; a test pins this.
+- **Changed before the registration.** Two monitor designs failed the synthetic no-drift checks and were replaced before any real-data run, as recorded in ADR-0010:
+  - p-uniformity: a one-sample test of the p-values against the uniform distribution ignored the finite calibration set, so it was replaced by the two-sample form;
+  - MMD: a reference-only standardisation broke the permutation test.
+
