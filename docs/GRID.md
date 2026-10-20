@@ -83,3 +83,21 @@ uv run python scripts/make_e3.py --results results/e3                        # t
 ```
 
 LAMDA E3 ran seeds 0 to 4 first and the seeds 5 to 9 cells afterwards (20 Oct 2026, on the researcher's go; drop the `extra_seeds` key to skip them). E3 numbers are comparable only within E3 (ADR-0009).
+
+## E4 (drift monitors and retraining policies)
+
+`configs/e4_bodmas.yaml` and `configs/e4_lamda.yaml` are E4 grid specs: a `grid:` block with `policies`. Each dataset expands into 38 cells, which are 19 arms at seeds 0 to 4 and the same 19 arms at seeds 5 to 9. The 19 arms are:
+- never, with all four monitors observing;
+- periodic(3), monitor-m and matched-m, each at delays 0 and 3.
+
+A matched cell reads its sibling monitor cell's refit counts, so run without chunks; the expansion order puts every source first. The registration is `docs/prereg/addendum-v3.md` (tag `prereg-v3`). `driftwatch grid` refuses E4 evidence cells until that tag exists. Smoke runs are allowed and write no monitor cache. Run from a frozen worktree at the tag, using the main checkout's data root:
+
+```bash
+git worktree add --detach ../DriftWatch-e4 prereg-v3
+cd ../DriftWatch-e4 && uv sync --frozen
+uv run driftwatch grid configs/e4_bodmas.yaml --smoke --out ../DriftWatch/results/e4_smoke/bodmas   # timing only
+uv run driftwatch grid configs/e4_bodmas.yaml --root ../DriftWatch/data --out ../DriftWatch/results/e4/bodmas
+uv run python scripts/make_e4.py --results results/e4                        # tables and figure (main tree)
+```
+
+The monitor statistics that do not depend on the policy are cached per window under `monitors.cache`: KS, the domain classifier and its null. The cache is keyed by code version, hold-out fraction and data-source digest. It changes cost, not results. E4 numbers are comparable with E3's random arm, never with E2 absolutes.
