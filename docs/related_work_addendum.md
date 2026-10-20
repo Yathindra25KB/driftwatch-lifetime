@@ -31,7 +31,7 @@ Three axes of this study, as in the guide:
 
 ## Not identified
 
-- **"Li et al. (NDSS 2025)"** appears in Table G.1 of the plan without a title. One web search on 2026-10-15 did not find an NDSS 2025 paper by an author named Li on malware drift. It may be the Li and Bertino paper above (LFreeDA is arXiv only, not NDSS) or a different work. **[verify: ask the researcher for the title before citing.]**
+- **"Li et al. (NDSS 2025)"** appears in Table G.1 of the plan without a title. One web search on 2026-10-15 did not find an NDSS 2025 paper by an author named Li on malware drift. It may be the Li and Bertino paper above (LFreeDA is arXiv only, not NDSS) or a different work. A second search on 2026-10-20 found one candidate: A. S. Li, A. Iyengar, A. Kundu and E. Bertino, "Revisiting Concept Drift in Windows Malware Detection: Adaptation to Real Drifted Malware with Minimal Samples", NDSS 2025 (arXiv 2407.13918; https://www.ndss-symposium.org/ndss-paper/revisiting-concept-drift-in-windows-malware-detection-adaptation-to-real-drifted-malware-with-minimal-samples/). It argues that active-learning retraining is suboptimal and proposes domain adaptation on control-flow graphs. It fits the context but has not been matched to Table G.1. **[verify: the researcher confirms the title against Table G.1 before it is cited.]**
 - **ActDroid (arXiv 2401.16982), SEED (arXiv 2605.24903), FIRCE (arXiv 2605.01962), arXiv 2606.07789** are in the guide's table and are covered in `report/ch05_related_work.md`; they were not re-read for this addendum.
 
 ## Position, in the words the guide allows

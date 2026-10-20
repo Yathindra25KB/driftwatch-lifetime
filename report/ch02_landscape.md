@@ -24,15 +24,15 @@ The platforms differ in ways that matter for the question asked here, and chapte
 - **Time resolution.** LAMDA slots are calendar months; BODMAS slots are two weeks. Delay is therefore reported in months for LAMDA and in slots and days for BODMAS (PROTOCOL.md D2).
 - **Time coverage.** LAMDA has a long, gappy timeline (CLAIMS W-01: usable months fall into 10 runs, the longest 62 months); BODMAS covers about thirteen months in two usable runs (CLAIMS W-02).
 - **Feature type.** LAMDA features are sparse integer counts (CLAIMS D-02); BODMAS features are dense floats (CLAIMS D-07).
-- **Timestamps.** LAMDA months come from the AndroZoo `added` field (CLAIMS D-03; meaning [verify]). BODMAS benign samples carry batch or placeholder dates, which the slicer excludes (CLAIMS D-08, D-14; ADR-0004).
+- **Timestamps.** LAMDA months come from the AndroZoo `added` field (CLAIMS D-03). The LAMDA paper says only "submission dates" and `year_month`, and its README says the year is when the APK "was added to AndroZoo repository"; neither names the AndroZoo CSV column, so the field is [verify] (checked 2026-10-20). BODMAS benign samples carry batch or placeholder dates, which the slicer excludes (CLAIMS D-08, D-14; ADR-0004).
 
 ## 2.4 The datasets
 
 | Dataset | Platform | Size and classes | Source of the numbers | Licence |
 |---|---|---|---|---|
 | LAMDA | Android | 1,008,381 apps; 369,906 malware; 638,475 benign (Baseline subset) | CLAIMS D-01 | MIT |
-| BODMAS | Windows PE | 134,435 samples; 57,293 malware; 77,142 benign | CLAIMS D-07 | BSD-2 |
-| EMBER2024 (optional, Tier 3) | Windows PE and other formats | not used in Phase 5 | arXiv 2506.05074, accessed 2026-10-13 [verify] | Apache-2.0 |
+| BODMAS | Windows PE | 134,435 samples; 57,293 malware; 77,142 benign | CLAIMS D-07 | BSD-2 (code repository; no dataset licence is stated on the project page, checked 2026-10-20) |
+| EMBER2024 (optional, Tier 3) | Windows PE and other formats | not used in Phase 5 | arXiv 2506.05074, accessed 2026-10-13 [verify] | Apache-2.0 (confirmed on the dataset card, 2026-10-20) |
 
 LAMDA is described by its authors as a longitudinal Android malware benchmark built to study concept drift, with about a dozen years of samples and no 2015 data (haque2025lamda; summary of 2026-10-13 [verify]). BODMAS is described as Windows PE malware and benign feature vectors collected over roughly thirteen months with curated family labels (yang2021bodmas). Both have duplicates and class-ratio properties that the slicer's constraints and the duplicate counts handle (CLAIMS D-05 for LAMDA).
 

@@ -14,7 +14,7 @@ The aim of this chapter is to say what each neighbour measured, so that the meas
 ## 5.2 Concept drift
 
 - **Survey.** Gama, Zliobaite, Bifet, Pechenizkiy and Bouchachia, "A Survey on Concept Drift Adaptation", ACM Computing Surveys 46(4), article 44, 2014, DOI 10.1145/2523813 (bibliographic data confirmed from search results of 2026-10-13). The survey treats concept drift as a change in the relation between inputs and target in online supervised learning, and covers adaptive learning, strategies, algorithms, evaluation and applications [verify: read; not yet in references.bib].
-- **Stream framing in security.** "Machine Learning (In) Security: A Stream of Problems" (arXiv 2010.16045) frames malware detection as a data-stream problem and discusses label availability and delay [verify: authors, venue and claims; not yet in references.bib].
+- **Stream framing in security.** Ceschin, Botacin, Bifet, Pfahringer, Oliveira, Gomes and Grégio, "Machine Learning (In) Security: A Stream of Problems", Digital Threats 2023 (arXiv 2010.16045), evaluates how delayed labels affect existing solutions and treats concept drift and evolution as the core problem; the abstract does not itself use the term "data stream" [verified at abstract level, accessed 2026-10-20; not yet in references.bib].
 
 ## 5.3 Detecting drift with conformal methods
 
@@ -27,14 +27,14 @@ The aim of this chapter is to say what each neighbour measured, so that the meas
 ## 5.4 Retraining under a labelling budget
 
 - **Continuous learning** (chen2023continuous; USENIX Security 2023). Combines contrastive learning with active learning for Android malware drift. The abstract-level summary reports a drop in F1 after months of deployment without updates and improvements in false negative and false positive rates from the proposed selection; it is the closest neighbour on budgeted retraining [verify: read the paper for the budgets used and how labels were assumed to arrive].
-- **ActDroid** (muzaffar2024actdroid; arXiv 2401.16982). An active-learning framework for Android malware detection that reports the effect of labelling delay on online learning models [verify: read; the journal version's relation to the arXiv version is open in REFERENCES_TODO.md].
-- **SEED** (amalapuram2026seed). Semi-supervised continual detection "on a budget"; delays adding newly observed samples to its replay buffer by fixed numbers of months [verify: read].
+- **ActDroid** (muzaffar2024actdroid; arXiv 2401.16982). (Muzaffar, Ragab Hassen, Zantout, Lones; arXiv v1 30 Jan 2024.) An active online learning framework for Android malware that treats detection as a streaming problem and compensates for concept drift between an app's release and its labelling; it reports up to 96% accuracy with about 24% of training data labelled [verified at abstract level, accessed 2026-10-20; the journal version's relation to the arXiv version is open in REFERENCES_TODO.md].
+- **SEED** (amalapuram2026seed). Semi-supervised continual detection "on a budget"; uses a "delayed buffer update strategy" to limit label-noise propagation during replay (Amalapuram et al., arXiv 2605.24903, 24 May 2026; the unit of the delay was not checked) and reports AUT gains on BODMAS and AndroZoo with 20% labelled data on seen tasks [verified at abstract level, accessed 2026-10-20].
 - **Label-efficient training updates** (minnei2026labelefficient) and **DRMD** (mcfadden2026drmd; AAAI 2026, reinforcement learning under drift) [verify: read both].
 
 ## 5.5 Label delay
 
 - **Botacin and Gomes** (botacin2025labeldelays; Computers and Security 148:104122). Studies the impact of label delays on malware detection pipelines. The search-result summary describes an exposure metric and a finding that analysis-queue-induced delay is a significant challenge, with pseudo-labels reducing the loss [verify: read; the numbers in the summary are not copied here].
-- **ADAPT** (arXiv 2507.08597). Identifies the manual analysis bottleneck and combats drift with pseudo-labelling [verify: read; not yet in references.bib].
+- **ADAPT** (arXiv 2507.08597). (Alam, Piplai, Rastogi; arXiv v1 11 Jul 2025.) Addresses the cost of the ground-truth labels that frequent retraining needs, with a model-agnostic pseudo-labelling algorithm; the abstract does not mention manual analysis queues [verified at abstract level, accessed 2026-10-20; not yet in references.bib].
 
 This study differs in what it holds fixed: the same windows, constraints and metric are applied to both platforms, label delay and analyst budget are crossed, and drift monitors are evaluated as a retraining trigger on the same stream. It does not propose a new detector.
 
