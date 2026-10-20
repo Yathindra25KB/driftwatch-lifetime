@@ -22,7 +22,9 @@ True labels are used here only through the queue (released rows) and the metric 
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -39,7 +41,8 @@ from driftwatch.conformal.recalibrate import (
 from driftwatch.data.slicer import Window, WindowSpec
 from driftwatch.models import make_model
 from driftwatch.models.base import Detector
-from driftwatch.sim.policies import make_policy
+from driftwatch.sim.monitoring import ArmMonitors, MonitorCache, WindowMonitoring, cache_path
+from driftwatch.sim.policies import MonitorTriggered, Scheduled, even_schedule, make_policy
 from driftwatch.sim.pool import TrainingPool
 from driftwatch.sim.queue import LabelQueue, SealedSlot
 from driftwatch.sim.selectors import (
@@ -98,6 +101,8 @@ class _State:
     n_arrived_train: int = 0
     n_arrived_train_malware: int = 0
     retrain_seconds: float = 0.0
+    monitors: ArmMonitors | None = None
+    queried_per_slot: list[int] = field(default_factory=list)
     extra: dict[str, Any] = field(default_factory=dict)
 
 
@@ -110,6 +115,51 @@ def _own_scores(st: _State):
         return s[np.arange(len(y)), np.asarray(y, dtype=np.int64)]
 
     return fn
+
+
+def _matched_source(ctx: Any) -> dict[str, Any]:
+    """Refit counts and queries per slot of the finished monitor run a matched arm copies.
+
+    Loaded once per run. The source directory must hold exactly one complete run.
+    """
+    if "matched" in ctx.extra:
+        return ctx.extra["matched"]
+    import pandas as pd  # noqa: PLC0415
+
+    root = Path(ctx.cfg.policy_source)
+    runs = [p.parent for p in root.glob("*/run.json")]
+    done = [r for r in runs if json.loads((r / "run.json").read_text("utf-8"))["status"]
+            == "complete"]  # fmt: skip
+    if len(done) != 1:
+        raise RuntimeError(
+            f"matched source {root} must hold exactly one complete run, found {len(done)}; "
+            "run its monitor cell first"
+        )
+    record = json.loads((done[0] / "run.json").read_text("utf-8"))
+    slots = pd.read_parquet(
+        done[0] / "slots.parquet",
+        columns=["variant", "window_id", "seed", "model", "slot_id", "retrained", "n_queried"],
+    )
+    keys = ["variant", "window_id", "seed", "model"]
+    counts = slots.groupby(keys)["retrained"].sum().astype(int).to_dict()
+    queried = {k: g["n_queried"].astype(int).tolist() for k, g in slots.groupby(keys, sort=False)}
+    out = {"counts": counts, "queried": queried, "config_hash": record["config_hash"]}
+    ctx.extra["matched"] = out
+    return out
+
+
+def _policy_for(ctx: Any, variant: str, seed: int, window_id: str, model: str, n_eval: int):
+    cfg = ctx.cfg
+    if cfg.policy == "monitor":
+        return make_policy("monitor", trigger=cfg.policy_trigger, min_gap=cfg.policy_min_gap)
+    if cfg.policy == "matched":
+        src = _matched_source(ctx)
+        key = (variant, window_id, seed, model)
+        if key not in src["counts"]:
+            raise RuntimeError(f"matched source has no arm {key}; it is incomplete or different")
+        k = int(src["counts"][key])
+        return Scheduled(even_schedule(k, 1 + int(cfg.delay), n_eval - 1))
+    return make_policy(cfg.policy, cfg.policy_period or 3)
 
 
 def _fit_score(st: _State, nc: dict[str, Any]) -> None:
@@ -139,6 +189,12 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
     rule = RecalibrationRule(nc["holdout_fraction"], nc["min_per_class"], nc["buffer_size"])
     fitted = R._initial_detectors(ctx, window, seed, train_key, train=proper)
     n_eval = len(plan.eval)
+    mon_win: WindowMonitoring | None = None
+    if cfg.monitors:
+        window_key = f"{variant}|{plan.window_id}"
+        cache = MonitorCache(cache_path(cfg.monitor_cache, ctx.version, window_key))
+        mon_win = WindowMonitoring(cfg.monitors, seed, window_key, cache)
+        mon_win.start(proper.X, proper.y, X_hold)  # initial window only (training rows)
     states: dict[int, _State] = {}
     for mi, det, _ in fitted:
         st = _State(
@@ -147,10 +203,11 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
             fit_key=train_key,
             queue=LabelQueue(delay=cfg.delay, n_slots=n_eval),  # type: ignore[arg-type]
             pool=TrainingPool(proper),  # type: ignore[arg-type]
-            policy=make_policy(cfg.policy, cfg.policy_period or 3),
+            policy=_policy_for(ctx, variant, seed, plan.window_id, det.name, n_eval),
             selector=make_selector(cfg.selector),  # type: ignore[arg-type]
             buffer=CalibrationBuffer(rule, allow_selected=trap),
             score=ProbabilityScore(),
+            monitors=None if mon_win is None else mon_win.arm(),
         )
         st.buffer.add(X_hold, y_hold, ORIGIN_HOLDOUT)
         _fit_score(st, nc)
@@ -171,6 +228,8 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
         below += int(slot.c3.status == "below_target")
         n_budget = budget_count(slot.n, cfg.budget_pct)  # type: ignore[arg-type]
         n_cal = calibration_count(n_budget, cfg.calibration_fraction or 0.0)
+        if mon_win is not None:
+            mon_win.remember_slot(s, public.X)  # features only; a later reference candidate
         for mi, st in states.items():
             released = st.queue.release(s)
             n_new_cal = 0
@@ -190,6 +249,8 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                     n_new_cal = len(cal_rows)
                 train_rows = released if nc["calibration_in_pool"] else released.take(~to_cal)
                 st.pool.add(train_rows)
+                if st.monitors is not None:
+                    st.monitors.note_arrived(train_rows.queried_in)
                 st.n_arrived_train += len(train_rows)
                 st.n_arrived_train_malware += int((train_rows.y == 1).sum())
             st.n_released += len(released)
@@ -208,8 +269,12 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                 st.n_retrains += 1
                 st.retrain_seconds += fit_seconds
                 _fit_score(st, nc)
+                if st.monitors is not None:
+                    st.monitors.on_refit()  # rule R: the reference moves to the newest pool slot
             elif event:
                 st.n_noop_retrains += 1
+            if isinstance(st.policy, MonitorTriggered):
+                st.policy.record(s, refit)  # the alarm is consumed either way
             if refit or n_new_cal:  # the calibration is recomputed under the model in force
                 st.cal = st.buffer.recalibrate(_own_scores(st), s)
             proba = st.det.predict_proba(public.X, st.fit_key)
@@ -230,6 +295,21 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
             }
             R._emit(ctx, key, row_id=scored.row_id, y_true=scored.y_true, proba=proba, pred=pred)
             n_pool = st.pool.n
+
+            # drift monitors: label-free view of the slot just scored; the alarm acts on s + 1
+            mon_cols: dict[str, Any] = {}
+            if st.monitors is not None:
+                alarms = st.monitors.update(
+                    s,
+                    slot.slot_id,
+                    public.X,
+                    proba,
+                    lambda X, st=st: st.det.predict_proba(X, st.fit_key),
+                    lambda st=st: st.buffer.rows()[0],  # features of arrived calibration rows
+                )
+                if isinstance(st.policy, MonitorTriggered):
+                    st.policy.notify(alarms[st.policy.trigger].fired)
+                mon_cols = st.monitors.columns(alarms)
 
             # conformal quantities of this slot: from the model, the features and the calibration
             cred = None
@@ -265,6 +345,7 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                     f"{min(n_budget, slot.n)} in slot {slot.slot_id} (equal labels spent)"
                 )
             st.n_queried += receipt.n_queried
+            st.queried_per_slot.append(receipt.n_queried)
             st.n_ignored += receipt.n_ignored
             n_reserved = int((selection.origin == ORIGIN_RANDOM).sum())
             n0, n1 = st.buffer.class_counts()
@@ -285,6 +366,9 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
                     "n_arrived_train_malware": st.n_arrived_train_malware,
                     "retrain_event": bool(event),
                     "retrained": bool(refit),
+                    **({"retrain_noop_reason": "no_new_labels" if event and not refit else None}
+                       if cfg.monitors or cfg.policy == "matched" else {}),
+                    **mon_cols,
                     "n_ignored_after_end": receipt.n_ignored,
                     "retrain_seconds": fit_seconds,
                     "fit_seconds": fit_seconds,
@@ -313,6 +397,20 @@ def run_window(ctx: Any, variant: str, spec: WindowSpec, seed: int, window: Wind
             "cal_skipped_total": st.buffer.n_skipped,
             "n_fallback_random": st.n_fallback_random,
         }
+        if st.monitors is not None:
+            st.extra.update(st.monitors.totals())
+        if isinstance(st.policy, Scheduled):
+            src = _matched_source(ctx)
+            source_queried = src["queried"][(variant, plan.window_id, seed, st.det.name)]
+            if source_queried != st.queried_per_slot:  # matched labels spent, slot by slot
+                raise RuntimeError(
+                    f"matched arm spent {st.queried_per_slot} labels per slot, its source "
+                    f"{source_queried} ({plan.window_id}, seed {seed}, {st.det.name})"
+                )
+            st.extra["matched_k"] = len(st.policy.slots)
+            st.extra["matched_source_hash"] = src["config_hash"]
+    if mon_win is not None:
+        mon_win.cache.save()
     random = R._random_for(ctx, variant, spec, seed, window, n_train_mal)
     R._finish_window(
         ctx, variant, spec, seed, window, train_key, fitted, f1s, fprs, fnrs, ratios, below,

@@ -146,6 +146,8 @@ class _Ctx:
     cache: InitialModelCache
     n_windows: int = 0
     n_slot_rows: int = 0
+    version: str = ""  # code version of the run (keys the monitor statistic cache)
+    extra: dict[str, Any] = field(default_factory=dict)  # per-run lookups (matched sources)
 
 
 def _spec_for(cfg: RunConfig, variant: str, seed: int) -> WindowSpec:
@@ -171,7 +173,7 @@ def _arm(cfg: RunConfig, series: str = "time_aware") -> dict[str, Any]:
         return {**ARM_DEFAULTS, "series": series}
     return {
         "series": series,
-        "policy": cfg.policy,
+        "policy": cfg.policy_label,
         "selector": cfg.selector,
         "delay": cfg.delay,
         "budget_pct": cfg.budget_pct,
@@ -822,7 +824,7 @@ def run(
     t0 = time.perf_counter()
     try:
         with MemoryWatchdog(memory_cap_bytes) as watchdog, store.predictions() as write:
-            ctx = _Ctx(cfg, source, store, write, hasher, cells, shared)
+            ctx = _Ctx(cfg, source, store, write, hasher, cells, shared, version=version)
             for variant in cfg.variants:
                 for seed in cfg.seeds:
                     spec = _spec_for(cfg, variant, seed)

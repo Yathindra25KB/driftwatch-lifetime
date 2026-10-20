@@ -4,8 +4,11 @@ Keys follow plan Appendix C (``.claude/rules/configs.md``): dataset, slots, wind
 (nT, nE, stride), ratio, seeds, model, policy, selector, delay, budget_pct, nonconf, pool,
 monitors, output. A config either describes the Phase 4 baseline (``selector``, ``delay`` and
 ``budget_pct`` null, ``policy: never``) or a simulation (Phase 5: all three set; ``policy``
-never or periodic). ``nonconf`` and ``monitors`` belong to later phases and must be null, as
-must monitor-triggered retraining: a config cannot ask for something this code does not do.
+never or periodic). ``nonconf`` adds the conformal layer (Phase 8). ``monitors`` (Phase 9)
+runs drift monitors on the conformal path, and two policies use them: ``monitor`` (retrain on
+the trigger monitor's alarm) and ``matched`` (the matched-count control, whose retrain count
+comes from a finished monitor run named by ``source``). Monitor settings are frozen in code
+(addendum v3); the config only names which monitors run.
 ``e0`` lists the window variants to run (the key keeps its Phase 4 name so that E0 hashes stay
 valid) and, in a simulation, the same variants apply.
 
@@ -34,7 +37,9 @@ from driftwatch.models import make_model
 DATASETS = ("lamda", "bodmas")
 PRESETS = ("adr-0004",)
 VARIANTS = ("rolling", "rolling_chow", "sensitivity", "single_run")
-POLICIES = ("never", "periodic")
+POLICIES = ("never", "periodic", "monitor", "matched")
+MONITOR_NAMES = ("ks", "mmd", "domain_clf", "p_uniformity")  # driftwatch.monitors.MONITORS
+DEFAULT_MIN_GAP = 2  # addendum v3
 SELECTORS = ("random", "uncertainty", "credibility")
 SCORES = ("probability", "centroid")
 NONCONF_KEYS = {
@@ -45,7 +50,7 @@ NONCONF_KEYS = {
     "calibration_in_pool",
     "trap_selected_calibration",
 }
-LATER_PHASE_KEYS = ("monitors",)
+LATER_PHASE_KEYS: tuple[str, ...] = ()
 SIM_KEYS = ("selector", "delay", "budget_pct", "pool")
 DEFAULT_PERIOD = 3  # PROTOCOL.md: retrain every 3 slots
 DEFAULT_CALIBRATION = 0.20  # PROTOCOL.md D8
@@ -62,6 +67,7 @@ TOP_KEYS = {
     "output",
     *SIM_KEYS,
     "nonconf",
+    "monitors",
     *LATER_PHASE_KEYS,
 }
 PACKAGES = (
@@ -87,25 +93,66 @@ def _int(value: Any, what: str, minimum: int) -> int:
     return value
 
 
-def _policy(raw: Any) -> tuple[str, int | None]:
-    """(name, period): ``policy`` is a name or ``{name, period}``; period only for periodic."""
-    if isinstance(raw, dict):
-        if set(raw) - {"name", "period"}:
-            raise ConfigError(f"policy takes only name and period, got {sorted(raw)}")
-        name, period = raw.get("name"), raw.get("period")
-    else:
-        name, period = raw, None
-    if name == "monitor":
-        raise ConfigError("monitor-triggered retraining is implemented in Phase 9")
+_POLICY_KEYS = {
+    "never": {"name"},
+    "periodic": {"name", "period"},
+    "monitor": {"name", "trigger", "min_gap"},
+    "matched": {"name", "trigger", "source"},
+}
+
+
+def _policy(raw: Any) -> tuple[str, int | None, dict[str, Any]]:
+    """(name, period, extras). ``policy`` is a name or a mapping with the keys of its kind.
+
+    ``period`` belongs to periodic; ``trigger`` and ``min_gap`` to monitor; ``trigger`` and
+    ``source`` (the output directory of the monitor run it is matched to) to matched.
+    """
+    d = dict(raw) if isinstance(raw, dict) else {"name": raw}
+    name = d.get("name")
     if name not in POLICIES:
         raise ConfigError(f"policy must be one of {POLICIES}, got {name!r}")
-    if name == "never":
-        if period is not None:
-            raise ConfigError("policy never takes no period")
-        return name, None
+    extra_keys = set(d) - _POLICY_KEYS[name]
+    if extra_keys:
+        raise ConfigError(f"policy {name} takes only {sorted(_POLICY_KEYS[name])}, got {sorted(d)}")
+    extras: dict[str, Any] = {}
+    if name in ("monitor", "matched"):
+        trigger = d.get("trigger")
+        if trigger not in MONITOR_NAMES:
+            raise ConfigError(f"policy {name} needs a trigger in {MONITOR_NAMES}, got {trigger!r}")
+        extras["policy_trigger"] = trigger
+    if name == "monitor":
+        extras["policy_min_gap"] = _int(d.get("min_gap", DEFAULT_MIN_GAP), "policy.min_gap", 1)
+    if name == "matched":
+        source = d.get("source")
+        if not isinstance(source, str) or not source:
+            raise ConfigError(
+                "policy matched needs source: the output directory of its monitor run"
+            )
+        extras["policy_source"] = source
+    if name != "periodic":
+        return name, None, extras
+    period = d.get("period")
     if period is None:
-        return name, DEFAULT_PERIOD
-    return name, _int(period, "policy.period", 1)
+        return name, DEFAULT_PERIOD, extras
+    return name, _int(period, "policy.period", 1), extras
+
+
+def _monitors(raw: Any) -> dict[str, Any]:
+    """``monitors: {names: [...], cache: <dir> or null}`` -> RunConfig fields."""
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict) or set(raw) - {"names", "cache"}:
+        raise ConfigError(f"monitors takes only names and cache, got {raw!r}")
+    names = raw.get("names")
+    if not isinstance(names, list) or not names:
+        raise ConfigError("monitors.names must be a non-empty list")
+    bad = [n for n in names if n not in MONITOR_NAMES]
+    if bad or len(set(names)) != len(names):
+        raise ConfigError(f"monitors.names must be distinct names from {MONITOR_NAMES}: {names}")
+    cache = raw.get("cache")
+    if cache is not None and not isinstance(cache, str):
+        raise ConfigError(f"monitors.cache must be a directory or null, got {cache!r}")
+    return {"monitors": tuple(names), "monitor_cache": cache}
 
 
 def _simulation(d: dict[str, Any]) -> dict[str, Any] | None:
@@ -230,10 +277,22 @@ class RunConfig:
     pool_new_label_weight: float | None = None
     pool_truncation: str | None = None
     nonconf: dict[str, Any] | None = None
+    policy_trigger: str | None = None
+    policy_min_gap: int | None = None
+    policy_source: str | None = None
+    monitors: tuple[str, ...] | None = None
+    monitor_cache: str | None = None
 
     @property
     def is_simulation(self) -> bool:
         return self.selector is not None
+
+    @property
+    def policy_label(self) -> str:
+        """The arm's policy column: ``monitor-ks``, ``matched-ks``, or the plain name."""
+        if self.policy in ("monitor", "matched"):
+            return f"{self.policy}-{self.policy_trigger}"
+        return self.policy
 
     # -- parsing -----------------------------------------------------------------------------
 
@@ -253,12 +312,19 @@ class RunConfig:
         for key in LATER_PHASE_KEYS:
             if d.get(key) is not None:
                 raise ConfigError(f"{key!r} belongs to a later phase and must be null")
-        policy, period = _policy(d.get("policy"))
+        policy, period, policy_extras = _policy(d.get("policy"))
         sim = _simulation(d)
-        if policy == "periodic" and sim is None:
+        if policy != "never" and sim is None:
             raise ConfigError(
-                "policy periodic needs selector, delay and budget_pct (a simulation config)"
+                f"policy {policy} needs selector, delay and budget_pct (a simulation config)"
             )
+        mon = _monitors(d.get("monitors"))
+        if mon and (sim is None or sim["nonconf"] is None):
+            raise ConfigError("monitors need a simulation config with a nonconf block")
+        if policy in ("monitor", "matched") and sim is not None and sim["nonconf"] is None:
+            raise ConfigError(f"policy {policy} needs a nonconf block (the conformal path)")
+        if policy == "monitor" and policy_extras["policy_trigger"] not in mon.get("monitors", ()):
+            raise ConfigError("policy monitor needs its trigger listed in monitors.names")
         if d.get("dataset") not in DATASETS:
             raise ConfigError(f"dataset must be one of {DATASETS}, got {d.get('dataset')!r}")
 
@@ -338,6 +404,8 @@ class RunConfig:
             per_slot_random_split=per_slot,
             policy_period=period,
             **(sim or {}),
+            **policy_extras,
+            **mon,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -359,6 +427,18 @@ class RunConfig:
         }
         if self.policy == "periodic":
             out["policy"] = {"name": "periodic", "period": self.policy_period}
+        elif self.policy == "monitor":
+            out["policy"] = {
+                "name": "monitor",
+                "trigger": self.policy_trigger,
+                "min_gap": self.policy_min_gap,
+            }
+        elif self.policy == "matched":
+            out["policy"] = {
+                "name": "matched",
+                "trigger": self.policy_trigger,
+                "source": self.policy_source,
+            }
         if self.is_simulation:
             out["selector"] = {
                 "name": self.selector,
@@ -372,6 +452,8 @@ class RunConfig:
             }
             if self.nonconf is not None:  # emitted only when set: E0 to E2 hashes are unchanged
                 out["nonconf"] = dict(self.nonconf)
+            if self.monitors is not None:  # emitted only when set: E0 to E3 hashes are unchanged
+                out["monitors"] = {"names": list(self.monitors), "cache": self.monitor_cache}
         return out
 
 

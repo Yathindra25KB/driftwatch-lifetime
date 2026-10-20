@@ -160,3 +160,23 @@ def test_the_cached_public_view_is_read_only_so_a_selector_cannot_reorder_scorin
     # scoring is unaffected by any attempt
     pred = np.zeros(slot.n, dtype=np.int8)
     assert slot.score(pred).scores.n == slot.n
+
+
+MONITORS = SIM.parent / "monitors"
+
+
+@pytest.mark.parametrize("path", sorted(MONITORS.glob("*.py")), ids=lambda p: p.name)
+def test_monitors_cannot_import_label_holders_or_metric_code(path: Path) -> None:
+    """Hard rule 4 for E4: a monitor imports no queue, slicer, runner or metric module."""
+    for mod, names in toplevel_imports(path):
+        assert mod not in FORBIDDEN_MODULES, f"{path.name} imports {mod}"
+        assert not mod.startswith(("driftwatch.sim", "driftwatch.data", "driftwatch.metrics")), (
+            f"{path.name} imports {mod}"
+        )
+        assert not FORBIDDEN_NAMES & set(names), f"{path.name} imports {sorted(names)}"
+
+
+def test_the_runner_side_of_the_monitors_imports_no_label_holder() -> None:
+    for mod, names in toplevel_imports(SIM / "monitoring.py"):
+        assert mod not in FORBIDDEN_MODULES, mod
+        assert not FORBIDDEN_NAMES & set(names), names

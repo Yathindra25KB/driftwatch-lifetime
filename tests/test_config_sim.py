@@ -1,7 +1,7 @@
-"""Simulator keys in the run config (Phase 5): selector, delay, budget, pool, periodic policy.
+"""Simulator keys in the run config: selector, delay, budget, pool, policies, monitors.
 
-E0 configs must keep parsing and hashing exactly as before; later-phase keys (nonconf,
-monitors, monitor-triggered retraining) must still be refused.
+E0 configs must keep parsing and hashing exactly as before; the Phase 9 keys (monitors, the
+monitor and matched policies) are emitted only when set, so earlier hashes do not move.
 """
 
 from __future__ import annotations
@@ -84,7 +84,26 @@ def test_new_keys_change_the_hash_and_equal_configs_agree() -> None:
 @pytest.mark.parametrize(
     ("changes", "message"),
     [
-        ({"policy": "monitor", **SIM}, "Phase 9"),
+        ({"policy": "monitor", **SIM}, "needs a trigger"),
+        ({"policy": {"name": "monitor", "trigger": "ks"}, **SIM}, "nonconf"),
+        ({"policy": {"name": "matched", "trigger": "ks"}, **SIM, "nonconf": {}}, "source"),
+        ({"policy": {"name": "monitor", "trigger": "ks", "period": 3}, **SIM}, "takes only"),
+        (
+            {"policy": {"name": "monitor", "trigger": "ks"}, **SIM, "nonconf": {}},
+            "trigger listed in monitors.names",
+        ),
+        (
+            {
+                "policy": {"name": "monitor", "trigger": "ks", "min_gap": 0},
+                **SIM,
+                "nonconf": {},
+                "monitors": {"names": ["ks"]},
+            },
+            "min_gap",
+        ),
+        ({**SIM, "nonconf": {}, "monitors": {"names": ["adwin"]}}, "monitors.names"),
+        ({**SIM, "nonconf": {}, "monitors": {"names": ["ks", "ks"]}}, "distinct"),
+        ({**SIM, "nonconf": {}, "monitors": {"names": ["ks"], "every": 2}}, "takes only"),
         ({"policy": "sometimes", **SIM}, "policy"),
         ({"policy": "periodic"}, "periodic"),  # needs selector, delay and budget
         ({"selector": "random", "delay": 1}, "budget_pct"),
@@ -113,7 +132,8 @@ def test_new_keys_change_the_hash_and_equal_configs_agree() -> None:
             {**SIM, "nonconf": {"trap_selected_calibration": True}},
             "only applies with calibration_fraction 0",
         ),
-        ({**SIM, "monitors": ["mmd"]}, "later phase"),
+        ({**SIM, "monitors": {"names": ["mmd"]}}, "need a simulation config with a nonconf"),
+        ({**SIM, "monitors": ["mmd"]}, "monitors takes only"),
         ({"policy": {"name": "periodic", "period": 0}, **SIM}, "period"),
         ({"policy": {"name": "never", "period": 3}, **SIM}, "period"),
     ],
@@ -197,3 +217,31 @@ def test_the_zero_reserved_share_is_a_named_trap() -> None:
         )
     )
     assert conf.nonconf is not None and conf.nonconf["trap_selected_calibration"] is True
+
+
+def test_monitor_and_matched_policies_round_trip_and_label_their_arm() -> None:
+    mon = RunConfig.from_dict(
+        cfg(
+            **SIM,
+            policy={"name": "monitor", "trigger": "mmd"},
+            nonconf={},
+            monitors={"names": ["mmd", "ks"]},
+        )
+    )
+    assert mon.policy_min_gap == 2 and mon.policy_label == "monitor-mmd"
+    d = mon.to_dict()
+    assert d["policy"] == {"name": "monitor", "trigger": "mmd", "min_gap": 2}
+    assert d["monitors"] == {"names": ["mmd", "ks"], "cache": None}
+    assert RunConfig.from_dict(d).to_dict() == d
+    matched = RunConfig.from_dict(
+        cfg(**SIM, policy={"name": "matched", "trigger": "mmd", "source": "r/x"}, nonconf={})
+    )
+    assert matched.policy_label == "matched-mmd" and matched.policy_source == "r/x"
+    assert RunConfig.from_dict(matched.to_dict()).to_dict() == matched.to_dict()
+    h = {config_hash(c.to_dict(), "v", "l") for c in (mon, matched)}
+    assert len(h) == 2
+
+
+def test_monitors_key_is_emitted_only_when_set() -> None:
+    conf = RunConfig.from_dict(cfg(**SIM, policy="periodic", nonconf={}))
+    assert "monitors" not in conf.to_dict() and conf.policy_label == "periodic"
