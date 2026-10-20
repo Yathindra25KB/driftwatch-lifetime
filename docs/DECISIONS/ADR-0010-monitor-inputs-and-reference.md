@@ -15,7 +15,7 @@
 ## Options and decisions
 
 ### 1. MMD input for models without an embedding
-- **A (proposed):** a TruncatedSVD projection (16 components) fitted without labels on the window's proper training rows (the window minus the time-ordered hold-out), plus the logit of the malware probability under the model in force; columns standardised on the reference sample; RBF kernel with the median-heuristic bandwidth on the reference; 200 rows per side; 199 permutations.
+- **A (proposed):** a TruncatedSVD projection (16 components) fitted without labels on the window's proper training rows (the window minus the time-ordered hold-out), plus the logit of the malware probability under the model in force; columns standardised on the pooled sample (reference plus slot) and an RBF kernel with the median-heuristic bandwidth on the pooled sample, both invariant under the permutations so the test stays exact; 200 rows per side; 199 permutations. (A first version standardised on the reference sample only; it gave 6 alarms in 200 no-drift synthetic slots and was replaced before any E4 run, commit bdad6e0.)
 - B: model score only (one dimension). It sees no covariate shift that leaves the score unchanged.
 - C: raw features. Kernel distances in 2,381 to 4,561 dimensions are dominated by noise; the cost is high.
 
@@ -48,4 +48,5 @@
 
 ## Evidence and references
 - `src/driftwatch/monitors/`, `src/driftwatch/sim/monitoring.py`, `tests/test_monitors.py` (change-point detection within 1 slot for all four; at most 6 alarms in 200 no-drift slots, run with `pytest -m slow`), `tests/test_runner_e4.py` (rule R, cache equality, runtime label spy).
+- `scripts/monitor_synthetic.py` -> `reports/tables/e4_synthetic_checks.csv` (synthetic, never evidence): every monitor alarms in the shift slot in 5 of 5 change-point streams and never before it; no-drift alarm rate over 8 reference draws x 100 slots at alpha 0.01: KS 1.75% (one reference draw 7%), MMD 0.13%, domain classifier 0%, p-uniformity 0.13%. The KS rate is above nominal because one reference draw serves many slots (alarms are dependent given the reference); this is stated in addendum v3, not tuned away.
 - PROTOCOL §3 (monitor quality), §4 (Mondrian p-value); ADR-0006 (threshold 0.5); ADR-0009 (calibration rows are not training rows).
