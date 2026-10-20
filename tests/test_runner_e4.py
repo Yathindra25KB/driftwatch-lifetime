@@ -22,6 +22,9 @@ from driftwatch.sim.runner import run
 
 NONCONF = {"score": "probability", "holdout_fraction": 0.2, "min_per_class": 10, "buffer_size": 400}
 ALL = list(MONITORS)
+# the domain classifier fits a 99-draw null per window: fast tests leave it out, the slow
+# variants run all four monitors
+CHEAP = ["ks", "mmd", "p_uniformity"]
 
 
 def cfg(policy, *, delay: int = 0, names=ALL, cache=None, nE: int = 6, **over) -> RunConfig:
@@ -101,11 +104,12 @@ def test_observing_monitors_do_not_change_the_arm(tmp_path: Path) -> None:
         model=[{"name": "lr"}],
     )
     a = go(plain, tmp_path / "a")
-    b = go(cfg({"name": "periodic", "period": 3}), tmp_path / "b")
+    b = go(cfg({"name": "periodic", "period": 3}, names=CHEAP), tmp_path / "b")
     pd.testing.assert_frame_equal(preds(a), preds(b))
     assert a.predictions_sha256 == b.predictions_sha256
 
 
+@pytest.mark.slow
 def test_never_arm_keeps_the_initial_reference_and_logs_every_monitor(tmp_path: Path) -> None:
     s = slots(go(cfg("never"), tmp_path))
     assert (s["monitor_ref_slot"] == -1).all() and not s["retrained"].any()
@@ -160,15 +164,17 @@ def test_a_dirty_tree_writes_no_disk_cache(tmp_path: Path) -> None:
     assert not list(cache.rglob("*.json"))
 
 
+@pytest.mark.parametrize(
+    "names", [CHEAP, pytest.param(ALL, marks=pytest.mark.slow)], ids=["cheap", "all"]
+)
 def test_monitor_outputs_do_not_depend_on_the_labels_the_runner_holds(
-    tmp_path: Path, monkeypatch
+    tmp_path: Path, monkeypatch, names: list[str]
 ) -> None:
     """Label invariance: permute every label the scoring and release doors hand out.
 
     The never arm does not refit, so its monitors depend on features and a fixed model only.
     If any label (scored y_true, released y) reached a monitor, its columns would change.
     """
-    names = list(MONITORS)
     plain = slots(go(cfg("never", names=names), tmp_path / "plain"))
     rng = np.random.default_rng(0)
     score, take = queue_mod.SealedSlot.score, queue_mod.SealedSlot._take
@@ -218,7 +224,10 @@ def test_disk_cache_is_reused_and_changes_no_statistic(tmp_path: Path) -> None:
     assert all(f.stat().st_mtime_ns >= before[f] for f in files)
 
 
-def test_monitors_read_no_label_at_run_time(tmp_path: Path, monkeypatch) -> None:
+@pytest.mark.parametrize(
+    "names", [CHEAP, pytest.param(ALL, marks=pytest.mark.slow)], ids=["cheap", "all"]
+)
+def test_monitors_read_no_label_at_run_time(tmp_path: Path, monkeypatch, names) -> None:
     """Runtime spy: every label read in an E4 run comes from the queue (release and scoring)."""
     log: list[tuple[str, str, str]] = []
     original = queue_mod.SealedSlot.__init__
@@ -227,7 +236,7 @@ def test_monitors_read_no_label_at_run_time(tmp_path: Path, monkeypatch) -> None
         original(self, spied(slot, log))
 
     monkeypatch.setattr(queue_mod.SealedSlot, "__init__", spying_init)
-    go(cfg({"name": "monitor", "trigger": "p_uniformity"}), tmp_path)
+    go(cfg({"name": "monitor", "trigger": "p_uniformity"}, names=names), tmp_path)
     callers = {c for c, _, _ in log}
     assert log and callers == {"driftwatch.sim.queue"}, callers
 
