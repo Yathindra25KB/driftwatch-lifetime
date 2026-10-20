@@ -1,6 +1,6 @@
 # Pre-registration addendum v3: RQ4, drift monitors and retraining (E4)
 
-**Status: DRAFT, not approved. It is registered by the annotated git tag `prereg-v3` once the researcher approves it; UNLOCKED only until that tag exists.** The tag, not this line, is the lock. It must predate the first E4 result (the first file under `results/e4/`). It is never moved or deleted.
+**Status: registered by the annotated git tag `prereg-v3`; UNLOCKED only until that tag exists.** The tag, not this line, is the lock. It predates the first E4 result (the first file under `results/e4/`). It was created on the researcher's go of 20 Oct 2026. The researcher approved this addendum as written, accepted ADR-0010, and chose seeds 0 to 9 for every E4 cell before any E4 result. It is never moved or deleted.
 
 Scope: this addendum adds RQ4 to `docs/PREREG.md` (tag `prereg-v1`) and `docs/prereg/addendum-v2.md` (tag `prereg-v2`) and changes nothing registered there. Everything not stated here is as registered in v1 and v2: windows, ratio, threshold, models, the conformal layer, the two-stage bootstrap, the decision rule, the exclusion and failure rules, and units.
 
@@ -63,17 +63,17 @@ Every subsample, permutation and fold is seeded by (seed, window, slot) only.
 
 ## Cells (reduced grid), per dataset
 
-| Cell | Count | Seeds |
+| Arm | Count | Seeds |
 |---|---|---|
-| never, with all four monitors observing (primary monitor quality) | 1 | 0 to 4 |
-| periodic(3) at d ∈ {0, 3} | 2 | 0 to 4 |
-| monitor-m at d ∈ {0, 3}, m ∈ {KS, MMD, domain classifier, p-uniformity} | 8 | 0 to 4 |
-| matched-m at d ∈ {0, 3} | 8 | 0 to 4 |
+| never, with all four monitors observing (primary monitor quality) | 1 | 0 to 4, and 5 to 9 |
+| periodic(3) at d ∈ {0, 3} | 2 | 0 to 4, and 5 to 9 |
+| monitor-m at d ∈ {0, 3}, m ∈ {KS, MMD, domain classifier, p-uniformity} | 8 | 0 to 4, and 5 to 9 |
+| matched-m at d ∈ {0, 3} | 8 | 0 to 4, and 5 to 9 |
 
-That is 19 cells per dataset and 38 in all. **Seeds 5 to 9** for all 19 cells run only if the researcher says so. The same seed and cell rules as E3 apply. BODMAS runs first.
+That is 19 arms per dataset, each run as two cells (seeds 0 to 4, then seeds 5 to 9): 38 cells per dataset and 76 in all. **The primary contrasts use all 10 seeds.** This was decided by the researcher before any E4 result. BODMAS runs first, and within a dataset the seed 0 to 4 cells run first.
 
 **Shrink order**, if compute runs short and before any claim is cut:
-1. LAMDA seeds stay 0 to 4.
+1. Drop the LAMDA seed 5 to 9 cells, and say so. LAMDA contrasts are then reported on seeds 0 to 4, as a registered fallback.
 2. Drop d = 3 on BODMAS (where periodic equals never at d = 3).
 3. Cut LAMDA E4 and report BODMAS only, saying so.
 
@@ -84,7 +84,7 @@ A positive value favours the monitor.
 - **M-P(m, d)** = A-AUT(monitor-m, d) − A-AUT(periodic(3), d). This is the comparison at matched labels spent: 4 monitors × 2 delays = 8 per stratum, 32 in the family.
 - **M-C(m, d)** = A-AUT(monitor-m, d) − A-AUT(matched-m, d). This is the comparison at a matched number of retrains, and it isolates timing: 8 per stratum, 32 in the family.
 
-The decision rule, the interval method (v1 two-stage bootstrap, 10,000 replicates, bootstrap seed 20261215) and the 0.01 AUT margin are as in v1. Wilcoxon on per-seed paired means is a supporting check only, with Holm **within each family** (32; a missing contrast counts as p = 1). With 5 seeds the smallest two-sided Wilcoxon p is 0.0625, so no Holm-adjusted p can fall below 0.0625. Every row shows A-AUT, labels spent per window and refits per window for both arms.
+The decision rule, the interval method (v1 two-stage bootstrap, 10,000 replicates, bootstrap seed 20261215) and the 0.01 AUT margin are as in v1. Wilcoxon on per-seed paired means is a supporting check only, with Holm **within each family** (32; a missing contrast counts as p = 1). With 10 seeds the smallest two-sided Wilcoxon p is about 0.002. Under the shrink fallback of 5 seeds it would be 0.0625, and no Holm-adjusted p could then fall below 0.0625. Every row shows A-AUT, labels spent per window and refits per window for both arms.
 
 **Answer to RQ4.** Monitors are said to beat periodic retraining only for the (dataset, model, monitor, delay) cells where M-P is detected positive. Otherwise the report says periodic is not beaten at this resolution and gives the interval half-widths. No pooled claim is made across datasets or models.
 

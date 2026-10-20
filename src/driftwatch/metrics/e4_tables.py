@@ -91,13 +91,17 @@ def collect(
         delay = None if arm == "never" else int(cfg["delay"])
         for model in sorted(d["f1"]["model"].unique()):
             key: ArmKey = (model, arm, delay)
-            if key in col.arms:
-                raise GridDataError(f"arm {key} appears in two cells")
-            col.arms[key] = stats.aut_matrix(d["f1"], model, variant="rolling").values
+            aut = stats.aut_matrix(d["f1"], model, variant="rolling").values
             s = d["slots"][d["slots"]["model"] == model].copy()
             s["window_key"] = _wid(s["window_id"])
-            col.slots[key] = s
-            col.windows[key] = d["windows"][d["windows"]["model"] == model].copy()
+            w_rows = d["windows"][d["windows"]["model"] == model].copy()
+            if key in col.arms:  # the same arm under another seed set (seeds 0-4 and 5-9)
+                if set(aut.columns) & set(col.arms[key].columns):
+                    raise GridDataError(f"arm {key}: a seed appears in two cells")
+                aut = pd.concat([col.arms[key], aut], axis=1).sort_index(axis=1)
+                s = pd.concat([col.slots[key], s], ignore_index=True)
+                w_rows = pd.concat([col.windows[key], w_rows], ignore_index=True)
+            col.arms[key], col.slots[key], col.windows[key] = aut, s, w_rows
             if model not in col.models:
                 col.models.append(model)
         del d

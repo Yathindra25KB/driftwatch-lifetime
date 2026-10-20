@@ -25,7 +25,8 @@ def e4_results(tmp_path_factory) -> tuple[Path, Path]:
             "monitor": {"triggers": ["ks", "mmd", "domain_clf", "p_uniformity"], "min_gap": 2},
             "matched": True,
         },
-        seeds=[0, 1],
+        seeds=[0],
+        extra_seeds=[1],  # two seed sets: the tables join them per arm
     )
     spec_dir = base / "configs"
     spec_dir.mkdir()
@@ -48,6 +49,7 @@ def test_make_e4_writes_every_table_and_the_figure(e4_results, tmp_path: Path) -
     assert {"labels_per_window", "refits_per_window", "a_aut_mean"} <= set(pol.columns)
     assert pol["labels_per_window"].nunique() == 1  # matched labels spent in every arm
     assert (pol.loc[pol["arm"] == "never", "refits_per_window"] == 0).all()
+    assert (pol["n_seeds"] == 2).all() and (pol["seed_set"] == "0-1").all()
     con = pd.read_csv(tmp_path / "e4_contrasts.csv")
     assert set(con["family"]) == {"M-P", "M-C"}
     assert (con["status"] == "computed").all()
@@ -61,7 +63,7 @@ def test_make_e4_writes_every_table_and_the_figure(e4_results, tmp_path: Path) -
     trig = mon[mon["context"] == "trigger_arm"]
     assert len(trig) == 4 * 2
     led = pd.read_csv(tmp_path / "e4_ledger.csv")
-    assert (led["status"] == "complete").all() and len(led) == 19
+    assert (led["status"] == "complete").all() and len(led) == 38
 
 
 @pytest.mark.slow

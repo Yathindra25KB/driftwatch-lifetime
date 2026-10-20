@@ -1,6 +1,6 @@
 # ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute
 
-**Status:** PROPOSED (2026-10-20). Only the researcher moves it to ACCEPTED; it is registered with `docs/prereg/addendum-v3.md`.
+**Status:** ACCEPTED by the researcher on 2026-10-20 (option A in every section, as proposed). It is registered with `docs/prereg/addendum-v3.md` (tag `prereg-v3`).
 **Date:** 2026-10-20
 **Deciders:** Yathindra (researcher, decides); Claude Code (engineering lead, proposes)
 **Phase:** 9

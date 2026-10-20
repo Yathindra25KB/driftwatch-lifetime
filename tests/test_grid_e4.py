@@ -92,12 +92,12 @@ def test_bad_e4_specs_fail_at_parse_time(over: dict, message: str) -> None:
 
 
 @pytest.mark.parametrize("ds", ["bodmas", "lamda"])
-def test_the_committed_e4_configs_parse_and_plan_19_cells(ds: str) -> None:
+def test_the_committed_e4_configs_parse_and_plan_38_cells(ds: str) -> None:
     path = CONFIGS / f"e4_{ds}.yaml"
     spec = load_spec(path)
     assert isinstance(spec, E4Spec)
     assert [c.cell_id for c in spec.cells()] == planned_ids_from_file(path)
-    assert len(spec.cells()) == 19
+    assert len(spec.cells()) == 38  # 19 arms x seeds 0-4 and 5-9
 
 
 @pytest.mark.slow
