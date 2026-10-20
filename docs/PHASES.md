@@ -11,9 +11,9 @@ Status, evidence, commit and the hours the researcher reports, for every phase a
 | 3 | Time slicer, C1-C3, leakage canary | 3 (26 Oct-1 Nov 2026) | 8 | DONE | [slicer review, 2 passes](reviews/slicer-review.md); [mutation matrix 15/15](../reports/mutation_matrix.md); [slicing run](../reports/slicing_run.md); [window options](../reports/window_options.md); [ADR-0005](DECISIONS/ADR-0005-windows-and-size-gate.md) (ACCEPTED); [ADR-0004 addendum 1](DECISIONS/ADR-0004-slot-definition.md); [CLAIMS W-01..W-07](CLAIMS.md) | 9b8e958 | 3 | Done 11 Oct 2026, before week 3. Canary tested on seeded drift, not the signal-free fixture; real-data canary left to Phase 4 by design. See "Phase 3 closeout" below |
 | 4 | Models, AUT/A-AUT, E0 baselines | 3-4 (26 Oct-8 Nov 2026) | 10 | DONE | [G1 evidence](../reports/G1.md); [E0 report](../reports/e0_baselines.md); [tables](../reports/tables/e0_baselines.csv); [fit times](../reports/tables/fit_times.csv); [ADR-0006](DECISIONS/ADR-0006-metrics-threshold-scaling.md) (ACCEPTED 15 Oct 2026); [CLAIMS E-01..E-12, M-01, M-02, B-01..B-05, T-01](CLAIMS.md) | 57e2003 | 2 (reported as under 3) | Done 11 Oct 2026, before week 3. G1 criteria met on LAMDA; BODMAS AUT above 0.90 left as an open alarm; ADR-0006 awaits acceptance; guide sanity band `[verify]`. See "Phase 4 closeout" below |
 | 5 | Delay and budget simulator, E1 | 5-8 (9 Nov-6 Dec 2026) | 32 | DONE | [G2 evidence](../reports/G2.md); [ADR-0007](DECISIONS/ADR-0007-pool-composition-and-budget.md) (PROPOSED); [E1 figure](../reports/figures/e1_random_vs_time.png); [E1 tables](../reports/tables/e1_summary.csv); [label influence](../reports/tables/label_influence_lamda.csv); [chapters 2, 5, 6](../report/ch06_method.md); [CLAIMS S-01..S-06, E-13..E-21](CLAIMS.md) | a5c8604 | 3 to 6 (reported) | Done 13 Oct 2026, before week 5. G2 criteria met except: ADR-0007 not accepted (researcher), second leakage-review pass did not complete (usage limit). Open: which comparator carries RQ1; parallel runs do not fit the 1.5 GiB cap. See "Phase 5 closeout" below |
-| 6 | Tier 1 grid (E2) and statistics | 9-11 (7-27 Dec 2026) | 24 | IN PROGRESS | [prereg-v1](../docs/PREREG.md) tag c26aa5f (15 Oct 2026, before any E2 result); [ADR-0008](DECISIONS/ADR-0008-rq1-comparator-and-e2-design.md) (ACCEPTED); [stats review](reviews/stats-review-e2.md); [GRID.md](GRID.md); [ch03](../report/ch03_analysis.md); grid ledger `results/e2/<dataset>/ledger.jsonl` | fca8a10 (code), c26aa5f (registered) | 10 (reported by the researcher on 20 Oct 2026 for Phases 6 to 8 together; no per-phase split) | E2 complete (54 of 54 cells), tables, figures, CLAIMS E-22 to E-39 and ch07 written, two stats passes. Not closed: hours and the closeout wait for the researcher (see "Phases 6 to 8: state" below) |
-| 7 | Tier 1 write-up and reproduction | 13-14 (4-17 Jan 2027) | 18 | IN PROGRESS | `driftwatch reproduce table1` (smoke passes; clean-clone full run MATCH, 31 min, CLAIMS E-24); [claims audit script](../scripts/claims_audit.py); [related-work addendum](related_work_addendum.md); ch01, ch04 (first draft), ch08 (partial) | on branch phase-07-tier1-writeup | included in the 10 h reported for Phase 6 | README, ch01 to ch08 drafts, claims audit (PASS), clean-clone reproduction and [G3 evidence](../reports/G3.md) exist. Not closed: G3 decision, hours and the closeout (researcher) |
-| 8 | Conformal layer and selection (E3) | 15-17 (18 Jan-7 Feb 2027) | 23 | IN PROGRESS | conformal modules, selectors, `runner_e3`, E3 grid spec and tables built and tested on synthetic streams; [addendum v2 draft](prereg/addendum-v2.md); [ADR-0009](DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.md) (PROPOSED) | on branch phase-08-conformal-e3 | included in the 10 h reported for Phase 6 | `prereg-v2` tagged f38858e (15 Oct 2026, before any E3 result); ADR-0009 ACCEPTED (option A). BODMAS E3 complete (28 of 28 cells, 0 failed, CLAIMS E-25); LAMDA E3 seeds 0 to 4 complete (16 of 16 cells); seeds 5 to 9 (12 cells) not run. Tables, figure, CLAIMS E-40 to E-47, ch07 section 7.5, a stats review and a leakage review exist; open: the trap-arm confound and the hold-out cut ([review](reviews/leakage-review-e3.md)). G3 is to be decided by the researcher |
+| 6 | Tier 1 grid (E2) and statistics | 9-11 (7-27 Dec 2026) | 24 | DONE | [prereg-v1](../docs/PREREG.md) tag c26aa5f (15 Oct 2026, before any E2 result); [ADR-0008](DECISIONS/ADR-0008-rq1-comparator-and-e2-design.md) (ACCEPTED); [stats review](reviews/stats-review-e2.md); [GRID.md](GRID.md); [ch03](../report/ch03_analysis.md); grid ledger `results/e2/<dataset>/ledger.jsonl` | e015804 (final evidence); fca8a10 (code), c26aa5f (registered) | 10 (reported by the researcher on 20 Oct 2026 for Phases 6 to 8 together; no per-phase split) | E2 complete (54 of 54 cells), tables, figures, CLAIMS E-22 to E-39 and ch07 written, two stats passes. Closed 20 Oct 2026 with Phases 7 and 8 (hours reported together). Open items for the researcher are listed under "Phases 6 to 8: state" |
+| 7 | Tier 1 write-up and reproduction | 13-14 (4-17 Jan 2027) | 18 | DONE | `driftwatch reproduce table1` (smoke passes; clean-clone full run MATCH, 31 min, CLAIMS E-24); [claims audit script](../scripts/claims_audit.py); [related-work addendum](related_work_addendum.md); ch01, ch04 (first draft), ch08 (partial) | e015804 (on phase-08-conformal-e3, which contains phase 7) | included in the 10 h reported for Phase 6 | README, ch01 to ch08 drafts, claims audit (PASS), clean-clone reproduction and [G3 evidence](../reports/G3.md) exist. G3 decided PASS by the researcher on 20 Oct 2026. Closed with Phases 6 and 8 |
+| 8 | Conformal layer and selection (E3) | 15-17 (18 Jan-7 Feb 2027) | 23 | DONE | conformal modules, selectors, `runner_e3`, E3 grid spec and tables built and tested on synthetic streams; [addendum v2 draft](prereg/addendum-v2.md); [ADR-0009](DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.md) (PROPOSED) | e015804 | included in the 10 h reported for Phase 6 | `prereg-v2` tagged f38858e (15 Oct 2026, before any E3 result); ADR-0009 ACCEPTED (option A). BODMAS E3 complete (28 of 28 cells, 0 failed, CLAIMS E-25); LAMDA E3 seeds 0 to 4 complete (16 of 16 cells); seeds 5 to 9 (12 cells) not run. Tables, figure, CLAIMS E-40 to E-47, ch07 section 7.5, a stats review and a leakage review exist; open: the trap-arm confound and the hold-out cut ([review](reviews/leakage-review-e3.md)). Closed with Phases 6 and 7; open: the trap-arm caveat and the hold-out deviation are kept, not fixed |
 | 9 | Drift monitors and scoring (E4) | 18-19 (8-21 Feb 2027) | 18 | NOT STARTED | | | | prereg-v3 |
 | 10 | Tier 3: cross-platform (E5), EMBER2024 (E6) | 20-21 (22 Feb-7 Mar 2027) | 0 (10 opt.) | NOT STARTED | | | | Optional; go/no-go Mon 22 Feb 2027; week 20 is buffer |
 | 11 | Paper and capstone completion | 21-24 (1-28 Mar 2027) | 24 | NOT STARTED | | | | |
@@ -287,7 +287,7 @@ Run config hashes (code version, config and lock file; commit 2bd12d6): E1 BODMA
 
 ## Phases 6 to 8: state at 16 Oct 2026
 
-Hours reported by the researcher on 20 Oct 2026: 10 h for Phases 6 to 8 together (no per-phase split; the budgets were 24, 18 and 23 h). Report title chosen by the researcher: "How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol"; if the work becomes a paper: "Detector Lifetime Under Delayed Labels: A Pre-Registered Time-Aware Study on Android and Windows PE Malware". The phases stay IN PROGRESS until the LAMDA seeds 5 to 9 are in the E3 tables and the pull request is open.
+Hours reported by the researcher on 20 Oct 2026: 10 h for Phases 6 to 8 together (no per-phase split; the budgets were 24, 18 and 23 h). Report title chosen by the researcher: "How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol"; if the work becomes a paper: "Detector Lifetime Under Delayed Labels: A Pre-Registered Time-Aware Study on Android and Windows PE Malware". The phases were closed on 20 Oct 2026 after the LAMDA seeds 5 to 9 entered the E3 tables (commit e015804).
 
 | Item | State |
 |---|---|
@@ -301,7 +301,7 @@ Hours reported by the researcher on 20 Oct 2026: 10 h for Phases 6 to 8 together
 | Reviews | stats: E2 two passes ([review](reviews/stats-review-e2.md)) and E3 one pass ([review](reviews/stats-review-e3.md)), major findings applied; leakage: E2 second pass (ADR-0008) and E3 ([review](reviews/leakage-review-e3.md)): no leak; trap-arm confound and hold-out cut recorded and open |
 | Clean-clone reproduction | `driftwatch reproduce table1` MATCH on a clean clone, 31 min (CLAIMS E-24) |
 
-### Open items for the researcher
+### Open items for the researcher (updated 20 Oct 2026)
 
 1. Gate G3 (see `reports/G3.md`), and whether the chapter drafts count as "core chapters exist".
 2. Hours for Phases 6, 7 and 8.
@@ -312,4 +312,26 @@ Hours reported by the researcher on 20 Oct 2026: 10 h for Phases 6 to 8 together
 
 ### Housekeeping not yet done
 
-Merge `phase-06` into `phase-07` into `phase-08` (the branches stack and the work is on the phase-08 head); remove the worktrees `E:\DriftWatch-grid` and `E:\DriftWatch-e3` (`git worktree remove`); `E:\tmp-clean-clone` can be deleted. The phase-closeout skill (hours, status DONE) waits for items 1 and 2 above.
+`phase-06` and `phase-07` are contained in `phase-08` (no merge needed); the worktree `E:\DriftWatch-grid` is removed and `E:\DriftWatch-e3` (code version f38858e) can be removed once no further E3 run is planned; `E:\tmp-clean-clone` can be deleted by the researcher. Tags `prereg-v1` and `prereg-v2` are pushed; one pull request for `phase-08-conformal-e3` is the next step.
+
+### Phases 6 to 8 config hashes
+
+Hashes of the config files and the lock at the closeout (commit e015804). The per-cell run config hashes (config, code version and lock) are in `reports/tables/e2_ledger.csv` and `reports/tables/e3_ledger.csv`.
+
+| File | SHA-256 |
+|---|---|
+| configs/e0_bodmas.yaml | `36bc82c2a4c11421cc926dcb5781961ca42cfac63ea407df0f1eefbf565ca0d5` |
+| configs/e0_lamda.yaml | `114dd2337c82dea1fadfdad7c180396dbb4912c833526aeefbe1fdac456954d2` |
+| configs/e1_bodmas.yaml | `a1677b3162b1f3070bfedd52621f0837131ea1183855cd86a3c403644d72bce5` |
+| configs/e1_lamda.yaml | `f55e605dd645c625b0e62caacf675f8d142bb030ab214520a2de8ddf6015476d` |
+| configs/e2_bodmas.yaml | `efabb09e34fce610ec11b51c1369f0b6bb486eb22922286822df67a5aefa74ff` |
+| configs/e2_lamda.yaml | `b57b5b08270ed170c22d4b266cb9627840517ec4d89f34d7ee55247c9fcc8f77` |
+| configs/e3_bodmas.yaml | `06a640b53b40059979dcac714cf70a76b94bfa5e47b9d243bad8935f09d02189` |
+| configs/e3_lamda.yaml | `4f0181081e658b660a6e0dd7048344bab1139c63af4ad8efb0c6f72d43e439d2` |
+| configs/li_bodmas_b0.5.yaml | `ca077fd06a0332232da946ff41915183f7d4a99f77308c5a9f33caf1da6def20` |
+| configs/li_bodmas_b5.yaml | `79e2a06f22082633d6324ec09bfee8dcd8c7e05ebee2331ff2eacf2761c0b24f` |
+| configs/li_bodmas_never.yaml | `12592db8311419b049284352ffcceae0731368e24460e732e1d6a09c6c74da36` |
+| configs/li_lamda_b0.5.yaml | `f1e2ce49c04fb1ee8b106e50d5eb92c8befb283f19d0e787a18957fce69749db` |
+| configs/li_lamda_b5.yaml | `cae058f1d6eddcd619b88b8923f8f65f67a14f0bcf30f79f34816674e5b6d2ef` |
+| configs/li_lamda_never.yaml | `3b94e93bb5b95eafdf07b033d6270d1bfb92a3088d37017ffc0cbf7e7945dc44` |
+| uv.lock | `2c5a7dfa5000f370ed1b4c1bba4c86c689a18a5bcce570be8b996fddddbca00e` |
