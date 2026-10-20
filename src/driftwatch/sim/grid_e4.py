@@ -166,7 +166,9 @@ class E4Spec:
             }
         )
         if names:
-            d["monitors"] = {"names": names, "cache": self.monitor_cache}
+            # smoke cells never write the evidence cache: nothing under results/e4/ may predate
+            # the prereg-v3 tag
+            d["monitors"] = {"names": names, "cache": None if smoke else self.monitor_cache}
         return RunConfig.from_dict(d)
 
 
