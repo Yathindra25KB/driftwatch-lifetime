@@ -44,6 +44,7 @@ SURFACE, INK, MUTED = "#ffffff", "#1b1f24", "#5f6b76"
 # legend entry and the numbers are in the CSV tables)
 MONITOR_COLORS = {"ks": "#2a78d6", "mmd": "#eb6834", "domain_clf": "#1baf7a",
                   "p_uniformity": "#eda100"}  # fmt: skip
+MIN_SPAN = 0.02  # A-AUT axis span at least twice the 0.01 margin
 BASE_STYLE = {"never": ("#8a949e", "s"), "periodic": (INK, "D")}
 
 
@@ -54,7 +55,7 @@ def build(
     problems: list[str] = []
     models: set[str] = set()
     delays: set[int] = set()
-    present: list[str] = []
+
     for ds in datasets:
         root = results / ds
         if not list(root.glob("ledger*.jsonl")):
@@ -65,7 +66,7 @@ def build(
         parts["ledger"].append(e4.ledger_table(col))
         if not col.arms:
             continue
-        present.append(ds)
+
         models |= set(col.models)
         delays |= {k[2] for k in col.arms if k[2] is not None}
         problems += [f"{ds}: {p}" for p in e4.check_equal_labels(col)]
@@ -76,7 +77,10 @@ def build(
     if problems:
         raise SystemExit("labels spent differ across arms:\n" + "\n".join(problems))
     if not out["contrasts"].empty:
-        out["contrasts"] = e4.add_holm(out["contrasts"], present, sorted(models), sorted(delays))
+        # the registered family: every requested dataset, a missing contrast at p = 1
+        out["contrasts"] = e4.add_holm(
+            out["contrasts"], list(datasets), sorted(models), sorted(delays)
+        )
     return out
 
 
@@ -125,17 +129,24 @@ def figure(policies: pd.DataFrame, monitors: pd.DataFrame, path: Path) -> bool:
             ax.set_xlabel("mean refits per window", color=MUTED, fontsize=8)
             if j == 0:
                 ax.set_ylabel("A-AUT", color=MUTED, fontsize=8)
+        lo, hi = axes[i][0].get_ylim()  # shared across the delay panels of the row
+        if hi - lo < MIN_SPAN:  # never stretch differences inside the 0.01 margin
+            mid = (hi + lo) / 2
+            axes[i][0].set_ylim(mid - MIN_SPAN / 2, mid + MIN_SPAN / 2)
         ax = axes[i][-1]
         q = monitors[(monitors["dataset"] == ds) & (monitors["model"] == model)
                      & (monitors["context"] == "observe_never")
                      & (monitors["status"] == "computed")]  # fmt: skip
         for r in q.itertuples():
+            has_ci = pd.notna(getattr(r, "precision_ci_low", float("nan")))
             ax.errorbar(
                 r.precision, r.recall,
-                xerr=[[r.precision - r.precision_ci_low], [r.precision_ci_high - r.precision]],
-                yerr=[[r.recall - r.recall_ci_low], [r.recall_ci_high - r.recall]],
-                marker="o", color=MONITOR_COLORS[r.monitor], markersize=8, capsize=2,
-                linestyle="none", markeredgecolor=SURFACE, markeredgewidth=2,
+                xerr=[[r.precision - r.precision_ci_low], [r.precision_ci_high - r.precision]]
+                if has_ci else None,
+                yerr=[[r.recall - r.recall_ci_low], [r.recall_ci_high - r.recall]]
+                if has_ci else None,
+                marker="o" if has_ci else "x", color=MONITOR_COLORS[r.monitor], markersize=8,
+                capsize=2, linestyle="none", markeredgewidth=2,
             )  # fmt: skip
         ax.set_xlim(-0.03, 1.03)
         ax.set_ylim(-0.03, 1.03)

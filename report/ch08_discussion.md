@@ -16,7 +16,20 @@ These statements are the ones a reader is most likely to attribute to the study,
 - **A delay curve on BODMAS.** With six evaluation slots and retraining every third slot, a BODMAS window has one useful refit, and at a delay of three periodic retraining equals never retraining by construction [P-12]. A BODMAS number about delay is a number about one refit.
 - **Independent replication.** LAMDA's 16 rolling windows are about four independent twelve-month blocks, and logistic regression is deterministic given its training rows, so seeds are draws of the C3 subsample and of the selection, not replicates of the model [P-12]. The intervals are wide because of the registered two-stage design, which counts within-window variation twice; that is an argument from the design, not a measured coverage (chapter 3, section 3.4), and the window stage is coarse in strata with few windows.
 - **That labels do not help when a flat result appears.** In the earlier diagnostic, retraining changed a small share of decisions at the smallest budgets [P-13]; a flat A-AUT at the smallest budget is the resolution of a few tens of labels per slot, not a finding that labels are useless.
-- **Anything about drift monitors, and more than a bounded statement about selection.** E3 is reported in section 7.5 with its own limits: two delays only, ten seeds on LAMDA over about four independent blocks of windows, a BODMAS interaction that equals the delay-0 advantage by construction, a selector advantage that is not separated from the change in class mix of the arrived labels [E-47], and a trap arm whose A-AUT is confounded with not retraining [E-45]. Its numbers are not comparable with E2 absolutes (ADR-0009). Monitors (E4 to E6) were not run.
+- **More than a bounded statement about selection.** E3 is reported in section 7.5 with its own limits:
+  - two delays only;
+  - ten seeds on LAMDA, over about four independent blocks of windows;
+  - a BODMAS interaction that equals the delay-0 advantage by construction;
+  - a selector advantage that is not separated from the change in class mix of the arrived labels [E-47];
+  - a trap arm whose A-AUT is confounded with not retraining [E-45].
+
+  Its numbers are not comparable with E2 absolutes (ADR-0009).
+- **That drift monitors help, or that they cannot.** E4 (section 7.6) found no monitor that beat periodic retraining at a budget of 1% [E-52, E-53]. The limits of that reading:
+  - it covers one alarm level per monitor, frozen before the run;
+  - the monitors alarmed in most slots [E-56], so where they saturate, the matched-count comparison does not test timing;
+  - on BODMAS the contrasts rest on one useful refit per window.
+
+  No monitor was tuned after the results (CLAUDE.md rule 10). E5 and E6 (Tier 3) were not run.
 - **Anything about an adaptive adversary.** The datasets contain natural evolution only. A detector that decays slowly here is not thereby robust to evasion (chapter 4).
 - **Results on other hardware.** Every cell was run on one laptop; numeric differences elsewhere are reported, not corrected (`docs/GRID.md`).
 
@@ -45,5 +58,5 @@ Tier 1 (E0 to E2) is complete on both datasets, with the cells that failed, if a
 - A stratified within-slot random-split comparator, which would remove the ratio depletion of the per-slot comparator (ADR-0008).
 - A longer BODMAS evaluation window, so that the delay axis has more than one refit (a new ADR).
 - A circular or stationary block bootstrap as a sensitivity check on the registered window stage (an addendum before results are read).
-- Drift monitors under delay (E4) on the platform with more refit events per window.
+- Drift monitors at lower alarm rates, for example with a larger sample per slot or a stricter significance level, registered in a new addendum before any run. Here E4 tested one frozen level, and most monitors alarmed in most slots [E-56].
 - A trap arm whose released labels also train the model, so that contamination is separated from not retraining (an addendum before the rerun).

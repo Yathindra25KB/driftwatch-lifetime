@@ -28,11 +28,25 @@ import numpy as np
 import pandas as pd
 
 from driftwatch.metrics import stats
-from driftwatch.metrics.grid_tables import GridDataError, block_len, load_cell, verdict
+from driftwatch.metrics.grid_tables import MARGIN, GridDataError, block_len, load_cell, verdict
 from driftwatch.metrics.monitor_scores import AlarmCounts, score_alarms
+from driftwatch.metrics.slot import drop_events
 from driftwatch.sim.ledger import fold_events, merged_ledger_events
 
 MONITORS = ("ks", "mmd", "domain_clf", "p_uniformity")
+REGISTERED_SEEDS = tuple(range(10))  # addendum v3: seeds 0 to 9 for every E4 cell
+MIN_DROP_WINDOWS = 3  # fewer windows with a drop event: counts only, no interval (stats review)
+MAX_DROPPED_SHARE = 0.025  # flag a ratio interval that lost more replicates than this
+
+
+def e4_verdict(est: stats.Estimate) -> str:
+    """The v1 reading, with a reversal inside the margin named as such (stats review E4 #3)."""
+    v = verdict(est)
+    if v == "reversed" and est.low >= -MARGIN:
+        return "reversed_within_margin"  # no change larger than 0.01, interval below zero
+    return v
+
+
 ArmKey = tuple[str, str, int | None]  # model, arm label, delay (None for never)
 
 
@@ -98,6 +112,8 @@ def collect(
             if key in col.arms:  # the same arm under another seed set (seeds 0-4 and 5-9)
                 if set(aut.columns) & set(col.arms[key].columns):
                     raise GridDataError(f"arm {key}: a seed appears in two cells")
+                if set(aut.index) != set(col.arms[key].index):
+                    raise GridDataError(f"arm {key}: the seed sets cover different windows")
                 aut = pd.concat([col.arms[key], aut], axis=1).sort_index(axis=1)
                 s = pd.concat([col.slots[key], s], ignore_index=True)
                 w_rows = pd.concat([col.windows[key], w_rows], ignore_index=True)
@@ -125,7 +141,11 @@ def check_equal_labels(col: E4Collected) -> list[str]:
         for k in keys[1:]:
             q = col.slots[k].set_index(index)["n_queried"]
             both = base.index.intersection(q.index)
-            if len(both) != len(base) or (base.loc[both] != q.loc[both]).any():
+            if (
+                len(both) != len(base)
+                or len(q) != len(base)
+                or (base.loc[both] != q.loc[both]).any()
+            ):
                 problems.append(f"{model}: labels per slot differ between {keys[0]} and {k}")
     return problems
 
@@ -174,7 +194,13 @@ def _contrast(col, model, plus: ArmKey, minus: ArmKey, family: str, monitor: str
     if plus not in col.arms or minus not in col.arms:
         return {**base, "status": "not_computed", "reason": "an arm is missing",
                 "verdict": "not_computed", "seed_level_wilcoxon_p": 1.0}  # fmt: skip
-    arrays, windows, used = stats.align_arms({"p": col.arms[plus], "m": col.arms[minus]})
+    pair = {"p": col.arms[plus], "m": col.arms[minus]}
+    try:  # the registered seeds; anything less is the registered fallback and says so
+        arrays, windows, used = stats.align_arms(pair, seeds=list(REGISTERED_SEEDS))
+        fallback = False
+    except ValueError:
+        arrays, windows, used = stats.align_arms(pair)
+        fallback = True
     base["seed_set"] = _seed_set(col.arms[plus][used])
     bl = block_len(col.geometry)
     rs = stats.resample_means(arrays, bl, n_boot=n_boot)
@@ -182,11 +208,20 @@ def _contrast(col, model, plus: ArmKey, minus: ArmKey, family: str, monitor: str
     est = stats.estimate(pt["p"] - pt["m"], rs["p"] - rs["m"])
     per_seed = (arrays["p"] - arrays["m"]).mean(axis=0)
     pw_p, pw_m = _per_window(col.slots[plus]), _per_window(col.slots[minus])
+    same_schedule = _schedule_identity(col.slots[plus], col.slots[minus])
+    v = e4_verdict(est)
+    if family == "M-C" and same_schedule == 1.0:
+        v = "not_informative_identical_schedule"  # the control refits at the monitor's slots
     return {
         **base, "status": "computed", "reason": "", "n_windows": len(windows),
-        "n_seeds": len(used), "block_len": bl,
+        "n_seeds": len(used), "seed_fallback": fallback, "block_len": bl,
+        "block_len_effective": stats.effective_block(bl, len(windows)),
+        "window_stage_coarse": stats.window_stage_is_coarse(bl, len(windows)),
+        "n_boot": n_boot, "boot_seed": stats.BOOT_SEED,
         "estimate": est.point, "ci_low": est.low, "ci_high": est.high,
-        "half_width": est.half_width, "verdict": verdict(est),
+        "boot_mean_minus_point": est.boot_mean - est.point,
+        "half_width": est.half_width, "verdict": v,
+        "identical_schedule_share": same_schedule,
         "seed_level_wilcoxon_p": stats.wilcoxon_p(per_seed),
         "min_wilcoxon_p": stats.min_wilcoxon_p(len(used)),
         "a_aut_plus": pt["p"], "a_aut_minus": pt["m"],
@@ -196,6 +231,22 @@ def _contrast(col, model, plus: ArmKey, minus: ArmKey, family: str, monitor: str
         "labels_per_window_minus": float(pw_m["labels"].mean()),
         **_shortfall(col.windows.get(minus)),
     }  # fmt: skip
+
+
+def _schedule_identity(a: pd.DataFrame, b: pd.DataFrame) -> float:
+    """Share of (seed, window) pairs in which two arms refitted at exactly the same slots."""
+
+    def schedules(s: pd.DataFrame) -> pd.Series:
+        r = s[s["retrained"].astype(bool)]
+        sched = r.groupby(["seed", "window_key"])["slot_index"].apply(lambda x: tuple(sorted(x)))
+        keys = s[["seed", "window_key"]].drop_duplicates().set_index(["seed", "window_key"])
+        return sched.reindex(keys.index).apply(lambda x: x if isinstance(x, tuple) else ())
+
+    sa, sb = schedules(a), schedules(b)
+    both = sa.index.intersection(sb.index)
+    if not len(both):
+        return math.nan
+    return float((sa.loc[both] == sb.loc[both]).mean())
 
 
 def _shortfall(windows: pd.DataFrame | None) -> dict[str, Any]:
@@ -219,7 +270,20 @@ def contrasts_table(col: E4Collected, *, n_boot: int = stats.N_BOOT) -> pd.DataF
                 rows.append(_contrast(col, model, mon, (model, "periodic", d), "M-P", m, d, n_boot))
                 rows.append(_contrast(col, model, mon, (model, f"matched-{m}", d), "M-C", m, d,
                                       n_boot))  # fmt: skip
-    return pd.DataFrame(rows)
+    out = pd.DataFrame(rows)
+    if not out.empty:  # monitors whose arms are identical: one comparison, not several
+        out["same_arm_as"] = [
+            ",".join(
+                m for m in MONITORS
+                if m != r.monitor
+                and (r.model, f"monitor-{m}", r.delay) in col.arms
+                and (r.model, f"monitor-{r.monitor}", r.delay) in col.arms
+                and col.arms[(r.model, f"monitor-{m}", r.delay)].equals(
+                    col.arms[(r.model, f"monitor-{r.monitor}", r.delay)])
+            )
+            for r in out.itertuples()
+        ]  # fmt: skip
+    return out
 
 
 def add_holm(df: pd.DataFrame, datasets: Sequence[str], models: Sequence[str],
@@ -249,26 +313,45 @@ def add_holm(df: pd.DataFrame, datasets: Sequence[str], models: Sequence[str],
 _COUNT_FIELDS = ("n_drops", "n_alarms", "n_true_alarms", "n_detected", "delay_sum", "n_slots")
 
 
-def _count_matrices(s: pd.DataFrame, monitor: str) -> dict[str, pd.DataFrame]:
-    """Per (window, seed) alarm counts of one monitor against the arm's own F1 series."""
+def _count_matrices(s: pd.DataFrame, monitor: str) -> tuple[dict[str, pd.DataFrame], dict]:
+    """Per (window, seed) alarm counts of one monitor against the arm's own F1 series.
+
+    Also returns, for the exploratory baselines and the drop-window count: the distinct
+    (window, slot) positions of drop events, the alarms an always-alarming monitor would score
+    as matched, and for every drop the number of scored slots that could match it.
+    """
     col_alarm = f"alarm_{monitor}"
     recs: dict[tuple[str, int], AlarmCounts] = {}
+    drop_at: set[tuple[str, int]] = set()
+    always_true, always_n, matchable = 0, 0, []
     for (wkey, seed), g in s.groupby(["window_key", "seed"], sort=False):
         g = g.sort_values("slot_index")
+        f1 = g["f1"].to_numpy()
         fired = g[col_alarm].fillna(False).to_numpy(bool)
-        recs[(str(wkey), int(seed))] = score_alarms(g["f1"].to_numpy(), fired)
+        recs[(str(wkey), int(seed))] = score_alarms(f1, fired)
+        always = score_alarms(f1, np.ones(len(f1), dtype=bool))
+        always_true += always.n_true_alarms
+        always_n += always.n_alarms
+        slot_idx = g["slot_index"].to_numpy()
+        for ev in drop_events(f1):
+            drop_at.add((str(wkey), int(slot_idx[ev.index])))
+            matchable.append(min(ev.index + 2, len(f1) - 1) - ev.index + 1)
     first = s.groupby("window_key")["slot_index"].min().sort_values(kind="stable")
     out = {}
     for i, f in enumerate(_COUNT_FIELDS):
         ser = pd.Series({k: v.as_tuple()[i] for k, v in recs.items()}, dtype=float)
         mat = ser.unstack(level=1)
         out[f] = mat.loc[[w for w in first.index.astype(str) if w in mat.index]]
-    return out
+    extra = {"drop_at": drop_at, "always_true": always_true, "always_n": always_n,
+             "matchable": matchable}  # fmt: skip
+    return out, extra
 
 
-def _ratio_estimate(rs: dict[str, np.ndarray], num: str, den: str, point: float):
+def _ratio_estimate(rs: dict[str, np.ndarray], num: str, den: str, point: float,
+                    keep: np.ndarray) -> tuple[float, float, float]:  # fmt: skip
+    """Point and percentile interval over the kept replicates (one rule for every ratio)."""
     with np.errstate(invalid="ignore", divide="ignore"):
-        r = rs[num] / rs[den]
+        r = (rs[num] / rs[den])[keep]
     r = r[np.isfinite(r)]
     if not np.isfinite(point) or r.size == 0:
         return math.nan, math.nan, math.nan
@@ -282,24 +365,45 @@ def _quality_row(col, model, monitor, context, key: ArmKey, n_boot: int) -> dict
             "arm": key[1], "delay": key[2], "seed_set": _seed_set(col.arms[key])}  # fmt: skip
     if f"alarm_{monitor}" not in s.columns:
         return {**base, "status": "not_computed", "reason": "monitor not run in this arm"}
-    mats = _count_matrices(s, monitor)
+    mats, extra = _count_matrices(s, monitor)
     total = AlarmCounts(*(int(mats[f].to_numpy().sum()) for f in _COUNT_FIELDS))
     arrays = {f: mats[f].to_numpy(dtype=np.float64) for f in _COUNT_FIELDS}
-    rs = stats.resample_means(arrays, block_len(col.geometry), n_boot=n_boot)
-    p, p_lo, p_hi = _ratio_estimate(rs, "n_true_alarms", "n_alarms", total.precision)
-    r, r_lo, r_hi = _ratio_estimate(rs, "n_detected", "n_drops", total.recall)
-    dly, d_lo, d_hi = _ratio_estimate(rs, "delay_sum", "n_detected", total.mean_delay)
-    decided = s[f"decided_{monitor}"].astype(bool)
-    return {
+    drop_windows = len({w for w, _ in extra["drop_at"]})
+    rate = total.alarm_rate
+    # exploratory baselines (not registered): an always-alarming monitor's precision, and the
+    # expected recall of random alarms at this monitor's alarm rate
+    always_prec = extra["always_true"] / extra["always_n"] if extra["always_n"] else math.nan
+    m = np.asarray(extra["matchable"], dtype=float)
+    random_recall = float(np.mean(1.0 - (1.0 - rate) ** m)) if m.size else math.nan
+    row = {
         **base, "status": "computed", "reason": "",
         "n_windows": arrays["n_drops"].shape[0], "n_seeds": arrays["n_drops"].shape[1],
-        "n_drops": total.n_drops, "n_alarms": total.n_alarms, "n_true_alarms": total.n_true_alarms,
+        "n_drops": total.n_drops, "n_distinct_drop_slots": len(extra["drop_at"]),
+        "n_windows_with_drops": drop_windows,
+        "n_alarms": total.n_alarms, "n_true_alarms": total.n_true_alarms,
         "n_detected": total.n_detected, "n_scored_slots": total.n_slots,
-        "alarm_rate": total.alarm_rate,
-        "precision": p, "precision_ci_low": p_lo, "precision_ci_high": p_hi,
-        "recall": r, "recall_ci_low": r_lo, "recall_ci_high": r_hi,
-        "mean_delay": dly, "delay_ci_low": d_lo, "delay_ci_high": d_hi,
-        "undecided_share": float(1.0 - decided.mean()),
+        "alarm_rate": rate,
+        "precision": total.precision, "recall": total.recall, "mean_delay": total.mean_delay,
+        "baseline_always_alarm_precision": always_prec,
+        "baseline_random_recall_at_rate": random_recall,
+        "undecided_share": float(1.0 - s[f"decided_{monitor}"].astype(bool).mean()),
+    }  # fmt: skip
+    if drop_windows < MIN_DROP_WINDOWS:
+        return {**row, "intervals": f"none: drops in {drop_windows} window(s) only",
+                "n_boot": n_boot, "n_boot_used": 0}  # fmt: skip
+    rs = stats.resample_means(arrays, block_len(col.geometry), n_boot=n_boot)
+    keep = (rs["n_drops"] > 0) & (rs["n_alarms"] > 0)  # one replicate set for every ratio
+    _, p_lo, p_hi = _ratio_estimate(rs, "n_true_alarms", "n_alarms", total.precision, keep)
+    _, r_lo, r_hi = _ratio_estimate(rs, "n_detected", "n_drops", total.recall, keep)
+    _, d_lo, d_hi = _ratio_estimate(rs, "delay_sum", "n_detected", total.mean_delay, keep)
+    used = int(keep.sum())
+    return {
+        **row, "intervals": "two-stage bootstrap",
+        "n_boot": n_boot, "n_boot_used": used,
+        "boot_dropped_flag": bool(1.0 - used / n_boot > MAX_DROPPED_SHARE),
+        "precision_ci_low": p_lo, "precision_ci_high": p_hi,
+        "recall_ci_low": r_lo, "recall_ci_high": r_hi,
+        "delay_ci_low": d_lo, "delay_ci_high": d_hi,
     }  # fmt: skip
 
 
