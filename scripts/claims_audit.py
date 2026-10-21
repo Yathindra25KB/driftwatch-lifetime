@@ -200,7 +200,7 @@ NOT_SHOWN = (
     "changed 0.2% to 2.1% of decisions in the earlier diagnostic (P-13).",
     "That conformal credibility adds anything over probability-based uncertainty (E3 does not "
     "separate them), or that a drift monitor beats periodic retraining: in E4 none did at a "
-    "budget of 1% (E-52, E-53).",
+    "budget of 1% (E-59, E-60).",
     "Anything about other platforms or EMBER2024: E5 and E6 (Tier 3) have not been run.",
     "Anything about evasion or adversarial examples: the study describes decay, not defeat "
     "(docs/ETHICS.md).",

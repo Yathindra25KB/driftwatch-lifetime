@@ -24,12 +24,12 @@ These statements are the ones a reader is most likely to attribute to the study,
   - a trap arm whose A-AUT is confounded with not retraining [E-45].
 
   Its numbers are not comparable with E2 absolutes (ADR-0009).
-- **That drift monitors help, or that they cannot.** E4 (section 7.6) found no monitor that beat periodic retraining at a budget of 1% [E-52, E-53]. The limits of that reading:
+- **That drift monitors help, or that they cannot.** E4 (section 7.6) found no monitor that beat periodic retraining at a budget of 1% [E-59, E-60]. The limits of that reading:
   - it covers one alarm level per monitor, frozen before the run;
-  - the monitors alarmed in most slots [E-56], so where they saturate, the matched-count comparison does not test timing;
+  - the monitors alarmed in most slots [E-63], so where they saturate, the matched-count comparison does not test timing;
   - on BODMAS the contrasts rest on one useful refit per window.
 
-  No monitor was tuned after the results (CLAUDE.md rule 10). E5 and E6 (Tier 3) were not run.
+  No monitor was tuned after the results (CLAUDE.md rule 10) [P-17]. E5 and E6 (Tier 3) were not run.
 - **Anything about an adaptive adversary.** The datasets contain natural evolution only. A detector that decays slowly here is not thereby robust to evasion (chapter 4).
 - **Results on other hardware.** Every cell was run on one laptop; numeric differences elsewhere are reported, not corrected (`docs/GRID.md`).
 
@@ -58,5 +58,5 @@ Tier 1 (E0 to E2) is complete on both datasets, with the cells that failed, if a
 - A stratified within-slot random-split comparator, which would remove the ratio depletion of the per-slot comparator (ADR-0008).
 - A longer BODMAS evaluation window, so that the delay axis has more than one refit (a new ADR).
 - A circular or stationary block bootstrap as a sensitivity check on the registered window stage (an addendum before results are read).
-- Drift monitors at lower alarm rates, for example with a larger sample per slot or a stricter significance level, registered in a new addendum before any run. Here E4 tested one frozen level, and most monitors alarmed in most slots [E-56].
+- Drift monitors at lower alarm rates, for example with a larger sample per slot or a stricter significance level, registered in a new addendum before any run. Here E4 tested one frozen level, and most monitors alarmed in most slots [E-63].
 - A trap arm whose released labels also train the model, so that contamination is separated from not retraining (an addendum before the rerun).

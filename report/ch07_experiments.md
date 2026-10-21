@@ -93,62 +93,65 @@ There are two primary contrasts, and a positive value favours the monitor [P-17]
 - **M-P:** the monitor arm minus periodic(3), at matched labels spent.
 - **M-C:** the monitor arm minus its matched-count control, at matched retrains. This isolates when the refits happen.
 
-**RQ4: no monitor beat periodic retraining.**
+**RQ4: no monitor beat periodic retraining.** No M-P row has an interval above zero, on either dataset, for either model, monitor or delay [E-59, E-60]. Monitor-triggered retraining was never better than retraining every third slot at the same labels spent. The table counts verdicts per dataset. "Reversed" means the interval lies wholly below zero and reaches past −0.01. "Below zero, within margin" means the interval lies below zero but inside ±0.01, so there is no change larger than 0.01. Both readings are two-sided descriptions beyond the registered RQ4 answer, and neither has family-wise control (see Statistics below).
 
-| | LAMDA | BODMAS |
+| M-P verdict (16 rows per dataset) | LAMDA | BODMAS |
 |---|---|---|
-| M-P rows detected positive | none of 16 | none of 16 |
-| M-P rows reversed (monitor worse) | 5 | 4 |
-| M-P rows equivalent | 9 | 12 |
-| M-P rows not detected | 2 | none |
-| Claim | E-52 | E-53 |
+| Detected positive (monitor better) | 0 | 0 |
+| Reversed | 2 | 0 |
+| Below zero, within margin | 3 | 4 |
+| Not detected | 2 | 0 |
+| Equivalent (inside ±0.01) | 9 | 12 |
+| Claim | E-59 | E-60 |
 
-On LAMDA [E-52]:
-- **Reversed.** These rows' intervals lie entirely below zero:
-  - logistic regression with KS at delay 0: −0.0089 [−0.0225, −0.0002];
-  - logistic regression with KS at delay 3: −0.0052 [−0.0136, −0.0007];
-  - logistic regression with MMD at delay 3: −0.0036 [−0.0082, −0.0008];
-  - LightGBM with KS at delay 0: −0.0026 [−0.0050, −0.0003];
-  - LightGBM with p-uniformity at delay 0: −0.0014 [−0.0030, −0.0003].
-- **Not detected.** Logistic regression with MMD at delay 0 is −0.0063 [−0.0149, 0.0002], and with p-uniformity at delay 0 it is −0.0033 [−0.0127, 0.0027].
-- **Largest point estimate for a monitor.** The domain classifier with logistic regression at delay 0 gives 0.0006 [−0.0008, 0.0025]. It refitted 4.31 times per window against periodic's 3.00.
+On LAMDA [E-59]:
+- **Reversed.** Only logistic regression with KS:
+  - at delay 0: −0.0089 [−0.0225, −0.0002], with 1.90 refits per window against periodic's 3.00. The KS arm refitted less often, which may explain more of this than detection does.
+  - at delay 3: −0.0052 [−0.0136, −0.0007], at about the same number of refits (1.98 against 2.00).
+- **Below zero, within margin:** LightGBM with KS at delay 0, LightGBM with p-uniformity at delay 0, and logistic regression with MMD at delay 3.
+- **Largest point estimate for a monitor:** the domain classifier with logistic regression at delay 0, 0.0006 [−0.0008, 0.0025], with 4.31 refits per window against 3.00.
 
-On BODMAS every M-P estimate lies between −0.0004 and 0.0004 [E-53]. The four reversed rows are all logistic regression at delay 3, at −0.0004, far inside the 0.01 margin. On BODMAS periodic(3) has one useful refit per window and none at delay 3, so M-P there partly compares more refits with fewer.
+On BODMAS, every M-P estimate lies between −0.0004 and 0.0004 [E-60].
+- At delay 3, KS, MMD and the domain classifier produce one and the same arm (one refit before slot 4), so their three rows are one comparison.
+- The four logistic-regression rows that lie below zero at delay 3 are therefore two distinct comparisons, both inside the margin.
+- Counting distinct comparisons, 7 M-P rows lie below zero across the two datasets, not 9.
+- On BODMAS, periodic(3) has one useful refit per window and none at delay 3, so M-P there partly compares more refits with fewer.
 
-**Timing did not matter at this resolution.** On LAMDA all 16 M-C rows are "equivalent", between −0.0023 and 0.0008 [E-54]. Refitting when a monitor alarmed gave the same A-AUT, within plus or minus 0.01, as refitting the same number of times at evenly spaced slots. On BODMAS, 12 M-C rows are equivalent and the four logistic-regression rows at delay 3 are reversed by −0.0004 or −0.0003 [E-55]. The control matched its source's refit count in every window [E-54, E-55]. It knows each window's count in advance, which favours it, so M-C is conservative for the monitor.
+**When the refits happened did not matter on LAMDA, where it could be tested.** All 16 LAMDA M-C rows are equivalent, between −0.0023 and 0.0008 [E-61]. The matched control refitted at exactly the monitor's slots in only 0% to 28% of window-seed pairs, so these rows do compare different timings at the same number of refits [E-61].
 
-**The monitors alarm in most slots.** On the never arm (the primary monitor-quality reading [E-56]):
+On BODMAS the test is weaker [E-62]:
+- In the two domain-classifier rows at delay 0, the monitor alarms in every slot and refits at slots 2 and 4. That is exactly the control's schedule, so the rows test nothing and are marked not informative.
+- Elsewhere the shared share reaches 0.75.
+- The rows below zero are the delay-3 logistic-regression rows: the same-arm trio and p-uniformity, all inside the margin.
 
-| Monitor | LAMDA alarm rate | BODMAS alarm rate |
-|---|---|---|
-| Domain classifier | 0.997 | 1.000 |
-| MMD | 0.785 and 0.796 | 1.000 |
-| KS | 0.617 | 1.000 |
-| p-uniformity | 0.562 and 0.687 | 0.806 and 0.872 |
-| Claim | E-56 | E-56 |
+The matched control refitted as often as its source in every window [E-61, E-62]. The registration argues that a control which knows each window's refit count is conservative for the monitor. That argument is not a measured property.
 
-Where a cell holds two values, they are the two models.
+**The monitors alarmed in most slots and found drops no better than chance would.** On the never arm, the primary reading [E-63]:
 
-Against drop events on LAMDA:
-- **Precision** is 0.444 to 0.538.
-- **Recall** is 0.743 to 1.000.
-- **Comparison with alarming always.** The domain classifier alarms in almost every slot, so its precision of 0.444 and 0.490 is close to what alarming in every slot would score. The other three monitors' precision lies in or near that range [E-56]. They therefore detect drops little better than always alarming would. This comparison is descriptive; no interval was computed for it.
+| Monitor | LAMDA alarm rate | Precision | Always alarming | Recall | Random alarms at the same rate |
+|---|---|---|---|---|---|
+| KS | 0.617 | 0.462 and 0.538 | 0.443 and 0.489 | 0.743 and 0.775 | 0.935 and 0.927 |
+| MMD | 0.796 and 0.785 | 0.449 and 0.486 | 0.443 and 0.489 | 0.942 and 0.916 | 0.987 and 0.980 |
+| Domain classifier | 0.997 | 0.444 and 0.490 | 0.443 and 0.489 | 1.000 | 1.000 |
+| p-uniformity | 0.562 and 0.687 | 0.461 and 0.465 | 0.443 and 0.489 | 0.796 and 0.876 | 0.906 and 0.955 |
+| Claim | E-63 | E-63 | E-63 | E-63 | E-63 |
 
-On BODMAS there are only 10 drop events over 6 windows and 10 seeds, so recall is 1.000 and precision is 0.056 to 0.102 [E-56]. Those figures say more about how few drops there were than about the monitors.
+In each cell the first value is LightGBM and the second logistic regression. The two baseline columns are exploratory and were not registered:
+- **Always alarming:** the precision of a monitor that alarms in every slot.
+- **Random alarms at the same rate:** the expected recall of alarms raised at random at the monitor's own alarm rate.
 
-Inside the monitor arms, alarm rates fall after refits reset the reference [E-57]. On LAMDA at delay 0, for example:
+Read against the baselines:
+- **Precision** is within 0.05 of the always-alarm value, and below it for MMD and p-uniformity with logistic regression [E-63].
+- **Recall** is below what random alarms at the same rate would reach, for KS, MMD and p-uniformity. Their alarms cluster in some windows rather than at drops.
 
-| Monitor | Alarm rate in its own arm | On the never arm [E-56] |
-|---|---|---|
-| KS | 0.242 | 0.617 |
-| MMD | 0.326 | 0.785 and 0.796 |
-| Domain classifier | 0.544 | 0.997 |
+LAMDA has 28 to 32 distinct drop slots over its 16 windows [E-63]. On BODMAS, every drop event of the never arm falls in one window, the same window for all ten seeds (one or two distinct slots). BODMAS precision and recall are therefore reported as counts, without intervals, and say nothing general [E-63]. This is the "large slots" limit named in the registration: with a few hundred rows per side and real drift between months, the tests reject in most slots.
 
-Under delay 3 many triggered events found no new label and were no-ops: 1.62 per window for the domain classifier on LAMDA, against 1.00 for periodic(3) [E-58].
+Inside the monitor arms, alarm rates are lower than on the never arm. On LAMDA at delay 0: KS 0.242, MMD 0.326, domain classifier 0.544 [E-64]. This is consistent with rule R, which resets the reference after each refit. It is not a like-for-like comparison, because drop events there come from each arm's own F1, which its refits change [E-64]. Under delay 3 many triggered events found no new label and were no-ops: 1.62 per window for the domain classifier on LAMDA, against 1.00 for periodic(3) [E-58].
 
-**Statistics.** Each family has 32 contrasts and the decision rule uses 10 paired seeds. As a result, the smallest Holm-adjusted Wilcoxon p-value any E4 contrast can reach is 0.0625 [P-18]. No row can pass a 0.05 Holm threshold whatever its effect. This was not written into the addendum; it is stated here after the results. The registered decision rule is the bootstrap interval. The eight monitor and delay rows of a stratum share the periodic arm, the windows and the seeds, so they are not independent tests. **[researcher: verify the reading of the reversed LAMDA rows; their upper interval ends lie between −0.0002 and −0.0008.]**
+**Statistics.** Each family has 32 contrasts, and a two-sided Wilcoxon test with 10 paired seeds cannot return less than 2/1024. So the smallest Holm-adjusted p that any E4 contrast can reach is 0.0625 [P-18, P-11], and no row can pass a 0.05 Holm threshold whatever its effect. Under the five-seed fallback the floor would be higher still. A raw p at its floor means only that all ten seed means share a sign, given the realised windows. This consequence was not written into addendum v3, whose wording suggests the ten-seed design escapes the floor; it is stated here after the results [P-18]. The registered decision rule is the bootstrap interval. Without family-wise control, the single reversed cells are not evidence that a monitor harms a detector. The eight monitor and delay rows of a stratum share the periodic arm, the windows and the seeds, and M-P and M-C share the monitor arm, so the rows are not independent tests. **[researcher: verify the reading of the reversed rows and of the exploratory baselines.]**
 
 **What E4 does not show.**
-- That monitors are useless. Monitor-triggered retraining matched periodic retraining within the margin in most rows. In this setting, at 1% of the slot, it was never better, and in nine rows it was slightly worse [E-52, E-53].
-- How the monitors behave at a lower alarm rate. The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.
-- Any result on other platforms, for label-based detectors, or for monitor-triggered labelling, which the registration excludes.
+- **That monitors are useless.** Monitor-triggered retraining matched periodic retraining within the margin in most rows and was never better. Where it was worse, it was mostly within the margin [E-59, E-60].
+- **How the monitors behave at a lower alarm rate.** The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.
+- **Whether alarm timing helps a monitor that saturates.** Where the control shares the monitor's schedule, M-C does not test timing [E-62].
+- **Any result on other platforms, for label-based detectors, or for monitor-triggered labelling.** The registration excludes all three.

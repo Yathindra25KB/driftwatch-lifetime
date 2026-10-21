@@ -1,7 +1,7 @@
 # Claims audit
 
 Files audited: README.md, report\ch01_introduction.md, report\ch02_landscape.md, report\ch03_analysis.md, report\ch04_latest_techniques.md, report\ch05_related_work.md, report\ch06_method.md, report\ch07_experiments.md, report\ch08_discussion.md.
-Paragraphs and tables with numbers: 90; with a resolving claim id: 69; marked [verify]: 21; uncovered: 0.
+Paragraphs and tables with numbers: 92; with a resolving claim id: 71; marked [verify]: 21; uncovered: 0.
 Claim ids cited: 74. Unresolved ids: 0. Cited rows lacking a source file or commit: 0. 'first' used as a contribution claim: 0.
 **Result: PASS**
 
@@ -45,7 +45,7 @@ Claim ids cited: 74. Unresolved ids: 0. Cited rows lacking a source file or comm
 - A delay curve on BODMAS: with nE = 6 and retraining every third slot there is one useful refit per window, and periodic equals never at a delay of three by construction (P-12).
 - Independent replication on LAMDA: its 16 rolling windows are about four independent 12-month blocks, and logistic regression is deterministic given its pool, so seeds are draws of the C3 subsample and of the selection, not replicates of the model (P-12).
 - That more labels do not help when a flat result appears at the smallest budget: retraining changed 0.2% to 2.1% of decisions in the earlier diagnostic (P-13).
-- That conformal credibility adds anything over probability-based uncertainty (E3 does not separate them), or that a drift monitor beats periodic retraining: in E4 none did at a budget of 1% (E-52, E-53).
+- That conformal credibility adds anything over probability-based uncertainty (E3 does not separate them), or that a drift monitor beats periodic retraining: in E4 none did at a budget of 1% (E-59, E-60).
 - Anything about other platforms or EMBER2024: E5 and E6 (Tier 3) have not been run.
 - Anything about evasion or adversarial examples: the study describes decay, not defeat (docs/ETHICS.md).
 - Results on another machine: every cell was run on one laptop; numeric drift elsewhere is reported, not corrected (docs/GRID.md).
