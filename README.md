@@ -1,13 +1,21 @@
 # DriftWatch
 
-**Status: Tier 1 results exist; the report is a draft.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
+**Status (21 Oct 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
 
 > We study malware detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring in a single time-aware protocol, reported with A-AUT, on Android and Windows PE data.
 
 ## What it is
-- A reproducible research protocol and the Python package that implements it: a time slicer with C1 to C3 checks, a label-delay and budget simulator, a conformal layer with uncertainty and credibility selectors, and AUT and A-AUT metrics.
-- A pre-registered study (`docs/PREREG.md`, tags `prereg-v1` and `prereg-v2`) whose every reported number is traceable to a result file and commit (`docs/CLAIMS.md`).
-- Tables and figures that are rebuilt from stored per-slot predictions with no model fits (`scripts/make_tables.py`, `scripts/make_figures.py`, `scripts/make_e3.py`).
+- A reproducible research protocol and the Python package that implements it: a time slicer with C1 to C3 checks, a label-delay and budget simulator, a conformal layer with uncertainty and credibility selectors, four drift monitors behind one alarm interface, and AUT and A-AUT metrics.
+- A pre-registered study (`docs/PREREG.md` and its addenda; tags `prereg-v1`, `prereg-v2` and `prereg-v3`) whose every reported number is traceable to a result file and commit (`docs/CLAIMS.md`).
+- Tables and figures that are rebuilt from stored per-slot predictions with no model fits (`scripts/make_tables.py`, `scripts/make_figures.py`, `scripts/make_e3.py`, `scripts/make_e4.py`).
+
+| Experiment | Question (RQ) | Status |
+|---|---|---|
+| E0, E1 | How far does a random split overstate a time-aware score? (RQ1) | done |
+| E2 | How much do label delay and analyst budget change the lifetime? (RQ2) | done |
+| E3 | Does selecting which samples to label help, and does it shrink with delay? (RQ3) | done |
+| E4 | Does retraining when a drift monitor alarms beat retraining every third slot? (RQ4) | done |
+| E5, E6 | Cross-platform replication; EMBER2024 | not run: future work |
 
 ## What it is not
 - Not a malware analysis tool. It never downloads, runs or redistributes malware; it uses feature files only.
@@ -28,6 +36,8 @@ uv run driftwatch reproduce table1                # full: fetch BODMAS, run E0, 
 
 The full reproduction downloads about 265 MB, runs the E0 configuration on BODMAS and compares the table with `reports/tables/e0_baselines.csv`. On a clean clone it matched: the time-aware columns to four decimals, and the random-split comparator columns within 0.006 (their draw is keyed by the data manifest hash and differs after a rebuild); it took 31 minutes on the development laptop while two other long jobs ran [E-24]. If the download fails, `docs/data_cards/bodmas.md` documents the manual path (the command exits with code 3 and says so).
 
+The tables for E2 to E4 are rebuilt from stored predictions, which are not committed (`results/` is never committed). To rerun an experiment, build the data cache (`uv run driftwatch data build`) and follow `docs/GRID.md`; E4 took 3.3 hours (BODMAS) and 13.0 hours (LAMDA) of cell time on the development laptop [E-48]. `uv run driftwatch grid <config> --smoke` measures time on one seed and one window and prints an extrapolation.
+
 ## Headline results (Tier 1), with their limits
 Everything below is from stored runs; chapter 7 of the report has the full tables and chapter 8 the limits. Effects are A-AUT differences with 95% two-stage bootstrap intervals over windows and seeds [P-08]; "detected" means the interval excludes zero in the hypothesised direction, and the equivalence margin is 0.01 [P-10] (`docs/PREREG.md`).
 
@@ -40,6 +50,10 @@ Everything below is from stored runs; chapter 7 of the report has the full table
 
 **E3 (selection under delay)** was registered separately (`docs/prereg/addendum-v2.md`) and its numbers are comparable only within E3 (ADR-0009). On LAMDA (ten seeds, 16 windows, 43.6 and 87.3 labels per slot) the advantage of uncertainty or credibility selection over random selection at equal labels is 0.0109 to 0.0177 A-AUT with no delay and 0.0015 to 0.0095 after a delay of three slots; the registered interaction is positive in all eight rows, 0.0061 to 0.0118 [E-42, E-43]. The rows share one random arm and about four independent blocks of windows, the seed-level test is conditional on the realised windows, and seeds 5 to 9 were added after the five-seed rows had been read, so the intervals are indicative [E-42]. The advantage is not separated from the change in class mix of the labels that selection brings in, and the one arm that leaves the class mix unchanged is not above random [E-46, E-47]. On BODMAS the delay-3 advantage is zero by construction, so its interaction (0.0030 to 0.0079) is not a test of shrinkage [E-41]. Chapter 7 section 7.5 has the limits, including a trap arm whose accuracy is confounded with not retraining.
 
+**E4 (drift monitors)** was registered separately (`docs/prereg/addendum-v3.md`, `docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.md`) and is comparable with E3's random arm, not with E2. Four monitors (KS on top features, MMD, a domain classifier, and a test on conformal scores) each drove retraining at a budget of 1%, against retraining every third slot at the same labels spent, and against a control that refits as often as the monitor but at evenly spaced slots. **No monitor beat periodic retraining:** none of the 32 monitor-minus-periodic contrasts has an interval above zero, and logistic regression with the KS monitor is below it by 0.0089 [-0.0225, -0.0002] at delay 0 and 0.0052 [-0.0136, -0.0007] at delay 3 on LAMDA [E-59, E-60]. At the same number of refits, the timing of the alarms made no difference larger than 0.01 on LAMDA [E-61]. The monitors alarmed in most slots, for example 0.997 of LAMDA slots for the domain classifier, and detected drops in F1 no better than chance would [E-63]. The thresholds were frozen before the run and not tuned. On BODMAS, periodic retraining has one useful refit per window, and several rows are the same comparison [E-60, E-62]. With 32 contrasts and 10 seeds no Holm-adjusted p-value can fall below 0.0625, so the bootstrap interval is the decision rule [P-18]. Chapter 7 section 7.6 has the limits.
+
+**Not run:** E5 (repeat the headline contrasts on another platform) and E6 (EMBER2024). As defined, E5 has no platform left to repeat on, because E3 and E4 ran on both; they are future work (`reports/G5-tier3-decision.md`).
+
 ## Where things are
 | Path | Contents |
 |---|---|
@@ -48,9 +62,11 @@ Everything below is from stored runs; chapter 7 of the report has the full table
 | `docs/CLAIMS.md` | Every number, with its file and commit |
 | `docs/PHASES.md` | Phase and gate ledger |
 | `docs/DECISIONS/` | Architecture decision records |
-| `docs/GRID.md` | Running the grids: cells, chunks, ledger, Kaggle and Colab path |
-| `src/driftwatch/` | The package (`data`, `models`, `sim`, `conformal`, `metrics`) |
-| `configs/` | One YAML per run family; `e2_*` and `e3_*` are grid specs |
+| `docs/GRID.md` | Running the grids (E2, E3, E4): cells, chunks, ledger, frozen worktree, Kaggle and Colab path |
+| `docs/results_audit.md` | What is on disk under `results/` (never committed), with code versions and flags |
+| `src/driftwatch/` | The package (`data`, `models`, `sim`, `conformal`, `monitors`, `metrics`) |
+| `configs/` | One YAML per run family; `e2_*`, `e3_*` and `e4_*` are grid specs |
+| `scripts/` | Table, figure and audit scripts (`make_*.py`, `claims_audit.py`, `audit_results.py`, `check_*.py`) |
 | `reports/` | Tables, figures, gate evidence files |
 | `report/` | The report chapters (drafts) |
 

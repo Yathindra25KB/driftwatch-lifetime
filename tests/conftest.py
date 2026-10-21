@@ -155,7 +155,6 @@ SLOW_MODULES = {
     "test_data_build.py",
     "test_data_review.py",
     "test_leakage_canary.py",
-    "test_slicer_review_fixes.py",
     "test_make_e1_figure.py",
 }
 

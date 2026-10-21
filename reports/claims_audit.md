@@ -1,7 +1,7 @@
 # Claims audit
 
 Files audited: README.md, report\ch01_introduction.md, report\ch02_landscape.md, report\ch03_analysis.md, report\ch04_latest_techniques.md, report\ch05_related_work.md, report\ch06_method.md, report\ch07_experiments.md, report\ch08_discussion.md.
-Paragraphs and tables with numbers: 92; with a resolving claim id: 71; marked [verify]: 21; uncovered: 0.
+Paragraphs and tables with numbers: 95; with a resolving claim id: 74; marked [verify]: 21; uncovered: 0.
 Claim ids cited: 74. Unresolved ids: 0. Cited rows lacking a source file or commit: 0. 'first' used as a contribution claim: 0.
 **Result: PASS**
 
