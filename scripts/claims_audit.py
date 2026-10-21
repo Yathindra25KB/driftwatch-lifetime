@@ -198,8 +198,10 @@ NOT_SHOWN = (
     "draws of the C3 subsample and of the selection, not replicates of the model (P-12).",
     "That more labels do not help when a flat result appears at the smallest budget: retraining "
     "changed 0.2% to 2.1% of decisions in the earlier diagnostic (P-13).",
-    "Anything about conformal selection, drift monitors, other platforms or EMBER2024: those "
-    "experiments (E3 to E6) have not been run in Tier 1.",
+    "That conformal credibility adds anything over probability-based uncertainty (E3 does not "
+    "separate them), or that a drift monitor beats periodic retraining: in E4 none did at a "
+    "budget of 1% (E-52, E-53).",
+    "Anything about other platforms or EMBER2024: E5 and E6 (Tier 3) have not been run.",
     "Anything about evasion or adversarial examples: the study describes decay, not defeat "
     "(docs/ETHICS.md).",
     "Results on another machine: every cell was run on one laptop; numeric drift elsewhere is "

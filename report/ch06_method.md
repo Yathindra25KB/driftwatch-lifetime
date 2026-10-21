@@ -132,7 +132,7 @@ E4 (RQ4) asks whether retraining when a drift monitor alarms does better than re
   - the model's malware probabilities;
   - the features of the calibration rows that have already arrived.
 
-  It has no label field. A test permutes every label that the runner holds and finds the monitors' outputs unchanged. Another test fails if a monitor module imports anything that holds labels.
+  It has no label field. A test permutes every label that the runner holds and finds the monitors' outputs unchanged. Another test fails if a monitor module imports anything that holds labels. Every value in this section is registered [P-17].
 - **The four monitors.** Each tests at a significance level of 0.01 per slot, on seeded samples of a few hundred rows per side.
   - *KS:* a two-sample Kolmogorov-Smirnov test on each of the 20 features that best separate the classes in the initial training window, with a Holm correction over the 20 tests.
   - *MMD:* maximum mean discrepancy with a Gaussian kernel and a permutation threshold. The detectors have no learned embedding, so the input is a 16-dimensional SVD projection of the features plus the model's score.

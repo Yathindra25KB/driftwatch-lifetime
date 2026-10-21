@@ -1,6 +1,6 @@
 # Chapter 7: Experiments and results (draft)
 
-> Status: draft written by Claude Code in Phase 6 for the researcher to rewrite, verify and defend. Every number carries a claim id from `docs/CLAIMS.md` (file and commit there). The analysis was registered before the grid was run (tag `prereg-v1`; chapter 3 explains the method); results are reported as measured, flat ones included. Wording follows the registered rule: a contrast is **detected** when its 95% interval excludes zero in the hypothesised direction, and "equivalent" means the whole interval lies within plus or minus 0.01 of A-AUT. **[researcher: verify]** marks sentences whose reading of a number you should check. E3 (selection) is added in section 7.5 once its rows are in the ledger.
+> Status: draft written by Claude Code in Phase 6 for the researcher to rewrite, verify and defend. Every number carries a claim id from `docs/CLAIMS.md` (file and commit there). The analysis was registered before the grid was run (tag `prereg-v1`; chapter 3 explains the method); results are reported as measured, flat ones included. Wording follows the registered rule: a contrast is **detected** when its 95% interval excludes zero in the hypothesised direction, and "equivalent" means the whole interval lies within plus or minus 0.01 of A-AUT. **[researcher: verify]** marks sentences whose reading of a number you should check. E3 (selection) is in section 7.5 and E4 (drift monitors) in section 7.6.
 
 ## 7.1 What was run
 
@@ -9,6 +9,8 @@
 | E0 | Baselines: LR and LightGBM, never retrained, time-aware windows, A-AUT; random-split comparator | LAMDA, BODMAS | done (Phase 4) |
 | E1 | Random split against time-aware per evaluation slot, both comparators | LAMDA, BODMAS | done (Phase 5) |
 | E2 | Delay x budget grid under never and periodic(3) retraining, random selection | LAMDA, BODMAS | done: all 54 cells complete, none failed [E-26] |
+| E3 | Uncertainty and credibility selection against random under delay | LAMDA, BODMAS | done: 56 cells complete, none failed [E-40] |
+| E4 | Drift monitors: monitor-triggered retraining against periodic(3) and against a matched-count control; monitor quality | LAMDA, BODMAS | done: 76 cells complete, none failed [E-48] |
 
 All runs use the windows of ADR-0005 (LAMDA four training and twelve evaluation months, stride three; BODMAS three training and six evaluation two-week slots, stride two), a 10% target malware ratio per evaluation slot, a fixed threshold of 0.5, and the two models with the fixed hyperparameters of the registration [P-02, P-03]. Seeds are draws of the C3 subsample and of the selection (chapter 3).
 
@@ -77,3 +79,76 @@ See chapter 8, section 8.2. In particular: no delay curve on BODMAS, no independ
 **Failures and artifacts.** No cell was dropped. One LAMDA centroid cell failed once with an operating-system memory error while a table job was running and was retried with the reason logged; one LAMDA cell carries a 60-second flag that is the computer-standby artifact described in section 7.3 [E-40].
 
 **What E3 does not show.** No statement about drift monitors (E4); no delay curve (two delays); no independent LAMDA replication beyond ten seeds of one platform and about four independent blocks of windows; no separation of selection from class-prior change; nothing about the trap arm's A-AUT. Chen et al.'s credibility-based selection and Transcendent are cited as related work, not re-implemented, and nothing here claims selection under a budget is new.
+
+## 7.6 E4: drift monitors and retraining (RQ4)
+
+**Set-up.** E4 was registered in `docs/prereg/addendum-v3.md` (tag `prereg-v3`) together with ADR-0010, before the first E4 result [P-17, E-48].
+- **Arms.** Four drift monitors (section 6.12) each drive a monitor-triggered arm. Each monitor arm has a matched-count control that refits as often, at evenly spaced slots. Periodic(3) and never-retrain arms complete the set.
+- **Grid.** Budget 1% of the slot, delays 0 and 3, both models, seeds 0 to 9, chosen before any result.
+- **Labels.** Every arm uses random selection with the same seeded draws, so every arm spent the same labels in every slot: 523.25 per window on LAMDA and 168.33 on BODMAS [E-50, E-51].
+- **Runs.** All 76 cells completed and none failed [E-48]. As a check, the periodic cells reproduce the stored E3 random-arm predictions exactly in all 8 pairs [E-49].
+- **Comparability.** E4 values compare with E3's random arm, not with E2.
+
+There are two primary contrasts, and a positive value favours the monitor [P-17]:
+- **M-P:** the monitor arm minus periodic(3), at matched labels spent.
+- **M-C:** the monitor arm minus its matched-count control, at matched retrains. This isolates when the refits happen.
+
+**RQ4: no monitor beat periodic retraining.**
+
+| | LAMDA | BODMAS |
+|---|---|---|
+| M-P rows detected positive | none of 16 | none of 16 |
+| M-P rows reversed (monitor worse) | 5 | 4 |
+| M-P rows equivalent | 9 | 12 |
+| M-P rows not detected | 2 | none |
+| Claim | E-52 | E-53 |
+
+On LAMDA [E-52]:
+- **Reversed.** These rows' intervals lie entirely below zero:
+  - logistic regression with KS at delay 0: −0.0089 [−0.0225, −0.0002];
+  - logistic regression with KS at delay 3: −0.0052 [−0.0136, −0.0007];
+  - logistic regression with MMD at delay 3: −0.0036 [−0.0082, −0.0008];
+  - LightGBM with KS at delay 0: −0.0026 [−0.0050, −0.0003];
+  - LightGBM with p-uniformity at delay 0: −0.0014 [−0.0030, −0.0003].
+- **Not detected.** Logistic regression with MMD at delay 0 is −0.0063 [−0.0149, 0.0002], and with p-uniformity at delay 0 it is −0.0033 [−0.0127, 0.0027].
+- **Largest point estimate for a monitor.** The domain classifier with logistic regression at delay 0 gives 0.0006 [−0.0008, 0.0025]. It refitted 4.31 times per window against periodic's 3.00.
+
+On BODMAS every M-P estimate lies between −0.0004 and 0.0004 [E-53]. The four reversed rows are all logistic regression at delay 3, at −0.0004, far inside the 0.01 margin. On BODMAS periodic(3) has one useful refit per window and none at delay 3, so M-P there partly compares more refits with fewer.
+
+**Timing did not matter at this resolution.** On LAMDA all 16 M-C rows are "equivalent", between −0.0023 and 0.0008 [E-54]. Refitting when a monitor alarmed gave the same A-AUT, within plus or minus 0.01, as refitting the same number of times at evenly spaced slots. On BODMAS, 12 M-C rows are equivalent and the four logistic-regression rows at delay 3 are reversed by −0.0004 or −0.0003 [E-55]. The control matched its source's refit count in every window [E-54, E-55]. It knows each window's count in advance, which favours it, so M-C is conservative for the monitor.
+
+**The monitors alarm in most slots.** On the never arm (the primary monitor-quality reading [E-56]):
+
+| Monitor | LAMDA alarm rate | BODMAS alarm rate |
+|---|---|---|
+| Domain classifier | 0.997 | 1.000 |
+| MMD | 0.785 and 0.796 | 1.000 |
+| KS | 0.617 | 1.000 |
+| p-uniformity | 0.562 and 0.687 | 0.806 and 0.872 |
+| Claim | E-56 | E-56 |
+
+Where a cell holds two values, they are the two models.
+
+Against drop events on LAMDA:
+- **Precision** is 0.444 to 0.538.
+- **Recall** is 0.743 to 1.000.
+- **Comparison with alarming always.** The domain classifier alarms in almost every slot, so its precision of 0.444 and 0.490 is close to what alarming in every slot would score. The other three monitors' precision lies in or near that range [E-56]. They therefore detect drops little better than always alarming would. This comparison is descriptive; no interval was computed for it.
+
+On BODMAS there are only 10 drop events over 6 windows and 10 seeds, so recall is 1.000 and precision is 0.056 to 0.102 [E-56]. Those figures say more about how few drops there were than about the monitors.
+
+Inside the monitor arms, alarm rates fall after refits reset the reference [E-57]. On LAMDA at delay 0, for example:
+
+| Monitor | Alarm rate in its own arm | On the never arm [E-56] |
+|---|---|---|
+| KS | 0.242 | 0.617 |
+| MMD | 0.326 | 0.785 and 0.796 |
+| Domain classifier | 0.544 | 0.997 |
+
+Under delay 3 many triggered events found no new label and were no-ops: 1.62 per window for the domain classifier on LAMDA, against 1.00 for periodic(3) [E-58].
+
+**Statistics.** Each family has 32 contrasts and the decision rule uses 10 paired seeds. As a result, the smallest Holm-adjusted Wilcoxon p-value any E4 contrast can reach is 0.0625 [P-18]. No row can pass a 0.05 Holm threshold whatever its effect. This was not written into the addendum; it is stated here after the results. The registered decision rule is the bootstrap interval. The eight monitor and delay rows of a stratum share the periodic arm, the windows and the seeds, so they are not independent tests. **[researcher: verify the reading of the reversed LAMDA rows; their upper interval ends lie between −0.0002 and −0.0008.]**
+
+**What E4 does not show.**
+- That monitors are useless. Monitor-triggered retraining matched periodic retraining within the margin in most rows. In this setting, at 1% of the slot, it was never better, and in nine rows it was slightly worse [E-52, E-53].
+- How the monitors behave at a lower alarm rate. The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.
+- Any result on other platforms, for label-based detectors, or for monitor-triggered labelling, which the registration excludes.

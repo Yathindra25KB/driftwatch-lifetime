@@ -1,8 +1,8 @@
 # Claims audit
 
 Files audited: README.md, report\ch01_introduction.md, report\ch02_landscape.md, report\ch03_analysis.md, report\ch04_latest_techniques.md, report\ch05_related_work.md, report\ch06_method.md, report\ch07_experiments.md, report\ch08_discussion.md.
-Paragraphs and tables with numbers: 65; with a resolving claim id: 45; marked [verify]: 20; uncovered: 0.
-Claim ids cited: 53. Unresolved ids: 0. Cited rows lacking a source file or commit: 0. 'first' used as a contribution claim: 0.
+Paragraphs and tables with numbers: 90; with a resolving claim id: 69; marked [verify]: 21; uncovered: 0.
+Claim ids cited: 74. Unresolved ids: 0. Cited rows lacking a source file or commit: 0. 'first' used as a contribution claim: 0.
 **Result: PASS**
 
 ## Uncovered paragraphs (a number with no resolving claim id)
@@ -21,6 +21,7 @@ Claim ids cited: 53. Unresolved ids: 0. Cited rows lacking a source file or comm
 - report\ch01_introduction.md:3: > Status: draft written by Claude Code in Phase 7 for the researcher to rewrite in their own words and defend. Numbers enter only through `d...
 - report\ch02_landscape.md:11: - **Concept drift**: a change over time in the relation between inputs and the label the detector predicts (gama2014survey [verify: not yet ...
 - report\ch02_landscape.md:41: - **They are not a measurement of label delay.** Neither dataset records when an analyst or a scanner first knew a label; the delay in this ...
+- report\ch03_analysis.md:41: The two stages count within-window variation twice, so the interval is wider than a plain standard error would give: about the square root o...
 - report\ch04_latest_techniques.md:3: > Status: first draft written by Claude Code in Phase 7 for the researcher to rewrite, verify and defend. Every source below was reached on ...
 - report\ch04_latest_techniques.md:13: **Training for stability.** TIF (Zheng et al., arXiv 2502.05098, submitted 7 Feb 2025, accessed 2026-10-15) groups training data into enviro...
 - report\ch04_latest_techniques.md:15: **Adaptation without, or with few, true labels.** ADAPT (Alam, Piplai, Rastogi, arXiv 2507.08597, 11 Jul 2025, accessed 2026-10-15) uses pse...
@@ -44,6 +45,7 @@ Claim ids cited: 53. Unresolved ids: 0. Cited rows lacking a source file or comm
 - A delay curve on BODMAS: with nE = 6 and retraining every third slot there is one useful refit per window, and periodic equals never at a delay of three by construction (P-12).
 - Independent replication on LAMDA: its 16 rolling windows are about four independent 12-month blocks, and logistic regression is deterministic given its pool, so seeds are draws of the C3 subsample and of the selection, not replicates of the model (P-12).
 - That more labels do not help when a flat result appears at the smallest budget: retraining changed 0.2% to 2.1% of decisions in the earlier diagnostic (P-13).
-- Anything about conformal selection, drift monitors, other platforms or EMBER2024: those experiments (E3 to E6) have not been run in Tier 1.
+- That conformal credibility adds anything over probability-based uncertainty (E3 does not separate them), or that a drift monitor beats periodic retraining: in E4 none did at a budget of 1% (E-52, E-53).
+- Anything about other platforms or EMBER2024: E5 and E6 (Tier 3) have not been run.
 - Anything about evasion or adversarial examples: the study describes decay, not defeat (docs/ETHICS.md).
 - Results on another machine: every cell was run on one laptop; numeric drift elsewhere is reported, not corrected (docs/GRID.md).
