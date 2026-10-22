@@ -67,7 +67,9 @@ These statements are the ones a reader is most likely to attribute to the study,
 
 ## 8.4 Ethics and scope
 
-The repository contains no malware, no decompiled code and no evasion tooling, and generates no adversarial examples (`docs/ETHICS.md`). The datasets keep their licences; BODMAS's dataset licence is not stated by its authors and is an open question (`docs/PHASES.md`). Describing how detectors decay is not the same as describing how to defeat them, and the report keeps to the former.
+The repository contains no malware, no decompiled code and no evasion tooling, and generates no adversarial examples (`docs/ETHICS.md`). The datasets keep their licences; BODMAS's dataset licence is not stated by its authors, so the report says only that the files are used as published and are not redistributed (`docs/licence_audit.md`). Describing how detectors decay is not the same as describing how to defeat them, and the report keeps to the former.
+
+**Dual use.** Knowing how fast a detector decays and when retraining pays could in principle help an adversary time an attack. The study measures natural drift on public datasets, reports aggregate effects, offers no method to cause drift, and finds effects that are small; it does not model an adaptive adversary (section 4.4).
 
 ## 8.5 Status of the tiers
 

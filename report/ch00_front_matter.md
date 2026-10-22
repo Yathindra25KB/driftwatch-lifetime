@@ -42,9 +42,9 @@ Counted from the chapter files on 22 Oct 2026 [T-02]. The chapters are shorter t
 | 5 | 1572 | 3.9 | 8 | Abstract-level; the researcher's reading of the closest papers is what would lengthen it. |
 | 6 | 3369 | 8.4 | 12 | Complete for the simulator, the conformal layer and the monitors. |
 | 7 | 5129 | 12.8 | 15 | Tables are in the repository (`reports/tables/`) and the ledger; the chapter reports the registered contrasts and their limits. |
-| 8 | 2913 | 7.3 | 6 | Longer than the budget because the limits are listed in full. |
+| 8 | 2977 | 7.4 | 6 | Longer than the budget because the limits are listed in full. |
 | 9 | 1287 | 3.2 | - | No budget in the guide. |
-| All, with the front matter | 21601 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
+| All, with the front matter | 21665 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
 <!-- length-table:end -->
 
 ## Acknowledgements
