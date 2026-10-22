@@ -18,8 +18,9 @@ def load_script(name: str):
 
 
 ll = load_script("list_licences")
-# locked only for the emscripten (Pyodide) platform: never installed on Windows or Linux
-PLATFORM_ONLY = {"httpx2-jsfetch"}
+# locked only for platforms this machine may not be: emscripten (Pyodide) for httpx2-jsfetch,
+# Windows for colorama and tzdata, so they have no installed metadata on Linux
+PLATFORM_ONLY = {"httpx2-jsfetch", "colorama", "tzdata"}
 
 
 def test_names_and_requirements_are_normalised() -> None:
