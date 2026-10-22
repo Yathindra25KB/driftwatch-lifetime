@@ -28,6 +28,25 @@ Terms are defined where first used. A glossary of the terms used throughout: **c
 
 [Researcher: the faculty's policy on disclosing AI assistance is not known (`docs/PHASES.md`). Replace this paragraph with the wording the policy requires.] The report and the code were produced with Claude Code (Anthropic), working as the engineering lead under the researcher's direction, with the researcher deciding every scope, pre-registration, gate and publication step. The researcher rewrites and defends the text. Everything that could be checked mechanically is: the claims audit (`scripts/claims_audit.py`) refuses a number without a ledger row, the bibliography check (`scripts/check_bib.py`) resolves every reference against Crossref or arXiv, the tables regenerate from stored predictions, and reviews (leakage, statistics, a simulated hostile review) are saved under `docs/reviews/` and `reports/`. Those reviews were written by separate instances of the same model family that wrote the code and the drafts, so they are self-review, not independent review. [Researcher: say here what you wrote and what you checked yourself, and add any review by a person.]
 
+<!-- length-table:start -->
+## Length against the guide's page budget
+
+Counted from the chapter files on 22 Oct 2026 [T-02]. The chapters are shorter than the guide's budget in several places; they were not padded, and each row says why.
+
+| Chapter | Words [T-02] | Pages at 400 words (estimate) | Guide's budget (pages) | Why this length |
+|---|---|---|---|---|
+| 1 | 1155 | 2.9 | 5 | The question, the claim and the scope fit in this length; no result is stated here. |
+| 2 | 1099 | 2.7 | 15 | Kept to what the study uses. No survey of the threat landscape: one sourced figure only (section 2.6), because threat statistics date quickly and none is used in the analysis. |
+| 3 | 2277 | 5.7 | 12 | Covers the registered analysis for E0 to E4; a longer chapter would repeat the registrations. |
+| 4 | 1526 | 3.8 | 12 | Abstract-level by design (no full paper was read); a longer chapter would need the papers themselves. |
+| 5 | 1572 | 3.9 | 8 | Abstract-level; the researcher's reading of the closest papers is what would lengthen it. |
+| 6 | 3369 | 8.4 | 12 | Complete for the simulator, the conformal layer and the monitors. |
+| 7 | 4829 | 12.1 | 15 | Tables are in the repository (`reports/tables/`) and the ledger; the chapter reports the registered contrasts and their limits. |
+| 8 | 2875 | 7.2 | 6 | Longer than the budget because the limits are listed in full. |
+| 9 | 1251 | 3.1 | - | No budget in the guide. |
+| All, with the front matter | 21178 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
+<!-- length-table:end -->
+
 ## Acknowledgements
 
 [Researcher: to be written.]
