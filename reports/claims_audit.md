@@ -1,7 +1,7 @@
 # Claims audit
 
-Files audited: README.md, report\ch01_introduction.md, report\ch02_landscape.md, report\ch03_analysis.md, report\ch04_latest_techniques.md, report\ch05_related_work.md, report\ch06_method.md, report\ch07_experiments.md, report\ch08_discussion.md.
-Paragraphs and tables with numbers: 96; with a resolving claim id: 91; marked [verify]: 5; uncovered: 0.
+Files audited: README.md, report\ch01_introduction.md, report\ch02_landscape.md, report\ch03_analysis.md, report\ch04_latest_techniques.md, report\ch05_related_work.md, report\ch06_method.md, report\ch07_experiments.md, report\ch08_discussion.md, report\ch09_conclusion.md.
+Paragraphs and tables with numbers: 107; with a resolving claim id: 102; marked [verify]: 5; uncovered: 0.
 Claim ids cited: 110. Unresolved ids: 0. Cited rows lacking a source file or commit: 0. 'first' used as a contribution claim: 0.
 **Result: PASS**
 
@@ -18,7 +18,7 @@ Claim ids cited: 110. Unresolved ids: 0. Cited rows lacking a source file or com
 - none
 
 ## Pending (marked [verify]; to be checked by the researcher)
-- report\ch01_introduction.md:3: > Status: draft written by Claude Code in Phase 7 for the researcher to rewrite in their own words and defend. Numbers enter only through `d...
+- report\ch01_introduction.md:3: > Status: draft written by Claude Code for the researcher to rewrite in their own words and defend; updated 22 Oct 2026 for the finished Tie...
 - report\ch03_analysis.md:41: The two stages count within-window variation twice, so the interval is wider than a plain standard error would give: about the square root o...
 - report\ch06_method.md:3: > Status: draft written by Claude Code in Phase 5 for the researcher to rewrite and defend. Sections 6.1 to 6.5 describe code that exists an...
 - report\ch06_method.md:85: - **Short windows on BODMAS.** With six evaluation slots and a retraining period of three, a window has one useful retraining event (before ...

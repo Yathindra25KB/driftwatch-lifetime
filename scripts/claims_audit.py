@@ -36,6 +36,7 @@ DEFAULT_FILES = (
     "report/ch06_method.md",
     "report/ch07_experiments.md",
     "report/ch08_discussion.md",
+    "report/ch09_conclusion.md",
 )
 ID_RE = re.compile(r"\b([A-Z]{1,2}-\d{2,3})\b")
 NUMBER_RE = re.compile(r"(?<![\w.])\d+(?:[.,]\d+)*%?(?![\w])")

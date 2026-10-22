@@ -1,6 +1,6 @@
 # Chapter 1: Introduction (draft)
 
-> Status: draft written by Claude Code in Phase 7 for the researcher to rewrite in their own words and defend. Numbers enter only through `docs/CLAIMS.md` and carry their claim id. Paragraphs marked **[researcher: verify]** need your check against the sources. No experimental result is stated in this chapter; results are in chapter 7. Target length: about 5 pages.
+> Status: draft written by Claude Code for the researcher to rewrite in their own words and defend; updated 22 Oct 2026 for the finished Tier 2. Numbers enter only through `docs/CLAIMS.md` and carry their claim id. Paragraphs marked **[researcher: verify]** need your check against the sources. No experimental result is stated in this chapter; results are in chapter 7. Target length: about 5 pages.
 
 ## 1.1 Motivation
 
@@ -18,7 +18,7 @@ This study asks how long a malware detector stays useful when labels arrive late
 
 ## 1.3 Research questions
 
-The questions and their registered analysis are in `docs/PREREG.md` (tag `prereg-v1` for RQ1 and RQ2; later addenda for RQ3 to RQ5). In plain words:
+The questions and their registered analysis are in `docs/PREREG.md` (tag `prereg-v1` for RQ1 and RQ2) and its addenda (`prereg-v2` for RQ3, `prereg-v3` for RQ4). Each was registered before the first result of its experiment. In plain words:
 
 - **RQ1.** How large is the gap between the F1 of a randomly split test and the time-aware AUT(F1), for the same models on the same data?
 - **RQ2.** How does A-AUT depend on label delay and analyst budget under never retraining and periodic retraining?
@@ -26,7 +26,7 @@ The questions and their registered analysis are in `docs/PREREG.md` (tag `prereg
 - **RQ4.** Does a drift monitor beat simple periodic retraining as a trigger?
 - **RQ5.** Do the directions of the effects agree across Android and Windows PE data?
 
-RQ1 and RQ2 are the Tier 1 questions of this report; RQ3 and RQ4 (Tier 2) and RQ5 (Tier 3) depend on the stop rules in `CLAUDE.md` and on what was finished, and the status is stated in chapter 8.
+RQ1 and RQ2 are the Tier 1 questions of this report and RQ3 and RQ4 the Tier 2 questions; all four were run. RQ5 (Tier 3) was not run: the go checklist failed on the capstone deadline (`reports/G5-tier3-decision.md`), so it is future work, and chapter 8 says what that leaves open.
 
 ## 1.4 Contribution
 
@@ -38,7 +38,7 @@ That is the whole claim of the work. It is a statement of what was measured, not
 
 The study uses pre-extracted feature files only: LAMDA for Android, with 1,008,381 apps and about 37% malware [D-01]; and BODMAS for Windows PE, with 134,435 samples [D-07]. Both keep their own licences (`docs/ETHICS.md`). No malware sample, binary or decompiled code is downloaded, executed, opened or redistributed. The repository describes how detectors decay, not how to defeat them: it contains no evasion tooling and generates no adversarial examples.
 
-Scope is divided in tiers. Tier 1 (E0 to E2) is the protocol, the random-versus-time comparison and the delay-by-budget grid, on both datasets. Tier 2 (E3, E4) adds conformal selection and monitors. Tier 3 (E5, E6) is optional. What was finished is stated in chapter 8 and `docs/PHASES.md`. **[researcher: verify the tier scope against your VISTAS submission and the stop-rule outcome at the time of writing.]**
+Scope is divided in tiers. Tier 1 (E0 to E2) is the protocol, the random-versus-time comparison and the delay-by-budget grid, on both datasets. Tier 2 (E3, E4) adds conformal selection and drift monitors, also on both datasets. Tier 3 (E5, a cross-platform replication, and E6, EMBER2024) was optional and was not run. Gates G1 to G4 were decided by the researcher from evidence files (`reports/G1.md` to `reports/G4.md`); what was finished is stated in chapter 8 and `docs/PHASES.md`.
 
 ## 1.6 Report outline
 
@@ -46,10 +46,11 @@ Scope is divided in tiers. Tier 1 (E0 to E2) is the protocol, the random-versus-
 |---|---|
 | 2 | The threat and detector landscape, in the terms used here |
 | 3 | How results are analysed: metrics, contrasts, uncertainty and what the statistics cannot show |
-| 4 | Recent techniques and attacks, from dated sources (first draft) |
+| 4 | Recent techniques and attacks, from dated sources |
 | 5 | Related work, placed against delay, budget and conformal monitoring |
-| 6 | The method: slicer, constraints, the label queue and the simulator |
-| 7 | Experiments E0 to E2 and their results |
+| 6 | The method: slicer, constraints, the label queue, the simulator, the conformal layer and the drift monitors |
+| 7 | Experiments E0 to E4 and their results |
 | 8 | Discussion, limitations and what the results do not show |
+| 9 | Conclusion and future work |
 
 Terms are defined where first used; a reader who knows machine learning but not malware analysis should be able to follow every chapter.
