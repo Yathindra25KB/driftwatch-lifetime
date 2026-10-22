@@ -152,6 +152,7 @@ Inside the monitor arms, alarm rates are lower than on the never arm. On LAMDA a
 
 **What E4 does not show.**
 - **That monitors are useless.** Monitor-triggered retraining matched periodic retraining within the margin in most rows and was never better. Where it was worse, it was mostly within the margin [E-59, E-60].
+- **That "equivalent" means "as good as periodic".** At this budget the whole difference between never retraining and retraining every third slot is small: on LAMDA at delay 0, 0.7534 against 0.7598 (LightGBM) and 0.6546 against 0.6655 (logistic regression); on BODMAS 0.9692 against 0.9692 and 0.9083 against 0.9079 [E-50, E-51]. The margin of 0.01 is about as large as that difference, so a monitor arm inside the margin of periodic retraining is also nearly inside the margin of never retraining. The reading of E4 rests on the signs and positions of the intervals, and on none being above zero, not on the word "equivalent".
 - **How the monitors behave at a lower alarm rate.** The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.
 - **Whether alarm timing helps a monitor that saturates.** Where the control shares the monitor's schedule, M-C does not test timing [E-62].
 - **Any result on other platforms, for label-based detectors, or for monitor-triggered labelling.** The registration excludes all three.
