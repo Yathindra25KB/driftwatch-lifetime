@@ -35,16 +35,16 @@ Counted from the chapter files on 22 Oct 2026 [T-02]. The chapters are shorter t
 
 | Chapter | Words [T-02] | Pages at 400 words (estimate) | Guide's budget (pages) | Why this length |
 |---|---|---|---|---|
-| 1 | 1169 | 2.9 | 5 | The question, the claim and the scope fit in this length; no result is stated here. |
+| 1 | 1170 | 2.9 | 5 | The question, the claim and the scope fit in this length; no result is stated here. |
 | 2 | 1099 | 2.7 | 15 | Kept to what the study uses. No survey of the threat landscape: one sourced figure only (section 2.6), because threat statistics date quickly and none is used in the analysis. |
 | 3 | 2277 | 5.7 | 12 | Covers the registered analysis for E0 to E4; a longer chapter would repeat the registrations. |
 | 4 | 1501 | 3.8 | 12 | Abstract-level by design (no full paper was read); a longer chapter would need the papers themselves. |
 | 5 | 1572 | 3.9 | 8 | Abstract-level; the researcher's reading of the closest papers is what would lengthen it. |
 | 6 | 3369 | 8.4 | 12 | Complete for the simulator, the conformal layer and the monitors. |
 | 7 | 5129 | 12.8 | 15 | Tables are in the repository (`reports/tables/`) and the ledger; the chapter reports the registered contrasts and their limits. |
-| 8 | 2875 | 7.2 | 6 | Longer than the budget because the limits are listed in full. |
-| 9 | 1282 | 3.2 | - | No budget in the guide. |
-| All, with the front matter | 21557 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
+| 8 | 2913 | 7.3 | 6 | Longer than the budget because the limits are listed in full. |
+| 9 | 1287 | 3.2 | - | No budget in the guide. |
+| All, with the front matter | 21601 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
 <!-- length-table:end -->
 
 ## Acknowledgements

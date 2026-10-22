@@ -117,7 +117,7 @@ Written 22 Oct 2026 by Claude Code. The review above was produced by a fresh sub
 |---|---|
 | 2.1 A combination, not a finding | **Changed.** The contribution statement now includes "a set of small or null effects under stated settings" (ch00, ch09 section 9.3). |
 | 2.2 Abstract-level related work | **Acknowledged and Researcher.** Stated in chapters 4 and 5 and unchanged: no full paper was read, and the positioning is worded as what the abstracts say. Reading Chen et al. in full is the researcher's, and it is the one paper the novelty rests on. No literature baseline was re-implemented (stated since chapter 1). |
-| 2.3 Chapter 4.5 is filler | **Researcher.** The section is short and says it can be cut to a page; whether to keep it depends on the faculty page limit. |
+| 2.3 Chapter 4.5 is filler | **Changed (researcher's decision, 22 Oct 2026).** Section 4.5 was cut to one paragraph. |
 | 2.4 Two platforms | **Changed.** Added as item 19 of chapter 8. |
 
 ## 3. Reproducibility
@@ -125,7 +125,7 @@ Written 22 Oct 2026 by Claude Code. The review above was produced by a fresh sub
 | Point | Response |
 |---|---|
 | 3.1 Strengths | Noted. |
-| 3.2 Predictions not archived | **Changed and Researcher.** Stated as a limit and as future work (item 18). Depositing the stored predictions (compressed Parquet files, which are not committed) with hashes is a release decision and an irreversible one if it goes to a public service; it waits for the researcher's go. |
+| 3.2 Predictions not archived | **Changed (researcher's decision, 22 Oct 2026: archive privately).** The predictions of E0 to E4 (577 files, 7.20 GiB) are hashed in `docs/predictions_manifest.csv` and packed into a private archive outside the repository; `scripts/archive_predictions.py --verify` checks `results/` against the manifest (CLAIMS E-69). Nothing was uploaded; a public deposit still waits for the researcher's go, and is stated as a limit (ch08 item 18). |
 | 3.3 Comparator draw | **Changed.** The mechanism is described exactly (seed and window identifier, which carries the source digest) and the effect on BODMAS is stated (item 17). The draw was not changed: that would change RQ1's registered numbers. |
 | 3.4 Version brittleness | **Acknowledged.** The results audit (`docs/results_audit.md`) lists the code versions and how many source files changed since each; E-49 shows E4's periodic cells reproduce E3's predictions exactly. A clean-clone run of the tests and of the Table 1 reproduction was made for this hand-in and matched (CLAIMS E-67). |
 | 3.5 Data acquisition | **Acknowledged.** Documented in the data cards. |
@@ -137,7 +137,7 @@ Written 22 Oct 2026 by Claude Code. The review above was produced by a fresh sub
 |---|---|
 | 4.1 Dual use | Noted; the licence audit adds one sentence for the researcher to decide on (`docs/licence_audit.md`, section 5). |
 | 4.2 BODMAS licence text | **Changed.** `docs/ETHICS.md` now says the code is BSD-2-Clause and no licence is stated for the dataset files; `docs/licence_audit.md` exists and is linked. |
-| 4.3 Tracked process documents | **Changed and Researcher.** Listed in the licence audit with a decision for the researcher before the repository is made public. |
+| 4.3 Tracked process documents | **Changed (researcher's decision, 22 Oct 2026).** `docs/source/` was removed from the index and added to `.gitignore`; `.claude/` stays tracked. The history still contains the files until it is rewritten, which was not done (`docs/licence_audit.md`, section 3). |
 | 4.4 Label provenance in the headline | **Changed.** In the abstract. |
 | 4.5 AI-disclosure and "independent" | **Changed and Researcher.** The reviews are described as self-review; the placeholder for the faculty's disclosure wording stays until the policy is known, and the researcher is asked to say what they wrote and checked. |
 

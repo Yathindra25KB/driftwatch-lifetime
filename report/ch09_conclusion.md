@@ -39,7 +39,7 @@ Each item below needs a new pre-registration before any run, because a change ma
 - **Controls for class prior**: a random baseline matched to the malware share of the selected labels and a threshold-free score such as the area under the precision-recall curve, both computable from stored predictions [E-66, E-47].
 - **A registered lifetime measure**: section 7.7 reads the number of slots until the mean F1 first falls 0.05 below its first value from the stored curves, as an exploratory description [E-68]. A registered version would fix the threshold and the start slot in advance, use per-window curves and give an interval.
 - **A monitor that uses labels**: a Transcend-style credibility monitor with label-conditional p-values, which the label queue can supply only after the delay [L-12, L-14].
-- **A comparator keyed by seed and time span alone**, and a deposit of the stored predictions with hashes, so that RQ1 and every table can be rebuilt without the original disk [E-24].
+- **A comparator keyed by seed and time span alone**, and a public deposit of the stored predictions (hashed and archived privately already [E-69]), so that RQ1 and every table can be rebuilt without the original disk [E-24].
 - **A stratified within-slot random-split comparator**, which would remove the ratio depletion of the per-slot comparator (ADR-0008) [E-18].
 
 ## 9.6 Reproducibility and release status
