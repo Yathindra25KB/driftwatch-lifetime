@@ -34,15 +34,10 @@ What this means for the study: the datasets here record natural time evolution; 
 
 ## 4.5 Language models on the analyst's side
 
-Recent papers evaluate large language models for malicious-code analysis. Three examples, read at abstract level on 22 Oct 2026:
-- A benchmark of 13 language models on 4,070 PyPI packages, 370 of them malicious, in which the models do better at detecting a malicious package (mean F1 from 0.40 to 0.99) than at pinpointing specific indicators (weighted F1 0.48); the authors recommend them for initial triage (arXiv 2602.16304) [L-27].
-- A study that decompiles Windows executables with Ghidra and classifies them with language models and concludes that standard models are not yet robust enough to replace traditional anti-virus software; a fine-tuned model degrades on newer malware (arXiv 2601.09035) [L-28].
-- A retrieval-augmented system for JAR files reporting a mean detection accuracy of 97% on a benchmark of 3,839 executables (arXiv 2510.15567) [L-29].
-
-For this study the relevance is on the label side: if language models shorten the time an analyst needs to label a sample, the delay parameter shrinks and the budget grows. The grid is built to read exactly that trade-off, but no language model is used here, and none of these papers measures labelling time.
+Recent papers (read at abstract level on 22 Oct 2026) evaluate language models for malicious-code analysis: a benchmark of 13 models on 4,070 PyPI packages that recommends them for initial triage, because they detect a malicious package better than they pinpoint its indicators (arXiv 2602.16304) [L-27]; a study of Windows executables decompiled with Ghidra, which concludes that standard models cannot yet replace traditional anti-virus software and that a fine-tuned model degrades on newer malware (arXiv 2601.09035) [L-28]; and a retrieval-augmented system for JAR files (arXiv 2510.15567) [L-29]. For this study the relevance is on the label side: if language models shorten the time an analyst needs to label a sample, the delay shrinks and the budget grows, which the grid can read. No language model is used here, and none of these papers measures labelling time.
 
 ## 4.6 What remains open in this chapter
 
 1. The statistics are abstract-level. Opening each paper and checking the quoted statistic against the paper would turn "the abstract reports" into "the paper shows"; that is the researcher's reading, and the sentences above are worded so that they stay true either way.
 2. A 2025 or 2026 survey on problem-space attacks and defenses was not found in a search on 2026-10-15; the two surveys above are the ones read.
-3. The guide allows compressing chapters 2 to 4 first if the faculty report has a page limit; this chapter can be cut to a page by keeping the three family headings and one sentence each.
+3. Section 4.5 was cut to one paragraph on 22 Oct 2026 at the researcher's decision, because it adds no evidence to the study. If the faculty report has a page limit, the guide allows compressing chapters 2 to 4 first; the rest of this chapter can be cut to a page by keeping the three family headings and one sentence each.

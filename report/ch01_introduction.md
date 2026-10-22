@@ -14,7 +14,7 @@ The second is operations. A detector is not trained once. Analysts get a few sus
 
 ## 1.2 Problem statement
 
-**What "lifetime" means here.** The registered measure is A-AUT, the mean over rolling windows of the area under the F1-versus-time curve, with the per-slot F1 curves behind it. It is a time-averaged score, not a count of months until a stated fall in F1; no such count is reported, and the report does not claim one (chapters 8 and 9).
+**What "lifetime" means here.** The registered measure is A-AUT, the mean over rolling windows of the area under the F1-versus-time curve, with the per-slot F1 curves behind it. It is a time-averaged score, not a count of months until a stated fall in F1. A count of slots until the mean F1 first falls by 0.05 is given only as an exploratory reading of the stored curves, not as a registered result (section 7.7, [E-68]).
 
 This study asks how long a malware detector stays useful when labels arrive late and the labelling budget is fixed, under one time-aware protocol that is the same for every experiment. It adds a third ingredient, **conformal drift monitoring**: a method that turns a model's score into a p-value saying how unusual a sample is compared with labelled calibration samples, which can serve both to choose samples to label and to signal that the detector should be retrained. The report states what was measured; it does not claim that any approach is best.
 

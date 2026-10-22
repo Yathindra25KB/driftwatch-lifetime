@@ -97,7 +97,7 @@ Written 22 Oct 2026 by Claude Code. The review above was produced by a fresh sub
 
 | Point | Response | Where |
 |---|---|---|
-| 1.1 Lifetime not measured | **Changed and Researcher.** The text no longer implies a months-until figure: "lifetime" is defined as A-AUT with the per-slot F1 curves, and the report says no such count is reported. A lifetime measure from the stored F1 curves is listed as future work and as an option below. Retitling is the researcher's choice. | ch00 abstract; ch01 section 1.2; ch09 sections 9.3 and 9.5 |
+| 1.1 Lifetime not measured | **Changed (decided by the researcher on 22 Oct 2026: exploratory lifetime reading plus retitle).** "Lifetime" is defined as A-AUT with the per-slot F1 curves, and an exploratory count of slots until the mean F1 first falls 0.05 is read from the stored curves and labelled as unregistered (new section 7.7; CLAIMS E-68). The title no longer promises a lifetime in months. | ch00 title and abstract; ch01 section 1.2; ch07 section 7.7; ch09 sections 9.3 and 9.5 |
 | 1.2 Margin as large as the headroom | **Changed.** The headroom (never against periodic at the E4 budget) is stated next to the E4 reading, with the numbers, and "equivalent" is no longer allowed to carry the conclusion. The domain-classifier arm's extra refits are stated. | ch07 section 7.6 ("What E4 does not show"); ch08 section 8.1 (RQ4); ch00 abstract |
 | 1.3 Class prior confounds F1 | **Changed and Acknowledged.** The correlation is added to the ledger as an exploratory row and stated as a threat, with its consequences for RQ3 and for the monitors' drop events. The class-matched random baseline and a threshold-free score are listed as future work; they would be new, unregistered analyses of stored predictions. | CLAIMS E-66; ch08 section 8.3 item 14; ch09 section 9.5 |
 | 1.4(a) Saturation, (b) drop labels | **Acknowledged.** Both stated; the claim that monitors "detect drops no better than chance" is kept only with its exploratory label and the prevalence caveat. | ch08 item 14 and item 13; ch07 section 7.6 |
@@ -142,6 +142,8 @@ Written 22 Oct 2026 by Claude Code. The review above was produced by a fresh sub
 | 4.5 AI-disclosure and "independent" | **Changed and Researcher.** The reviews are described as self-review; the placeholder for the faculty's disclosure wording stays until the policy is known, and the researcher is asked to say what they wrote and checked. |
 
 ## Options for the researcher that would address the two largest points
+
+**Decision of 22 Oct 2026:** options 1 and 3 were taken (the lifetime reading is section 7.7 of the report, ledger row E-68, and the title was changed); option 2 was not taken and stays future work. The class-prior confound (point 1.3) therefore remains a stated limit.
 
 These are new analyses of stored predictions, not new experiments, and none is registered; each would be labelled exploratory, given a ledger row, and reported whatever it shows. They are not done, because the Phase 11 rule is to mark a missing number and ask.
 

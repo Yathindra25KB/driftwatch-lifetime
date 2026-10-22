@@ -1,8 +1,8 @@
-# How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol
+# Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data
 
 Yathindra K B, VISTAS. Capstone report, due 10 Dec 2026. Source: the repository `Yathindra25KB/Driftwatch-` (MIT licence); every number in this report has a row in `docs/CLAIMS.md`.
 
-> Status: draft written by Claude Code for the researcher to rewrite and defend; the title is the researcher's choice recorded in `docs/PHASES.md`. Items in square brackets are for the researcher.
+> Status: draft written by Claude Code for the researcher to rewrite and defend; the title was changed on 22 Oct 2026 at the researcher's choice, after the simulated review found that the earlier question-form title promised a lifetime in months that the report does not test. Items in square brackets are for the researcher.
 
 ## Abstract
 
@@ -10,7 +10,7 @@ A malware detector is trained on samples up to a date and used on samples that a
 
 Four experiments were pre-registered before their first result and run to completion; one extension of the number of seeds, decided after reading earlier rows, is disclosed in chapter 8. (1) A random split overstates the time-aware score by an amount that depends on how the comparison is built, and the gap is not attributed to temporal leakage alone. (2) On LAMDA, retraining on bought labels helps by hundredths of A-AUT and a delay of three slots (three months) costs about as much; on BODMAS the effects are smaller and the design allows one refit per window. (3) Choosing samples by uncertainty or conformal credibility was above random choice at equal labels, and the advantage was smaller after a delay, but it is not separated from a change in class mix, and F1 at a fixed threshold also moves with the share of malware in a slot. (4) No drift monitor beat retraining every third slot at the same labels spent. At this budget the whole difference between never retraining and retraining every third slot is itself about a hundredth of A-AUT, and the monitors alarmed in most slots, so this is a result about these settings and not about drift monitoring in general. The numbers, intervals and the limits that bound each reading are in chapters 7 and 8 and in the claims ledger [E-30, E-35, E-42, E-59].
 
-"Lifetime" is read through A-AUT and the per-slot F1 curves; no single figure of months until a stated fall in F1 is reported. LAMDA's labels come from antivirus detection counts with an unpublished scan date and discard ambiguous apps, so detection here may look easier than in operation [D-15, D-16]. The contribution is the protocol, the open code and the pre-registered grid, with every number traceable to a result file and a commit, and a set of small or null effects under stated settings. A negative result is reported as one. Cross-platform replication and EMBER2024 were not run.
+"Lifetime" is read through A-AUT and the per-slot F1 curves. As an exploratory description of the stored curves, not a registered result, the never-retrained detector's mean F1 on LAMDA first falls 0.05 below its first-month value at month 7, and on BODMAS it does not fall that far within six two-week slots [E-68]. LAMDA's labels come from antivirus detection counts with an unpublished scan date and discard ambiguous apps, so detection here may look easier than in operation [D-15, D-16]. The contribution is the protocol, the open code and the pre-registered grid, with every number traceable to a result file and a commit, and a set of small or null effects under stated settings. A negative result is reported as one. Cross-platform replication and EMBER2024 were not run.
 
 ## Reading guide
 
@@ -35,16 +35,16 @@ Counted from the chapter files on 22 Oct 2026 [T-02]. The chapters are shorter t
 
 | Chapter | Words [T-02] | Pages at 400 words (estimate) | Guide's budget (pages) | Why this length |
 |---|---|---|---|---|
-| 1 | 1155 | 2.9 | 5 | The question, the claim and the scope fit in this length; no result is stated here. |
+| 1 | 1169 | 2.9 | 5 | The question, the claim and the scope fit in this length; no result is stated here. |
 | 2 | 1099 | 2.7 | 15 | Kept to what the study uses. No survey of the threat landscape: one sourced figure only (section 2.6), because threat statistics date quickly and none is used in the analysis. |
 | 3 | 2277 | 5.7 | 12 | Covers the registered analysis for E0 to E4; a longer chapter would repeat the registrations. |
-| 4 | 1526 | 3.8 | 12 | Abstract-level by design (no full paper was read); a longer chapter would need the papers themselves. |
+| 4 | 1501 | 3.8 | 12 | Abstract-level by design (no full paper was read); a longer chapter would need the papers themselves. |
 | 5 | 1572 | 3.9 | 8 | Abstract-level; the researcher's reading of the closest papers is what would lengthen it. |
 | 6 | 3369 | 8.4 | 12 | Complete for the simulator, the conformal layer and the monitors. |
-| 7 | 4829 | 12.1 | 15 | Tables are in the repository (`reports/tables/`) and the ledger; the chapter reports the registered contrasts and their limits. |
+| 7 | 5129 | 12.8 | 15 | Tables are in the repository (`reports/tables/`) and the ledger; the chapter reports the registered contrasts and their limits. |
 | 8 | 2875 | 7.2 | 6 | Longer than the budget because the limits are listed in full. |
-| 9 | 1251 | 3.1 | - | No budget in the guide. |
-| All, with the front matter | 21178 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
+| 9 | 1282 | 3.2 | - | No budget in the guide. |
+| All, with the front matter | 21557 | | 85 or so | Well under the guide's total. Which chapters to lengthen, and whether the faculty has a page limit, are the researcher's decisions. |
 <!-- length-table:end -->
 
 ## Acknowledgements

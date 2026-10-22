@@ -156,3 +156,11 @@ Inside the monitor arms, alarm rates are lower than on the never arm. On LAMDA a
 - **How the monitors behave at a lower alarm rate.** The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.
 - **Whether alarm timing helps a monitor that saturates.** Where the control shares the monitor's schedule, M-C does not test timing [E-62].
 - **Any result on other platforms, for label-based detectors, or for monitor-triggered labelling.** The registration excludes all three.
+
+## 7.7 An exploratory reading of "lifetime" from the stored E2 curves
+
+This section answers the review's point that the report never says how many slots a detector lasts. It is exploratory: it was not registered, it reads a committed table (`reports/tables/e2_per_slot.csv`) and runs no experiment, and it would be reported whatever it showed [E-68]. Lifetime is read here as the first slot at which the mean F1 over windows and seeds is at least 0.05 below its value at the first slot, the same size as the drop in E4, together with the slope of mean F1 per slot.
+
+For the never-retrained detector on LAMDA (slots are months), mean F1 falls by 0.05 from slot 1 at slot 7 for both LightGBM and logistic regression, and the slope is -0.0066 per slot for LightGBM and -0.0084 for logistic regression [E-68]. With periodic retraining at delay 0 and budget 5% the slope is about half (-0.0032 and -0.0056) and the 0.05 fall is not reached within 12 slots [E-68]. On BODMAS (slots are two weeks) neither detector falls by 0.05 within the six slots, and the slopes are small (-0.0010 for LightGBM, -0.0039 for logistic regression) [E-68].
+
+Three limits apply. The curves are not monotonic: LAMDA LightGBM has a higher mean F1 at slot 3 than at slot 1, so "first falls below" depends on which slot is taken as the start [E-68]. F1 at a fixed threshold also moves with the share of malware in a slot, so a fall is not an effect of age alone [E-66]. The averages are over windows that are not independent (about four blocks on LAMDA [P-12]), and no interval is given. Read this as a description of the stored curves in the unit the title asks about, not as a tested result.
