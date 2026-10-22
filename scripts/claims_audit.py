@@ -28,6 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FILES = (
     "README.md",
+    "report/ch00_front_matter.md",
     "report/ch01_introduction.md",
     "report/ch02_landscape.md",
     "report/ch03_analysis.md",
