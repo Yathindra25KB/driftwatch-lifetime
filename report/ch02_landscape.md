@@ -1,6 +1,6 @@
 # Chapter 2: Landscape (draft)
 
-> Status: draft written by Claude Code in Phase 5 for the researcher to rewrite, verify and defend. Sources retrieved on **2026-10-13**; descriptions taken from search-result summaries are marked [verify: read the source]. Project facts carry a CLAIMS id (docs/CLAIMS.md). No threat-landscape statistic is quoted here: any figure about how much malware exists or how fast it changes must come with a retrieved source and an access date before it enters this chapter [verify].
+> Status: draft written by Claude Code for the researcher to rewrite, verify and defend. Fact-checked on **22 Oct 2026**: project facts carry a CLAIMS id (docs/CLAIMS.md) and every external statistic carries a literature row (L-nn) with its source and access date. Source descriptions are at abstract level (the full papers were not read). Items still open are marked [verify].
 
 ## 2.1 The problem in one paragraph
 
@@ -8,12 +8,12 @@ A learned malware detector is trained on samples seen up to a date and used on s
 
 ## 2.2 Concepts used in this report
 
-- **Concept drift**: a change over time in the relation between inputs and the label the detector predicts (gama2014survey [verify: not yet in references.bib; see REFERENCES_TODO.md]).
+- **Concept drift**: a change over time in the relation between inputs and the label the detector predicts (Gama et al., 2014; gama2014survey) [L-16].
 - **Time-aware evaluation**: train on earlier data, test on strictly later data, in fixed time slots; the TESSERACT constraints C1 (train older than test), C2 (test slots hold data from their own time window) and C3 (test slots at the target malware ratio) make this concrete (pendlebury2019tesseract).
 - **AUT**: area under the F1-versus-time curve over successive test slots; **A-AUT**: its average over rolling windows (ADR-0006).
 - **Label delay**: the time between a sample being scored and its true label becoming known; in the simulator, `d` whole slots after the next one (chapter 6).
 - **Analyst budget**: the number of samples whose true label can be obtained per slot.
-- **Conformal drift monitor**: a score computed from how unusual a sample or batch is compared with calibration data, used to flag drift without waiting for labels (chapters 5 and, when implemented, 8 and 9).
+- **Conformal drift monitor**: a score computed from how unusual a sample or batch is compared with calibration data, used to flag drift without waiting for labels (the literature in chapter 5, section 5.3; the four monitors of this study in chapter 6, section 6.12).
 
 ## 2.3 Why Android and Windows PE
 
@@ -32,16 +32,16 @@ The platforms differ in ways that matter for the question asked here, and chapte
 |---|---|---|---|---|
 | LAMDA | Android | 1,008,381 apps; 369,906 malware; 638,475 benign (Baseline subset) | CLAIMS D-01 | MIT |
 | BODMAS | Windows PE | 134,435 samples; 57,293 malware; 77,142 benign | CLAIMS D-07 | BSD-2 (code repository; no dataset licence is stated on the project page, checked 2026-10-20) |
-| EMBER2024 (optional, Tier 3) | Windows PE and other formats | not used in Phase 5 | arXiv 2506.05074, accessed 2026-10-13 [verify] | Apache-2.0 (confirmed on the dataset card, 2026-10-20) |
+| EMBER2024 (Tier 3, not run) | Windows PE and other formats | not used | arXiv 2506.05074 [L-30] | Apache-2.0 (confirmed on the dataset card, 2026-10-20) [L-30] |
 
-LAMDA is described by its authors as a longitudinal Android malware benchmark built to study concept drift, with about a dozen years of samples and no 2015 data (haque2025lamda; summary of 2026-10-13 [verify]). BODMAS is described as Windows PE malware and benign feature vectors collected over roughly thirteen months with curated family labels (yang2021bodmas). Both have duplicates and class-ratio properties that the slicer's constraints and the duplicate counts handle (CLAIMS D-05 for LAMDA).
+LAMDA is described by its authors as a longitudinal Android malware benchmark built to study concept drift, spanning 12 years (2013 to 2025, no 2015) [L-08] (haque2025lamda). BODMAS is described as Windows PE malware and benign feature vectors collected over roughly thirteen months with curated family labels (yang2021bodmas; CLAIMS D-07, D-08). Both have duplicates and class-ratio properties that the slicer's constraints and the duplicate counts handle (CLAIMS D-05 for LAMDA).
 
 ## 2.5 What the datasets cannot tell us
 
-- **They are not a measurement of label delay.** Neither dataset records when an analyst or a scanner first knew a label; the delay in this study is a simulated parameter, not an observed one. How realistic the range `d` in {0, 1, 2, 3} slots is, is a question for the discussion chapter [verify against Botacin and Gomes, botacin2025labeldelays].
-- **They are not the population.** LAMDA's labels come from an existing aggregation of scanner verdicts, and BODMAS from a security company's database [verify: read each dataset's own account of labelling].
+- **They are not a measurement of label delay.** Neither dataset records when an analyst or a scanner first knew a label; the delay in this study is a simulated parameter, not an observed one. Botacin and Gomes study delays caused by limited analysis queues (botacin2025labeldelays) [L-18]; this study does not take its range of `d` in {0, 1, 2, 3} slots from their data, and how realistic that range is, is a question for the discussion chapter.
+- **They are not the population, and their labels are not ground truth.** LAMDA's labels come from VirusTotal detection counts: zero detections is benign, four or more is malware, and apps with one to three are discarded [D-15]. The dataset card calls the labelling AV-centric, and the scan date is not published, so a label may reflect knowledge later than the collection date [D-16]. This is a form of label leakage that the study cannot remove; chapter 8 lists it as a threat. BODMAS's own project page does not describe how its labels were produced [D-17] [verify: read the BODMAS paper].
 - **They are not adversarial.** The study measures decay under natural drift; it does not generate or evaluate evasion (hard rule 12).
 
 ## 2.6 Threat-landscape context
 
-This section is intentionally left to the researcher. Statements such as "the number of new Android malware samples per year" or "the share of detections that rely on machine learning" need a retrieved source and an access date each. Candidates to retrieve and read: the platforms' own annual security reports, and the datasets' papers for their collection statistics. Nothing is quoted from memory [verify].
+Threat statistics date quickly and measure different things, so this study uses none of them in its analysis. One figure is given for scale. The AV-TEST Institute states on its malware statistics page that it registers "over 450,000 new malicious programs (malware)" each day, counting malware and potentially unwanted applications together; the page carries no data date and its per-year and per-platform charts are images, so no further figure is quoted [L-32]. A daily volume of that size is why a detector cannot be assumed to see only what it was trained on, and why the question of this report is about how long a detector stays useful, not whether it will meet unfamiliar samples. **[researcher: decide whether to add a platform-specific source for Android or Windows; none was retrieved.]**
