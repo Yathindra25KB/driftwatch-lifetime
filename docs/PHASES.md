@@ -39,8 +39,8 @@ The researcher fills this in weekly (about 20 minutes, plan §5.1 step 9). Compa
 | Week | Dates | Hours | Cumulative | 4-week average | Notes |
 |---|---|---|---|---|---|
 | 0 | 10-11 Oct 2026 (before week 1) | 10 | 10 | | Phase 1 (3 h), Phase 2 (2 h), Phase 3 (3 h) and Phase 4 (2 h, reported as under 3), researcher-reported |
-| 1 | 12 Oct - 18 Oct 2026 | | | | |
-| 2 | 19 Oct - 25 Oct 2026 | | | | |
+| 1 | 12 Oct - 18 Oct 2026 | 5 to 9 | | | Researcher-reported as a range on 22 Oct 2026, not an exact figure; cumulative and 4-week average left blank until exact hours are given |
+| 2 | 19 Oct - 25 Oct 2026 | 5 to 9 | | | Same: range reported on 22 Oct 2026 (week 2 not yet over) |
 | 3 | 26 Oct - 01 Nov 2026 | | | | |
 | 4 | 02 Nov - 08 Nov 2026 | | | | G1 |
 | 5 | 09 Nov - 15 Nov 2026 | | | | |
