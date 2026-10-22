@@ -1,0 +1,9 @@
+dataset,model,arm,n_slots,first_f1,last_f1,lifetime_slots,slope_per_slot
+bodmas,lgbm,never,6,0.9801,0.9734,,-0.001
+bodmas,lgbm,"periodic, delay 0, budget 5%",6,0.9801,0.9732,,-0.0009
+bodmas,lr,never,6,0.9319,0.9023,,-0.0039
+bodmas,lr,"periodic, delay 0, budget 5%",6,0.9319,0.9073,,-0.0025
+lamda,lgbm,never,12,0.783,0.7696,7.0,-0.0066
+lamda,lgbm,"periodic, delay 0, budget 5%",12,0.783,0.7912,,-0.0032
+lamda,lr,never,12,0.6982,0.6709,7.0,-0.0084
+lamda,lr,"periodic, delay 0, budget 5%",12,0.6982,0.6872,,-0.0056
