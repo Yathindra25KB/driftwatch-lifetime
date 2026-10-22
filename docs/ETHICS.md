@@ -19,7 +19,7 @@ DriftWatch studies how malware detectors **decay** over time, and what label del
 | AndroZoo | Academic key; redistribution forbidden | Not used (would need a faculty-sponsored key) |
 | SOREL-20M | Own terms, not verified | Excluded (build guide §10) |
 
-Every dataset version, source URL and file hash goes into `data/manifest.json` (Phase 2) and its data card under `docs/data_cards/`. The full licence audit is `docs/licence_audit.md` (Phase 12).
+Every dataset version, source URL and file hash goes into `data/manifest.json` (Phase 2) and its data card under `docs/data_cards/`. The full licence audit is `docs/licence_audit.md` (22 Oct 2026; regenerate the dependency table with `uv run python scripts/list_licences.py`).
 
 ## Data handling
 
