@@ -6,8 +6,8 @@
 
 | Experiment | What | Data | Status |
 |---|---|---|---|
-| E0 | Baselines: LR and LightGBM, never retrained, time-aware windows, A-AUT; random-split comparator | LAMDA, BODMAS | done (Phase 4) |
-| E1 | Random split against time-aware per evaluation slot, both comparators | LAMDA, BODMAS | done (Phase 5) |
+| E0 | Baselines: LR and LightGBM, never retrained, time-aware windows, A-AUT; random-split comparator | LAMDA, BODMAS | done |
+| E1 | Random split against time-aware per evaluation slot, both comparators | LAMDA, BODMAS | done |
 | E2 | Delay x budget grid under never and periodic(3) retraining, random selection | LAMDA, BODMAS | done: all 54 cells complete, none failed [E-26] |
 | E3 | Uncertainty and credibility selection against random under delay | LAMDA, BODMAS | done: 56 cells complete, none failed [E-40] |
 | E4 | Drift monitors: monitor-triggered retraining against periodic(3) and against a matched-count control; monitor quality | LAMDA, BODMAS | done: 76 cells complete, none failed [E-48] |
