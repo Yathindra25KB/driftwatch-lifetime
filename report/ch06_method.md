@@ -1,6 +1,6 @@
 # Chapter 6: Method (draft)
 
-> Status: draft written by Claude Code in Phase 5 for the researcher to rewrite and defend. Sections 6.1 to 6.5 describe code that exists and is tested at the commit named in docs/PHASES.md; sections 6.6 and 6.7 describe things that do not exist yet and are marked so. No result number appears here. Protocol constants (slot length, delay, budget, period) are quoted from docs/PROTOCOL.md; they are settings, not measurements. Anything not yet checked against the source is marked [verify].
+> Status: draft written by Claude Code for the researcher to rewrite and defend; completed for Tiers 1 and 2 on 22 Oct 2026. Every section describes code that exists and is tested at the commits named in docs/PHASES.md (sections 6.1 to 6.9: the simulator; 6.10: the grid; 6.11: the conformal layer; 6.12: the drift monitors). No result number appears here. Protocol constants (slot length, delay, budget, period) are quoted from docs/PROTOCOL.md; they are settings, not measurements. Anything not yet checked against the source is marked [verify].
 
 ## 6.1 What the simulator is for
 
