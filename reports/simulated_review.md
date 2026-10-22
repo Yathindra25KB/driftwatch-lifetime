@@ -127,7 +127,7 @@ Written 22 Oct 2026 by Claude Code. The review above was produced by a fresh sub
 | 3.1 Strengths | Noted. |
 | 3.2 Predictions not archived | **Changed and Researcher.** Stated as a limit and as future work (item 18). Depositing the stored predictions (compressed Parquet files, which are not committed) with hashes is a release decision and an irreversible one if it goes to a public service; it waits for the researcher's go. |
 | 3.3 Comparator draw | **Changed.** The mechanism is described exactly (seed and window identifier, which carries the source digest) and the effect on BODMAS is stated (item 17). The draw was not changed: that would change RQ1's registered numbers. |
-| 3.4 Version brittleness | **Acknowledged.** The results audit (`docs/results_audit.md`) lists the code versions and how many source files changed since each; E-49 shows E4's periodic cells reproduce E3's predictions exactly. A clean-clone run of the tests and of the Table 1 reproduction was made for this hand-in (see the Phase 11 evidence). |
+| 3.4 Version brittleness | **Acknowledged.** The results audit (`docs/results_audit.md`) lists the code versions and how many source files changed since each; E-49 shows E4's periodic cells reproduce E3's predictions exactly. A clean-clone run of the tests and of the Table 1 reproduction was made for this hand-in and matched (CLAIMS E-67). |
 | 3.5 Data acquisition | **Acknowledged.** Documented in the data cards. |
 | 3.6 Draft state | **Researcher.** This is the stated plan: the report is a draft for the researcher to rewrite and defend, and the remaining `[verify]` and `[researcher: ...]` markers are the genuine open items. |
 
