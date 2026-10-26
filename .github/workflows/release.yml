@@ -1,0 +1,140 @@
+name: Release
+
+# A tag v* publishes to PyPI and creates the GitHub Release (which makes Zenodo mint a DOI).
+# workflow_dispatch with target=testpypi is the rehearsal. Both use Trusted Publishing
+# (OIDC): no API token is stored anywhere. Procedure and go gates: docs/RELEASING.md.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Where to publish (the rehearsal goes to TestPyPI)"
+        required: true
+        default: testpypi
+        type: choice
+        options: [testpypi]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.3"
+      - name: Check version, tag and changelog agree
+        run: uv run --frozen python scripts/check_release.py --tag "${{ github.ref_type == 'tag' && github.ref_name || '' }}"
+      - name: Build sdist and wheel
+        run: uv build
+      - name: Check distribution metadata
+        run: uvx twine@7.0.0 check --strict dist/*
+      - name: Check distribution contents (no data, no results, size)
+        run: uv run --frozen python scripts/check_release.py --dist dist
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  smoke-wheel:
+    name: smoke-wheel (${{ matrix.os }})
+    needs: build
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      # no checkout: the wheel must work without the repository
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install the wheel into a fresh virtual environment
+        shell: bash
+        run: |
+          python -m venv venv
+          if [ -f venv/Scripts/python.exe ]; then PY=venv/Scripts/python.exe; else PY=venv/bin/python; fi
+          "$PY" -m pip install --upgrade pip
+          "$PY" -m pip install dist/*.whl
+          echo "DW=${PY%/*}/driftwatch" >> "$GITHUB_ENV"
+      - name: Smoke experiment from the installed package
+        shell: bash
+        run: |
+          mkdir empty && cd empty
+          "../$DW" --version
+          "../$DW" smoke --out smoke-report
+
+  publish-testpypi:
+    name: publish to TestPyPI
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
+    needs: smoke-wheel
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/driftwatch-lifetime/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: publish to PyPI
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: smoke-wheel
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/driftwatch-lifetime/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
+
+  github-release:
+    name: GitHub Release
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+      - name: Release notes from CHANGELOG.md
+        run: python3 scripts/check_release.py --notes "${{ github.ref_name }}" > notes.md
+      - name: Create the release (Zenodo mints the DOI when it is published)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          extra=""
+          if [ -f reports/architecture_report.pdf ]; then extra="reports/architecture_report.pdf"; fi
+          gh release create "${{ github.ref_name }}" dist/* $extra \
+            --title "DriftWatch ${{ github.ref_name }}" --notes-file notes.md --verify-tag
