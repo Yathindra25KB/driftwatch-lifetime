@@ -68,6 +68,7 @@ The formatter and re-injection hooks always exit 0. The Stop gate exits 2 only o
 | Date | Change | Authority | Evidence |
 |---|---|---|---|
 | 10 Oct 2026 | Download allowlist gains `huggingface.co`, `drive.google.com`, `drive.usercontent.google.com` and the suffixes `.huggingface.co` (LFS CDN) and `.hf.co` (Xet storage). Look-alikes (`huggingface.co.evil.com`, `evilhf.co`) and other Google hosts (`docs.google.com`, `google.com`) stay blocked. | Researcher, Phase 2 plan approval (Phase 2 CHANGE_REQUEST noted in docs/PHASES.md "Phase 2 prerequisites") | `tests/test_guard.py` download tests (allowed and blocked cases) |
+| 26 Oct 2026 | Download allowlist gains the exact hosts `zenodo.org`, `sandbox.zenodo.org` (Zenodo integration and its metadata dry run), `export.arxiv.org` (monthly arXiv audit API) and `yathindra25kb.github.io` (the docs site, for link checks). No suffix is added: look-alikes (`zenodo.org.evil.com`), other arXiv hosts (`arxiv.org`) and other GitHub Pages sites stay blocked. | Researcher, Phase 12 plan question round (26 Oct 2026) | `tests/test_guard.py` download tests (allowed and blocked cases) |
 
 ### Defense in depth
 `tests/test_repo_invariants.py` runs on every Stop. It fails if docs/PREREG.md differs from its highest prereg tag, if a LOCKED status names a missing tag, if a committed golden file changed, or if data/ or results/ files are tracked. Any route around the guard (scripts, git history operations) therefore turns the next stop red.

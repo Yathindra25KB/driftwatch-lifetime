@@ -354,6 +354,11 @@ def test_powershell_non_recursive_delete_allowed(guard, locked_repo):
         "curl https://hf.co.evil.com/x",
         "curl https://docs.google.com/x",
         "curl https://google.com/x",
+        # Phase 12 hosts are exact: no look-alikes, no other arXiv hosts, no other Pages sites.
+        "curl https://zenodo.org.evil.com/x",
+        "curl https://evilzenodo.org/x",
+        "curl https://arxiv.org/pdf/1807.07838",
+        "curl https://someone-else.github.io/x",
     ],
 )
 def test_download_from_unlisted_host_blocked(guard, locked_repo, command):
@@ -388,6 +393,11 @@ def test_download_blocked_in_powershell(guard, locked_repo, command):
         "curl -sSfI https://cas-bridge.xethub.hf.co/x",
         "curl -sSfI https://drive.google.com/drive/folders/x",
         "curl -sSfI https://drive.usercontent.google.com/download?id=x",
+        # Phase 12 hosts: Zenodo (and its sandbox), the arXiv API and the docs site.
+        "curl -sSf https://zenodo.org/api/records/1",
+        "curl -sSf https://sandbox.zenodo.org/api/deposit/depositions",
+        "curl -sSf https://export.arxiv.org/api/query?search_query=cat:cs.CR",
+        "curl -sSfI https://yathindra25kb.github.io/driftwatch-lifetime/latest/",
     ],
 )
 def test_allowed_network_commands(guard, locked_repo, command):
