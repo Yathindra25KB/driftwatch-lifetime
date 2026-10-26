@@ -30,9 +30,23 @@ def test_names_and_requirements_are_normalised() -> None:
 
 
 def test_direct_dependencies_come_from_pyproject() -> None:
-    runtime, dev = ll.direct_dependencies(ROOT / "pyproject.toml")
+    runtime, dev, docs = ll.direct_dependencies(ROOT / "pyproject.toml")
     assert {"numpy", "lightgbm", "scikit-learn"} <= runtime
     assert {"pytest", "ruff"} <= dev
+    assert {"sphinx", "furo", "myst-parser"} <= docs
+
+
+def test_a_reviewed_licence_applies_only_to_the_reviewed_version(monkeypatch) -> None:
+    version, lic, where = ll.licence_of("docutils")
+    assert where.startswith("reviewed") and "GPL" not in lic.upper().replace("BSD", "")
+    monkeypatch.setitem(ll.REVIEWED, "docutils", ("0.0.1", "Public Domain"))
+    _, lic2, where2 = ll.licence_of("docutils")
+    assert not where2.startswith("reviewed")  # a new version is read from its metadata again
+    assert lic2 != "Public Domain"
+
+
+def test_every_reviewed_package_is_a_locked_package() -> None:
+    assert set(ll.REVIEWED) <= {ll.norm(n) for n in ll.locked_packages(ROOT / "uv.lock")}
 
 
 def test_every_locked_package_has_a_licence_except_platform_only_ones() -> None:
