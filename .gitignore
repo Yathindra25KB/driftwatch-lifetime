@@ -43,3 +43,8 @@ Thumbs.db
 
 # Course source documents (build guide, plan, phase prompts): kept locally, not redistributed
 /docs/source/
+
+# Documentation build output
+/docs/_build/
+/_site/
+/_linkcheck/

@@ -1,0 +1,86 @@
+name: Docs
+
+# Pull requests: strict build + link check (nothing is published).
+# main:   deploys the build to gh-pages/latest/.
+# v* tag: deploys the build to gh-pages/vX.Y.Z/ (frozen for that release).
+# weekly: link check only, to catch rot in external links.
+# Tool and strictness: ADR-0011. The deploy is plain git with the built-in token.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: build (strict) + link check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.3"
+          enable-cache: true
+      - name: Install the locked environment (includes the docs group)
+        run: uv sync --frozen
+      - name: Build, every warning is an error
+        run: uv run --frozen sphinx-build -c docs -W --keep-going -b html . _site
+      - name: Check external links
+        run: uv run --frozen sphinx-build -c docs -b linkcheck . _linkcheck
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: _site/
+          retention-days: 14
+
+  deploy:
+    name: deploy to gh-pages
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: _site
+      - name: Publish the build into its version folder
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ "$REF_TYPE" = "tag" ]; then dest="$REF_NAME"; else dest="latest"; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch --depth=1 origin gh-pages
+            git worktree add pages FETCH_HEAD
+            git -C pages checkout -B gh-pages
+          else
+            git worktree add --orphan -b gh-pages pages
+          fi
+          rm -rf "pages/$dest"
+          mkdir -p "pages/$dest"
+          cp -r _site/. "pages/$dest/"
+          python3 scripts/docs_versions.py pages
+          cd pages
+          git add -A
+          if git diff --cached --quiet; then echo "nothing to publish"; exit 0; fi
+          git commit -m "docs: $dest from ${GITHUB_SHA::7}"
+          git push origin gh-pages
