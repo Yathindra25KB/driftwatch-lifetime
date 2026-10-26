@@ -466,9 +466,16 @@ class RunConfig:
 
 
 def lock_sha256(repo_root: Path | str) -> str:
-    """SHA-256 of ``uv.lock`` with line endings normalised (Windows and Linux agree)."""
-    raw = (Path(repo_root) / "uv.lock").read_bytes().replace(b"\r\n", b"\n")
-    return hashlib.sha256(raw).hexdigest()
+    """SHA-256 of ``uv.lock`` with line endings normalised (Windows and Linux agree).
+
+    An installed package has no lock file; the hash then covers the installed package versions
+    (prefixed so it can never equal a lock hash), which is what pins an installed run.
+    """
+    lock = Path(repo_root) / "uv.lock"
+    if not lock.exists():
+        text = "installed:" + json.dumps(package_versions(), sort_keys=True)
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return hashlib.sha256(lock.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def config_hash(config: dict[str, Any], code_version: str, lock_hash: str) -> str:

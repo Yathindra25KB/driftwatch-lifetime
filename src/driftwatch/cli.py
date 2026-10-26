@@ -1,8 +1,8 @@
 """Command-line entry point `driftwatch`.
 
-Phase 2 adds `data download|build|verify|inventory`, Phase 3 `data slice` and Phase 4
-`run <config.yaml>` (the E0 baseline). Later phases add `grid` (Phase 6) and
-`reproduce table1` (Phase 7).
+Subcommands: `data download|build|verify|inventory|slice`, `run <config.yaml>`,
+`grid <spec.yaml>`, `reproduce table1` and `smoke`. `smoke` needs no repository checkout
+and no dataset: it runs the synthetic fixture end to end and compares with a golden table.
 """
 
 import argparse
@@ -31,7 +31,9 @@ def build_parser() -> argparse.ArgumentParser:
     data = sub.add_parser("data", help="download, cache, verify and inventory the datasets")
     data_sub = data.add_subparsers(dest="data_command", required=True)
 
-    def add(name: str, help_text: str, dataset_default: str | None = None):
+    def add(
+        name: str, help_text: str, dataset_default: str | None = None
+    ) -> argparse.ArgumentParser:
         p = data_sub.add_parser(name, help=help_text)
         if dataset_default is None:
             p.add_argument("dataset", choices=DATASET_CHOICES)
@@ -104,6 +106,13 @@ def build_parser() -> argparse.ArgumentParser:
     rp.add_argument(
         "--write-reference", action="store_true", help="smoke only: (re)write the golden table"
     )
+
+    sm = sub.add_parser(
+        "smoke", help="end-to-end check on the synthetic fixture (works from an installed package)"
+    )
+    sm.add_argument("--out", type=Path, default=Path("driftwatch-smoke"), help="report folder")
+    sm.add_argument("--work-dir", type=Path, help="fixture caches and results go here")
+    sm.add_argument("--tolerance", type=float, default=0.002, help="absolute, per numeric cell")
 
     gr = sub.add_parser("grid", help="run the pre-registered delay x budget grid (E2), by cell")
     gr.add_argument("spec", type=Path, help="a grid spec such as configs/e2_lamda.yaml")
@@ -243,14 +252,14 @@ def _run_reproduce(args: argparse.Namespace) -> int:
     try:
         report = reproduce_table1(
             repo_root=repo,
-            data_root=args.data_root,
+            data_root=getattr(args, "data_root", Path("data/reproduce")),
             out_dir=args.out,
             work_dir=args.work_dir,
             tolerance=args.tolerance,
             smoke=args.smoke,
-            memory_cap_gb=args.memory_cap_gb,
-            require_clean=not args.allow_dirty,
-            write_reference=args.write_reference,
+            memory_cap_gb=getattr(args, "memory_cap_gb", 1.5),
+            require_clean=not getattr(args, "allow_dirty", False),
+            write_reference=getattr(args, "write_reference", False),
         )
     except ManualDownloadRequired as exc:
         print(exc, file=sys.stderr)
@@ -386,8 +395,9 @@ def main(argv: list[str] | None = None) -> int:
                 f"results in {summary.dir}"
             )
         return 0
-    if args.command == "reproduce":
+    if args.command in ("reproduce", "smoke"):
         logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+        args.smoke = args.smoke if args.command == "reproduce" else True
         return _run_reproduce(args)
     if args.command == "grid":
         from driftwatch.sim.config import ConfigError
