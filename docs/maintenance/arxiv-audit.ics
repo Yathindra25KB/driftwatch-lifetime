@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//DriftWatch//maintenance//EN
+BEGIN:VEVENT
+UID:driftwatch-arxiv-audit@driftwatch-lifetime
+DTSTAMP:20261026T000000Z
+DTSTART;VALUE=DATE:20261201
+RRULE:FREQ=MONTHLY;BYMONTHDAY=1
+SUMMARY:DriftWatch: monthly arXiv audit
+DESCRIPTION:Run the arxiv-audit skill (docs/MAINTENANCE.md). The GitHub workflow opens an issue on the 1st; if it did not run: uv run python scripts/arxiv_audit.py
+BEGIN:VALARM
+TRIGGER:-PT0M
+ACTION:DISPLAY
+DESCRIPTION:DriftWatch arXiv audit
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:driftwatch-deps-refresh@driftwatch-lifetime
+DTSTAMP:20261026T000000Z
+DTSTART;VALUE=DATE:20270105
+RRULE:FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=5
+SUMMARY:DriftWatch: quarterly dependency refresh and dataset-version watch
+DESCRIPTION:docs/MAINTENANCE.md: uv lock --upgrade, full checks, scripts/dataset_watch.py. Open a pull request; do not merge if a table moved.
+BEGIN:VALARM
+TRIGGER:-PT0M
+ACTION:DISPLAY
+DESCRIPTION:DriftWatch dependency refresh
+END:VALARM
+END:VEVENT
+END:VCALENDAR

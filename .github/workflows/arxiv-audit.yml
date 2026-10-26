@@ -1,0 +1,58 @@
+name: arXiv audit
+
+# Monthly: list new cs.CR / cs.LG papers near this study and open an issue with the candidates.
+# Triage into docs/related_work_addendum.md is a person's or the arxiv-audit skill's job.
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Start date YYYY-MM-DD (empty: 31 days ago)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: List candidates
+        env:
+          SINCE: ${{ inputs.since }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SINCE" ]; then SINCE=$(date -u -d "31 days ago" +%F); fi
+          python3 scripts/arxiv_audit.py --since "$SINCE" --no-state
+          ls reports/arxiv_audit/
+      - name: Open an issue with the candidates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          report=$(ls reports/arxiv_audit/*.md | sort | tail -1)
+          title="arXiv audit $(date -u +%Y-%m)"
+          if [ -n "$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[].number')" ]; then
+            echo "an open issue for this month already exists"; exit 0
+          fi
+          {
+            cat "$report"
+            echo
+            echo "Triage with the \`arxiv-audit\` skill (docs/MAINTENANCE.md). Candidates are keyword matches and have not been read."
+          } > body.md
+          gh label create related-work --color 0e8a16 --description "Literature to triage" --force
+          gh issue create --title "$title" --label related-work --body-file body.md
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: arxiv-audit
+          path: reports/arxiv_audit/
+          retention-days: 90

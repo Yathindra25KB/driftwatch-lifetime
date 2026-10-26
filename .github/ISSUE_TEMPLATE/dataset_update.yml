@@ -1,0 +1,28 @@
+name: Dataset update
+description: A dataset (LAMDA, BODMAS, EMBER2024) has a new version, a licence change or a correction.
+labels: [dataset-update]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A new dataset version never replaces the studied one silently. Rerunning needs a new
+        manifest and a new pre-registration addendum before any run (docs/MAINTENANCE.md).
+  - type: dropdown
+    id: dataset
+    attributes:
+      label: Dataset
+      options: [LAMDA, BODMAS, EMBER2024, other]
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link to the upstream change notes, release or commit
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What changed (versions, licence, labels, file layout)?
+    validations:
+      required: true
