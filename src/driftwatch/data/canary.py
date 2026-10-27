@@ -16,8 +16,8 @@ it claims (stop rule: fix the slicer first). If ``aut_true`` is already at the r
 level there is no gap to close (``NO_GAP``): either nothing decays, or something leaks. An
 AUT above 0.9 on a hard split is a leakage warning in its own right (guide section 9).
 
-AUT here is the guide's formula ``1/(N-1) * sum (f_k + f_{k+1}) / 2``; PROTOCOL D17 asks
-Phase 4 to check it against TESSERACT v4. The canary only compares like with like.
+AUT here is the guide's formula ``1/(N-1) * sum (f_k + f_{k+1}) / 2``; PROTOCOL D17 records
+the check against TESSERACT v4 (ADR-0006). The canary only compares like with like.
 """
 
 from __future__ import annotations

@@ -14,7 +14,7 @@ for loader-level code only (Phase 3 leakage review, finding 1). The metadata is 
 safe to hand over. `label`, `family`, `vt_count`, `category` and `year_month` are labels or
 derived from them. On BODMAS, `ts` and its flags also give the class away: benign
 timestamps are mostly midnight dates, and malware timestamps never are (Phase 2 leakage
-review, finding 1). Phase 5 adds the spy test that enforces this boundary.
+review, finding 1). The spy test in tests/test_sim_sealed.py enforces this boundary.
 """
 
 from __future__ import annotations

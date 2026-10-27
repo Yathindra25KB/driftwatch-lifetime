@@ -1,6 +1,8 @@
-"""Run harness (Phase 4: config, result store, E0 runner) and simulator (Phase 5).
+"""Run harness and simulator: configuration, result store, runners, grids and reproduction.
 
-Phase 4 holds only the never-retrain baseline runner. The label queue, selectors and
-policies arrive in Phase 5; the label queue is the only place a delay will live
-(``sim/queue.py``).
+The label queue (``queue.py``) is the only place a label delay lives; selectors, policies and
+the pool see handles, never held-back labels. ``runner`` runs the E0 baseline and the
+delay/budget simulation, ``runner_e3`` adds conformal selection and (with ``monitoring``)
+monitor-triggered retraining for E4, the ``grid*`` modules run the pre-registered grids by
+cell, and ``reproduce`` rebuilds Table 1.
 """

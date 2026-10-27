@@ -153,7 +153,7 @@ def _check_raw_against_committed_manifest(layout: Any, committed: Path, log: lis
 
     ``SOURCE.json`` is the download log (it carries a timestamp) and is not compared.
     """
-    import hashlib
+    from driftwatch.data.cache import sha256_file
 
     if not committed.exists():
         log.append(f"no committed manifest at {committed}: raw files not compared")
@@ -171,11 +171,7 @@ def _check_raw_against_committed_manifest(layout: Any, committed: Path, log: lis
         if path.stat().st_size != rec["bytes"]:
             bad.append(f"size differs {rel}")
             continue
-        h = hashlib.sha256()
-        with path.open("rb") as fh:
-            for chunk in iter(lambda: fh.read(1 << 20), b""):
-                h.update(chunk)
-        if h.hexdigest() != rec["sha256"]:
+        if sha256_file(path) != rec["sha256"]:
             bad.append(f"hash differs {rel}")
     if bad:
         raise ReproductionError(

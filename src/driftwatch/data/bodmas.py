@@ -4,7 +4,7 @@
 from the decompressing stream ``batch_size`` at a time, so the 1.28 GB matrix is never in
 memory at once. ``bodmas_metadata.csv`` is aligned row for row with X and sorted by
 timestamp, so each ISO week is a contiguous run of rows. Values are stored as published
-(float32, unnormalised): scaling is a training-window concern for later phases.
+(float32, unnormalised): scaling is a training-window concern, fitted in the models.
 """
 
 from __future__ import annotations

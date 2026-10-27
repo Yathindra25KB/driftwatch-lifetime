@@ -5,7 +5,7 @@ handles) and nothing else. It never sees a label, a timestamp or a row id (hard 
 it cannot reach the queue. It returns a :class:`Selection`; the queue resolves the handles
 and releases the true labels after the delay.
 
-Phase 8 plugs uncertainty and credibility selectors into the same ``select`` call through the
+The uncertainty and credibility selectors use the same ``select`` call through the
 optional ``scores`` argument (one value per row, in the public handle order). Random
 selection ignores it.
 

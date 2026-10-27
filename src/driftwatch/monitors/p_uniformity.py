@@ -61,7 +61,9 @@ class PUniformity:
     alpha: float = ALPHA
     name: str = "p_uniformity"
 
-    def start(self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any):
+    def start(
+        self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any
+    ) -> None:
         return None  # nothing to fit: the reference is the calibration buffer
 
     def update(self, view: SlotView, state: MonitorState) -> Alarm:

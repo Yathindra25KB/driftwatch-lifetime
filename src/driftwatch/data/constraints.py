@@ -13,7 +13,7 @@ Every check raises a :class:`ConstraintViolation`. None of them warns, and none 
 switched off. Never weaken a check to get green: write an ADR and ask the researcher.
 
 The checks take plain arrays. They know nothing about datasets, slots or files, so the
-slicer and later phases (the simulator re-checks C1 against the real training pool) share them.
+slicer and the simulator (which re-checks C1 against the real training pool) share them.
 """
 
 from __future__ import annotations

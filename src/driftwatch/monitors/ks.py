@@ -66,7 +66,9 @@ class KSTopK:
     def settings(self) -> str:
         return f"k{self.k}-n{self.n_sub}"
 
-    def start(self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any):
+    def start(
+        self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any
+    ) -> None:
         state.fitted["features"] = top_features(train_X, train_y, self.k)
 
     def update(self, view: SlotView, state: MonitorState) -> Alarm:
