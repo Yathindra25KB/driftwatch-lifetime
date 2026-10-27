@@ -4,18 +4,6 @@ This section explains how DriftWatch is built and why it is built that way: what
 
 Protocol constants (slot lengths, window sizes, delays, budgets, ratios) are **not** repeated here. They live in [PROTOCOL](../PROTOCOL.md), which is the single source of truth. Numbers that are results are in the [claims ledger](../CLAIMS.md).
 
-```{toctree}
-:maxdepth: 1
-
-data-and-slicing
-simulator
-conformal-and-monitors
-evidence-and-reproducibility
-quality-and-release
-extending
-screenshots
-```
-
 ## What the system does
 
 DriftWatch simulates a malware detector that is deployed and then lives through time. Samples arrive in time slots. In each slot the detector scores the new samples, an analyst may buy labels for a small budgeted selection of them, those labels arrive some slots later, and a policy decides when to retrain. The system measures how long the detector stays useful (AUT and A-AUT of the per-slot F1) under different delays, budgets, selectors and retraining triggers, always inside the time-aware constraints C1 to C3.
@@ -83,3 +71,17 @@ The project's [hard rules](https://github.com/Yathindra25KB/driftwatch-lifetime/
 4. [Evidence and reproducibility](evidence-and-reproducibility.md) for how a run becomes a table and a ledger row.
 5. [Quality and release](quality-and-release.md) for the guardrails, CI, release and maintenance pipelines.
 6. [Extending](extending.md) for adding a dataset, selector or monitor without breaking the protocol.
+7. [The project working](screenshots.md) for captures of real runs, the documentation site and the pipelines.
+
+```{toctree}
+:hidden:
+:maxdepth: 1
+
+data-and-slicing
+simulator
+conformal-and-monitors
+evidence-and-reproducibility
+quality-and-release
+extending
+screenshots
+```

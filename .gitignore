@@ -48,3 +48,6 @@ Thumbs.db
 /docs/_build/
 /_site/
 /_linkcheck/
+
+# Browser-automation scratch output
+.playwright-mcp/

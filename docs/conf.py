@@ -36,8 +36,21 @@ source_suffix = {".md": "markdown", ".rst": "restructuredtext"}
 exclude_patterns = [
     "_build",
     "**/_build",
-    ".*",
-    ".*/**",
+    # hidden folders by name (a blanket ".*/**" would also match "./x", the name Sphinx gives
+    # the top of docs/_static while copying it, and silently drop every static file)
+    ".git",
+    ".github",
+    ".venv",
+    ".cache",
+    ".claude",
+    ".claude-state",
+    ".agents",
+    ".codex",
+    ".playwright-mcp",
+    ".pytest-tmp",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".hypothesis",
     "data",
     "results",
     "tests",
@@ -85,7 +98,8 @@ linkcheck_ignore = [
 
 html_theme = "furo"
 html_title = f"DriftWatch {release}"
-html_static_path: list[str] = []
+html_static_path = ["_static"]
+html_css_files = ["print.css"]
 html_theme_options = {
     "source_repository": "https://github.com/Yathindra25KB/driftwatch-lifetime/",
     "source_branch": "main",
