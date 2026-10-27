@@ -29,6 +29,28 @@ git config gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
 
 The private key never leaves the machine and is never committed.
 
+## First release only: the public repository (GO)
+
+The development repository `Yathindra25KB/Driftwatch-` is private and its history contains `docs/source/` (course documents with no stated licence). The public repository is a new one, `Yathindra25KB/driftwatch-lifetime`, made from a filtered copy of that history. The private repository stays as the archive.
+
+1. **Finish the merges first.** Merge the open pull requests into `main` of the development repository (GO), because the filtered copy is taken from what is on `main` and the tags.
+2. **Make the filtered copy** (local, never pushes):
+
+   ```bash
+   uv run python scripts/make_public_history.py --out ../public-history
+   ```
+
+   It clones a mirror, removes `docs/source` from every commit with `git-filter-repo`, and checks that no commit or tree still holds the path, that every tag (including `prereg-v1` to `prereg-v3`) and every commit survived, that no blob is large, and that no secret-shaped text is present. It writes `commit_map.csv` (old and new hash).
+3. **Create and fill the public repository (GO, public and permanent).** In a browser or with `gh`, create `Yathindra25KB/driftwatch-lifetime` as an empty public repository, then push only `main` and the tags from the mirror:
+
+   ```bash
+   cd ../public-history/mirror.git
+   git push https://github.com/Yathindra25KB/driftwatch-lifetime.git main --tags
+   ```
+
+4. **Make the commit hashes findable.** Every hash cited in `docs/CLAIMS.md`, `docs/PHASES.md` and the decision records is a hash of the development history, and filtering changed all of them. In a pull request on the public repository, add `commit_map.csv` as `docs/commit_map.csv` and one sentence under the rules in `docs/CLAIMS.md` saying so.
+5. **Switch on the repository's services** (the table above): Pages, environments, branch protection, then the pending publishers.
+
 ## Every release
 
 1. **Branch and changes.** Work on a branch and merge to `main` through a pull request with CI green.
