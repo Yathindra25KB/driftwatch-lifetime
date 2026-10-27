@@ -59,6 +59,7 @@ The development repository `Yathindra25KB/Driftwatch-` is private and its histor
    - `uv run pytest -q` and `uv run pytest -q -m slow`; `uv run ruff check . && uv run ruff format --check .`; `uv run python scripts/check_guardrails.py`
    - `uv run python scripts/claims_audit.py` (PASS); `uv run python scripts/check_bib.py`
    - `uv run python scripts/list_licences.py`, with `docs/licence_audit.md` updated if anything changed
+   - `uvx cffconvert --validate -i CITATION.cff` and `uv run python scripts/zenodo_dry_run.py --check`
    - docs: `uv run --group docs sphinx-build -W --keep-going -b html docs docs/_build/html` and `-b linkcheck`
    - architecture PDF: `uvx --with playwright python scripts/export_architecture_pdf.py` prints the architecture section to `reports/architecture_report.pdf` with the Edge or Chrome that is installed (nothing is downloaded; Playwright is only a driver and is not a project dependency). Look at every page: the script checks that each diagram was drawn, not how it looks. The release workflow attaches the file to the draft release when it is committed.
 4. **Rehearsal (GO).** Push a commit with version `X.Y.ZrcN` to a branch. Run *Actions → Release → Run workflow*, target `testpypi`. Then run *Actions → Clean room → Run workflow*, source `testpypi`. Both OS legs must pass. Release candidates go to TestPyPI only.

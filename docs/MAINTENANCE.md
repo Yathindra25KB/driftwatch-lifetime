@@ -88,6 +88,7 @@ Run before every release, and whenever a release workflow fails.
 uv run python scripts/check_release.py                 # pyproject, CITATION.cff and CHANGELOG agree
 uv build && uv run python scripts/check_release.py --dist dist
 uvx twine check --strict dist/*
+uvx cffconvert --validate -i CITATION.cff              # citation file matches schema 1.2.0
 uv run python scripts/zenodo_dry_run.py --check        # .zenodo.json is well formed
 uv run python scripts/claims_audit.py                  # every number has a ledger row
 uv run python scripts/check_bib.py                     # every reference resolves
