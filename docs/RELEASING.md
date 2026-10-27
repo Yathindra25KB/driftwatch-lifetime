@@ -48,8 +48,9 @@ The private key never leaves the machine and is never committed.
    git push origin vX.Y.Z
    ```
 
-   The workflow runs: build → wheel smoke on Linux and Windows → `pypi` environment approval (**GO**) → PyPI upload → GitHub Release. The Release's publication makes Zenodo mint the DOI (**GO**: approve the `pypi` environment only if you also accept the DOI).
-7. **After the release.**
+   The workflow runs: build → wheel smoke on Linux and Windows → `pypi` environment approval (**GO**, uploads to PyPI) → a **draft** GitHub Release with the notes and files attached.
+7. **Publish the release (GO for the DOI).** Open the draft on GitHub (*Releases*), read the notes and the attached files, then click **Publish release**. Zenodo mints the DOI only when a release is published, and a DOI can never be deleted, so this is a separate decision from the upload. Check that the Zenodo integration is switched on for the repository *before* this click.
+8. **After the release.**
    - Put the version DOI and the concept DOI in `CITATION.cff` (`identifiers`) and the README badge, through a pull request.
    - Run *Clean room* with source `pypi`.
    - Check that the docs at `/vX.Y.Z/` are live.

@@ -51,3 +51,14 @@ def test_smoke_command_exits_zero_and_writes_a_report(tmp_path: Path, capsys) ->
     assert capsys.readouterr().out.startswith("MATCH")
     report = json.loads(next((tmp_path / "out").glob("table1_smoke_*.json")).read_text("utf-8"))
     assert report["verdict"] == "MATCH"
+
+
+def test_lock_hash_falls_back_only_outside_a_checkout(tmp_path: Path) -> None:
+    from driftwatch.sim.config import lock_sha256
+
+    assert len(lock_sha256(tmp_path)) == 64  # installed package: no uv.lock, no pyproject
+    (tmp_path / "pyproject.toml").write_text("[project]\nname='x'\n", encoding="utf-8")
+    with pytest.raises(FileNotFoundError, match="source checkout"):
+        lock_sha256(tmp_path)  # a checkout that lost its lock file is an error
+    (tmp_path / "uv.lock").write_bytes(b"a\r\nb\r\n")
+    assert lock_sha256(tmp_path) == lock_sha256(tmp_path)

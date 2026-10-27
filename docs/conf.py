@@ -27,7 +27,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinx_copybutton",
     "sphinxcontrib.mermaid",
 ]
 source_suffix = {".md": "markdown", ".rst": "restructuredtext"}

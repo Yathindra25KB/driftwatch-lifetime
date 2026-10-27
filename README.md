@@ -1,6 +1,10 @@
 # DriftWatch
 
-**Status (21 Oct 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
+[![CI](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/ci.yml/badge.svg)](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/ci.yml)
+[![Docs](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/docs.yml/badge.svg)](https://yathindra25kb.github.io/driftwatch-lifetime/latest/)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
+**Status (27 Oct 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
 
 > We study malware detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring in a single time-aware protocol, reported with A-AUT, on Android and Windows PE data.
 
@@ -22,7 +26,18 @@
 - Not an evasion or attack toolkit. It describes how detectors decay, not how to defeat them (`docs/ETHICS.md`).
 - Not a production detector, and not related to the PyPI package `driftwatch` (a general ML drift-monitoring library). This project's distribution name is `driftwatch-lifetime` (ADR-0003).
 
-## Quick start
+## Install
+Python `3.12` is required.
+
+```bash
+pip install driftwatch-lifetime        # or: uv tool install driftwatch-lifetime
+driftwatch --version
+driftwatch smoke                       # no data and no clone needed; ends with a line starting MATCH
+```
+
+`driftwatch smoke` regenerates a small synthetic fixture (random values in the real file layout), runs the whole pipeline on it and compares the table with a golden copy shipped in the package. Fixture numbers test the code path only; they are never evidence. The unrelated PyPI package `driftwatch` (a general ML drift library) installs the same import name, so do not install both in one environment (ADR-0003).
+
+## Quick start (from a clone)
 Requires [uv](https://docs.astral.sh/uv/). uv installs the locked Python itself. Start Claude Code, if you use it, from the repository root: the guardrail hooks resolve every path against the folder where the session started (ADR-0001).
 
 ```bash
@@ -63,6 +78,9 @@ Everything below is from stored runs; chapter 7 of the report has the full table
 | `docs/PHASES.md` | Phase and gate ledger |
 | `docs/DECISIONS/` | Architecture decision records |
 | `docs/GRID.md` | Running the grids (E2, E3, E4): cells, chunks, ledger, frozen worktree, Kaggle and Colab path |
+| `docs/architecture/` | How the system is built: package map, the sealed label queue, the per-slot loop, conformal layer, monitors, evidence chain, pipelines (with diagrams) |
+| `docs/MAINTENANCE.md`, `docs/RELEASING.md`, `docs/ROADMAP.md` | The maintenance playbook, the release procedure with its go gates, and future work |
+| `CHANGELOG.md` | What changed in each release |
 | `docs/results_audit.md` | What is on disk under `results/` (never committed), with code versions and flags |
 | `src/driftwatch/` | The package (`data`, `models`, `sim`, `conformal`, `monitors`, `metrics`) |
 | `configs/` | One YAML per run family; `e2_*`, `e3_*` and `e4_*` are grid specs |
@@ -73,5 +91,28 @@ Everything below is from stored runs; chapter 7 of the report has the full table
 ## Ethics
 The repository contains no malware, no decompiled code and no evasion tooling, and generates no adversarial examples. Feature files are used under their own licences (LAMDA under the MIT licence; BODMAS code under a BSD licence with the dataset licence not stated by its authors; EMBER2024 under the Apache licence). See `docs/ETHICS.md`.
 
-## Licence and citation
-Code: MIT (`LICENSE`). Datasets keep their own licences (`docs/ETHICS.md`). Citation metadata is in `CITATION.cff`: Yathindra K B, DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring (pre-release software, repository `Yathindra25KB/Driftwatch-`).
+## Documentation
+The documentation site has the protocol, the pre-registration, the claims ledger, the report chapters, the architecture and the API reference: https://yathindra25kb.github.io/driftwatch-lifetime/latest/ (versioned: one folder per release).
+
+## Limits
+Read these before relying on any result. They are stated in full, with their evidence, in chapter 8 of the report.
+- The effects are small against the spread over windows, and several intervals are wide by design (see the limits paragraph under "Headline results").
+- Seeds are draws of a subsample, not replicates of a model, and LAMDA's windows overlap, so the independent blocks are far fewer than the windows.
+- Delay is simulated and the analyst is perfect (the dataset label is the truth). Labels are the datasets' own: LAMDA's card warns of antivirus-centric labelling, and how BODMAS's labels were produced was not verified (D-17). None of this is measured in a real security operations centre.
+- Two datasets, two detectors, one machine. Tier 3 (another platform, EMBER2024) was not run.
+- The fixture used by `driftwatch smoke` is random data in the real layout. Its numbers are never evidence.
+
+## Licence, citation and acknowledgements
+Code: MIT (`LICENSE`). Datasets keep their own licences and are never redistributed (`docs/ETHICS.md`, `docs/licence_audit.md`). The wheel and the repository contain no dataset content other than the synthetic fixture.
+
+To cite the software, use `CITATION.cff` (GitHub shows a "Cite this repository" button); each release also has a DOI on Zenodo, linked from the release page. Until a release DOI exists:
+
+```bibtex
+@software{kb_driftwatch,
+  author  = {K B, Yathindra},
+  title   = {DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring},
+  year    = {2026},
+  url     = {https://github.com/Yathindra25KB/driftwatch-lifetime},
+  license = {MIT}
+}
+```
