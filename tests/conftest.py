@@ -136,3 +136,31 @@ def build_fixture_caches(root: Path) -> Path:
 def built_data(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """A data root with both datasets cached from the fixture (read-only for tests)."""
     return build_fixture_caches(tmp_path_factory.mktemp("built") / "data")
+
+
+# Tests that build a whole synthetic grid (a module-scoped run of 27 or 28 cells) are marked
+# slow: they are excluded from the fast suite and run with `uv run pytest -m slow` (and in CI).
+SLOW_FIXTURES = {"grid_root", "e3_root"}
+# End-to-end E0-era runs (each builds and runs a whole synthetic experiment): the same code
+# paths are exercised in the fast suite by the simulator tests, and these run with `-m slow`,
+# in CI and at every phase closeout.
+SLOW_MODULES = {
+    "test_runner_e0.py",
+    "test_make_e0_table.py",
+    "test_compare_runs.py",
+    # whole-dataset slicing, cache builds and canary scripts on the built fixture: each module
+    # builds caches or runs a script end to end; the slicer's own unit and property tests
+    # (test_slicer*.py, test_constraints.py) stay in the fast suite
+    "test_slicing_run.py",
+    "test_data_build.py",
+    "test_data_review.py",
+    "test_leakage_canary.py",
+    "test_make_e1_figure.py",
+}
+
+
+def pytest_collection_modifyitems(config, items) -> None:
+    for item in items:
+        in_slow_module = Path(str(item.fspath)).name in SLOW_MODULES
+        if in_slow_module or SLOW_FIXTURES & set(getattr(item, "fixturenames", ())):
+            item.add_marker(pytest.mark.slow)

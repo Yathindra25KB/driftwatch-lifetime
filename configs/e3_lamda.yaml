@@ -1,0 +1,53 @@
+# E3 on LAMDA (Android): selection under delay, reduced grid (docs/prereg/addendum-v2.md).
+# A grid spec: `driftwatch grid configs/e3_lamda.yaml`. Never edit this file after it has
+# produced stored results: copy it to a new name.
+# LAMDA has three refit events per window, so it is the informative dataset for RQ3.
+# Seeds 5 to 9 are run only if the researcher's hours allow (addendum v2).
+name: e3_lamda
+dataset: lamda
+slots:
+  preset: adr-0004
+  min_malware: 50
+window:
+  nT: 4
+  nE: 12
+  stride: 3
+ratio:
+  target: 0.10
+  sensitivity: 0.05
+model:
+  - name: lr
+    C: 1.0
+    max_iter: 1000
+    tol: 0.0001
+    scaling: standard(with_mean=dense_only)
+    threshold: 0.5
+  - name: lgbm
+    profile: fast
+    n_jobs: 4
+    threshold: 0.5
+e0:
+  variants: [rolling]
+  random_split: false
+output: results/e3/lamda
+nonconf:                       # ADR-0009 and addendum v2: fixed before any E3 run
+  score: probability
+  holdout_fraction: 0.20
+  min_per_class: 20
+  buffer_size: 1000
+  calibration_in_pool: false
+grid:
+  policy: {name: periodic, period: 3}
+  delay: [0, 3]
+  budget_pct: [1.0, 2.0]
+  selectors: [random, uncertainty, credibility]
+  calibration_fraction: 0.20
+  score: probability
+  seeds: [0, 1, 2, 3, 4]
+  extra_seeds: [5, 6, 7, 8, 9]
+  anchor:
+    selector: credibility
+    delay: 0
+    budget_pct: 2.0
+    reserved: [0.0, 0.10, 0.40]      # 0.0 is the deliberate exchangeability trap
+    score_comparison: centroid

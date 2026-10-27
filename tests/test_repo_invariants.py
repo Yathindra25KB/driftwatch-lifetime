@@ -21,7 +21,11 @@ TAG_RE = re.compile(r"prereg-v(\d+)")
 
 
 def run_git(repo: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    # decode as UTF-8 like the working-tree read below; the Windows default code page turned
+    # the first non-ASCII registered file (addendum v3) into a false "differs from its tag"
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, encoding="utf-8"
+    )
 
 
 def prereg_drift(repo: Path) -> list[str]:

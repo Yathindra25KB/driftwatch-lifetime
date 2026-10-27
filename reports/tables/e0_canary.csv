@@ -1,0 +1,3 @@
+dataset,verdict,exit_code,n_windows,aut_true,aut_shuffled,f1_random_split,gap,closure,leakage_warning,spec_digest
+bodmas,NO_GAP,3,6,0.3679,0.358,0.3597,-0.0082,,False,5b8cd71e6a7e9697
+lamda,PASS,0,4,0.4459,0.6322,0.6314,0.1855,1.0043,False,d31a60138dd323ba

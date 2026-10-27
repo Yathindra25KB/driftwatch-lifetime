@@ -1,38 +1,56 @@
 # DriftWatch pre-registration
 
-**Status: UNLOCKED** (draft written in Phase 1; finalised and tagged `prereg-v1` in Phase 6, before the first grid result)
+**Status: registered by the annotated git tag `prereg-v1`; UNLOCKED only until that tag exists** (written in Phase 1, finalised in Phase 6, tagged before the first E2 grid result). The tag, not this line, is the lock: the registered version of this file is `git show prereg-v1:docs/PREREG.md`, and changes go only into `docs/prereg/addendum-vN.md`.
 
 ## How the lock works
 
-1. This file is a draft until the researcher approves its final diff in Phase 6. Then the annotated git tag `prereg-v1` is created on the commit that contains it. The tag date must come before the first E2 result.
+1. This file was a draft until the researcher approved its final diff in Phase 6. Then the annotated git tag `prereg-v1` was created on the commit that contains it. The tag date must come before the first E2 result (the first file under `results/e2/`).
 2. While any `prereg-v*` tag exists, the PreToolUse guard (`.claude/hooks/guard.py`) blocks every Edit or Write that would make this file differ from its content at the highest `prereg-v*` tag. It also blocks shell commands that would write to this file, and any deletion or move of a `prereg-v*` tag.
 3. After the lock, changes go only into addendum files, `docs/prereg/addendum-vN.md`: v2 in Phase 8 (RQ3), v3 in Phase 9 (RQ4), v4 in Phase 10 (RQ5 replication). Each addendum is locked in the same way once its tag `prereg-vN` exists.
-4. Provenance is the tag, not this text: `git show prereg-v1:docs/PREREG.md` is the registered version.
+4. Provenance is the tag, not this text.
 
-Hypotheses are the build guide's (§5). The primary metrics, contrasts and decision rules come from the implementation plan, Appendix D. Values marked **TBD (owner)** are filled before the tag and never by looking at results.
+Hypotheses are the build guide's (section 5). The primary metrics, contrasts and decision rules come from the implementation plan, Appendix D, and from the Phase 6 planning session (15 Oct 2026).
+
+## What was already known when this file was locked (stated, not hidden)
+
+E0 (Phase 4) and E1 (Phase 5, including the label-influence diagnostic) were run and read before this tag. They show the never-retrain A-AUT on both datasets, both RQ1 comparators, and counts of decisions that retraining changes at 0.5% and 5% of the slot (CLAIMS E-01 to E-21). No delay or budget grid result (E2) existed. RQ1 is therefore a registered reading of known numbers, not a prediction made before results. RQ2 is registered before any E2 result.
 
 ## Research questions
 
 | RQ | Hypothesis (a target to test, not a known result) | Primary metric and contrasts | Analysis and decision rule | Tag |
 |---|---|---|---|---|
-| RQ1 | A large gap between random-split F1 and time-aware AUT(F1), mostly from temporal leakage in the random split. | Gap = random-split F1 minus AUT(F1), same data, same C3 ratio, per model and dataset. | Report the gap with a 95% window-first bootstrap interval. Judge "large" against a band fixed in advance: **0.05** [estimate; confirm before tag]. | v1 |
-| RQ2 | AUT falls roughly steadily with delay and rises with budget with diminishing returns. | A-AUT. Contrasts: d = 0 vs d = 3 at B = 1% and 5% (periodic); periodic at 5% vs never; the budget curve 0.5% to 5%. | Effect sizes (AUT lost per slot of delay, AUT gained per extra label) with intervals; Wilcoxon signed-rank on 10 seeds only as a supporting check; no single-cell claims. | v1 |
+| RQ1 | A large gap between random-split F1 and time-aware AUT(F1), mostly from temporal leakage in the random split. | **Primary comparator: the per-slot matched random-split series** (same slots, same seeds, malware subsampled to the C3 ratio per slot; E1). Gap = AUT of that series minus time-aware AUT, per window, then the mean over windows, per model and dataset. The E0 window-level comparator (pooled held-out rows of the window, one global C3 draw) is reported beside it and is secondary. The choice was made after seeing both (reports/G2.md, open decision A; ADR-0008): the per-slot series is the one that matches "same data, same C3 ratio". | Report the gap with a 95% two-stage bootstrap interval (below). "Large" means at or above the band **0.05** (the E0 sanity margin). Point estimate and interval lower bound are both reported against the band; the lower bound at or above 0.05 is "established above the band". "Mostly from leakage" is not tested here (the comparator also differs in achieved ratio, ADR-0008); the sentence is not made. | v1 |
+| RQ2 | AUT falls roughly steadily with delay and rises with budget with diminishing returns. | A-AUT (mean AUT over rolling windows). **Primary contrasts** (periodic retraining, random selection, per dataset x model = 4 strata): C-D1 A-AUT(d=0) minus A-AUT(d=3) at B = 1%; C-D2 the same at B = 5%; C-P A-AUT(periodic, d=0, B=5%) minus A-AUT(never); C-B A-AUT(B=5%) minus A-AUT(B=0.5%) at d=0. **Secondary and descriptive:** the full 4x4 grid, the OLS slope of A-AUT over d = 0..3 at each budget, and the budget concavity (AUT gained per 100 extra labels per slot between 0.5% and 1% against between 2% and 5%, at d=0). | Effect sizes in plain units with 95% two-stage bootstrap intervals: AUT lost per slot of delay (C-D divided by 3, and the OLS slope), AUT gained per 100 extra labels per evaluated slot, always with the absolute query counts. Wilcoxon signed-rank on the per-seed paired means (10 seeds) only as a supporting check, with Holm adjustment over the 16 primary contrasts. A contrast is **detected** in a stratum when its interval excludes 0 in the hypothesised direction; otherwise it is "not detected" and the interval half-width is the resolution. Practical-equivalence margin **0.01 AUT** [estimate]: an interval inside plus or minus 0.01 is reported as "no change larger than 0.01". No single-cell claims, no pooling of datasets or models. | v1 |
 | RQ3 | The advantage of uncertainty or credibility selection over random selection shrinks as delay grows. | Difference in AUT from random selection at equal labels spent; selector-by-delay interaction; reserved-slice ablation. | Interaction estimate with interval; report it if no advantage exists at any delay. | v2 |
 | RQ4 | Periodic retraining is a hard baseline; monitors may fail to beat it. | AUT at matched labels spent and at matched retrain count; alarm precision, alarm recall and detection delay. | Frozen thresholds; report all monitors; a negative result is a result. | v3 |
 | RQ5 | Directions agree across platforms; magnitudes differ. | Sign agreement and ratio of effect sizes across LAMDA and BODMAS for the pre-registered contrasts. | Descriptive comparison with intervals; no pooled significance claim. | v1 (E2), v4 (E5) |
 
-## Fixed before any run (to complete before `prereg-v1`)
+## Fixed before any run
 
 | Item | Value | Owner |
 |---|---|---|
-| Seeds | 5 for the grid; 10 for headline contrasts (guide §10). Seed values: TBD | Phase 6 |
-| A-AUT windows per dataset (nT, nE, stride) | TBD | ADR-0005 (Phase 3) |
-| Malware ratio | 10% target; one sensitivity ratio: TBD | ADR-0005 (Phase 3) |
-| Slot length, minimum-size gate, gap handling | TBD | ADR-0004 (Phase 2) |
-| Decision threshold, scaling policy, A-AUT window formula | TBD (default fixed 0.5) | ADR-0006 (Phase 4) |
-| Model hyperparameters (LR; LightGBM fast profile) | TBD; recorded here before E0 runs | Phase 4 |
-| Training-pool design (new-label weight, windowing) | TBD | ADR-0007 (Phase 5) |
-| Grid | delay {0,1,2,3}; budget {0.5,1,2,5}% of the evaluated slot; policies never and periodic(3); LR and LightGBM; both datasets | Phase 6 |
-| Exclusion rules | TBD | Phase 6 |
-| Failure rule | Failures are logged with their reason, never silently rerun; no cell is dropped, rerun or re-seeded because its result looks wrong. | fixed |
+| Seeds | Grid cells: 0, 1, 2, 3, 4. Headline cells again with seeds 5 to 9 (10 seeds in all): d in {0, 3} x B in {1%, 5%}, plus B = 0.5% and B = 2% at d = 0 (6 periodic cells per dataset) and never. Chow-stride secondary cells: seeds 0 to 4. Never: seeds 0 to 9, both window variants. E0 seeds were 0 to 4 | Phase 6 |
+| A-AUT windows per dataset (nT, nE, stride) | LAMDA 4, 12, 3; BODMAS 3, 6, 2 (months; 2-week slots). Secondary check at Chow's stride min(nT, nE): LAMDA 4, BODMAS 3, on the four delay-contrast cells and never | ADR-0005 (accepted), ADR-0006 |
+| Malware ratio | 10% target; sensitivity ratio 5% (E0 only); cap and flag for slots already below target | ADR-0005 (accepted) |
+| Slot length, minimum-size gate, gap handling | LAMDA calendar month; BODMAS 2 weeks from 2019-08-26; M = 50; gaps never bridged | ADR-0004 (accepted) |
+| Decision threshold, scaling policy, A-AUT window formula | Fixed 0.5, malware when P > 0.5; StandardScaler fitted on the training window (centred only for dense); A-AUT = mean and sample std (ddof 1) of AUT over windows, Chow Eq. 2-4 and 6-8 | ADR-0006 |
+| Model hyperparameters (LR; LightGBM fast profile) | **LR:** L2, C 1.0, lbfgs, tol 1e-4, max_iter 1000, no class weights. **LightGBM fast:** 100 trees, learning rate 0.1, 31 leaves, min child samples 20, max_bin 63, colsample_bytree 0.5, subsample 0.8 (every tree), deterministic, col-wise, 4 threads. Fixed before E0 runs; never tuned to chase published numbers | ADR-0006; configs/e0_*.yaml, configs/e2_*.yaml |
+| Training-pool design | New-label weight 1; no truncation; pool = initial window plus arrived labels; budget = percentage of the evaluated slot after C3, count `floor(pct/100 * n + 1/2)`; retrain before evaluation slots 3, 6, 9, ... counted from the first evaluation slot (no-op when no label arrived). ACCEPTED by the researcher on 15 Oct 2026 | ADR-0007 |
+| Grid | delay {0, 1, 2, 3} slots; budget {0.5, 1, 2, 5}% of the evaluated slot; policies never and periodic(3); LR and LightGBM; both datasets; random selection (calibration slice 20%, no effect under random selection). 27 runs per dataset: 16 grid cells, 6 headline extra-seed cells, 4 Chow-stride cells, 1 never | configs/e2_lamda.yaml, configs/e2_bodmas.yaml |
+| Never arm | One run per (dataset, model, window, seed). It does not depend on delay or budget (it never refits); a test pins that its predictions equal those of a simulation config with policy never at any delay and budget | tests/test_grid.py |
+| Uncertainty | Two-stage bootstrap: windows are resampled in moving blocks of length ceil(nE / stride) (LAMDA 4, BODMAS 3; Chow variant ceil(nE / min(nT, nE)): LAMDA 3, BODMAS 2), then seeds are resampled with replacement inside each selected window; arms are cut with the same indices so contrasts are paired on window and seed. 10,000 replicates, percentile 95% interval, bootstrap seed 20261215. The two-stage scheme counts within-window variance twice and is conservative (about sqrt(2) wider when seed noise dominates); that is accepted and stated | metrics/stats.py |
+| Units | AUT lost per slot of delay = (A-AUT(d=0) - A-AUT(d=3)) / 3, and the OLS slope over d = 0..3. AUT gained per 100 extra labels per evaluated slot = difference of A-AUT divided by the difference of the mean absolute query count per slot, times 100. Absolute counts (mean queries per slot, labels per window) printed beside every percentage | metrics/stats.py |
+| Recovery time | Slots until F1 returns to 90% of its pre-drop level, with the drop event defined as a fall of at least 0.05 below the trailing 3-slot mean (the same definition as monitor scoring, resolving PROTOCOL D6); descriptive only | metrics/slot.py |
+| Exclusion rules | A window with fewer than two evaluation slots has no AUT and is excluded and counted. Slots below the target ratio are kept and flagged (cap and flag). No window, seed or cell is excluded because of its value; an AUT above 0.90 is flagged as a leakage alarm and kept. A cell whose run failed stays in the ledger with its reason and is reported as missing; contrasts that need it are reported as not computed | Phase 6 |
+| Failure rule | Failures are logged with their reason, never silently rerun; no cell is dropped, rerun or re-seeded because its result looks wrong. A retry of an infrastructure failure (memory cap, killed process) is a new ledger event that names the failed attempt. A bug found after this tag is fixed in a new commit, the affected cells are marked invalidated in the ledger, and exactly those are rerun | fixed |
 | Shrink order if a fit exceeds 60 s | delay 2, budget 0.5%, windows, seeds on non-headline cells (shrink the grid before the claim) | fixed |
+| Memory | One run at a time (`--workers 1`) under the approved 1.5 GiB cap; a cell killed by the cap is reported as cap-limited, not rescued by raising the cap | ADR-0007 |
+
+## Known limits (written before the results)
+
+- **BODMAS geometry (nT 3, nE 6, stride 2, period 3):** each window has one useful refit (before slot 3). At d = 3 nothing queried in slots 0 to 2 has arrived by then, so periodic equals never by construction and C-D1 and C-D2 reduce to periodic at d = 0 against never; at d = 2 only slot-0 labels have arrived. The BODMAS delay axis is a delay in a single refit, not a delay curve. The researcher kept this geometry on 15 Oct 2026.
+- **LAMDA windows overlap:** the 16 rolling windows are about four independent 12-month blocks, so intervals are wide and are blocked accordingly.
+- **Seeds are not full replicates for LR:** the model is deterministic given its pool; seeds are C3 draws and selector draws.
+- **Small label counts:** a slot's budget is tens to a couple of hundred labels, about a tenth of them malware; retraining changed 0.2% to 2.1% of decisions in the E1 diagnostic (CLAIMS E-13 to E-15), so flat results are plausible and are reported as they are.
+- **Pool repeats:** feature vectors that repeat across slots are counted per slot (`n_seen_in_pool`, initial plus arrived rows) and reported; they are not removed.
+- **Comparator ratio:** the per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA (CLAIMS E-18); RQ1 states a gap, not a leakage-only quantity.

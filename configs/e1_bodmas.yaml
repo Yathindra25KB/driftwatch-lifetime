@@ -1,0 +1,32 @@
+# E1 on BODMAS (Windows PE): random split vs time-aware F1 per slot, never retrain (RQ1).
+# Never edit this file after it has produced stored results: copy it to a new name.
+name: e1_bodmas
+dataset: bodmas
+slots:
+  preset: adr-0004        # BODMAS 2-week slots from 2019-08-26, placeholder-dated benign rows excluded
+  min_malware: 50         # size gate M (ADR-0004, ADR-0005)
+window:
+  nT: 3                   # ADR-0005
+  nE: 6
+  stride: 2
+ratio:
+  target: 0.10            # C3 headline (ADR-0005)
+  sensitivity: 0.05
+seeds: [0, 1, 2, 3, 4]
+model:
+  - name: lr
+    C: 1.0
+    max_iter: 1000
+    tol: 0.0001
+    scaling: standard(with_mean=dense_only)
+    threshold: 0.5
+  - name: lgbm
+    profile: fast
+    n_jobs: 4
+    threshold: 0.5
+policy: never
+e0:
+  variants: [rolling]
+  random_split: true
+  per_slot_random_split: true   # per-slot matched comparator, predictions stored (series random_split)
+output: results/e1

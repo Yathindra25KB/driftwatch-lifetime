@@ -376,6 +376,7 @@ class EvalSlot:
     c3: C3Result
     perm: np.ndarray  # seeded, label-independent shuffle that defines the public order
     n_seen_in_initial_train: int | None = None
+    fv_hash: np.ndarray | None = None  # feature-vector hashes of the kept rows (queue and pool)
 
     def public(self) -> OpaqueSlot:
         """The label-free view (hard rule 4): features and opaque handles only.
@@ -462,6 +463,7 @@ class Window:
                 c3=c3,
                 perm=perm,
                 n_seen_in_initial_train=seen,
+                fv_hash=None if rows.fv_hash is None else rows.fv_hash[kept],
             )
             log.info(
                 "C3 %s: malware %d -> %d, benign %d -> %d, %.1f%% of malware discarded, "

@@ -14,12 +14,12 @@ DriftWatch studies how malware detectors **decay** over time, and what label del
 |---|---|---|
 | DriftWatch code | MIT (ADR-0002) | This repository |
 | LAMDA | MIT [verified in build guide §1] | Feature files; cite the dataset paper; not redistributed |
-| BODMAS | BSD-2-Clause [verified in build guide §1] | Feature files; cite; not redistributed |
+| BODMAS | The repository code is BSD-2-Clause; **no licence is stated for the dataset files** (data card, checked 20 Oct 2026; the build guide's BSD-2-Clause for the dataset is [verify]) | Feature files; cite; not redistributed (downloaded into the git-ignored `data/` only) |
 | EMBER2024 (optional, Tier 3) | Apache-2.0 [verified in build guide §1] | Win32 weekly subset only; not redistributed |
 | AndroZoo | Academic key; redistribution forbidden | Not used (would need a faculty-sponsored key) |
 | SOREL-20M | Own terms, not verified | Excluded (build guide §10) |
 
-Every dataset version, source URL and file hash goes into `data/manifest.json` (Phase 2) and its data card under `docs/data_cards/`. The full licence audit is `docs/licence_audit.md` (Phase 12).
+Every dataset version, source URL and file hash goes into `data/manifest.json` (Phase 2) and its data card under `docs/data_cards/`. The full licence audit is `docs/licence_audit.md` (22 Oct 2026; regenerate the dependency table with `uv run python scripts/list_licences.py`).
 
 ## Data handling
 
