@@ -11,6 +11,7 @@ Every number or claim of consequence that appears in the README, the report (`re
 5. **Never "first".** No contribution is claimed as "first". State what was measured.
 6. **Corrections append.** A changed value gets a new row that names the claim it supersedes; old rows are never edited away.
 7. **Regenerable.** Values from experiments must regenerate from stored per-slot predictions with `scripts/make_tables.py` (Phase 6 onward).
+8. **Commit hashes.** The commits cited in this ledger, in `docs/PHASES.md` and in the decision records are hashes of the private development history. The public history was made from it by removing one folder of unlicensed course documents (`docs/source`), which changes every hash. `docs/commit_map.csv` maps each old hash (column `old`) to its public hash (column `new`). The tags `prereg-v1` to `prereg-v3` were carried over and point at the rewritten commits whose content is unchanged.
 
 ## Ledger
 
