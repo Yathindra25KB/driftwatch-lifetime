@@ -1,0 +1,437 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 5: Related work (draft)" href="ch05_related_work.html"><link rel="prev" title="Chapter 3: How the results are analysed (draft)" href="ch03_analysis.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 4: Recent techniques and attacks (draft) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/report/ch04_latest_techniques.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/report/ch04_latest_techniques.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-4-recent-techniques-and-attacks-draft">
+<h1>Chapter 4: Recent techniques and attacks (draft)<a class="headerlink" href="#chapter-4-recent-techniques-and-attacks-draft" title="Link to this heading">¶</a></h1>
+<blockquote>
+<div><p>Status: draft written by Claude Code for the researcher to rewrite, verify and defend. Fact-checked on <strong>22 Oct 2026</strong>: every statistic below was compared with the abstract of its source (the arXiv abstract text, a publisher or proceedings page, or a Crossref record) and carries a literature claim id (docs/CLAIMS.md, rows L-01 to L-31) with the source and the access date. <strong>None of the full papers was read</strong>, so a sentence says what an abstract says, not what the paper proves; where a reading of the full paper is needed, the sentence says so. The chapter is written from the defender’s side: it says what kinds of techniques exist and what they imply for evaluation, and it contains no recipe for building evasive malware (hard rule 12; <code class="docutils literal notranslate"><span class="pre">docs/ETHICS.md</span></code>). Target length: about 12 pages; this draft is shorter on purpose, because it reports abstracts and not full papers.</p>
+</div></blockquote>
+<section id="why-this-chapter-exists">
+<h2>4.1 Why this chapter exists<a class="headerlink" href="#why-this-chapter-exists" title="Link to this heading">¶</a></h2>
+<p>The study measures how long a detector stays useful when labels arrive late. That question sits inside a larger and fast-moving field. This chapter lists what has been published recently on the three things that decide a detector’s lifetime: how drift is handled, how an adversary can shorten the lifetime on purpose, and what language models bring to the analyst’s side of the loop. It exists so that chapter 5 and the discussion in chapter 8 can say which of these the study does not address.</p>
+</section>
+<section id="handling-drift-training-adaptation-and-detection">
+<h2>4.2 Handling drift: training, adaptation and detection<a class="headerlink" href="#handling-drift-training-adaptation-and-detection" title="Link to this heading">¶</a></h2>
+<p>Three families appear in the 2024 to 2026 abstracts read for this draft.</p>
+<p><strong>Training for stability.</strong> TIF (Zheng et al., arXiv 2502.05098, submitted 7 Feb 2025, accepted by IEEE Transactions on Software Engineering according to the arXiv comment) groups training data into environments by the date an app was observed and combines multi-proxy contrastive learning with invariant gradient alignment, so that features that are stable across periods are preferred over features that matter only in one. Its abstract reports that it excels on a decade-long dataset, “particularly in early deployment stages” [L-01]. The idea attacks decay at its source and is complementary to buying labels.</p>
+<p><strong>Adaptation without, or with few, true labels.</strong> ADAPT (Alam, Piplai and Rastogi, arXiv 2507.08597, 11 Jul 2025) uses pseudo-labels from unlabeled data and reports experiments on five datasets across Android, Windows and PDF [L-02]. LFreeDA (Li and Bertino, arXiv 2511.14963, 18 Nov 2025) adapts a Windows detector with pseudo-labels from unsupervised domain adaptation; it reports gains of up to 12.6% in accuracy and 11.1% in F1 over no adaptation, being 4% (accuracy) and 3.4% (F1) below fully supervised upper bounds, and matching methods that are given ground-truth labels for 300 target samples [L-03]. MADCAT (Roh et al., arXiv 2505.18734, 24 May 2025) adapts at test time by training the encoder on a small, balanced subset of the test data [L-04]. These methods spend no analyst time, which makes them a natural zero-budget reference for the budget axis of this study.</p>
+<p><strong>Selecting what to label and detecting drift.</strong> Chen, Ding and Wagner (USENIX Security 2023) combine contrastive learning with active learning to choose samples for analysts [L-11]. DREAM (He et al., arXiv 2405.04095, 7 May 2024; ACM CCS 2025 according to the arXiv comment) detects drifting samples in a contrastive autoencoder and reports that, for a Drebin classifier, it reaches the same accuracy with 76.6% fewer newly labelled samples than the best existing methods [L-05]. Minnei et al. (arXiv 2603.28396, 30 Mar 2026) combine active and semi-supervised learning on Android and Windows and report annotation cost cut by up to 90% at detection performance comparable to full-label retraining [L-06]. Structure-based drift measures from decision-tree rulesets are studied on EMBER2024 by Kalny et al. (arXiv 2604.22629, 24 Apr 2026), who find that fixed two-month windows with feature-level Pearson correlation were the most reliable configuration and that no single method dominates [L-07].</p>
+<p>What these abstracts do not say is how late the labels are or what a fixed per-period budget costs; the delay and the budget enter the study as parameters.</p>
+</section>
+<section id="evaluation-benchmarks-and-the-evaluation-trap">
+<h2>4.3 Evaluation: benchmarks and the evaluation trap<a class="headerlink" href="#evaluation-benchmarks-and-the-evaluation-trap" title="Link to this heading">¶</a></h2>
+<p>LAMDA, the Android benchmark used here, spans 12 years (2013 to 2025, without 2015) with over one million samples, about 37% malware and 1,380 malware families according to its arXiv abstract; an ICLR 2026 poster page for it exists [L-08]. The sizes used in this study, counted from the data, are in CLAIMS D-01 and D-02. McNdroid (Kamol et al., arXiv 2605.06894, 7 May 2026) covers the same years with static, dynamic and call-graph features and reports degradation over growing train-test gaps [L-09]. For Windows PE, the datasets used here are BODMAS and, if Tier 3 were run, EMBER2024 [L-30].</p>
+<p>Two evaluation points recur. First, results depend strongly on how time is cut: the extended TESSERACT paper and Chow et al. (arXiv 2506.23814, discussed in chapter 5) identify factors that move reported performance even with temporal splits [L-22, L-23]. Second, confidence is not free: Aurora (Herzog, Eusebi and Cavallaro, arXiv 2505.22843, 28 May 2025, revised 21 Jan 2026) asks whether the confidence estimates that selective and active methods rely on are trustworthy, and reports fragility in state-of-the-art frameworks across datasets of varying drift severity [L-10]. That is a caution for any uncertainty- or credibility-based selector, including those of RQ3, and chapter 7 section 7.5 reports that E3 does not show that credibility adds anything over uncertainty (the two selectors’ advantages over random, CLAIMS E-43).</p>
+<p>A third point concerns drift detectors themselves. Cerqueira et al. (arXiv 2606.07789) benchmark 14 drift detection methods on 7 real-world datasets and score them with timing-aware criteria such as an F1 detection score and a normalised detection time [L-31]. The monitor scores of this study (alarm precision, recall and detection delay against drop events in F1, chapter 6 section 6.12) follow the same idea of scoring detectors by whether and how soon they fire, but they are not that paper’s metrics, and the study does not claim they are comparable with its numbers.</p>
+</section>
+<section id="adversaries">
+<h2>4.4 Adversaries<a class="headerlink" href="#adversaries" title="Link to this heading">¶</a></h2>
+<p>An adversary does not wait for drift. In the problem space, an attacker modifies a malicious file so that it keeps its behaviour but changes what the classifier sees; in the feature space, the change is applied to the features directly, which is easier to study and usually less realistic. Surveys organise the literature by attack domain and generation technique (Aryal, Gupta, Abdelsalam, Kunwar and Thuraisingham, “A Survey on Adversarial Attacks for Malware Analysis”, IEEE Access 13:428-459, 2025 issue, record created 18 Dec 2024; the arXiv text 2111.08223 is an earlier version by three of the authors [L-26]) and by the assumptions, attacks and defenses of the “arms race” (Li, Li, Ye and Xu, arXiv 2005.11671; ACM Computing Surveys 55(1), article 15). One finding of the latter’s abstract is that the effectiveness of practical evasion depends largely on how much freedom the attacker has in the problem space, and that adversarial training depends on the defender’s ability to identify the most powerful attack [L-25].</p>
+<p>What this means for the study: the datasets here record natural time evolution; the study measures decay from drift only and does not model an adaptive adversary. A detector that looks durable here is not thereby robust to evasion. The repository contains no attack code (<code class="docutils literal notranslate"><span class="pre">docs/ETHICS.md</span></code>).</p>
+</section>
+<section id="language-models-on-the-analyst-s-side">
+<h2>4.5 Language models on the analyst’s side<a class="headerlink" href="#language-models-on-the-analyst-s-side" title="Link to this heading">¶</a></h2>
+<p>Recent papers (read at abstract level on 22 Oct 2026) evaluate language models for malicious-code analysis: a benchmark of 13 models on 4,070 PyPI packages that recommends them for initial triage, because they detect a malicious package better than they pinpoint its indicators (arXiv 2602.16304) [L-27]; a study of Windows executables decompiled with Ghidra, which concludes that standard models cannot yet replace traditional anti-virus software and that a fine-tuned model degrades on newer malware (arXiv 2601.09035) [L-28]; and a retrieval-augmented system for JAR files (arXiv 2510.15567) [L-29]. For this study the relevance is on the label side: if language models shorten the time an analyst needs to label a sample, the delay shrinks and the budget grows, which the grid can read. No language model is used here, and none of these papers measures labelling time.</p>
+</section>
+<section id="what-remains-open-in-this-chapter">
+<h2>4.6 What remains open in this chapter<a class="headerlink" href="#what-remains-open-in-this-chapter" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>The statistics are abstract-level. Opening each paper and checking the quoted statistic against the paper would turn “the abstract reports” into “the paper shows”; that is the researcher’s reading, and the sentences above are worded so that they stay true either way.</p></li>
+<li><p>A 2025 or 2026 survey on problem-space attacks and defenses was not found in a search on 2026-10-15; the two surveys above are the ones read.</p></li>
+<li><p>Section 4.5 was cut to one paragraph on 22 Oct 2026 at the researcher’s decision, because it adds no evidence to the study. If the faculty report has a page limit, the guide allows compressing chapters 2 to 4 first; the rest of this chapter can be cut to a page by keeping the three family headings and one sentence each.</p></li>
+</ol>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ch05_related_work.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 5: Related work (draft)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ch03_analysis.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 3: How the results are analysed (draft)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 4: Recent techniques and attacks (draft)</a><ul>
+<li><a class="reference internal" href="#why-this-chapter-exists">4.1 Why this chapter exists</a></li>
+<li><a class="reference internal" href="#handling-drift-training-adaptation-and-detection">4.2 Handling drift: training, adaptation and detection</a></li>
+<li><a class="reference internal" href="#evaluation-benchmarks-and-the-evaluation-trap">4.3 Evaluation: benchmarks and the evaluation trap</a></li>
+<li><a class="reference internal" href="#adversaries">4.4 Adversaries</a></li>
+<li><a class="reference internal" href="#language-models-on-the-analyst-s-side">4.5 Language models on the analyst’s side</a></li>
+<li><a class="reference internal" href="#what-remains-open-in-this-chapter">4.6 What remains open in this chapter</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

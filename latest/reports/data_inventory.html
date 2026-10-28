@@ -1,0 +1,1329 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Data inventory (Phase 2) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/reports/data_inventory.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/reports/data_inventory.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="data-inventory-phase-2">
+<h1>Data inventory (Phase 2)<a class="headerlink" href="#data-inventory-phase-2" title="Link to this heading">¶</a></h1>
+<p>Generated by <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">inventory</span></code> from <code class="docutils literal notranslate"><span class="pre">data/manifest.json</span></code> (content hash <code class="docutils literal notranslate"><span class="pre">sha256:50bf7ae397423197b18c9a9c3caef8b4f575c2c3aec0592a03a2cb833d01e84b</span></code>) and the per-unit caches. Do not edit by hand: regenerate. Interpretation, decisions and open questions are in <a class="reference internal" href="data_inventory_notes.html"><span class="std std-doc">data_inventory_notes.md</span></a> and ADR-0004.</p>
+<section id="lamda">
+<h2>LAMDA<a class="headerlink" href="#lamda" title="Link to this heading">¶</a></h2>
+<p><img alt="lamda counts" src="../_images/data_lamda_counts.png" /></p>
+<p>Table view: <a class="reference download internal" download="" href="../_downloads/edee97f26951f9d2982fc14f9adca518/data_lamda_units.csv"><span class="xref download myst">units</span></a>; slots: <a class="reference download internal" download="" href="../_downloads/f969f3557b5349462a97783dddcd3270/data_lamda_slots_month.csv"><span class="xref download myst">month</span></a>, <a class="reference download internal" download="" href="../_downloads/1085c74c21e914126bdcf91e80a9acfe/data_lamda_slots_quarter.csv"><span class="xref download myst">quarter</span></a>.</p>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>source</p></td>
+<td><p>IQSeC-Lab/LAMDA</p></td>
+</tr>
+<tr class="row-odd"><td><p>version</p></td>
+<td><p>ad9614bdd5556767f97ced2fce797c2f06408ebf</p></td>
+</tr>
+<tr class="row-even"><td><p>rows</p></td>
+<td><p>1008381</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware</p></td>
+<td><p>369906</p></td>
+</tr>
+<tr class="row-even"><td><p>benign</p></td>
+<td><p>638475</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware share</p></td>
+<td><p>0.3668</p></td>
+</tr>
+<tr class="row-even"><td><p>features</p></td>
+<td><p>4561</p></td>
+</tr>
+<tr class="row-odd"><td><p>feature dtype</p></td>
+<td><p>int8</p></td>
+</tr>
+<tr class="row-even"><td><p>density (non-zero share)</p></td>
+<td><p>0.01633</p></td>
+</tr>
+<tr class="row-odd"><td><p>base unit</p></td>
+<td><p>month</p></td>
+</tr>
+<tr class="row-even"><td><p>populated base units</p></td>
+<td><p>120</p></td>
+</tr>
+<tr class="row-odd"><td><p>timestamp used</p></td>
+<td><p>added (AndroZoo) when inside year_month, else first of the month</p></td>
+</tr>
+<tr class="row-even"><td><p>raw size on disk</p></td>
+<td><p>340.5 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p>cache size on disk</p></td>
+<td><p>119.7 MB</p></td>
+</tr>
+<tr class="row-even"><td><p>build peak memory</p></td>
+<td><p>0.87 GB (cap 1.50 GB)</p></td>
+</tr>
+<tr class="row-odd"><td><p>build wall-clock</p></td>
+<td><p>93.1 s</p></td>
+</tr>
+<tr class="row-even"><td><p>build code version</p></td>
+<td><p>bba2692-dirty</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="timestamps">
+<h3>Timestamps<a class="headerlink" href="#timestamps" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>min</p></td>
+<td><p>2013-06-09T21:44:12+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>max</p></td>
+<td><p>2025-01-26T23:59:10+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>share_with_time_of_day</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>distinct_days</p></td>
+<td><p>3113</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_min</p></td>
+<td><p>2013-06-09T21:44:39+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_max</p></td>
+<td><p>2025-01-25T14:59:05+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_p01</p></td>
+<td><p>2013-06-10T03:21:17.300000+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_share_at_midnight</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_most_common_ts</p></td>
+<td><p>2018-01-19T09:33:26+00:00 x 13</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_min</p></td>
+<td><p>2013-06-09T21:44:12+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>benign_max</p></td>
+<td><p>2025-01-26T23:59:10+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_p01</p></td>
+<td><p>2013-06-10T02:41:34.920000+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>benign_share_at_midnight</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_most_common_ts</p></td>
+<td><p>2013-06-10T19:10:50+00:00 x 7</p></td>
+</tr>
+<tr class="row-even"><td><p>share_ts_equals_added</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_without_added</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>rows_ts_from_month_start</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Rows per year and class (<a class="reference download internal" download="" href="../_downloads/a03296ab5b881a0ff2e293af192d36a8/data_lamda_years.csv"><span class="xref download myst">csv</span></a>):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>year</p></th>
+<th class="head"><p>benign</p></th>
+<th class="head"><p>malware</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2013</p></td>
+<td><p>42048</p></td>
+<td><p>44383</p></td>
+</tr>
+<tr class="row-odd"><td><p>2014</p></td>
+<td><p>55427</p></td>
+<td><p>45756</p></td>
+</tr>
+<tr class="row-even"><td><p>2016</p></td>
+<td><p>64059</p></td>
+<td><p>45134</p></td>
+</tr>
+<tr class="row-odd"><td><p>2017</p></td>
+<td><p>77785</p></td>
+<td><p>21359</p></td>
+</tr>
+<tr class="row-even"><td><p>2018</p></td>
+<td><p>64942</p></td>
+<td><p>39350</p></td>
+</tr>
+<tr class="row-odd"><td><p>2019</p></td>
+<td><p>49465</p></td>
+<td><p>41585</p></td>
+</tr>
+<tr class="row-even"><td><p>2020</p></td>
+<td><p>55718</p></td>
+<td><p>46355</p></td>
+</tr>
+<tr class="row-odd"><td><p>2021</p></td>
+<td><p>45528</p></td>
+<td><p>35627</p></td>
+</tr>
+<tr class="row-even"><td><p>2022</p></td>
+<td><p>44768</p></td>
+<td><p>41648</p></td>
+</tr>
+<tr class="row-odd"><td><p>2023</p></td>
+<td><p>46462</p></td>
+<td><p>7892</p></td>
+</tr>
+<tr class="row-even"><td><p>2024</p></td>
+<td><p>47633</p></td>
+<td><p>794</p></td>
+</tr>
+<tr class="row-odd"><td><p>2025</p></td>
+<td><p>44640</p></td>
+<td><p>23</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="identifiers">
+<h3>Identifiers<a class="headerlink" href="#identifiers" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ids_not_sha256</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>their_prefixes</p></td>
+<td><p>{}</p></td>
+</tr>
+<tr class="row-even"><td><p>their_labels</p></td>
+<td><p>{}</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="slot-occupancy-and-minimum-size-gate">
+<h3>Slot occupancy and minimum-size gate<a class="headerlink" href="#slot-occupancy-and-minimum-size-gate" title="Link to this heading">¶</a></h3>
+<p>A slot passes gate M when it holds at least M malware and 9M benign, so that C3 subsampling to 10% malware keeps M malware. Gap slots hold no rows; “longest passing run” counts consecutive passing slots (gaps break a run).</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>slot_length</p></th>
+<th class="head"><p>slots_in_span</p></th>
+<th class="head"><p>gap_slots</p></th>
+<th class="head"><p>non_empty_slots</p></th>
+<th class="head"><p>M</p></th>
+<th class="head"><p>passing_slots</p></th>
+<th class="head"><p>longest_passing_run</p></th>
+<th class="head"><p>run_start</p></th>
+<th class="head"><p>run_end</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>month</p></td>
+<td><p>140</p></td>
+<td><p>20</p></td>
+<td><p>120</p></td>
+<td><p>30</p></td>
+<td><p>101</p></td>
+<td><p>66</p></td>
+<td><p>2018-11-01</p></td>
+<td><p>2024-05-01</p></td>
+</tr>
+<tr class="row-odd"><td><p>month</p></td>
+<td><p>140</p></td>
+<td><p>20</p></td>
+<td><p>120</p></td>
+<td><p>50</p></td>
+<td><p>97</p></td>
+<td><p>62</p></td>
+<td><p>2018-11-01</p></td>
+<td><p>2024-01-01</p></td>
+</tr>
+<tr class="row-even"><td><p>month</p></td>
+<td><p>140</p></td>
+<td><p>20</p></td>
+<td><p>120</p></td>
+<td><p>100</p></td>
+<td><p>93</p></td>
+<td><p>62</p></td>
+<td><p>2018-11-01</p></td>
+<td><p>2024-01-01</p></td>
+</tr>
+<tr class="row-odd"><td><p>quarter</p></td>
+<td><p>48</p></td>
+<td><p>5</p></td>
+<td><p>43</p></td>
+<td><p>30</p></td>
+<td><p>34</p></td>
+<td><p>29</p></td>
+<td><p>2017-10-01</p></td>
+<td><p>2025-01-01</p></td>
+</tr>
+<tr class="row-even"><td><p>quarter</p></td>
+<td><p>48</p></td>
+<td><p>5</p></td>
+<td><p>43</p></td>
+<td><p>50</p></td>
+<td><p>34</p></td>
+<td><p>29</p></td>
+<td><p>2017-10-01</p></td>
+<td><p>2025-01-01</p></td>
+</tr>
+<tr class="row-odd"><td><p>quarter</p></td>
+<td><p>48</p></td>
+<td><p>5</p></td>
+<td><p>43</p></td>
+<td><p>100</p></td>
+<td><p>32</p></td>
+<td><p>26</p></td>
+<td><p>2017-10-01</p></td>
+<td><p>2024-04-01</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="duplicates">
+<h3>Duplicates<a class="headerlink" href="#duplicates" title="Link to this heading">¶</a></h3>
+<p><img alt="lamda duplicates" src="../_images/data_lamda_duplicates.png" /></p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dataset</p></td>
+<td><p>lamda</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows</p></td>
+<td><p>1008381</p></td>
+</tr>
+<tr class="row-even"><td><p>distinct_vectors</p></td>
+<td><p>679423</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_sharing_a_vector</p></td>
+<td><p>421860</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_with_both_labels</p></td>
+<td><p>2177</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_in_label_conflicting_vectors</p></td>
+<td><p>54835</p></td>
+</tr>
+<tr class="row-even"><td><p>sha256_duplicate_rows</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>sha256_in_several_units</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_in_several_slots_month</p></td>
+<td><p>63908</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_seen_in_earlier_slot_month</p></td>
+<td><p>238576</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_in_several_slots_quarter</p></td>
+<td><p>52425</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_seen_in_earlier_slot_quarter</p></td>
+<td><p>196556</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Per-slot table: <a class="reference download internal" download="" href="../_downloads/7d647ac82c4295bb1818fe80cbed38cb/data_lamda_duplicates_per_slot.csv"><span class="xref download myst">duplicates per slot</span></a>.</p>
+</section>
+<section id="families-malware">
+<h3>Families (malware)<a class="headerlink" href="#families-malware" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>named_families</p></td>
+<td><p>1381</p></td>
+</tr>
+<tr class="row-odd"><td><p>named_families_with_10_or_more</p></td>
+<td><p>435</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_singleton_labels</p></td>
+<td><p>150604</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_without_family</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_in_top_10_families</p></td>
+<td><p>130427</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Top 20: <a class="reference download internal" download="" href="../_downloads/c485f12a110a45b77047bd24ffa0d15d/data_lamda_families_top20.csv"><span class="xref download myst">families</span></a>.</p>
+</section>
+<section id="missing-values-and-consistency-checks-from-the-build">
+<h3>Missing values and consistency checks (from the build)<a class="headerlink" href="#missing-values-and-consistency-checks-from-the-build" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>added_month_mismatch</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>added_null</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>family_null_benign</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>family_null_malware</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>feature_nulls</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>folder_year_mismatch</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>max_value</p></td>
+<td><p>17</p></td>
+</tr>
+<tr class="row-odd"><td><p>meta_family_conflicts</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>meta_label_conflicts</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>meta_missing</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>meta_vt_conflicts</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>nnz</p></td>
+<td><p>75089877</p></td>
+</tr>
+<tr class="row-even"><td><p>rows_read</p></td>
+<td><p>1008381</p></td>
+</tr>
+<tr class="row-odd"><td><p>vt_label_conflicts</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>vt_non_integral</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>vt_null</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>excluded</p></td>
+<td><p>{}</p></td>
+</tr>
+<tr class="row-odd"><td><p>metadata_csv_duplicate_sha256</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="bodmas">
+<h2>BODMAS<a class="headerlink" href="#bodmas" title="Link to this heading">¶</a></h2>
+<p><img alt="bodmas counts" src="../_images/data_bodmas_counts.png" /></p>
+<p>Table view: <a class="reference download internal" download="" href="../_downloads/e85e9aad447b303d1dd412149605180a/data_bodmas_units.csv"><span class="xref download myst">units</span></a>; slots: <a class="reference download internal" download="" href="../_downloads/76928bc2a981c4dd01db7f318c7c1db0/data_bodmas_slots_1w.csv"><span class="xref download myst">1w</span></a>, <a class="reference download internal" download="" href="../_downloads/85c42976bfdc827bd229f95a6280c281/data_bodmas_slots_2w.csv"><span class="xref download myst">2w</span></a>, <a class="reference download internal" download="" href="../_downloads/34e467b30152799964b621801cc4794d/data_bodmas_slots_4w.csv"><span class="xref download myst">4w</span></a>.</p>
+<section id="id1">
+<h3>Overview<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>source</p></td>
+<td><p>https://drive.google.com/drive/folders/1Uf-LebLWyi9eCv97iBal7kL1NgiGEsv_</p></td>
+</tr>
+<tr class="row-odd"><td><p>version</p></td>
+<td><p>{‘bodmas.npz’: ‘1_7uhKCrc9hmIOxxfZMoKK6aP8-GJ-DNJ’, ‘bodmas_malware_category.csv’: ‘10bdoOn9qhf647HwANpAga78ye8rOEgwJ’, ‘bodmas_metadata.csv’: ‘16UtiitjekNfqHGlLWtxkxyuU23o2qaja’}</p></td>
+</tr>
+<tr class="row-even"><td><p>rows</p></td>
+<td><p>134435</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware</p></td>
+<td><p>57293</p></td>
+</tr>
+<tr class="row-even"><td><p>benign</p></td>
+<td><p>77142</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware share</p></td>
+<td><p>0.4262</p></td>
+</tr>
+<tr class="row-even"><td><p>features</p></td>
+<td><p>2381</p></td>
+</tr>
+<tr class="row-odd"><td><p>feature dtype</p></td>
+<td><p>float32</p></td>
+</tr>
+<tr class="row-even"><td><p>density (non-zero share)</p></td>
+<td><p>0.27594</p></td>
+</tr>
+<tr class="row-odd"><td><p>base unit</p></td>
+<td><p>week</p></td>
+</tr>
+<tr class="row-even"><td><p>populated base units</p></td>
+<td><p>424</p></td>
+</tr>
+<tr class="row-odd"><td><p>timestamp used</p></td>
+<td><p>metadata <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> (first appearance, per the BODMAS page), UTC</p></td>
+</tr>
+<tr class="row-even"><td><p>raw size on disk</p></td>
+<td><p>265.5 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p>cache size on disk</p></td>
+<td><p>1231.2 MB</p></td>
+</tr>
+<tr class="row-even"><td><p>build peak memory</p></td>
+<td><p>0.56 GB (cap 1.50 GB)</p></td>
+</tr>
+<tr class="row-odd"><td><p>build wall-clock</p></td>
+<td><p>23.4 s</p></td>
+</tr>
+<tr class="row-even"><td><p>build code version</p></td>
+<td><p>bba2692-dirty</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id2">
+<h3>Timestamps<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>min</p></td>
+<td><p>2007-01-01T08:46:39+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>max</p></td>
+<td><p>2020-09-30T03:05:27+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>share_with_time_of_day</p></td>
+<td><p>0.5078</p></td>
+</tr>
+<tr class="row-odd"><td><p>distinct_days</p></td>
+<td><p>1181</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_min</p></td>
+<td><p>2019-08-29T09:59:25+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_max</p></td>
+<td><p>2020-09-30T03:05:27+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_p01</p></td>
+<td><p>2019-08-31T22:13:23.080000+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_share_at_midnight</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_most_common_ts</p></td>
+<td><p>2020-07-11T23:02:11+00:00 x 19</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_min</p></td>
+<td><p>2007-01-01T08:46:39+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>benign_max</p></td>
+<td><p>2020-09-30T00:00:00+00:00</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_p01</p></td>
+<td><p>2015-01-01T00:00:00+00:00</p></td>
+</tr>
+<tr class="row-even"><td><p>benign_share_at_midnight</p></td>
+<td><p>0.8577</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_most_common_ts</p></td>
+<td><p>2020-01-01T00:00:00+00:00 x 5877</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_placeholder_ts_rows</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_ts_without_offset</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>benign_placeholder_ts_rows</p></td>
+<td><p>9545</p></td>
+</tr>
+<tr class="row-odd"><td><p>benign_ts_without_offset</p></td>
+<td><p>3712</p></td>
+</tr>
+<tr class="row-even"><td><p>placeholder_rule</p></td>
+<td><p>date-only timestamp shared by &gt;= 1000 rows</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Rows per year and class (<a class="reference download internal" download="" href="../_downloads/b5633c296a5dc74018cd6b2105607346/data_bodmas_years.csv"><span class="xref download myst">csv</span></a>):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>year</p></th>
+<th class="head"><p>benign</p></th>
+<th class="head"><p>malware</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2007</p></td>
+<td><p>6</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2008</p></td>
+<td><p>13</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2009</p></td>
+<td><p>37</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2010</p></td>
+<td><p>36</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2011</p></td>
+<td><p>90</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2012</p></td>
+<td><p>53</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2013</p></td>
+<td><p>54</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2014</p></td>
+<td><p>78</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2015</p></td>
+<td><p>1653</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2016</p></td>
+<td><p>288</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2017</p></td>
+<td><p>2462</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2018</p></td>
+<td><p>5872</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2019</p></td>
+<td><p>20686</p></td>
+<td><p>15823</p></td>
+</tr>
+<tr class="row-odd"><td><p>2020</p></td>
+<td><p>45814</p></td>
+<td><p>41470</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id3">
+<h3>Identifiers<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ids_not_sha256</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-odd"><td><p>their_prefixes</p></td>
+<td><p>{‘virusshare’: 7}</p></td>
+</tr>
+<tr class="row-even"><td><p>their_labels</p></td>
+<td><p>{0: 7}</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id4">
+<h3>Slot occupancy and minimum-size gate<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<p>A slot passes gate M when it holds at least M malware and 9M benign, so that C3 subsampling to 10% malware keeps M malware. Gap slots hold no rows; “longest passing run” counts consecutive passing slots (gaps break a run).</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>slot_length</p></th>
+<th class="head"><p>slots_in_span</p></th>
+<th class="head"><p>gap_slots</p></th>
+<th class="head"><p>non_empty_slots</p></th>
+<th class="head"><p>M</p></th>
+<th class="head"><p>passing_slots</p></th>
+<th class="head"><p>longest_passing_run</p></th>
+<th class="head"><p>run_start</p></th>
+<th class="head"><p>run_end</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1w</p></td>
+<td><p>718</p></td>
+<td><p>294</p></td>
+<td><p>424</p></td>
+<td><p>30</p></td>
+<td><p>51</p></td>
+<td><p>33</p></td>
+<td><p>2020-02-17</p></td>
+<td><p>2020-10-05</p></td>
+</tr>
+<tr class="row-odd"><td><p>1w</p></td>
+<td><p>718</p></td>
+<td><p>294</p></td>
+<td><p>424</p></td>
+<td><p>50</p></td>
+<td><p>49</p></td>
+<td><p>25</p></td>
+<td><p>2020-02-17</p></td>
+<td><p>2020-08-10</p></td>
+</tr>
+<tr class="row-even"><td><p>1w</p></td>
+<td><p>718</p></td>
+<td><p>294</p></td>
+<td><p>424</p></td>
+<td><p>100</p></td>
+<td><p>33</p></td>
+<td><p>16</p></td>
+<td><p>2020-04-06</p></td>
+<td><p>2020-07-27</p></td>
+</tr>
+<tr class="row-odd"><td><p>2w</p></td>
+<td><p>359</p></td>
+<td><p>84</p></td>
+<td><p>275</p></td>
+<td><p>30</p></td>
+<td><p>27</p></td>
+<td><p>17</p></td>
+<td><p>2020-02-10</p></td>
+<td><p>2020-10-05</p></td>
+</tr>
+<tr class="row-even"><td><p>2w</p></td>
+<td><p>359</p></td>
+<td><p>84</p></td>
+<td><p>275</p></td>
+<td><p>50</p></td>
+<td><p>27</p></td>
+<td><p>17</p></td>
+<td><p>2020-02-10</p></td>
+<td><p>2020-10-05</p></td>
+</tr>
+<tr class="row-odd"><td><p>2w</p></td>
+<td><p>359</p></td>
+<td><p>84</p></td>
+<td><p>275</p></td>
+<td><p>100</p></td>
+<td><p>27</p></td>
+<td><p>17</p></td>
+<td><p>2020-02-10</p></td>
+<td><p>2020-10-05</p></td>
+</tr>
+<tr class="row-even"><td><p>4w</p></td>
+<td><p>180</p></td>
+<td><p>22</p></td>
+<td><p>158</p></td>
+<td><p>30</p></td>
+<td><p>13</p></td>
+<td><p>8</p></td>
+<td><p>2020-02-10</p></td>
+<td><p>2020-09-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>4w</p></td>
+<td><p>180</p></td>
+<td><p>22</p></td>
+<td><p>158</p></td>
+<td><p>50</p></td>
+<td><p>13</p></td>
+<td><p>8</p></td>
+<td><p>2020-02-10</p></td>
+<td><p>2020-09-21</p></td>
+</tr>
+<tr class="row-even"><td><p>4w</p></td>
+<td><p>180</p></td>
+<td><p>22</p></td>
+<td><p>158</p></td>
+<td><p>100</p></td>
+<td><p>13</p></td>
+<td><p>8</p></td>
+<td><p>2020-02-10</p></td>
+<td><p>2020-09-21</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id5">
+<h3>Duplicates<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dataset</p></td>
+<td><p>bodmas</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows</p></td>
+<td><p>134435</p></td>
+</tr>
+<tr class="row-even"><td><p>distinct_vectors</p></td>
+<td><p>134428</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_sharing_a_vector</p></td>
+<td><p>14</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_with_both_labels</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_in_label_conflicting_vectors</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>sha256_duplicate_rows</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>sha256_in_several_units</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_in_several_slots_1w</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_seen_in_earlier_slot_1w</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_in_several_slots_2w</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_seen_in_earlier_slot_2w</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>vectors_in_several_slots_4w</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>rows_seen_in_earlier_slot_4w</p></td>
+<td><p>4</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Per-slot table: <a class="reference download internal" download="" href="../_downloads/8726c46c91052815c1e196087b932972/data_bodmas_duplicates_per_slot.csv"><span class="xref download myst">duplicates per slot</span></a>.</p>
+</section>
+<section id="id6">
+<h3>Families (malware)<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>named_families</p></td>
+<td><p>582</p></td>
+</tr>
+<tr class="row-odd"><td><p>named_families_with_10_or_more</p></td>
+<td><p>196</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_singleton_labels</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_without_family</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>malware_in_top_10_families</p></td>
+<td><p>29950</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Top 20: <a class="reference download internal" download="" href="../_downloads/657b77028f134c23e381f4e5658befb0/data_bodmas_families_top20.csv"><span class="xref download myst">families</span></a>.</p>
+</section>
+<section id="id7">
+<h3>Missing values and consistency checks (from the build)<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>item</p></th>
+<th class="head"><p>value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>bad_sha256</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-odd"><td><p>inf</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>label_family_conflicts</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>malware_without_category</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>nan</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>nonzero</p></td>
+<td><p>88325432</p></td>
+</tr>
+<tr class="row-even"><td><p>rows</p></td>
+<td><p>134435</p></td>
+</tr>
+<tr class="row-odd"><td><p>ts_unsorted</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>ts_with_time_of_day</p></td>
+<td><p>68266</p></td>
+</tr>
+<tr class="row-odd"><td><p>ts_without_offset</p></td>
+<td><p>3712</p></td>
+</tr>
+<tr class="row-even"><td><p>ts_without_offset_malware_family</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>weeks_skipped</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Data inventory (Phase 2)</a><ul>
+<li><a class="reference internal" href="#lamda">LAMDA</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#timestamps">Timestamps</a></li>
+<li><a class="reference internal" href="#identifiers">Identifiers</a></li>
+<li><a class="reference internal" href="#slot-occupancy-and-minimum-size-gate">Slot occupancy and minimum-size gate</a></li>
+<li><a class="reference internal" href="#duplicates">Duplicates</a></li>
+<li><a class="reference internal" href="#families-malware">Families (malware)</a></li>
+<li><a class="reference internal" href="#missing-values-and-consistency-checks-from-the-build">Missing values and consistency checks (from the build)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bodmas">BODMAS</a><ul>
+<li><a class="reference internal" href="#id1">Overview</a></li>
+<li><a class="reference internal" href="#id2">Timestamps</a></li>
+<li><a class="reference internal" href="#id3">Identifiers</a></li>
+<li><a class="reference internal" href="#id4">Slot occupancy and minimum-size gate</a></li>
+<li><a class="reference internal" href="#id5">Duplicates</a></li>
+<li><a class="reference internal" href="#id6">Families (malware)</a></li>
+<li><a class="reference internal" href="#id7">Missing values and consistency checks (from the build)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

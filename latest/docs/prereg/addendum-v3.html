@@ -1,0 +1,575 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Pre-registration addendum v3: RQ4, drift monitors and retraining (E4) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/docs/prereg/addendum-v3.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/docs/prereg/addendum-v3.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="pre-registration-addendum-v3-rq4-drift-monitors-and-retraining-e4">
+<h1>Pre-registration addendum v3: RQ4, drift monitors and retraining (E4)<a class="headerlink" href="#pre-registration-addendum-v3-rq4-drift-monitors-and-retraining-e4" title="Link to this heading">¶</a></h1>
+<p><strong>Status: registered by the annotated git tag <code class="docutils literal notranslate"><span class="pre">prereg-v3</span></code>; UNLOCKED only until that tag exists.</strong> The tag, not this line, is the lock. It predates the first E4 result (the first file under <code class="docutils literal notranslate"><span class="pre">results/e4/</span></code>). It was created on the researcher’s go of 20 Oct 2026. The researcher approved this addendum as written, accepted ADR-0010, and chose seeds 0 to 9 for every E4 cell before any E4 result. It is never moved or deleted.</p>
+<p>Scope: this addendum adds RQ4 to <code class="docutils literal notranslate"><span class="pre">docs/PREREG.md</span></code> (tag <code class="docutils literal notranslate"><span class="pre">prereg-v1</span></code>) and <code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v2.md</span></code> (tag <code class="docutils literal notranslate"><span class="pre">prereg-v2</span></code>) and changes nothing registered there. Everything not stated here is as registered in v1 and v2: windows, ratio, threshold, models, the conformal layer, the two-stage bootstrap, the decision rule, the exclusion and failure rules, and units.</p>
+<section id="what-was-known-when-this-was-written">
+<h2>What was known when this was written<a class="headerlink" href="#what-was-known-when-this-was-written" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>E0 to E3 are complete and have been read (CLAIMS E-01 to E-43). E3 shows how the random arm behaves on the conformal path, and E4’s periodic arm uses the same configuration.</p></li>
+<li><p>No E4 run on real data exists.</p></li>
+<li><p>The monitor code was tested on synthetic streams only: <code class="docutils literal notranslate"><span class="pre">tests/test_monitors.py</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/test_runner_e4.py</span></code>, <code class="docutils literal notranslate"><span class="pre">scripts/monitor_synthetic.py</span></code>.</p></li>
+<li><p>Two monitor designs were changed after the synthetic no-drift checks failed them, before any real-data run (ADR-0010):</p>
+<ul>
+<li><p>p-uniformity: the one-sample KS against U(0, 1) was replaced by a two-sample KS against the calibration scores.</p></li>
+<li><p>MMD: the reference-only standardisation was replaced by a pooled standardisation.</p></li>
+</ul>
+</li>
+<li><p>A real-data smoke run (one seed, one window per cell, all 19 cells per dataset, 20 Oct 2026) measured only time, memory and failures. Its F1 values were not read.</p>
+<ul>
+<li><p>Every cell completed.</p></li>
+<li><p>Peak memory was 0.91 GB on BODMAS and 0.57 GB on LAMDA, under the 1.5 GiB cap.</p></li>
+<li><p>The longest single fit was 2.5 s, so no fit approaches the 60 s rule.</p></li>
+<li><p>The grid’s extrapolation is 3.0 h for BODMAS and 8.8 h for LAMDA. This is an upper bound: smoke runs keep no disk cache, so the domain classifier’s null is refitted in every cell, while evidence runs fit it once per window and share it.</p></li>
+<li><p>During the smoke runs, the domain classifier’s solver was changed from liblinear to lbfgs for cost (ADR-0010).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="hypothesis-guide-rq4">
+<h2>Hypothesis (guide, RQ4)<a class="headerlink" href="#hypothesis-guide-rq4" title="Link to this heading">¶</a></h2>
+<p>Periodic retraining is a hard baseline. Monitor-triggered retraining may fail to beat it. A negative or flat result is reported as it is.</p>
+</section>
+<section id="design">
+<h2>Design<a class="headerlink" href="#design" title="Link to this heading">¶</a></h2>
+<ul>
+<li><p><strong>Arms.</strong> All arms run on the E3 conformal path:</p>
+<ul class="simple">
+<li><p>random selector, reserved share 0.20 of the budget;</p></li>
+<li><p>probability score, hold-out 0.20, calibration buffer 1,000;</p></li>
+<li><p>minimum 20 rows per class (v2 values).</p></li>
+</ul>
+<p>Every arm therefore queries the same rows in every slot, so <strong>labels spent are equal by construction</strong>. The tables check this slot by slot and stop on a difference. The arms are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">never</span></code>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodic(3)</span></code>, which is E3’s random arm;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">monitor-m</span></code>, for each monitor m;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">matched-m</span></code>, the matched-retrains control for each monitor m.</p></li>
+</ul>
+</li>
+<li><p><strong>Models and data.</strong> LR and LightGBM (v1 hyperparameters), LAMDA and BODMAS, A-AUT windows as in v1.</p></li>
+<li><p><strong>Budget and delays.</strong> B = 1% of the evaluated slot; delay d ∈ {0, 3}.</p></li>
+<li><p><strong>E4 numbers are comparable with E3’s random arm, never with E2 absolutes.</strong></p></li>
+</ul>
+<section id="the-four-monitors-one-interface-update-slot-view-state-alarm">
+<h3>The four monitors (one interface: <code class="docutils literal notranslate"><span class="pre">update(slot</span> <span class="pre">view,</span> <span class="pre">state)</span> <span class="pre">-&gt;</span> <span class="pre">alarm</span></code>)<a class="headerlink" href="#the-four-monitors-one-interface-update-slot-view-state-alarm" title="Link to this heading">¶</a></h3>
+<p>Frozen values, ADR-0010:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Monitor</p></th>
+<th class="head"><p>Input (no labels of evaluated slots)</p></th>
+<th class="head"><p>Test</p></th>
+<th class="head"><p>Alarm</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>KS</p></td>
+<td><p>the 20 features with the largest absolute standardised class-mean difference on the window’s proper training rows (initial window, its own labels), fixed per window; 500 vs 500 rows</p></td>
+<td><p>two-sample KS per feature, Holm over the 20</p></td>
+<td><p>smallest adjusted p ≤ 0.01</p></td>
+</tr>
+<tr class="row-odd"><td><p>MMD</p></td>
+<td><p>TruncatedSVD (16 components) fitted without labels on the proper training rows, plus the logit of the model’s malware probability; pooled standardisation; RBF kernel, pooled median-heuristic bandwidth; 200 vs 200 rows</p></td>
+<td><p>199 seeded permutations</p></td>
+<td><p>p ≤ 0.01</p></td>
+</tr>
+<tr class="row-even"><td><p>Domain classifier</p></td>
+<td><p>raw features, 500 vs 500 rows</p></td>
+<td><p>LR (C = 1, lbfgs, 200 iterations, scaled per fold), 5-fold stratified CV AUC; null of 99 random-label splits of the initial reference, computed once per window</p></td>
+<td><p>p = (1 + #{null ≥ AUC}) / 100 ≤ 0.01</p></td>
+</tr>
+<tr class="row-odd"><td><p>p-uniformity</p></td>
+<td><p>label-free conformal scores <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">−</span> <span class="pre">max(P,</span> <span class="pre">1</span> <span class="pre">−</span> <span class="pre">P)</span></code>, Mondrian by predicted class; calibration = features of the arrived calibration rows</p></td>
+<td><p>two-sample KS of the slot’s scores (500 rows) against the calibration scores per predicted class, Bonferroni over classes</p></td>
+<td><p>p ≤ 0.01; undecided (counted, no alarm) if a predicted class has fewer than 20 calibration rows</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Every subsample, permutation and fold is seeded by (seed, window, slot) only.</p>
+<p><strong>Reference (rule R).</strong> The initial reference is a 500-row seeded sample of the window’s time-ordered hold-out. After a refit, the reference becomes the sample of the newest evaluation slot whose labelled rows were in the pool at that fit, which is at most <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">−</span> <span class="pre">1</span> <span class="pre">−</span> <span class="pre">d</span></code>. Arms that never refit keep the initial reference.</p>
+</section>
+<section id="policies">
+<h3>Policies<a class="headerlink" href="#policies" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Monitor-triggered.</strong> The monitor runs on slot <code class="docutils literal notranslate"><span class="pre">s</span></code> after <code class="docutils literal notranslate"><span class="pre">s</span></code> is scored. An alarm makes a retrain event before slot <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">+</span> <span class="pre">1</span></code> when at least <strong>min_gap = 2</strong> slots have passed since the last actual refit. The initial model counts as a refit at slot 0.</p></li>
+<li><p><strong>Alarm with no new labels.</strong> If no new label has arrived, the event is a logged no-op.</p></li>
+<li><p><strong>Alarms are never carried.</strong> An alarm is consumed at the next slot whether it refits, makes a no-op or is blocked by the gap.</p></li>
+<li><p><strong>Matched-count control.</strong> For each (window, seed, model), k is the monitor arm’s number of actual refits. The k events are placed evenly over slots <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">d</span> <span class="pre">..</span> <span class="pre">nE</span> <span class="pre">−</span> <span class="pre">1</span></code>: event j is at <code class="docutils literal notranslate"><span class="pre">first</span> <span class="pre">+</span> <span class="pre">floor((j</span> <span class="pre">+</span> <span class="pre">1)·n</span> <span class="pre">/</span> <span class="pre">(k</span> <span class="pre">+</span> <span class="pre">1))</span></code>. They are chosen without looking at data. Events with no new label are no-ops, so the control can refit fewer times than k. Its refit count is reported.</p></li>
+</ul>
+</section>
+</section>
+<section id="cells-reduced-grid-per-dataset">
+<h2>Cells (reduced grid), per dataset<a class="headerlink" href="#cells-reduced-grid-per-dataset" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Arm</p></th>
+<th class="head"><p>Count</p></th>
+<th class="head"><p>Seeds</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>never, with all four monitors observing (primary monitor quality)</p></td>
+<td><p>1</p></td>
+<td><p>0 to 4, and 5 to 9</p></td>
+</tr>
+<tr class="row-odd"><td><p>periodic(3) at d ∈ {0, 3}</p></td>
+<td><p>2</p></td>
+<td><p>0 to 4, and 5 to 9</p></td>
+</tr>
+<tr class="row-even"><td><p>monitor-m at d ∈ {0, 3}, m ∈ {KS, MMD, domain classifier, p-uniformity}</p></td>
+<td><p>8</p></td>
+<td><p>0 to 4, and 5 to 9</p></td>
+</tr>
+<tr class="row-odd"><td><p>matched-m at d ∈ {0, 3}</p></td>
+<td><p>8</p></td>
+<td><p>0 to 4, and 5 to 9</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>That is 19 arms per dataset, each run as two cells (seeds 0 to 4, then seeds 5 to 9): 38 cells per dataset and 76 in all. <strong>The primary contrasts use all 10 seeds.</strong> This was decided by the researcher before any E4 result. BODMAS runs first, and within a dataset the seed 0 to 4 cells run first.</p>
+<p><strong>Shrink order</strong>, if compute runs short and before any claim is cut:</p>
+<ol class="arabic simple">
+<li><p>Drop the LAMDA seed 5 to 9 cells, and say so. LAMDA contrasts are then reported on seeds 0 to 4, as a registered fallback.</p></li>
+<li><p>Drop d = 3 on BODMAS (where periodic equals never at d = 3).</p></li>
+<li><p>Cut LAMDA E4 and report BODMAS only, saying so.</p></li>
+</ol>
+</section>
+<section id="primary-contrasts-per-dataset-model">
+<h2>Primary contrasts (per dataset × model)<a class="headerlink" href="#primary-contrasts-per-dataset-model" title="Link to this heading">¶</a></h2>
+<p>A positive value favours the monitor.</p>
+<ul class="simple">
+<li><p><strong>M-P(m, d)</strong> = A-AUT(monitor-m, d) − A-AUT(periodic(3), d). This is the comparison at matched labels spent: 4 monitors × 2 delays = 8 per stratum, 32 in the family.</p></li>
+<li><p><strong>M-C(m, d)</strong> = A-AUT(monitor-m, d) − A-AUT(matched-m, d). This is the comparison at a matched number of retrains, and it isolates timing: 8 per stratum, 32 in the family.</p></li>
+</ul>
+<p>The decision rule, the interval method (v1 two-stage bootstrap, 10,000 replicates, bootstrap seed 20261215) and the 0.01 AUT margin are as in v1. Wilcoxon on per-seed paired means is a supporting check only, with Holm <strong>within each family</strong> (32; a missing contrast counts as p = 1). With 10 seeds the smallest two-sided Wilcoxon p is about 0.002. Under the shrink fallback of 5 seeds it would be 0.0625, and no Holm-adjusted p could then fall below 0.0625. Every row shows A-AUT, labels spent per window and refits per window for both arms.</p>
+<p><strong>Answer to RQ4.</strong> Monitors are said to beat periodic retraining only for the (dataset, model, monitor, delay) cells where M-P is detected positive. Otherwise the report says periodic is not beaten at this resolution and gives the interval half-widths. No pooled claim is made across datasets or models.</p>
+</section>
+<section id="monitor-quality-secondary-descriptive">
+<h2>Monitor quality (secondary, descriptive)<a class="headerlink" href="#monitor-quality-secondary-descriptive" title="Link to this heading">¶</a></h2>
+<p>The measure is alarm precision, alarm recall and detection delay against drop events defined from true labels:</p>
+<ul class="simple">
+<li><p><strong>Drop event:</strong> F1 at least 0.05 below the trailing 3-slot mean, the PREREG v1 recovery-time definition (<code class="docutils literal notranslate"><span class="pre">metrics.slot.drop_events</span></code>).</p></li>
+<li><p><strong>Match:</strong> an alarm at <code class="docutils literal notranslate"><span class="pre">s</span></code> matches a drop at <code class="docutils literal notranslate"><span class="pre">t</span></code> when <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">≤</span> <span class="pre">s</span> <span class="pre">≤</span> <span class="pre">t</span> <span class="pre">+</span> <span class="pre">2</span></code>.</p></li>
+<li><p><strong>Precision:</strong> computed over alarms at slots ≥ 3.</p></li>
+</ul>
+<p>Intervals use the two-stage bootstrap of the per-(window, seed) counts, with ratios of pooled counts. The primary context is the never cell (all four monitors observing, fixed reference). The secondary context is each monitor arm’s own alarms against its own F1. Alarm rate per slot and the undecided share are reported beside these.</p>
+</section>
+<section id="known-limits-written-before-the-results">
+<h2>Known limits (written before the results)<a class="headerlink" href="#known-limits-written-before-the-results" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>BODMAS geometry.</strong> nE = 6, so periodic(3) has one useful refit, and at d = 3 periodic equals never. Monitors can refit from slot 2 (min_gap 2). On BODMAS, M-P is therefore partly a “more refits” contrast; M-C isolates timing. The report says so next to every BODMAS M-P.</p></li>
+<li><p><strong>False alarms given one reference.</strong> Under no drift, the rate is nominal on average over reference draws. A fixed reference makes alarms within a window dependent, so in a given window the rate can be higher: in the synthetic check, KS ran at 1.75% pooled and 7% for one reference draw (ADR-0010). The never-cell alarm rate is reported beside precision.</p></li>
+<li><p><strong>Large slots.</strong> Real slots are large and real drift is common, so the tests may alarm in most slots. If they do, monitor-triggered retraining reduces to “retrain every 2 slots”, and M-P measures retrain frequency more than detection. The alarm rate is reported, and the thresholds are not changed.</p></li>
+<li><p><strong>The matched-count control is non-causal.</strong> It learns at the start of a window how many refits its monitor arm made in that window, which depends on later slots. It carries one count per window and no timing or labels. It favours the control, so M-C is conservative for the monitor and cannot inflate a monitor’s advantage. The control can refit fewer times than k when an event finds no new label. M-C rows report the share of windows with such a shortfall and its mean.</p></li>
+<li><p><strong>Monitor quality is a reading of association.</strong> A drop event is a fall in F1 of the model in force. A monitor that sees covariate shift with no F1 fall counts as a false alarm.</p></li>
+<li><p><strong>Few labels.</strong> At 1% of a slot, refits change few decisions (E1 diagnostic, CLAIMS E-13 to E-15). Flat contrasts are plausible.</p></li>
+<li><p><strong>Seeds are subsample draws</strong> (C3 and selection), not independent replicates.</p></li>
+</ul>
+</section>
+<section id="exclusions-and-failures">
+<h2>Exclusions and failures<a class="headerlink" href="#exclusions-and-failures" title="Link to this heading">¶</a></h2>
+<p>As in v1:</p>
+<ul class="simple">
+<li><p>A failed cell is logged with its reason and is never rerun because of its result.</p></li>
+<li><p>Bugs found after the tag are fixed in a new commit, the affected cells are marked invalidated and exactly those are rerun.</p></li>
+<li><p>If a matched cell’s source monitor cell failed, the matched cell is reported as not computed, together with its source’s reason.</p></li>
+</ul>
+</section>
+<section id="not-done-in-this-addendum">
+<h2>Not done in this addendum<a class="headerlink" href="#not-done-in-this-addendum" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>No tuning of any value above after the tag.</p></li>
+<li><p>No other monitors (ADWIN, DDM and other label-based detectors are out of scope: they need labels).</p></li>
+<li><p>No monitor-triggered <em>labelling</em>: the budget is spent every slot, as in v1.</p></li>
+<li><p>No re-implementation of Transcendent or HCC.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Pre-registration addendum v3: RQ4, drift monitors and retraining (E4)</a><ul>
+<li><a class="reference internal" href="#what-was-known-when-this-was-written">What was known when this was written</a></li>
+<li><a class="reference internal" href="#hypothesis-guide-rq4">Hypothesis (guide, RQ4)</a></li>
+<li><a class="reference internal" href="#design">Design</a><ul>
+<li><a class="reference internal" href="#the-four-monitors-one-interface-update-slot-view-state-alarm">The four monitors (one interface: <code class="docutils literal notranslate"><span class="pre">update(slot</span> <span class="pre">view,</span> <span class="pre">state)</span> <span class="pre">-&gt;</span> <span class="pre">alarm</span></code>)</a></li>
+<li><a class="reference internal" href="#policies">Policies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cells-reduced-grid-per-dataset">Cells (reduced grid), per dataset</a></li>
+<li><a class="reference internal" href="#primary-contrasts-per-dataset-model">Primary contrasts (per dataset × model)</a></li>
+<li><a class="reference internal" href="#monitor-quality-secondary-descriptive">Monitor quality (secondary, descriptive)</a></li>
+<li><a class="reference internal" href="#known-limits-written-before-the-results">Known limits (written before the results)</a></li>
+<li><a class="reference internal" href="#exclusions-and-failures">Exclusions and failures</a></li>
+<li><a class="reference internal" href="#not-done-in-this-addendum">Not done in this addendum</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

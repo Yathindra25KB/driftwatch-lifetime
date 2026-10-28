@@ -1,0 +1,166 @@
+# Chapter 7: Experiments and results (draft)
+
+> Status: draft written by Claude Code in Phase 6 for the researcher to rewrite, verify and defend. Every number carries a claim id from `docs/CLAIMS.md` (file and commit there). The analysis was registered before the grid was run (tag `prereg-v1`; chapter 3 explains the method); results are reported as measured, flat ones included. Wording follows the registered rule: a contrast is **detected** when its 95% interval excludes zero in the hypothesised direction, and "equivalent" means the whole interval lies within plus or minus 0.01 of A-AUT. **[researcher: verify]** marks sentences whose reading of a number you should check. E3 (selection) is in section 7.5 and E4 (drift monitors) in section 7.6.
+
+## 7.1 What was run
+
+| Experiment | What | Data | Status |
+|---|---|---|---|
+| E0 | Baselines: LR and LightGBM, never retrained, time-aware windows, A-AUT; random-split comparator | LAMDA, BODMAS | done |
+| E1 | Random split against time-aware per evaluation slot, both comparators | LAMDA, BODMAS | done |
+| E2 | Delay x budget grid under never and periodic(3) retraining, random selection | LAMDA, BODMAS | done: all 54 cells complete, none failed [E-26] |
+| E3 | Uncertainty and credibility selection against random under delay | LAMDA, BODMAS | done: 56 cells complete, none failed [E-40] |
+| E4 | Drift monitors: monitor-triggered retraining against periodic(3) and against a matched-count control; monitor quality | LAMDA, BODMAS | done: 76 cells complete, none failed [E-48] |
+
+All runs use the windows of ADR-0005 (LAMDA four training and twelve evaluation months, stride three; BODMAS three training and six evaluation two-week slots, stride two), a 10% target malware ratio per evaluation slot, a fixed threshold of 0.5, and the two models with the fixed hyperparameters of the registration [P-02, P-03]. Seeds are draws of the C3 subsample and of the selection (chapter 3).
+
+## 7.2 E0 and E1: the time-aware baseline and the random-split gap (RQ1)
+
+**Time-aware A-AUT with no retraining.** On BODMAS the logistic model scores 0.912 and LightGBM 0.977; on LAMDA 0.678 and 0.760 [E-02, E-03]. The same figures are reproduced by the E1 time-aware series and by the never arm of E2 [E-16, E-27, E-28]. The BODMAS values exceed 0.90, which the protocol treats as a leakage alarm until explained. The real-data canary passes on LAMDA and is inconclusive on BODMAS (no gap to close), unchanged when it was re-run on the final code [E-09, E-22]. BODMAS evaluates only 20 distinct two-week slots, about nine months in two stretches [E-12], and no explanation beyond that is claimed here **[researcher: verify and decide how to word the open alarm]**.
+
+**The gap, under two definitions.** RQ1 registered the gap between random-split F1 and time-aware AUT against a band of 0.05, with the per-slot matched comparator as primary (ADR-0008). Both readings were seen before registration (CLAIMS E-19) and both are reported [E-35]. The primary comparator was therefore chosen after its number and the window-level one were known, and it is biased downwards on LAMDA because it reaches a lower malware ratio than the time-aware series [E-18]; the choice favours the "gap below the band" reading, and the LAMDA LR interval below still contains 0.05:
+
+| Dataset, model [E-35] | Per-slot matched gap (primary), 95% interval | Window-level E0 gap (secondary), 95% interval |
+|---|---|---|
+| LAMDA, LR | 0.0295 [-0.0125, 0.0768] | 0.1523 [0.0988, 0.1759] |
+| LAMDA, LightGBM | 0.0403 [0.0240, 0.0481] | 0.1369 [0.0909, 0.1595] |
+| BODMAS, LR | 0.0354 [0.0271, 0.0395] | 0.0282 [0.0135, 0.0382] |
+| BODMAS, LightGBM | 0.0057 [0.0013, 0.0074] | -0.0002 [-0.0082, 0.0068] |
+
+Under the primary comparator no cell reaches the 0.05 band, not even its point estimate; under the window-level comparator both LAMDA models are above it with the lower end of the interval above it too, and both BODMAS models are below. The two comparators differ in what they score (the window-level one includes held-out rows of the training-era slots and one global C3 draw), and the per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA [E-18, P-14]. The honest statement is that **the size of the gap depends on how the comparator is defined, that it is not established as large under the registered primary definition, and that the data do not show it to be caused by temporal leakage alone** [E-19].
+
+## 7.3 E2: label delay and analyst budget (RQ2)
+
+**Set-up.** Periodic retraining every third evaluation slot, labels arriving after `d` extra slots, a budget of 0.5%, 1%, 2% or 5% of the evaluated slot (about 22 to 218 labels per slot on LAMDA and 14 to 141 on BODMAS) [E-28, E-27], random selection, retraining on the initial window plus arrived labels. Absolute counts at 5%: LAMDA 218 labels queried per slot, 2,619 per window, of which 2,393 arrive before the window ends; BODMAS 141 per slot, 844 per window, 705 arrived [E-37].
+
+**Cell values.** A-AUT on LAMDA moves from 0.679 (LR) and 0.760 (LightGBM) with no retraining to 0.694 and 0.781 with periodic retraining at 5% of the slot and no extra delay [E-28]. On BODMAS the same arms are 0.912 and 0.977 and 0.915 and 0.977 [E-27]. The full 4 x 4 grids, with the standard deviation over windows in every cell, are `reports/figures/e2_heatmap_lamda.png` and `e2_heatmap_bodmas.png`.
+
+**Registered contrasts, 10 seeds.** Differences of A-AUT with 95% intervals; the two delay contrasts compare delay 0 with delay 3 [E-29, E-30]:
+
+| Contrast [E-29, E-30] | LAMDA, LR | LAMDA, LightGBM | BODMAS, LR | BODMAS, LightGBM |
+|---|---|---|---|---|
+| C-D1, delay 0 minus 3 at 1% | 0.0032 [-0.0011, 0.0077] equivalent | 0.0046 [0.0025, 0.0057] detected, inside the margin | 0.0010 [-0.0001, 0.0023] equivalent | 0.0001 [-0.0005, 0.0008] equivalent |
+| C-D2, delay 0 minus 3 at 5% | 0.0114 [0.0047, 0.0171] detected | 0.0131 [0.0083, 0.0151] detected | 0.0027 [0.0019, 0.0036] detected, inside the margin | 0.0001 [-0.0005, 0.0008] equivalent |
+| C-P, periodic (d=0, 5%) minus never | 0.0168 [0.0071, 0.0243] detected | 0.0197 [0.0124, 0.0224] detected | 0.0027 [0.0019, 0.0036] detected, inside the margin | 0.0001 [-0.0005, 0.0008] equivalent |
+| C-B, 5% minus 0.5% at d=0 | 0.0131 [0.0061, 0.0191] detected | 0.0165 [0.0104, 0.0187] detected | 0.0025 [0.0014, 0.0031] detected, inside the margin | 0.0012 [0.0001, 0.0020] detected, inside the margin |
+
+On BODMAS the C-D2 and C-P columns are the same comparison, and C-D1 is periodic at 1% against never: with one useful refit per window, periodic retraining at delay 3 equals never retraining by construction (chapter 3, section 3.7) [P-12]. They are therefore one finding, not three, and the BODMAS delay numbers measure a delay in a single refit. The same holds at Chow's stride [E-36]. **[researcher: verify this reading of the BODMAS columns.]**
+
+**In plain units.** On LAMDA at 5% of the slot (218 labels per slot) each extra slot of delay costs 0.0038 [0.0016, 0.0057] A-AUT for LR and 0.0044 [0.0028, 0.0050] for LightGBM; at 1% (44 labels per slot) the cost is 0.0011 [-0.0004, 0.0026] and 0.0015 [0.0008, 0.0019] [E-30]. The slope over the four delays at each budget grows with the budget on LAMDA for both models and on BODMAS for LR (for LightGBM on LAMDA 0.0007, 0.0016, 0.0026 and 0.0046 at 0.5%, 1%, 2% and 5%) [E-33]. That growth with budget is a description of five-seed point estimates whose intervals overlap; the registration has no contrast for it, so it is exploratory and no mechanism is claimed. Between neighbouring budgets on LAMDA, LightGBM gains 0.0166, 0.0081 and 0.0072 A-AUT per 100 extra labels per slot (0.5% to 1%, 1% to 2%, 2% to 5%); the registered concavity, gain 0.5% to 1% minus gain 2% to 5%, is 0.0095 [0.0029, 0.0144], whose interval excludes zero: diminishing returns are detected in one of the four strata (LAMDA, LightGBM). For LAMDA LR it is 0.0033 [-0.0132, 0.0194] and for BODMAS 0.0038 [-0.0008, 0.0086] (LR) and 0.0080 [-0.0008, 0.0162] (LightGBM), not detected [E-34].
+
+**Reading against the hypotheses (RQ2).** On LAMDA the registered pattern is seen in both models at 5%: AUT falls with delay, rises with budget, and periodic retraining at 5% is above never retraining. At 1% the delay effect is detected for LightGBM (inside the margin) and not for LR. On BODMAS the effects are at most 0.003 A-AUT, inside the margin. For LightGBM the delay and retraining contrasts are equivalent to zero (intervals inside plus or minus 0.01); its one budget contrast, C-B, is borderline (0.0012 [0.0001, 0.0020], lower end 0.0001) and was not checked at Chow's stride, so it is uncorroborated [E-29]. The geometry limits what BODMAS can say. The effects on LAMDA are small in absolute terms: 0.011 to 0.020 A-AUT for contrasts whose arms differ by hundreds of labels per slot, against standard deviations over windows of about 0.05 to 0.07 [E-28]. They are measured with intervals that exclude zero, not with a claim that they matter operationally **[researcher: decide how to word the practical significance]**.
+
+**Supporting checks.** The seed-level Wilcoxon p-values of the 16 primary contrasts and their Holm adjustment over the fixed family are in the ledger [E-31]; they are conditional on the realised windows and measure subsample noise only. The same four contrasts on seeds 0 to 4 [E-32], and at Chow's stride with fewer windows [E-36], agree in direction and size; the 5-seed rows are nested in the 10-seed set and are not a replication. At Chow's stride the LAMDA LR contrast C-P is not detected (0.0103 [-0.0016, 0.0207]), the only primary-type contrast that changes verdict.
+
+**Recovery.** Drop events (a fall of 0.05 below the trailing three-slot mean) on LAMDA: LR 1.58 per window and seed series, recovered within the window in 73% of cases with no retraining and 81% with periodic retraining at 5%; LightGBM 1.40 and 1.46 events, recovered in 80% and 84%. On BODMAS drops are rare (LR 0.27 per series, recovered 38% both with and without retraining; LightGBM 0.03 to 0.07) [E-38]. These are descriptive counts.
+
+**Failures and artifacts.** No cell failed and none was rerun for its result. The LAMDA never cell was restarted once (two "started" events in the ledger) after the driver stopped on a transient failure to read the code version, not because of a result; it resumed from its checkpoints at the same code version [E-26]. One LAMDA cell spanned an eight-hour computer standby; its wall time and one timed fit are artifacts, annotated in the ledger, and its predictions are unaffected [E-26].
+
+## 7.4 What E2 does not show
+
+See chapter 8, section 8.2. In particular: no delay curve on BODMAS, no independent replication on LAMDA (about four independent blocks), no statement about why a flat result is flat at the smallest budgets, and no result about selection or monitors.
+
+## 7.5 E3: selection under delay (RQ3)
+
+**Set-up.** Registered in `docs/prereg/addendum-v2.md` (tag `prereg-v2`) before the first E3 result. Three arms spend the same number of labels in every slot: random, uncertainty (probability closest to 0.5) and credibility (lowest Mondrian p-value of the predicted class). A random reserved slice (20% of the budget) feeds the calibration buffer; rows a selector chose never do, and calibration rows never train the model (ADR-0009). Periodic retraining every third slot, delays 0 and 3, budgets 1% and 2%, both models. BODMAS and LAMDA each ran 28 cells, with seeds 0 to 9 on the 12 Main cells and seeds 0 to 4 on the ablation and score cells; the LAMDA seeds 5 to 9 (12 cells) were added on 20 Oct 2026 after the five-seed results had been read, on the researcher's go and as the addendum allows, and none of the 56 cells failed or was rerun for a result [E-40]. Because the initial model is fitted without its calibration hold-out, **E3 values are comparable only with each other, never with E2 values** (ADR-0009). The primary contrast is the interaction `I_S(B)`, the advantage of selector `S` over random at delay 0 minus its advantage at delay 3; the hypothesis predicts a positive value.
+
+**BODMAS: the interaction is not a test of shrinkage.** At delay 3 periodic retraining equals never retraining on BODMAS, so the advantage at delay 3 is zero by construction and `I_S` equals the advantage at delay 0 [E-41, E-44]. With 10 seeds and 6 windows the eight BODMAS interactions (two selectors, two budgets, two models; four per model) are 0.0030 to 0.0079 A-AUT with intervals that exclude zero, the lowest interval end being 0.0000 to four decimals (logistic regression, uncertainty, 1%), and every logistic-regression row is inside the 0.01 margin [E-41]. This reports that, at delay 0 and 28 to 56 labels per slot, A-AUT was 0.003 to 0.008 higher with selection than with random choice on BODMAS (interval upper ends up to 0.012), not that the advantage shrinks with delay. The logistic-regression, uncertainty, 1% interval excludes zero by about 0.00002 and is borderline; the bootstrap means of the logistic-regression rows lie below their point estimates [E-41]. The Holm-adjusted Wilcoxon p of these rows is 0.0312, and for BODMAS it tests an advantage at delay 0, not a shrinkage [E-41].
+
+**LAMDA: the informative dataset.** Over 16 windows and ten seeds the advantage of both selectors over random at delay 0 is 0.0109 to 0.0177 A-AUT, and every interval excludes zero; at delay 3 it is 0.0015 to 0.0095, and for logistic regression the verdict is "equivalent" in three of four rows (uncertainty at 1%, 0.0027 [-0.0052, 0.0060]; credibility at 1%, 0.0015 [-0.0057, 0.0042]; credibility at 2%, 0.0032 [-0.0033, 0.0059]) [E-43]. "Equivalent" here means only that the interval includes zero and lies within plus or minus 0.01; that margin is as large as most of the delay-0 advantages, so these verdicts carry little information and the contrast between "detected at delay 0" and "equivalent at delay 3" is not itself a test. The registered statistic is the interaction, and it is positive in all eight selector, budget and model rows, with intervals that exclude zero: 0.0094 to 0.0118 for logistic regression and 0.0061 to 0.0077 for LightGBM, the latter inside the 0.01 margin in three of four rows, at 43.6 labels per slot (1%) and 87.3 (2%) [E-42]. The advantage of a selector over random was therefore smaller after a delay of three slots than with none in this sample, in both models. The seed-level Wilcoxon test has the smallest p-value it can return with ten paired seeds (0.002) in every row, and its Holm-adjusted value over the family of 16 is 0.0312 for all of them, LAMDA and BODMAS alike [E-42]. Five cautions apply. (i) The eight rows are not eight replications: they share the random arm, the windows and the seeds, and LAMDA's 16 windows are about four independent blocks; the lowest interval ends (0.0020 to 0.0023 for LightGBM) should not be read as excluding zero with confidence, and the intervals are likely too narrow, not conservative. (ii) The Wilcoxon test is on seed-level means conditional on the realised windows; it measures subsample noise, not window-to-window variation, so the adjusted p-value does not support more than the bootstrap interval does. (iii) The addendum registers seeds 0 to 4 for the Main cells and makes seeds 5 to 9 on LAMDA conditional on hours; they were added on 20 Oct 2026 after the five-seed rows had been read (interactions 0.0064 to 0.0116), and the ten-seed rows contain the five-seed ones, so they are not a replication. The table keeps both sets [E-42]. (iv) A positive advantage remains at delay 3 for LightGBM (0.0072 to 0.0095), so the sample shows a reduced advantage, not none [E-43]. (v) Only two delays were run; no shape of the decay is claimed.
+
+**What the advantage is made of.** Selection changes the class mix of the labels that reach the pool: at delay 0, 2% of the slot, the share of malware among the arrived training labels is 0.085 for random selection and 0.266 (uncertainty) or 0.193 (credibility) for logistic regression on LAMDA, and 0.303 for credibility with LightGBM [E-47]. The registration states that this is not corrected. The advantage of a selector over random therefore combines picking informative rows with a change of class prior, and the study does not separate the two. Descriptively, the one arm whose arrived class mix is close to random's (credibility with the centroid score: malware share 0.082 on LAMDA LightGBM, against 0.085) has an A-AUT below random's (0.7593 against 0.7647; logistic regression 0.6478 against 0.6676) [E-46, E-47, E-43]; no interval was computed, and this supports, without resolving, the class-prior reading. The uncertainty and credibility arms differ by about 0.005 or less with no interval, and **no claim is made that conformal credibility adds anything over probability-based uncertainty.**
+
+**Reserved-slice ablation (descriptive).** With credibility selection at delay 0 and 2%, reserving 10%, 20% and 40% of the budget for random calibration labels gives LAMDA advantages of 0.0181, 0.0153 and 0.0143 (logistic regression) and 0.0177, 0.0160 and 0.0141 (LightGBM); the point estimates fall as the reserved share rises, the intervals overlap, and differences between shares were not estimated, so no trend is claimed [E-45]. Prediction-set coverage with a reserved slice is 0.878 to 0.899 against the nominal 0.90, below it in every one of the twelve rows and lowest on LAMDA LightGBM [E-45].
+
+**The trap arm.** The arm with no reserved slice feeds the calibration buffer from the selected rows on purpose. Its prediction-set coverage rises above nominal (0.93 to 0.96) and its credibility is inflated (mean 0.73 and 0.76 on LAMDA against 0.51 and 0.58 with a reserved slice) [E-45]: these values are consistent with the exchangeability argument that calibration on selected rows is biased, but they are confounded in the same way as the A-AUT below, because an arm that never retrains also has different probabilities and p-values, so no cause is assigned. Its A-AUT is below random (-0.0117 [-0.0136, -0.0075] LightGBM and -0.0134 [-0.0305, -0.0012] logistic regression on LAMDA) [E-45], **but this number is not evidence about calibration contamination.** In the implementation every label released to the trap arm goes to the calibration buffer and none to the training pool, so the arm never retrains; its A-AUT difference mixes the contamination with the absence of retraining (CLAIMS E-45; `docs/reviews/leakage-review-e3.md`). Nothing is read from this arm as evidence about contamination. **[researcher: decide whether to register an addendum and rerun the two trap cells (one per dataset, each with both models) with the released labels also entering the pool.]**
+
+**Nonconformity score (descriptive, point estimates only; no interval was computed and no difference between scores is tested).** The centroid-distance score has a lower A-AUT than the probability score in three of four strata at delay 0, 2% (LAMDA LightGBM 0.7593 against 0.7806, LAMDA logistic regression 0.6478 against 0.6829, BODMAS LightGBM 0.9724 against 0.9772) and a value 0.0006 higher in the fourth (BODMAS logistic regression 0.9128 against 0.9122); its prediction sets are larger (mean size 1.64 to 1.69 against 0.96 to 1.05 on LAMDA) and, for logistic regression on LAMDA, undercover (0.7912) [E-46]. No score was tuned after the registration.
+
+**Failures and artifacts.** No cell was dropped. One LAMDA centroid cell failed once with an operating-system memory error while a table job was running and was retried with the reason logged; one LAMDA cell carries a 60-second flag that is the computer-standby artifact described in section 7.3 [E-40].
+
+**What E3 does not show.** No statement about drift monitors (E4); no delay curve (two delays); no independent LAMDA replication beyond ten seeds of one platform and about four independent blocks of windows; no separation of selection from class-prior change; nothing about the trap arm's A-AUT. Chen et al.'s credibility-based selection and Transcendent are cited as related work, not re-implemented, and nothing here claims selection under a budget is new.
+
+## 7.6 E4: drift monitors and retraining (RQ4)
+
+**Set-up.** E4 was registered in `docs/prereg/addendum-v3.md` (tag `prereg-v3`) together with ADR-0010, before the first E4 result [P-17, E-48].
+- **Arms.** Four drift monitors (section 6.12) each drive a monitor-triggered arm. Each monitor arm has a matched-count control that refits as often, at evenly spaced slots. Periodic(3) and never-retrain arms complete the set.
+- **Grid.** Budget 1% of the slot, delays 0 and 3, both models, seeds 0 to 9, chosen before any result.
+- **Labels.** Every arm uses random selection with the same seeded draws, so every arm spent the same labels in every slot: 523.25 per window on LAMDA and 168.33 on BODMAS [E-50, E-51].
+- **Runs.** All 76 cells completed and none failed [E-48]. As a check, the periodic cells reproduce the stored E3 random-arm predictions exactly in all 8 pairs [E-49].
+- **Comparability.** E4 values compare with E3's random arm, not with E2.
+
+There are two primary contrasts, and a positive value favours the monitor [P-17]:
+- **M-P:** the monitor arm minus periodic(3), at matched labels spent.
+- **M-C:** the monitor arm minus its matched-count control, at matched retrains. This isolates when the refits happen.
+
+**RQ4: no monitor beat periodic retraining.** No M-P row has an interval above zero, on either dataset, for either model, monitor or delay [E-59, E-60]. Monitor-triggered retraining was never better than retraining every third slot at the same labels spent. The table counts verdicts per dataset. "Reversed" means the interval lies wholly below zero and reaches past −0.01. "Below zero, within margin" means the interval lies below zero but inside ±0.01, so there is no change larger than 0.01. Both readings are two-sided descriptions beyond the registered RQ4 answer, and neither has family-wise control (see Statistics below).
+
+| M-P verdict (16 rows per dataset) | LAMDA | BODMAS |
+|---|---|---|
+| Detected positive (monitor better) | 0 | 0 |
+| Reversed | 2 | 0 |
+| Below zero, within margin | 3 | 4 |
+| Not detected | 2 | 0 |
+| Equivalent (inside ±0.01) | 9 | 12 |
+| Claim | E-59 | E-60 |
+
+On LAMDA [E-59]:
+- **Reversed.** Only logistic regression with KS:
+  - at delay 0: −0.0089 [−0.0225, −0.0002], with 1.90 refits per window against periodic's 3.00. The KS arm refitted less often, which may explain more of this than detection does.
+  - at delay 3: −0.0052 [−0.0136, −0.0007], at about the same number of refits (1.98 against 2.00).
+- **Below zero, within margin:** LightGBM with KS at delay 0, LightGBM with p-uniformity at delay 0, and logistic regression with MMD at delay 3.
+- **Largest point estimate for a monitor:** the domain classifier with logistic regression at delay 0, 0.0006 [−0.0008, 0.0025], with 4.31 refits per window against 3.00.
+
+On BODMAS, every M-P estimate lies between −0.0004 and 0.0004 [E-60].
+- At delay 3, KS, MMD and the domain classifier produce one and the same arm (one refit before slot 4), so their three rows are one comparison.
+- The four logistic-regression rows that lie below zero at delay 3 are therefore two distinct comparisons, both inside the margin.
+- Counting distinct comparisons, 7 M-P rows lie below zero across the two datasets, not 9.
+- On BODMAS, periodic(3) has one useful refit per window and none at delay 3, so M-P there partly compares more refits with fewer.
+
+**When the refits happened did not matter on LAMDA, where it could be tested.** All 16 LAMDA M-C rows are equivalent, between −0.0023 and 0.0008 [E-61]. The matched control refitted at exactly the monitor's slots in only 0% to 28% of window-seed pairs, so these rows do compare different timings at the same number of refits [E-61].
+
+On BODMAS the test is weaker [E-62]:
+- In the two domain-classifier rows at delay 0, the monitor alarms in every slot and refits at slots 2 and 4. That is exactly the control's schedule, so the rows test nothing and are marked not informative.
+- Elsewhere the shared share reaches 0.75.
+- The rows below zero are the delay-3 logistic-regression rows: the same-arm trio and p-uniformity, all inside the margin.
+
+The matched control refitted as often as its source in every window [E-61, E-62]. The registration argues that a control which knows each window's refit count is conservative for the monitor. That argument is not a measured property.
+
+**The monitors alarmed in most slots and found drops no better than chance would.** On the never arm, the primary reading [E-63]:
+
+| Monitor | LAMDA alarm rate | Precision | Always alarming | Recall | Random alarms at the same rate |
+|---|---|---|---|---|---|
+| KS | 0.617 | 0.462 and 0.538 | 0.443 and 0.489 | 0.743 and 0.775 | 0.935 and 0.927 |
+| MMD | 0.796 and 0.785 | 0.449 and 0.486 | 0.443 and 0.489 | 0.942 and 0.916 | 0.987 and 0.980 |
+| Domain classifier | 0.997 | 0.444 and 0.490 | 0.443 and 0.489 | 1.000 | 1.000 |
+| p-uniformity | 0.562 and 0.687 | 0.461 and 0.465 | 0.443 and 0.489 | 0.796 and 0.876 | 0.906 and 0.955 |
+| Claim | E-63 | E-63 | E-63 | E-63 | E-63 |
+
+In each cell the first value is LightGBM and the second logistic regression. The two baseline columns are exploratory and were not registered:
+- **Always alarming:** the precision of a monitor that alarms in every slot.
+- **Random alarms at the same rate:** the expected recall of alarms raised at random at the monitor's own alarm rate.
+
+Read against the baselines:
+- **Precision** is within 0.05 of the always-alarm value, and below it for MMD and p-uniformity with logistic regression [E-63].
+- **Recall** is below what random alarms at the same rate would reach, for KS, MMD and p-uniformity. Their alarms cluster in some windows rather than at drops.
+
+LAMDA has 28 to 32 distinct drop slots over its 16 windows [E-63]. On BODMAS, every drop event of the never arm falls in one window, the same window for all ten seeds (one or two distinct slots). BODMAS precision and recall are therefore reported as counts, without intervals, and say nothing general [E-63]. This is the "large slots" limit named in the registration: with a few hundred rows per side and real drift between months, the tests reject in most slots.
+
+Inside the monitor arms, alarm rates are lower than on the never arm. On LAMDA at delay 0: KS 0.242, MMD 0.326, domain classifier 0.544 [E-64]. This is consistent with rule R, which resets the reference after each refit. It is not a like-for-like comparison, because drop events there come from each arm's own F1, which its refits change [E-64]. Under delay 3 many triggered events found no new label and were no-ops: 1.62 per window for the domain classifier on LAMDA, against 1.00 for periodic(3) [E-58].
+
+**Statistics.** Each family has 32 contrasts, and a two-sided Wilcoxon test with 10 paired seeds cannot return less than 2/1024. So the smallest Holm-adjusted p that any E4 contrast can reach is 0.0625 [P-18, P-11], and no row can pass a 0.05 Holm threshold whatever its effect. Under the five-seed fallback the floor would be higher still. A raw p at its floor means only that all ten seed means share a sign, given the realised windows. This consequence was not written into addendum v3, whose wording suggests the ten-seed design escapes the floor; it is stated here after the results [P-18]. The registered decision rule is the bootstrap interval. Without family-wise control, the single reversed cells are not evidence that a monitor harms a detector. The eight monitor and delay rows of a stratum share the periodic arm, the windows and the seeds, and M-P and M-C share the monitor arm, so the rows are not independent tests. **[researcher: verify the reading of the reversed rows and of the exploratory baselines.]**
+
+**What E4 does not show.**
+- **That monitors are useless.** Monitor-triggered retraining matched periodic retraining within the margin in most rows and was never better. Where it was worse, it was mostly within the margin [E-59, E-60].
+- **That "equivalent" means "as good as periodic".** At this budget the whole difference between never retraining and retraining every third slot is small: on LAMDA at delay 0, 0.7534 against 0.7598 (LightGBM) and 0.6546 against 0.6655 (logistic regression); on BODMAS 0.9692 against 0.9692 and 0.9083 against 0.9079 [E-50, E-51]. The margin of 0.01 is about as large as that difference, so a monitor arm inside the margin of periodic retraining is also nearly inside the margin of never retraining. The reading of E4 rests on the signs and positions of the intervals, and on none being above zero, not on the word "equivalent".
+- **How the monitors behave at a lower alarm rate.** The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.
+- **Whether alarm timing helps a monitor that saturates.** Where the control shares the monitor's schedule, M-C does not test timing [E-62].
+- **Any result on other platforms, for label-based detectors, or for monitor-triggered labelling.** The registration excludes all three.
+
+## 7.7 An exploratory reading of "lifetime" from the stored E2 curves
+
+This section answers the review's point that the report never says how many slots a detector lasts. It is exploratory: it was not registered, it reads a committed table (`reports/tables/e2_per_slot.csv`) and runs no experiment, and it would be reported whatever it showed [E-68]. Lifetime is read here as the first slot at which the mean F1 over windows and seeds is at least 0.05 below its value at the first slot, the same size as the drop in E4, together with the slope of mean F1 per slot.
+
+For the never-retrained detector on LAMDA (slots are months), mean F1 falls by 0.05 from slot 1 at slot 7 for both LightGBM and logistic regression, and the slope is -0.0066 per slot for LightGBM and -0.0084 for logistic regression [E-68]. With periodic retraining at delay 0 and budget 5% the slope is about half (-0.0032 and -0.0056) and the 0.05 fall is not reached within 12 slots [E-68]. On BODMAS (slots are two weeks) neither detector falls by 0.05 within the six slots, and the slopes are small (-0.0010 for LightGBM, -0.0039 for logistic regression) [E-68].
+
+Three limits apply. The curves are not monotonic: LAMDA LightGBM has a higher mean F1 at slot 3 than at slot 1, so "first falls below" depends on which slot is taken as the start [E-68]. F1 at a fixed threshold also moves with the share of malware in a slot, so a fall is not an effect of age alone [E-66]. The averages are over windows that are not independent (about four blocks on LAMDA [P-12]), and no interval is given. Read this as a description of the stored curves in the unit the title asks about, not as a tested result.

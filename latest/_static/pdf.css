@@ -1,0 +1,60 @@
+/* Layout rules for a PDF or a printed page: one clean column, no navigation, diagrams kept
+   whole and capped in height so they share a page with their text instead of leaving blank
+   pages. Not scoped to a media type on purpose: scripts/export_architecture_pdf.py loads this
+   file directly (headless browsers do not always apply print media), while print.css imports
+   it for print media only, so the normal site is not affected. */
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+}
+
+.skip-to-content,
+.sidebar-drawer,
+.sidebar-container,
+.toc-drawer,
+.back-to-top,
+.mobile-header,
+.theme-toggle-container,
+.related-pages,
+.headerlink,
+footer {
+  display: none !important;
+}
+
+.page,
+.main,
+.content,
+article {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body {
+  font-size: 10pt;
+}
+
+h1,
+h2,
+h3 {
+  break-after: avoid;
+}
+
+table,
+pre,
+img {
+  break-inside: avoid;
+}
+
+.mermaid {
+  break-inside: avoid;
+  text-align: center;
+}
+
+.mermaid svg {
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 125mm !important;
+}

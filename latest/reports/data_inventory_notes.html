@@ -1,0 +1,656 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Data inventory: interpretation and open questions (Phase 2) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/reports/data_inventory_notes.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/reports/data_inventory_notes.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="data-inventory-interpretation-and-open-questions-phase-2">
+<h1>Data inventory: interpretation and open questions (Phase 2)<a class="headerlink" href="#data-inventory-interpretation-and-open-questions-phase-2" title="Link to this heading">¶</a></h1>
+<p>Companion to the generated <a class="reference internal" href="data_inventory.html"><span class="std std-doc">data_inventory.md</span></a>. Every number below comes from that file, its CSV tables, or <code class="docutils literal notranslate"><span class="pre">data/manifest.json</span></code> (cache v2, 10 Oct 2026). Tags: [measured] means this machine, [verified] means checked against a source, [verify] means still to check.</p>
+<section id="answers-to-the-guide-s-week-1-verify-questions">
+<h2>Answers to the guide’s week-1 [verify] questions<a class="headerlink" href="#answers-to-the-guide-s-week-1-verify-questions" title="Link to this heading">¶</a></h2>
+<section id="timestamp-type-and-granularity">
+<h3>1. Timestamp type and granularity<a class="headerlink" href="#timestamp-type-and-granularity" title="Link to this heading">¶</a></h3>
+<p><strong>LAMDA.</strong></p>
+<ul class="simple">
+<li><p><strong>Timestamp.</strong> The parquet files carry only <code class="docutils literal notranslate"><span class="pre">year_month</span></code> (YYYY-MM). The repository’s root <code class="docutils literal notranslate"><span class="pre">metadata.csv</span></code> (not described in the README) carries <code class="docutils literal notranslate"><span class="pre">added</span></code> (<code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span> <span class="pre">HH:MM:SS</span></code>) for all 1,008,381 apps. <code class="docutils literal notranslate"><span class="pre">year_month</span></code> equals the month of <code class="docutils literal notranslate"><span class="pre">added</span></code> for every row (0 mismatches) [measured].</p></li>
+<li><p><strong>What <code class="docutils literal notranslate"><span class="pre">added</span></code> means.</strong> It is AndroZoo’s “added” field: the date the APK entered AndroZoo. AndroZoo notes that an APK “could very well have existed for years before it was added” [verify: AndroZoo lists page as quoted by a search result, 10 Oct 2026; the direct fetch returned 404].</p></li>
+<li><p><strong>What the cache uses.</strong> The cache uses <code class="docutils literal notranslate"><span class="pre">added</span></code> as the slotting timestamp <code class="docutils literal notranslate"><span class="pre">ts</span></code>, at second resolution. A per-row <code class="docutils literal notranslate"><span class="pre">ts_source</span></code> column records this: “added” for every real row.</p></li>
+<li><p><strong>C1 implication.</strong> Time order is AndroZoo collection order. It is not first-seen in the wild, and it is not compile or dex time (PROTOCOL D13). “Never train on the future” therefore means “never train on apps collected later”. This is a threat to validity for the report, not a leakage bug.</p></li>
+</ul>
+<p><strong>BODMAS.</strong> <code class="docutils literal notranslate"><span class="pre">bodmas_metadata.csv</span></code> has one <code class="docutils literal notranslate"><span class="pre">timestamp</span></code> per sample. The BODMAS page describes it as when the sample “first appeared”. The two classes are timed differently [measured]:</p>
+<ul class="simple">
+<li><p><strong>Malware</strong> (57,293 rows) spans 2019-08-29 to 2020-09-30, with second-level times. Only 2 malware timestamps are date-only.</p></li>
+<li><p><strong>Benign</strong> (77,142 rows) spans 2007-01-01 to 2020-09-30. 66,167 benign rows (85.8%) are date-only (<code class="docutils literal notranslate"><span class="pre">00:00:00</span></code>) and arrive in <strong>daily batches</strong>:</p>
+<ul>
+<li><p>In the study window the median is 150 rows per day and the regular maximum is 599; many days hold exactly 300 (<a class="reference download internal" download="" href="../_downloads/2a7bc0413b3bf5b538498a7c282c4365/data_bodmas_benign_days.csv"><span class="xref download myst">csv</span></a>).</p></li>
+<li><p>Four days stand out: 2020-01-01 (5,877 rows), 2015-01-01 (1,563), 2018-02-01 (1,100) and 2018-03-19 (1,005). They are round dates and look like placeholders. The inventory flags date-only timestamps shared by at least 1,000 rows as placeholder candidates, 9,545 rows in all. Only 2020-01-01 lies inside the study window.</p></li>
+<li><p>13,514 benign rows predate the first malware week (2019-W35).</p></li>
+</ul>
+</li>
+<li><p><strong>Offset.</strong> 3,712 timestamps (all benign) carry no UTC offset; they are read as UTC.</p></li>
+<li><p><strong>Per-row flags.</strong> The cache stores per-row flags <code class="docutils literal notranslate"><span class="pre">ts_date_only</span></code>, <code class="docutils literal notranslate"><span class="pre">ts_naive</span></code> and <code class="docutils literal notranslate"><span class="pre">ts_tie_count</span></code>, so later phases can exclude rows by rule (leakage review, finding 2).</p></li>
+<li><p><strong>C1 and C2 implication.</strong> Benign “time” is mostly the day of a collection batch, while malware time is a first-seen instant. Where a C2 slot is wide enough to contain whole days, both classes come from the same window. The 2020-01-01 batch, however, carries no meaningful date. Weeks 2020-W02 to 2020-W07 hold 6 to 29 benign each against about 1,000 malware.</p></li>
+<li><p><strong>Ordering inside a slot.</strong> Benign rows dated <code class="docutils literal notranslate"><span class="pre">00:00:00</span></code> sort first within each day, so row order inside a slot is linked to class. Any time-ordered hold-out must be cut at slot boundaries, never by row position (leakage review, finding 9; for the Phase 3 and Phase 8 ADRs).</p></li>
+</ul>
+</section>
+<section id="feature-count-dtype-values">
+<h3>2. Feature count, dtype, values<a class="headerlink" href="#feature-count-dtype-values" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>LAMDA</p></th>
+<th class="head"><p>BODMAS</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Features</p></td>
+<td><p>4,561 (<code class="docutils literal notranslate"><span class="pre">feat_0</span></code>…<code class="docutils literal notranslate"><span class="pre">feat_4560</span></code>, matches PROTOCOL D9)</p></td>
+<td><p>2,381</p></td>
+</tr>
+<tr class="row-odd"><td><p>Stored as</p></td>
+<td><p>int8, CSR</p></td>
+<td><p>float32, dense, unnormalised</p></td>
+</tr>
+<tr class="row-even"><td><p>Value range</p></td>
+<td><p>0 to 17: counts, not only 0/1</p></td>
+<td><p>as published; 0 NaN, 0 inf</p></td>
+</tr>
+<tr class="row-odd"><td><p>Density (non-zero share)</p></td>
+<td><p>1.63% (75.1 M non-zeros)</p></td>
+<td><p>27.6%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="size-on-disk-and-build-cost">
+<h3>3. Size on disk and build cost<a class="headerlink" href="#size-on-disk-and-build-cost" title="Link to this heading">¶</a></h3>
+<p>These are the cache v2 builds of 10 Oct 2026, with the 1.5 GB cap enforced by the watchdog.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>LAMDA</p></th>
+<th class="head"><p>BODMAS</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Raw files</p></td>
+<td><p>340.5 MB (Baseline parquet + metadata.csv + README)</p></td>
+<td><p>265.5 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cache</p></td>
+<td><p>119.7 MB</p></td>
+<td><p>1,231.2 MB (dense float32, memory-mappable)</p></td>
+</tr>
+<tr class="row-even"><td><p>Peak memory</p></td>
+<td><p><strong>0.87 GB</strong> (rebuild 0.93 GB)</p></td>
+<td><p>0.56 GB</p></td>
+</tr>
+<tr class="row-odd"><td><p>Wall-clock</p></td>
+<td><p>93.1 s (rebuild 91.2 s)</p></td>
+<td><p>23.4 s (rebuild 20.8 s)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="simple">
+<li><p><strong>How LAMDA stays small.</strong> The build streams one 8,192-row batch at a time. Each source file is a single parquet row group, and a probe of 2013_train alone peaked at 0.53 GB.</p></li>
+<li><p><strong>Stop rule.</strong> The cap held with at least 0.57 GB of headroom on every build, so the Phase 2 stop rule does not fire.</p></li>
+<li><p><strong>v1 cache.</strong> The first build (cache v1: 0.85 GB, 93.1 s) is archived in the manifest under <code class="docutils literal notranslate"><span class="pre">previous_caches</span></code>.</p></li>
+</ul>
+</section>
+<section id="slot-occupancy-and-the-minimum-size-gate">
+<h3>4. Slot occupancy and the minimum-size gate<a class="headerlink" href="#slot-occupancy-and-the-minimum-size-gate" title="Link to this heading">¶</a></h3>
+<p>See the gate tables in the inventory. A slot passes gate M when it has at least M malware and 9M benign and is not <strong>partly empty</strong>.</p>
+<ul>
+<li><p><strong>LAMDA months (span 2013-06 to 2025-01, 140 slots).</strong></p>
+<ul class="simple">
+<li><p>20 months are empty, and 97 of 120 non-empty months pass M = 50.</p></li>
+<li><p>The longest passing run is <strong>62 months, 2018-11 to 2023-12</strong>, at M = 50 or M = 100.</p></li>
+<li><p>Failures cluster in 2016–2017 (almost no benign) and in 2024–2025 (almost no malware). 2025 holds January only.</p></li>
+</ul>
+</li>
+<li><p><strong>LAMDA quarters (48 slots).</strong></p>
+<ul class="simple">
+<li><p>5 quarters are empty, and 6 are partly empty: 2013Q2, 2013Q3, 2014Q3, 2016Q1, 2017Q2 and 2025Q1.</p></li>
+<li><p>34 of 43 non-empty quarters pass M = 50, and the longest run is 29 quarters (2017Q4 to 2024Q4).</p></li>
+</ul>
+</li>
+<li><p><strong>BODMAS, study window 2019-W35 to 2020-W40 (58 ISO weeks, none empty).</strong> These counts are for the study window:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Length</p></th>
+<th class="head"><p>Slots</p></th>
+<th class="head"><p>Fail M = 50</p></th>
+<th class="head"><p>Also fail without the 2020-01-01 rows</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1 week</p></td>
+<td><p>58</p></td>
+<td><p>9</p></td>
+<td><p>2019-12-30</p></td>
+</tr>
+<tr class="row-odd"><td><p>2 weeks</p></td>
+<td><p>29</p></td>
+<td><p>2 (2020-01-13, 2020-01-27)</p></td>
+<td><p>2019-12-30 (it passed only through 5,877 placeholder-dated benign)</p></td>
+</tr>
+<tr class="row-even"><td><p>4 weeks</p></td>
+<td><p>15</p></td>
+<td><p>2 (2020-01-13; 2020-09-21, which is partly empty because the data ends)</p></td>
+<td><p>none</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+</ul>
+</section>
+<section id="the-2015-gap-and-other-gaps-lamda">
+<h3>5. The 2015 gap and other gaps (LAMDA)<a class="headerlink" href="#the-2015-gap-and-other-gaps-lamda" title="Link to this heading">¶</a></h3>
+<p>LAMDA has no 2015 folder and no <code class="docutils literal notranslate"><span class="pre">added</span></code> date in 2015. The empty run is longer than 2015: 2014-09 to 2016-01, 17 consecutive empty months. 2013-07, 2013-08 and 2017-06 are also empty. The paper gives two reasons for the missing year (“lacks valid entries”; “unavailability of hashes in the AndroZoo repository”) [verified, arXiv 2505.18551, 10 Oct 2026]. The cache stores no rows for empty months. The slot schemes list them as gap slots, and partly empty slots fail the gate. <code class="docutils literal notranslate"><span class="pre">.claude/rules/data.md</span></code> forbids rolling windows that span either. The handling is in ADR-0004.</p>
+</section>
+<section id="duplicate-feature-vectors-leakage-risk">
+<h3>6. Duplicate feature vectors (leakage risk)<a class="headerlink" href="#duplicate-feature-vectors-leakage-risk" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>LAMDA.</strong> 1,008,381 rows hold only 679,423 distinct feature vectors.</p>
+<ul>
+<li><p>238,576 rows (23.7%) carry a vector that already appeared in an earlier month; 196,556 rows (19.5%) do so for quarters.</p></li>
+<li><p>The per-month share peaks at about 0.65 in early 2018 and settles at about 0.1 to 0.2 after 2020.</p></li>
+<li><p>2,177 vectors carry both labels, covering 54,835 rows.</p></li>
+<li><p>No sha256 appears twice.</p></li>
+<li><p>The feature hash uses int32 indices and int8 values, so it does not depend on batch size (tested).</p></li>
+</ul>
+</li>
+<li><p><strong>BODMAS.</strong> 7 vector pairs (14 rows), 4 of them across weeks: negligible.</p></li>
+<li><p><strong>For Phase 4 (finding 13).</strong> Any duplicate-based exclusion must use only the past (“seen earlier”, ideally relative to the actual training pool), never “appears in several slots”, which also looks at the future.</p></li>
+</ul>
+</section>
+<section id="clean-rebuild-and-verification-cache-v2">
+<h3>7. Clean rebuild and verification (cache v2)<a class="headerlink" href="#clean-rebuild-and-verification-cache-v2" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Rebuild.</strong> Both datasets were rebuilt from the raw files into a fresh root, <code class="docutils literal notranslate"><span class="pre">data/rebuild_check/</span></code> (10 Oct 2026).</p></li>
+<li><p><strong>Byte-identical.</strong> All 1,088 cache files (LAMDA 240, BODMAS 848) are byte-identical to those recorded in <code class="docutils literal notranslate"><span class="pre">data/manifest.json</span></code>, and the raw file hashes match.</p></li>
+<li><p><strong>Verify.</strong> <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">verify</span></code> passes on both roots: 0 problems.</p></li>
+<li><p><strong>What verify now proves.</strong> It recomputes every row’s feature hash from X (X/meta alignment), checks LAMDA <code class="docutils literal notranslate"><span class="pre">year_month</span></code> against its unit, and checks that every file lies under the current cache version. Negative tests cover each content check.</p></li>
+</ul>
+</section>
+</section>
+<section id="other-findings">
+<h2>Other findings<a class="headerlink" href="#other-findings" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>LAMDA labels.</strong> All checks are consistent: benign rows have vt_count 0, malware rows have vt_count of at least 4, and the parquet labels, vt_count and family agree with <code class="docutils literal notranslate"><span class="pre">metadata.csv</span></code>. 1,381 named AVClass2 families exist, 435 of them with at least 10 samples. 150,604 malware rows (40.7% of malware) carry an AVClass2 <code class="docutils literal notranslate"><span class="pre">singleton:&lt;sha&gt;</span></code> label.</p></li>
+<li><p><strong>Label-revealing metadata (finding 1).</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code>, <code class="docutils literal notranslate"><span class="pre">vt_count</span></code> and <code class="docutils literal notranslate"><span class="pre">category</span></code> are labels in disguise, and so is BODMAS time of day. Each one separates the classes perfectly on this data.</p></li>
+<li><p>The loader therefore offers <code class="docutils literal notranslate"><span class="pre">SlotData.public()</span></code>, which exposes only X and row ids, for selectors, policies and monitors. Phase 5 adds the spy test.</p></li>
+</ul>
+</li>
+<li><p><strong>BODMAS identifiers.</strong> 7 rows carry a <code class="docutils literal notranslate"><span class="pre">VirusShare_&lt;md5&gt;</span></code> identifier instead of a sha256. All 7 are labelled benign with timestamp 2020-01-01. VirusShare is a malware repository, so their labels deserve a check.</p></li>
+<li><p><strong>BODMAS families.</strong> 582 named families, 196 of them with at least 10 samples (the page says 581). Every malware row has a family and a category.</p></li>
+</ul>
+</section>
+<section id="leakage-review-10-oct-2026">
+<h2>Leakage review (10 Oct 2026)<a class="headerlink" href="#leakage-review-10-oct-2026" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Review.</strong> The leakage-reviewer subagent read <code class="docutils literal notranslate"><span class="pre">src/driftwatch/data/</span></code>, the tests and these reports.</p></li>
+<li><p><strong>No direct leak.</strong> It found no direct temporal leak in the cache contents: one unit per row, no label in any sort key, and nothing fitted at ingestion.</p></li>
+<li><p><strong>Fixed in <code class="docutils literal notranslate"><span class="pre">bba2692</span></code> (cache v2), with tests:</strong></p>
+<ul>
+<li><p>1: label-revealing metadata (the public view);</p></li>
+<li><p>2: placeholder dates (per-row flags and the gate sensitivity check);</p></li>
+<li><p>3: resume mixing builds (builder fingerprints, version archive);</p></li>
+<li><p>4: verify blind spots (alignment and routing checks, negative tests);</p></li>
+<li><p>5: ISO year boundary;</p></li>
+<li><p>6: partly empty slots;</p></li>
+<li><p>7: explicit week anchor;</p></li>
+<li><p>8: naive timestamps flagged;</p></li>
+<li><p>10: missing metadata.csv is an error;</p></li>
+<li><p>11: sha256 index lower-cased before sorting;</p></li>
+<li><p>12: batch-size-independent hash.</p></li>
+</ul>
+</li>
+<li><p><strong>Carried to later ADRs:</strong></p>
+<ul>
+<li><p>9: cut time-ordered hold-outs at slot boundaries (Phase 3 and Phase 8).</p></li>
+<li><p>13: E0’s duplicate sensitivity must be past-only (Phase 4).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="open-questions-cannot-be-answered-from-the-data-alone">
+<h2>Open questions (cannot be answered from the data alone)<a class="headerlink" href="#open-questions-cannot-be-answered-from-the-data-alone" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Question</p></th>
+<th class="head"><p>Why it matters</p></th>
+<th class="head"><p>Who or how</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Q1</p></td>
+<td><p>Confirm that LAMDA <code class="docutils literal notranslate"><span class="pre">year_month</span></code> is derived from AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code> (the date of entering AndroZoo)</p></td>
+<td><p>C1 meaning of “time” for Android</p></td>
+<td><p>Read the AndroZoo lists page directly; LAMDA authors</p></td>
+</tr>
+<tr class="row-odd"><td><p>Q2</p></td>
+<td><p>What do BODMAS benign timestamps mean (daily batch dates; round-date outliers 2020-01-01, 2015-01-01, 2018-02-01, 2018-03-19; 13,514 before Aug 2019)?</p></td>
+<td><p>C1 and C2 for Windows; whether to exclude placeholder-dated rows (ADR-0004)</p></td>
+<td><p>BODMAS paper §3 or the authors</p></td>
+</tr>
+<tr class="row-even"><td><p>Q3</p></td>
+<td><p>Are the 7 benign <code class="docutils literal notranslate"><span class="pre">VirusShare_*</span></code> rows really benign?</p></td>
+<td><p>Label noise (tiny)</p></td>
+<td><p>Flagged in the data card</p></td>
+</tr>
+<tr class="row-odd"><td><p>Q4</p></td>
+<td><p>Are the 3,712 offset-less BODMAS timestamps UTC?</p></td>
+<td><p>Date-only values could cross a week boundary under a positive offset</p></td>
+<td><p>Assumed UTC; flagged per row (<code class="docutils literal notranslate"><span class="pre">ts_naive</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p>Q5</p></td>
+<td><p>What licence applies to the BODMAS dataset files themselves (the repository code is BSD-2-Clause)?</p></td>
+<td><p>Licence audit (Phase 12)</p></td>
+<td><p>Ask the authors, or keep the guide’s BSD-2 with [verify]</p></td>
+</tr>
+<tr class="row-odd"><td><p>Q6</p></td>
+<td><p>Why does LAMDA 2025 hold only January 2025?</p></td>
+<td><p>Last-year coverage</p></td>
+<td><p>LAMDA authors or card; treat as a single month</p></td>
+</tr>
+<tr class="row-even"><td><p>Q7</p></td>
+<td><p>LAMDA features reach 17: does the vectoriser count tokens?</p></td>
+<td><p>Model input semantics (binary or count)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">feature_mapping.csv</span></code> and the paper’s §3; Phase 4</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Data inventory: interpretation and open questions (Phase 2)</a><ul>
+<li><a class="reference internal" href="#answers-to-the-guide-s-week-1-verify-questions">Answers to the guide’s week-1 [verify] questions</a><ul>
+<li><a class="reference internal" href="#timestamp-type-and-granularity">1. Timestamp type and granularity</a></li>
+<li><a class="reference internal" href="#feature-count-dtype-values">2. Feature count, dtype, values</a></li>
+<li><a class="reference internal" href="#size-on-disk-and-build-cost">3. Size on disk and build cost</a></li>
+<li><a class="reference internal" href="#slot-occupancy-and-the-minimum-size-gate">4. Slot occupancy and the minimum-size gate</a></li>
+<li><a class="reference internal" href="#the-2015-gap-and-other-gaps-lamda">5. The 2015 gap and other gaps (LAMDA)</a></li>
+<li><a class="reference internal" href="#duplicate-feature-vectors-leakage-risk">6. Duplicate feature vectors (leakage risk)</a></li>
+<li><a class="reference internal" href="#clean-rebuild-and-verification-cache-v2">7. Clean rebuild and verification (cache v2)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-findings">Other findings</a></li>
+<li><a class="reference internal" href="#leakage-review-10-oct-2026">Leakage review (10 Oct 2026)</a></li>
+<li><a class="reference internal" href="#open-questions-cannot-be-answered-from-the-data-alone">Open questions (cannot be answered from the data alone)</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

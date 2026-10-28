@@ -1,0 +1,52 @@
+# Gate G1 evidence (Phase 4)
+
+**Gate:** G1, end of week 4 (Sun 8 Nov 2026). Question: is there a sensible time-aware baseline on at least one dataset, so that simulator work may start?
+**Prepared:** 11 Oct 2026, by Claude Code (engineering lead), from `reports/e0_baselines.md`, `reports/tables/*.csv` and docs/CLAIMS.md (E-01 to E-12, B-05). Reviewed by the leakage-reviewer and stats-reviewer subagents; their findings are applied (see "Process").
+**The gate decision is the researcher's** (CLAUDE.md). This file states which criteria the evidence meets, which it does not, and what is open.
+
+## Summary
+Criteria 1, 2, 4, 5 and 6 are met on LAMDA. Criterion 3 (AUT above 0.90) is **open for BODMAS**: BODMAS shows almost no gap and a high AUT, which is not explained. The sanity band from the guide was not checked. The stop rule ("fix the slicer") is not triggered, because a sensible time-aware baseline exists on LAMDA.
+
+## Criteria
+
+| # | Criterion (Phase 4 prompt; PREREG RQ1 band) | Result | Met |
+|---|---|---|---|
+| 1 | Time-aware A-AUT below the random-split F1 by at least 0.05 on at least one dataset | LAMDA: gap 0.152 (LR) and 0.137 (LightGBM); per-window range 0.04 to 0.30, positive in all 16 windows; 95% block bootstrap 0.100 to 0.175 and 0.091 to 0.160 (CLAIMS E-03). BODMAS: 0.028 (0.014 to 0.038) and -0.000 (-0.008 to 0.007), below the band (E-02) | **Yes, on LAMDA.** No, on BODMAS |
+| 2 | Real-data canary moves AUT toward the random number | LAMDA PASS: 0.446 (true timestamps) to 0.632 (shuffled), random-split F1 0.631, closure 1.00, exit 0. BODMAS NO_GAP, exit 3: inconclusive, not counted (E-09) | **Yes, on LAMDA** |
+| 3 | Any AUT above 0.90 on a hard split is explained or treated as a leakage alarm | LAMDA AUT 0.68 and 0.76: none above 0.90. BODMAS AUT 0.912 (LR) and 0.977 (LightGBM): above 0.90, **not cleared** | **Open for BODMAS** |
+| 4 | AUT tests, constraint tests and the fast suite green | 669 passed, ruff clean, at the closeout commit; AUT tests pin constant F1, hand-computed trapezoids, Chow Eq. 2-4 and 6-10 and slicer agreement | Yes |
+| 5 | A rerun from the same config gives identical per-slot predictions | Seed 0 of every variant, both datasets, rerun on the same commit: all 16 cell prediction hashes equal, and all 120 window rows agree on AUT and on every comparator column (E-11) | Yes |
+| 6 | Fit-time budget: no fit over 60 s, or a shrink plan | Slowest fit 8.6 s (LightGBM default, BODMAS); configured models 1.2 to 3.5 s; resident peak of the full runs 1.40 GiB (BODMAS) and 0.90 GiB (LAMDA) against the 1.5 GiB cap (B-05, E-01) | Yes |
+| 7 | Published ranges used only as a sanity band | The guide's band is `[verify]`: not supplied and not decodable here. No published number was used as a target | Not checked |
+
+## The BODMAS alarm
+Both BODMAS AUTs are above 0.90, the random split scores the same for LightGBM (0.03 higher for LR), and the canary's trivial model is flat.
+
+Established:
+- C1, C2 and C3 are checks that raise and passed on every evaluated slot; the slicer has had two leakage reviews and the Phase 4 runner one, with no temporal leak found.
+- No evaluated BODMAS row repeats a feature vector of its training window (0 of 101,247 evaluated rows, counted per window-slot cell; E-10).
+
+Not established: the cause. About nine evaluated months (20 two-week slots in two stretches; January and February 2020 are lost to the placeholder exclusion and the size gate) of EMBER-style features may simply show little drift for these models, but that has not been separated from an undetected artefact (for example timestamp structure in benign rows). **Carry it as an open alarm.** It limits what the study can say about BODMAS and about RQ5 (directions agree across platforms). It does not weaken the LAMDA baseline, whose canary passed and whose gap is large in every window.
+
+## Caveats the researcher should weigh
+1. **The headline rests on one dataset and one run.** All 16 LAMDA windows come from one 62-month run and overlap heavily (roughly four independent 12-month blocks). The intervals are descriptive.
+2. **The comparator is not matched per slot.** It matches the time-aware window's training class counts and the overall test ratio, but caps test malware once over the pool; months with huge malware counts weigh more. The comparator's mean test ratio is 0.098 against 0.084 for LAMDA's time-aware slots. The gap is "time-aware minus a time-blind evaluation", and RQ1's attribution to leakage in the random split is not tested by E0.
+3. **LAMDA has repeats.** 6.3% of evaluated LAMDA window-slot rows repeat a training-window feature vector (E-10). This was not measured for the comparator, so the direction of its effect on the gap is unknown. ADR-0004 item 6 asks for this to be reported with the results.
+4. **Prevalence.** 51% of distinct LAMDA slots are below the 10% target (cap and flag), and training windows run at 8% to 73% malware with a fixed 0.5 threshold; FNR is 0.27 to 0.29 on LAMDA (E-08). F1 depends on prevalence, so some month-to-month movement is not decay (for example LightGBM's F1 on 2023-10 to 2023-11 goes 0.49 to 0.91 as the slot ratio goes 0.052 to 0.100, with no retraining).
+5. **A-AUT stride.** ADR-0005 stays the headline; Chow's stride agrees within 0.01 in every cell (E-04), so D18 does not change the result.
+6. **Seeds are not replicates.** LR ignores the seed; five seeds are five C3 draws. Seed spread must not be read as precision.
+7. **The 0.05 band** was in the PREREG draft from the Phase 1 commit of 10 Oct 2026, before any E0 result; it is still marked "[estimate; confirm before tag]".
+
+## Process
+- Constraint, slicer and runner code were reviewed independently; the first E0 run was stopped unread after the leakage review found the comparator confound (ADR-0006, process note) and replaced by a run of the amended code.
+- The stats review changed the interval method (iid bootstrap to moving-block bootstrap), removed an unsupported "gap is understated" sentence, corrected the training-prior range and the slot denominators, and added the comparator and repeats caveats above.
+- All reported numbers come from clean commit `cd72d83`; the tables from `scripts/make_e0_table.py` at commit `2010858`.
+
+## What the researcher still decides
+- ADR-0006: PROPOSED to ACCEPTED (values were frozen before results under the delegation recorded in the ADR).
+- Whether to supply the guide's sanity band.
+- Whether the BODMAS alarm needs a dedicated investigation before Phase 6 (candidate checks: a timestamp-source ablation on benign rows, a longer-delay evaluation, an EMBER2024 Win32 subset) and whether RQ1 needs a per-slot-matched comparator.
+- Gate G1 itself.
+
+## Addendum (Phase 5, 13 Oct 2026)
+Criterion 1 above (gap of at least 0.05 on one dataset) was evaluated on E0's window-level comparator. Phase 5's per-slot matched comparator (CLAIMS E-17 to E-19, reports/G2.md "Open decision A") gives LAMDA gaps of 0.029 (LR) and 0.040 (LightGBM) on the same windows and models, below the band; on the cells where both series reached the target ratio they are 0.062 and 0.042. The criterion is therefore comparator-dependent. The G1 evidence above is unchanged; the choice of the RQ1 comparator is the researcher's.
