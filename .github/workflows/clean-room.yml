@@ -1,0 +1,102 @@
+name: Clean room
+
+# Reproduction on machines that have never seen the repository (fresh GitHub runners).
+# install: pip-installs the published package (no checkout) and runs the smoke experiment.
+# table1:  checks out a ref, installs the locked environment and runs the full Table 1
+#          reproduction (downloads BODMAS, about 265 MB). Logs are kept as artifacts.
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Where the package comes from"
+        required: true
+        default: testpypi
+        type: choice
+        options: [testpypi, pypi]
+      version:
+        description: "Version to install (empty: newest, including pre-releases on TestPyPI)"
+        required: false
+        default: ""
+      full_table1:
+        description: "Also run the full Table 1 reproduction from the git ref"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: install + smoke (${{ inputs.source }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install driftwatch-lifetime into a fresh virtual environment
+        shell: bash
+        env:
+          SOURCE: ${{ inputs.source }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          python -m venv venv
+          if [ -f venv/Scripts/python.exe ]; then PY=venv/Scripts/python.exe; else PY=venv/bin/python; fi
+          echo "PY=$PY" >> "$GITHUB_ENV"
+          echo "DW=${PY%/*}/driftwatch" >> "$GITHUB_ENV"
+          spec="driftwatch-lifetime"
+          if [ -n "$VERSION" ]; then spec="driftwatch-lifetime==$VERSION"; fi
+          "$PY" -m pip install --upgrade pip
+          if [ "$SOURCE" = "testpypi" ]; then
+            # the package from TestPyPI, its dependencies from PyPI
+            "$PY" -m pip install --pre --index-url https://test.pypi.org/simple/ \
+              --extra-index-url https://pypi.org/simple/ "$spec"
+          else
+            "$PY" -m pip install "$spec"
+          fi
+          "$PY" -m pip freeze > pip-freeze.txt
+      - name: Smoke experiment
+        shell: bash
+        run: |
+          "$DW" --version | tee smoke.log
+          "$DW" smoke --out smoke-report 2>&1 | tee -a smoke.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: clean-room-${{ inputs.source }}-${{ matrix.os }}
+          path: |
+            smoke.log
+            smoke-report/
+            pip-freeze.txt
+          retention-days: 90
+
+  table1:
+    name: full Table 1 from ${{ github.ref_name }}
+    if: inputs.full_table1
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.12.3"
+      - name: Install the locked environment
+        run: uv sync --frozen
+      - name: Reproduce Table 1 (exit 3 means the dataset host refused the download)
+        run: |
+          set -o pipefail
+          uv run --frozen driftwatch reproduce table1 --out reports/reproduction 2>&1 | tee table1.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: clean-room-table1
+          path: |
+            table1.log
+            reports/reproduction/
+          retention-days: 90

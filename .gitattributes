@@ -7,3 +7,4 @@
 *.png binary
 *.parquet binary
 *.npz binary
+*.ics text eol=crlf

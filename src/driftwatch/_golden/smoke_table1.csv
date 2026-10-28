@@ -1,0 +1,3 @@
+dataset,model,variant,ratio,n_seeds,n_windows,n_eval_slots,a_aut_mean,a_aut_std,a_aut_seed_sd,f1_random_split,gap,gap_ci_low,gap_ci_high,gap_block_len,gap_window_min,gap_window_max,random_test_ratio,train_prior_min,train_prior_max,f1_random_pooled,gap_pooled,f1_first_slot,f1_last_slot,mean_fpr,mean_fnr,mean_achieved_ratio,share_below_target,n_distinct_slots,share_distinct_slots_below_target,n_drop_events,n_recovered,fit_seconds_median,share_converged,sanity_band
+bodmas,lgbm,rolling,0.4,1,1,2,0.0,,,,,,,2,,,,0.4583,0.4583,,,0.0,0.0,0.0,1.0,0.4,0.0,2,0.0,0.0,0.0,0.0179,,[verify]
+bodmas,lr,rolling,0.4,1,1,2,0.4949,,,,,,,2,,,,0.4583,0.4583,,,0.5455,0.4444,0.5833,0.375,0.4,0.0,2,0.0,0.0,0.0,0.0453,1.0,[verify]

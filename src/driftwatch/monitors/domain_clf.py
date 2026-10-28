@@ -86,7 +86,9 @@ class DomainClassifier:
     def null_key(self, state: MonitorState) -> str:
         return f"{self.name}|{self.settings}|{state.window_key}|null"
 
-    def start(self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any):
+    def start(
+        self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any
+    ) -> None:
         key = self.null_key(state)
         if key in state.cache:
             state.fitted["null"] = np.asarray(state.cache[key], dtype=np.float64)

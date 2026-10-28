@@ -8,6 +8,10 @@ metadata: ``License-Expression``, else ``License``, else the ``License ::`` clas
 that order. A package with none of these is reported as ``UNKNOWN`` and has to be looked up by a
 person. Whether a package is a direct runtime dependency, a direct development dependency or a
 transitive one comes from ``pyproject.toml``.
+
+``REVIEWED`` holds the few licences a person has read and corrected, each tied to the exact
+version that was reviewed (a new version is read from its metadata again, and so re-reviewed).
+Each entry is explained in docs/licence_audit.md.
 """
 
 from __future__ import annotations
@@ -20,6 +24,13 @@ from importlib import metadata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# name -> (reviewed version, licence, why the metadata is wrong). The metadata alone says
+# "GPL" for docutils because the project ships one GPL-3 file, tools/editors/emacs/rst.el,
+# in its source tarball; the installed package contains no GPL file (COPYING.rst, 0.22.4).
+REVIEWED: dict[str, tuple[str, str]] = {
+    "docutils": ("0.22.4", "Public Domain; BSD-2-Clause (installed files)"),
+}
 
 
 def norm(name: str) -> str:
@@ -35,11 +46,14 @@ def locked_packages(lock: Path) -> list[str]:
     return sorted(norm(p["name"]) for p in data["package"])
 
 
-def direct_dependencies(pyproject: Path) -> tuple[set[str], set[str]]:
+def direct_dependencies(pyproject: Path) -> tuple[set[str], set[str], set[str]]:
+    """Direct runtime, development and documentation dependencies."""
     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    groups = data.get("dependency-groups", {})
     runtime = {requirement_name(s) for s in data["project"].get("dependencies", [])}
-    dev = {requirement_name(s) for s in data.get("dependency-groups", {}).get("dev", [])}
-    return runtime, dev
+    dev = {requirement_name(s) for s in groups.get("dev", [])}
+    docs = {requirement_name(s) for s in groups.get("docs", [])}
+    return runtime, dev, docs
 
 
 def licence_of(name: str) -> tuple[str, str, str]:
@@ -48,6 +62,9 @@ def licence_of(name: str) -> tuple[str, str, str]:
         dist = metadata.distribution(name)
     except metadata.PackageNotFoundError:
         return "not installed", "UNKNOWN", "-"
+    reviewed = REVIEWED.get(norm(name))
+    if reviewed and dist.version == reviewed[0]:
+        return dist.version, reviewed[1], "reviewed (docs/licence_audit.md)"
     md = dist.metadata
     expr = (md.get("License-Expression") or "").strip()
     if expr:
@@ -68,7 +85,7 @@ def licence_of(name: str) -> tuple[str, str, str]:
 
 
 def rows(root: Path = ROOT) -> list[dict[str, str]]:
-    runtime, dev = direct_dependencies(root / "pyproject.toml")
+    runtime, dev, docs = direct_dependencies(root / "pyproject.toml")
     out = []
     for name in locked_packages(root / "uv.lock"):
         if name == "driftwatch-lifetime":
@@ -79,6 +96,8 @@ def rows(root: Path = ROOT) -> list[dict[str, str]]:
             if name in runtime
             else "direct, development"
             if name in dev
+            else "direct, documentation"
+            if name in docs
             else "transitive"
         )
         out.append(

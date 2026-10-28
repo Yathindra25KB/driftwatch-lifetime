@@ -466,9 +466,21 @@ class RunConfig:
 
 
 def lock_sha256(repo_root: Path | str) -> str:
-    """SHA-256 of ``uv.lock`` with line endings normalised (Windows and Linux agree)."""
-    raw = (Path(repo_root) / "uv.lock").read_bytes().replace(b"\r\n", b"\n")
-    return hashlib.sha256(raw).hexdigest()
+    """SHA-256 of ``uv.lock`` with line endings normalised (Windows and Linux agree).
+
+    An installed package has no lock file; the hash then covers the versions of the packages
+    in :data:`PACKAGES` and the Python version (prefixed so it can never equal a lock hash).
+    That pins an installed smoke run, not transitive dependencies. A source checkout whose
+    lock file is missing is an error, never a fallback: evidence runs need the real lock.
+    """
+    root = Path(repo_root)
+    lock = root / "uv.lock"
+    if not lock.exists():
+        if (root / "pyproject.toml").exists():
+            raise FileNotFoundError(f"{lock} is missing from a source checkout")
+        text = "installed:" + json.dumps(package_versions(), sort_keys=True)
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return hashlib.sha256(lock.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def config_hash(config: dict[str, Any], code_version: str, lock_hash: str) -> str:

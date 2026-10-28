@@ -79,7 +79,9 @@ class MMD:
     alpha: float = ALPHA
     name: str = "mmd"
 
-    def start(self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any):
+    def start(
+        self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any
+    ) -> None:
         k = max(1, min(self.n_components, train_X.shape[1] - 1))
         svd = TruncatedSVD(n_components=k, random_state=int(state.seed))
         svd.fit(train_X)

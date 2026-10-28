@@ -1,0 +1,41 @@
+name: Reproduction failure
+description: "`driftwatch smoke` or `driftwatch reproduce table1` did not match or did not run."
+labels: [reproduction-failure]
+body:
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      options:
+        - driftwatch smoke
+        - driftwatch reproduce table1 --smoke
+        - driftwatch reproduce table1
+    validations:
+      required: true
+  - type: input
+    id: exit
+    attributes:
+      label: Exit code
+      description: "0 match, 1 mismatch, 2 cannot run, 3 the dataset download needs the manual path (see the BODMAS data card)."
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: The report
+      description: Paste the JSON report from the output folder (reports/reproduction/ or driftwatch-smoke/) and the last 30 lines of output.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Output of `driftwatch --version`, and how you installed (PyPI or clone)
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Operating system, Python version, free RAM
+    validations:
+      required: true

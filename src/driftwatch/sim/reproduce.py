@@ -42,6 +42,8 @@ COMPARATOR_COLUMNS = {
 COMPARATOR_TOLERANCE = 0.02  # [estimate]; the observed differences are reported next to it
 IGNORED = {"fit_seconds_median", "sanity_band"}  # timing and a placeholder column
 SMOKE_GOLDEN = Path("tests/golden/table1_smoke.csv")
+# the same table, shipped inside the wheel so that an installed package can run the smoke
+PACKAGED_GOLDEN = Path(__file__).resolve().parents[1] / "_golden" / "smoke_table1.csv"
 STORED_TABLE = Path("reports/tables/e0_baselines.csv")
 SMOKE_CONFIG: dict[str, Any] = {
     "name": "table1_smoke",
@@ -151,7 +153,7 @@ def _check_raw_against_committed_manifest(layout: Any, committed: Path, log: lis
 
     ``SOURCE.json`` is the download log (it carries a timestamp) and is not compared.
     """
-    import hashlib
+    from driftwatch.data.cache import sha256_file
 
     if not committed.exists():
         log.append(f"no committed manifest at {committed}: raw files not compared")
@@ -169,11 +171,7 @@ def _check_raw_against_committed_manifest(layout: Any, committed: Path, log: lis
         if path.stat().st_size != rec["bytes"]:
             bad.append(f"size differs {rel}")
             continue
-        h = hashlib.sha256()
-        with path.open("rb") as fh:
-            for chunk in iter(lambda: fh.read(1 << 20), b""):
-                h.update(chunk)
-        if h.hexdigest() != rec["sha256"]:
+        if sha256_file(path) != rec["sha256"]:
             bad.append(f"hash differs {rel}")
     if bad:
         raise ReproductionError(
@@ -212,6 +210,11 @@ def _ensure_bodmas(
         raise ReproductionError("data verify failed after the build: " + "; ".join(problems))
 
 
+def is_checkout(repo: Path) -> bool:
+    """True for a source checkout (as opposed to an installed wheel)."""
+    return (repo / "pyproject.toml").exists() and (repo / "src" / "driftwatch").is_dir()
+
+
 def reproduce_table1(
     *,
     repo_root: Path | str,
@@ -235,19 +238,34 @@ def reproduce_table1(
     out.mkdir(parents=True, exist_ok=True)
     cap = int(memory_cap_gb * 1024**3)
     work = Path(work_dir) if work_dir else Path(tempfile.mkdtemp(prefix="driftwatch-table1-"))
+    checkout = is_checkout(repo)
+    if not checkout and not smoke:
+        raise ReproductionError(
+            "the full reproduction needs a source checkout (configs, manifest and stored table); "
+            "git clone the repository, or run `driftwatch smoke` for the installed package"
+        )
     if smoke:
         from driftwatch.data.build import build_dataset
         from driftwatch.data.cache import Layout
+        from driftwatch.data.fixture import write_fixture
         from driftwatch.data.presets import cached_source
 
         root = work / "data"
         fixture = repo / "tests" / "fixtures" / "synthetic"
-        if not fixture.exists():
-            raise ReproductionError(f"smoke mode needs the committed fixture at {fixture}")
+        if not checkout or not fixture.exists():
+            # an installed package regenerates the (seeded) fixture; it equals the committed one
+            # at the array level (tests/test_fixture_regenerates.py)
+            fixture = write_fixture(work / "fixture")
+            notes.append(f"synthetic fixture regenerated in {fixture}")
+        if not checkout:
+            repo = work  # no checkout: the run is pinned by the installed package versions
         build_dataset("bodmas", Layout(root), raw_layout=Layout(fixture), batch_size=16)
         cfg = smoke_config(str(work / "results"))
         source = cached_source("bodmas", root)
-        reference = Path(stored_table) if stored_table else repo / SMOKE_GOLDEN
+        if stored_table:
+            reference = Path(stored_table)
+        else:
+            reference = repo / SMOKE_GOLDEN if checkout else PACKAGED_GOLDEN
     else:
         root = Path(data_root)
         _ensure_bodmas(root, cap, notes, repo / "data" / "manifest.json")

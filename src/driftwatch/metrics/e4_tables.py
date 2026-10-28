@@ -56,10 +56,6 @@ def _seed_set(frame: pd.DataFrame) -> str:
     return f"{s[0]}-{s[-1]}" if s == list(range(s[0], s[-1] + 1)) else "_".join(map(str, s))
 
 
-def _wid(w: pd.Series) -> pd.Series:
-    return stats.window_key(w.astype(str))
-
-
 def _arm_label(cfg: dict[str, Any]) -> str:
     pol = cfg.get("policy")
     if isinstance(pol, dict):
@@ -107,7 +103,7 @@ def collect(
             key: ArmKey = (model, arm, delay)
             aut = stats.aut_matrix(d["f1"], model, variant="rolling").values
             s = d["slots"][d["slots"]["model"] == model].copy()
-            s["window_key"] = _wid(s["window_id"])
+            s["window_key"] = stats.window_key_of(s["window_id"])
             w_rows = d["windows"][d["windows"]["model"] == model].copy()
             if key in col.arms:  # the same arm under another seed set (seeds 0-4 and 5-9)
                 if set(aut.columns) & set(col.arms[key].columns):

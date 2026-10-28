@@ -14,10 +14,11 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import logging
 import zipfile
 from pathlib import Path
+
+from driftwatch.data.cache import sha256_file as sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENTS = ("e0", "e1", "e2", "e3", "e4")
@@ -33,14 +34,6 @@ def collect(results: Path, experiments: tuple[str, ...] = EXPERIMENTS) -> list[P
         if base.is_dir():
             found.extend(p for p in base.rglob("*") if p.is_file() and p.name in NAMES)
     return sorted(found, key=lambda p: p.relative_to(results).as_posix())
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1 << 20), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def manifest_rows(results: Path, files: list[Path]) -> list[dict[str, str | int]]:

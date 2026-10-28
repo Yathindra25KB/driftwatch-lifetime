@@ -1,0 +1,30 @@
+name: Related work
+description: A paper the related-work chapter should cover.
+labels: [related-work]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: arXiv id or DOI
+      description: An identifier that resolves. Titles alone cannot be added.
+    validations:
+      required: true
+  - type: dropdown
+    id: axis
+    attributes:
+      label: Which axis does it touch?
+      multiple: true
+      options:
+        - label delay
+        - labelling or analyst budget
+        - conformal prediction
+        - drift monitoring
+        - time-aware evaluation
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters for this study (one or two sentences)
+    validations:
+      required: true

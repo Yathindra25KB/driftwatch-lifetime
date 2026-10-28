@@ -3,20 +3,26 @@ message: "If you use this software, please cite it using the metadata from this 
 type: software
 title: "DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring"
 abstract: >-
-  Pre-release research software. A time-aware protocol (TESSERACT constraints
-  C1-C3, AUT and A-AUT) applied to pre-extracted LAMDA (Android) and BODMAS
-  (Windows PE) feature files to study how label delay, a fixed analyst budget
-  and drift monitoring change a malware detector's useful lifetime.
+  Research software and a pre-registered study. One time-aware protocol
+  (TESSERACT constraints C1-C3, reported with AUT and A-AUT) is applied to
+  pre-extracted LAMDA (Android) and BODMAS (Windows PE) feature files to
+  measure how label delay, a fixed analyst budget, conformal sample selection
+  and drift monitors change a malware detector's useful lifetime. No malware
+  sample is downloaded, executed or redistributed.
 authors:
   - given-names: Yathindra
     family-names: K B
     affiliation: "VISTAS"
-repository-code: "https://github.com/Yathindra25KB/Driftwatch-"
+    email: yathindrakb25@gmail.com
+repository-code: "https://github.com/Yathindra25KB/driftwatch-lifetime"
+url: "https://yathindra25kb.github.io/driftwatch-lifetime/latest/"
 license: MIT
-version: 0.0.0
+version: 0.1.0
 keywords:
   - malware detection
   - concept drift
   - label delay
+  - active learning
   - conformal prediction
   - time-aware evaluation
+  - reproducibility

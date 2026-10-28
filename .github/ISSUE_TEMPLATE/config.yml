@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security or ethics concern
+    url: https://github.com/Yathindra25KB/driftwatch-lifetime/security/policy
+    about: Please read SECURITY.md before opening a public issue about a vulnerability.
+  - name: Documentation
+    url: https://yathindra25kb.github.io/driftwatch-lifetime/latest/
+    about: The docs explain the protocol, the claims ledger and how to reproduce Table 1.

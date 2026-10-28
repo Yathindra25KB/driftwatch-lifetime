@@ -35,10 +35,6 @@ SEED_SETS = {"0-4": tuple(range(5)), "0-9": tuple(range(10))}
 ArmKey = tuple[str, str, int, float, float, str]  # model, selector, delay, budget, share, score
 
 
-def _wid(w: pd.Series) -> pd.Series:
-    return stats.window_key(w.astype(str))
-
-
 class E3Collected:
     def __init__(self, dataset: str) -> None:
         self.dataset = dataset
@@ -99,7 +95,7 @@ def collect(
             m = stats.aut_matrix(d["f1"], model, variant="rolling")
             blocks.setdefault(key, []).append(m.values)
             s = d["slots"][d["slots"]["model"] == model].copy()
-            s["window_key"] = _wid(s["window_id"])
+            s["window_key"] = stats.window_key_of(s["window_id"])
             col.slots.setdefault(key, []).append(s)
             if model not in col.models:
                 col.models.append(model)

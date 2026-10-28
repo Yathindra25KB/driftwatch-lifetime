@@ -1,0 +1,52 @@
+name: Bug report
+description: Something in the code or the documentation is wrong.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not attach malware, binaries or dataset files. DriftWatch uses feature files only.
+        This project describes how detectors decay; it does not accept requests for evasion
+        or adversarial-example tooling.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The exact commands, starting from a clean environment.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Output of `driftwatch --version`
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Operating system and Python version
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - constraints C1-C3
+        - label queue / sealed labels
+        - metrics
+        - models
+        - conformal
+        - monitors
+        - CLI
+        - docs
+        - packaging
+    validations:
+      required: false

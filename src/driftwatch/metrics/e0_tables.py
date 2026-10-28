@@ -7,12 +7,15 @@ See the script docstring for the column definitions. No fits, no model code.
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+
+log = logging.getLogger(__name__)
 
 KEYS = ["dataset", "model", "variant", "ratio"]
 N_BOOT = 2000
@@ -238,7 +241,7 @@ def _newest_runs(results: Path, config_dir: Path | None) -> dict[str, Path]:
         try:
             data = check_run(record.parent, config_dir)
         except RunRejected as exc:
-            print(f"skipped: {exc}")
+            log.warning("skipped: %s", exc)
             continue
         dataset = data["config"]["dataset"]
         mtime = record.stat().st_mtime

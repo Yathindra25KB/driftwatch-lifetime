@@ -95,7 +95,9 @@ class Monitor(Protocol):
     name: str
     alpha: float
 
-    def start(self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any):
+    def start(
+        self, state: MonitorState, train_X: Any, train_y: np.ndarray, ref_full_X: Any
+    ) -> None:
         """Fit what the monitor needs once per window, from the initial training window only."""
         ...
 
@@ -137,7 +139,7 @@ def reference_sample(X: Any, seed: int, window_key: str, ref_slot: int, n: int =
     return take_rows(X, idx)
 
 
-def current_sample(view: SlotView, state: MonitorState, n: int = N_SUB):
+def current_sample(view: SlotView, state: MonitorState, n: int = N_SUB) -> tuple[np.ndarray, Any]:
     """Seeded positions and rows of the current slot (same draw in every arm)."""
     idx = subsample_index(_n_rows(view.X), n, rng_for(state.seed, state.window_key, "cur",
                                                       view.slot_id))  # fmt: skip

@@ -61,6 +61,12 @@ ALLOWED_HOSTS = frozenset(
         "huggingface.co",
         "drive.google.com",
         "drive.usercontent.google.com",
+        # Phase 12 (ADR-0001 change request, 26 Oct 2026): the Zenodo integration and its
+        # sandbox dry run, the arXiv API for the monthly audit, and the project's docs site.
+        "zenodo.org",
+        "sandbox.zenodo.org",
+        "export.arxiv.org",
+        "yathindra25kb.github.io",
     }
 )
 # Hugging Face serves files from cdn-lfs*.huggingface.co and its Xet storage under *.hf.co.

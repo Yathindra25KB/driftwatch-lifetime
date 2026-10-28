@@ -1,0 +1,41 @@
+{
+  "title": "DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring",
+  "upload_type": "software",
+  "description": "<p>Research software and a pre-registered study of how long a malware detector stays useful. One time-aware protocol (TESSERACT constraints C1-C3, reported with AUT and A-AUT) is applied to pre-extracted LAMDA (Android) and BODMAS (Windows PE) feature files to measure the effect of label delay, a fixed analyst budget, conformal sample selection and drift monitors.</p><p>The release contains code, configurations, aggregate result tables, figures, the claims ledger and the report chapters. It contains no dataset content apart from a small synthetic test fixture, and no malware samples.</p>",
+  "creators": [
+    {
+      "name": "K B, Yathindra",
+      "affiliation": "VISTAS"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "malware detection",
+    "concept drift",
+    "label delay",
+    "active learning",
+    "conformal prediction",
+    "time-aware evaluation",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Yathindra25KB/driftwatch-lifetime",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://yathindra25kb.github.io/driftwatch-lifetime/latest/",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://pypi.org/project/driftwatch-lifetime/",
+      "relation": "isIdenticalTo",
+      "scheme": "url"
+    }
+  ],
+  "notes": "The datasets are not included and keep their own licences: LAMDA (MIT), BODMAS (code BSD-2-Clause; dataset used as published by its authors). Build them with `driftwatch data download` and `driftwatch data build`. AndroZoo and SOREL-20M are not used.",
+  "language": "eng"
+}

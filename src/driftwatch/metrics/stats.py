@@ -65,6 +65,11 @@ def window_key(window_id: pd.Series) -> pd.Series:
     return window_id.str.split("|", n=1).str[1]
 
 
+def window_key_of(window_id: pd.Series) -> pd.Series:
+    """:func:`window_key` of a column that may not hold strings yet."""
+    return window_key(window_id.astype(str))
+
+
 OPTIONAL_KEYS = ("series", "variant")  # kept as keys when the table has them
 
 

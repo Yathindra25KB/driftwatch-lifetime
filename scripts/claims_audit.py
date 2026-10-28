@@ -38,6 +38,13 @@ DEFAULT_FILES = (
     "report/ch07_experiments.md",
     "report/ch08_discussion.md",
     "report/ch09_conclusion.md",
+    "docs/architecture/index.md",
+    "docs/architecture/data-and-slicing.md",
+    "docs/architecture/simulator.md",
+    "docs/architecture/conformal-and-monitors.md",
+    "docs/architecture/evidence-and-reproducibility.md",
+    "docs/architecture/quality-and-release.md",
+    "docs/architecture/extending.md",
 )
 ID_RE = re.compile(r"\b([A-Z]{1,2}-\d{2,3})\b")
 NUMBER_RE = re.compile(r"(?<![\w.])\d+(?:[.,]\d+)*%?(?![\w])")

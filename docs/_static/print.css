@@ -1,0 +1,2 @@
+/* Applied when a page is printed from a browser; the rules live in pdf.css. */
+@import url("pdf.css") print;
