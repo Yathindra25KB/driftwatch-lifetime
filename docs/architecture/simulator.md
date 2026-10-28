@@ -35,16 +35,18 @@ flowchart TB
 
 *Figure 4. Who can see what. Solid arrows into `Selector`, `Monitor` and `Detector` carry only features and opaque handles. True labels flow only along the two arrows leaving `SealedSlot` (to the metric door and to the queue) and then out of the queue, after the delay, into the training pool.*
 
-What the type system and the module layout guarantee:
+What the type system and the module layout provide (these are design properties that the tests below sample; they are not proofs, and Python does not enforce private attributes, so code that deliberately reached into `SealedSlot` could still read a label):
 
 - `OpaqueSlot` has **no label, no timestamp and no dataset row id**, and no back-reference to its slot. Its arrays are made read-only, because the same arrays back the scoring door and an in-place shuffle would silently pair predictions with the wrong labels.
-- A selector returns a `Selection` of *handles* (positions in a seeded, label-independent order). Only `LabelQueue.query` can translate handles into rows, through `SealedSlot._take`.
-- The queue accepts a query only for the slot just streamed, so a label can never be bought for a slot that has not been scored yet.
-- `Released` carries the labels that arrive at a slot, with the slot each was queried in. It is the only object that moves labels into the training pool.
+- A selector returns a `Selection` of *handles* (positions in a seeded, label-independent order). Only `LabelQueue.query` translates handles into rows, through `SealedSlot._take`.
+- The queue accepts a query only for the slot just streamed, so a label is not bought for a slot that has not been scored yet.
+- `Released` carries the labels that arrive at a slot, with the slot each was queried in. It is the object that moves labels into the training pool.
+
+None of this addresses noise in the datasets' own labels (antivirus-based, with an unpublished scan date for LAMDA, [D-16](../CLAIMS.md); not verified for BODMAS, [D-17](../CLAIMS.md)); that is a limit of the study.
 
 ### How it is verified
 
-`tests/test_sim_sealed.py` replaces `y`, `ts` and `row_id` of an `EvalSlot` with spy objects that record the module of every caller and raise on any operation they do not expect. A whole stream is then driven through the real selector, policy, pool and queue, and the test asserts that every recorded read comes from `driftwatch.sim.queue`, and that selectors, policies and the pool performed none. Import-level checks in the same file (they parse the source with `ast`) fail if a selector, policy, pool or monitor imports a type that holds labels, or if any module other than `sim/queue.py` reads slot labels. Three deliberate breakages of the boundary were caught by these tests (see [S-01 to S-06](../CLAIMS.md)).
+`tests/test_sim_sealed.py` replaces `y`, `ts` and `row_id` of an `EvalSlot` with spy objects that record the module of every caller and raise on any operation they do not expect. A whole stream is then driven through the real selector, policy, pool and queue, and the test asserts that every recorded read comes from `driftwatch.sim.queue`, and that selectors, policies and the pool performed none. Import-level checks in the same file (they parse the source with `ast`) fail if a selector, policy, pool or monitor imports a type that holds labels, or if any module other than `sim/queue.py` reads slot labels. The spy test has no recorded mutation check of its own ([S-02](../CLAIMS.md)). Three deliberate breakages of the *runner* (arrived labels not reaching the pool, the in-loop C1 assertion removed, comparator rows not filtered from the E0 table) were each caught by the runner regression tests ([S-04](../CLAIMS.md)).
 
 ## The delay rule
 
@@ -94,7 +96,7 @@ flowchart TD
 
 Notes that matter when reading the code:
 
-- **Scoring precedes spending.** The slot is scored with the model as it stood *before* this slot's labels were bought, so a label can never inform the slot it came from (`.claude/rules/sim.md`).
+- **Scoring precedes spending.** The slot is scored with the model as it stood *before* this slot's labels were bought, so a label does not inform the slot it came from (the rule in `.claude/rules/sim.md`, checked by the runner tests).
 - **A scheduled retrain with nothing new is a no-op.** If the policy fires but no label has arrived since the last fit, the model is not refitted; the event is counted separately (`n_noop_retrains`). This is why, at a delay longer than the retraining period, periodic retraining on BODMAS equals never retraining by construction ([P-12](../CLAIMS.md)).
 - **Budget is a percentage of the evaluated slot after C3 subsampling**, because that is the slot the selector sees. The absolute count is always logged next to the percentage (`budget_count`, `n_budget`; [ADR-0007](../DECISIONS/ADR-0007-pool-composition-and-budget.md)).
 - **Determinism.** Every random draw is keyed by a seed and a slot id (`selector_rng`, `reserved_rng`), never by iteration order, so a run is repeatable and resumable without duplicate rows.

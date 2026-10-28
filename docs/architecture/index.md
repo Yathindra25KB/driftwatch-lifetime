@@ -1,6 +1,6 @@
 # Architecture
 
-This section explains how DriftWatch is built and why it is built that way: what the packages are, how a label travels from the dataset to a retrained detector, which parts of the code make leakage impossible rather than merely unlikely, and how a number gets from a result file into the report. It is written for a reader who wants to review, extend or reproduce the study, and it points at the code (file and symbol) behind every box.
+This section explains how DriftWatch is built and why it is built that way: what the packages are, how a label travels from the dataset to a retrained detector, which parts of the code make label access inside the simulator narrow and testable (leakage in the datasets' own labels is a stated limit, not something the code can remove, D-16 and D-17), and how a number gets from a result file into the report. It is written for a reader who wants to review, extend or reproduce the study, and it points at the code (file and symbol) behind every box.
 
 Protocol constants (slot lengths, window sizes, delays, budgets, ratios) are **not** repeated here. They live in [PROTOCOL](../PROTOCOL.md), which is the single source of truth. Numbers that are results are in the [claims ledger](../CLAIMS.md).
 
@@ -10,8 +10,8 @@ DriftWatch simulates a malware detector that is deployed and then lives through 
 
 Three design decisions shape everything else:
 
-1. **Leakage is prevented by types and by one door, not by discipline.** The true label of a sample is reachable only through the label queue and the scoring function. Selectors, policies and monitors receive an `OpaqueSlot` that has no labels (see [simulator](simulator.md)).
-2. **A run is a pure function of a configuration.** One YAML file, a seed and the locked environment determine every stored prediction; the run records the hash of all three (see [evidence](evidence-and-reproducibility.md)).
+1. **Label access is narrowed by types and by one door, and checked by tests, not left to discipline.** The true label of a sample is meant to be reachable only through the label queue and the scoring function. Selectors, policies and monitors receive an `OpaqueSlot` that has no labels. A spy test and import checks (`tests/test_sim_sealed.py`, [S-02](../CLAIMS.md)) verify this on the paths they exercise; Python does not enforce private attributes, and noise in the datasets' own labels is outside what the code can address (see [simulator](simulator.md)).
+2. **A run is meant to be a deterministic function of a configuration.** One YAML file, a seed and the locked environment are meant to determine every stored prediction, and the run records the hash of all three. This was checked by rerunning seed 0 of every E0 variant on one machine ([E-11](../CLAIMS.md)); the random-split comparator is the known exception after a data rebuild ([E-24](../CLAIMS.md)), and E2 to E4 were not rerun (see [evidence](evidence-and-reproducibility.md)).
 3. **Tables are rebuilt from stored predictions.** Models are fitted once, during a run. Every table, figure and contrast afterwards is computed from the per-slot predictions on disk, with no model fit, so analysis can be repeated and reviewed cheaply.
 
 ## Package map
@@ -58,8 +58,8 @@ The project's [hard rules](https://github.com/Yathindra25KB/driftwatch-lifetime/
 | C1, C2, C3 are assertions that raise | `data/constraints.py` (`ConstraintViolation`); re-checked by `SealedSlot.assert_c1` against the real training pool | constraint suites and the slicer mutation matrix (every deliberate breakage must be caught, [W-07](../CLAIMS.md)) |
 | Label delay lives only in `sim/queue.py` | `LabelQueue.release_slot` is the single place `t + 1 + d` is computed | `tests/test_queue_delay.py`, property tests over the delay range |
 | True labels reach only the queue and the metric code | `SealedSlot` hides `y`; selectors, policies and monitors receive `OpaqueSlot` (no labels, no row ids) | the spy test `tests/test_sim_sealed.py`: labels are replaced by objects that record every caller and raise on anything unexpected |
-| Fit scalers, thresholds and calibration sets on the current training window only | detectors take the window id at fit and refuse to score under another; calibration rows are never rows the scoring model was fitted on (ADR-0009) | model and conformal suites; leakage reviews of E2, E3 and E4 |
-| One YAML config per run; log hash, seeds, versions; store per-slot predictions | `sim/config.py` (`RunConfig`, `config_hash`, `lock_sha256`, `package_versions`), `sim/results.py` | config and result-store tests; repeat runs give identical prediction hashes |
+| Fit scalers, thresholds and calibration sets on the current training window only | detectors take the window id at fit and refuse to score under another; calibration rows are never rows the scoring model was fitted on (ADR-0009) | model and conformal suites; the E3 and E4 leakage reviews (`docs/reviews/leakage-review-e3.md`, `leakage-review-e4.md`) and the slicer review |
+| One YAML config per run; log hash, seeds, versions; store per-slot predictions | `sim/config.py` (`RunConfig`, `config_hash`, `lock_sha256`, `package_versions`), `sim/results.py` | config and result-store tests; a rerun of seed 0 of every E0 variant gave identical prediction hashes on one machine ([E-11](../CLAIMS.md)); E2 to E4 were not rerun |
 | No number without a ledger row | `scripts/claims_audit.py` fails a paragraph that has a number and no resolving claim id | the audit runs in the closeout and release checks |
 | Locked files stay locked | the guard hook blocks edits to the pre-registration after its tag; `tests/test_repo_invariants.py` fails if it differs from its tag | guard tests and the guardrail demonstration |
 

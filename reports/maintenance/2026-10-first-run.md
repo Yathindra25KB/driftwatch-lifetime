@@ -30,7 +30,7 @@ The three tasks of `docs/MAINTENANCE.md` that Phase 12 asks to see run once: the
 | guardrail demonstration | 45 of 45 |
 | `driftwatch smoke` | `MATCH`, 2 rows, max difference 0.000000 |
 | smoke result tables against the baseline taken before the upgrade | 40 prediction rows, 4 slot rows, 2 window rows; every probability, decision and label identical; only `config_hash`, `window_id` and the timing column differ, as expected |
-| tables rebuilt from the stored E1 to E4 predictions (`make_tables.py`, `make_e3.py`, `make_e4.py`) | all exit 0; **`git status reports/` shows no modified table: no number moved** |
+| tables rebuilt from the stored E1 to E4 predictions (`make_tables.py`, `make_e3.py`, `make_e4.py`) | all exit 0; **`git status reports/` shows no modified file: the E2, E3 and E4 tables and figures these scripts write equal the committed copies.** Not rerun: the E0 and E1 tables and the label-influence table (other scripts) |
 | `check_e4_vs_e3.py` | exit 0 |
 | licence lister | no GPL-family or new unknown licence; two label spellings changed (pandas now says BSD-3-Clause); python-dateutil 3.0.0's licence files read again and unchanged in structure; `docs/licence_audit.md` table regenerated |
 

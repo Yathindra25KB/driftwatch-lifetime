@@ -6,7 +6,7 @@ All notable changes to `driftwatch-lifetime` are recorded here. The format follo
 
 ## [0.1.0] - unreleased
 
-First public release. It contains the whole study as run for the capstone report. Every number it reports is traceable in `docs/CLAIMS.md`.
+Initial public release. It contains the whole study as run for the capstone report. Every number the README and the report chapters report has a row in `docs/CLAIMS.md` with a source file and a commit. Rows that cite files under `results/` can be regenerated only from the stored predictions, which are not in the repository (they are hashed in `docs/predictions_manifest.csv` and archived privately, E-69). A few rows are marked `[verify]` where the source could not be read (for example how BODMAS's labels were produced, D-17).
 
 ### Added
 - **Data:** download, build, verify and inventory the LAMDA (Android) and BODMAS (Windows PE) feature files. Caching respects a memory cap, and a manifest records the expected hashes (`driftwatch data ...`). No dataset content is shipped.
@@ -21,7 +21,9 @@ First public release. It contains the whole study as run for the capstone report
 - **Release and maintenance:** release pipeline (TestPyPI rehearsal, PyPI through Trusted Publishing, GitHub Release, Zenodo DOI), documentation site, maintenance playbook, monthly arXiv audit, issue templates.
 
 ### Results
-- E0 to E4 as reported in chapter 7 of the report and in `README.md`; CLAIMS rows E-01 to E-69. Pre-registrations: tags `prereg-v1` (E2), `prereg-v2` (E3) and `prereg-v3` (E4), each placed before the results it governs.
+- E0 to E4 as reported in chapter 7 of the report and in `README.md`; CLAIMS rows E-01 to E-75 (E-66 and E-68 are exploratory, and E-70 to E-75 record the release work, not results).
+- Headline: effects are small (hundredths of A-AUT): retraining on bought labels helps a little on LAMDA and about nothing on BODMAS, and no drift monitor beat retraining every third slot (E-59, E-60). The limits that apply to every one of these sentences are in the README under "Limits".
+- Pre-registrations: tags `prereg-v1` (E2), `prereg-v2` (E3) and `prereg-v3` (E4), each placed before the results it governs. The exception is RQ1 (E0 and E1): those results were run and read before `prereg-v1`, so RQ1 is a registered reading of known numbers, not a prediction (`docs/PREREG.md`, "What was already known when this file was locked").
 
 ### Not included
 - Tier 3 (E5 cross-platform replication, E6 EMBER2024) was not run; see `docs/ROADMAP.md`.
