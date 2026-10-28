@@ -1,6 +1,6 @@
 # Data and slicing
 
-The data layer turns two published feature files into a stream of time slots that the simulator can consume, and it makes the three time-aware constraints impossible to skip. It never touches a binary, a malware sample or a model.
+The data layer turns two published feature files into a stream of time slots that the simulator can consume, and it enforces the three time-aware constraints as checks that raise when violated and that no configuration option can switch off. It never touches a binary, a malware sample or a model.
 
 ## The pipeline from upstream file to window
 

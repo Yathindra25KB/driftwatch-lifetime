@@ -20,14 +20,14 @@ Baseline taken at `f7dffb5`, before the edits; compared with the working tree of
 | Smoke run, predictions table | 40 rows, 16 columns in both; only `config_hash` and `window_id` differ (both embed the code version), every probability, decision and label is equal |
 | Smoke run, slot table | 4 rows, 30 columns; only `config_hash` and `window_id` differ |
 | Smoke run, window table | 2 rows, 51 columns; `config_hash`, `window_id` and `fit_seconds` (a timing) differ |
-| `make_tables.py`, `make_e3.py`, `make_e4.py` rebuilt from the stored E1 to E4 predictions | every command exit 0; `git status reports/` empty, so every committed table is reproduced byte for byte |
+| `make_tables.py`, `make_e3.py`, `make_e4.py` rebuilt from the stored E1 to E4 predictions | every command exit 0; `git status reports/` empty, so everything these three scripts write under `reports/` (the E2, E3 and E4 tables and figures) equals the committed copy. Not covered: files written by other scripts (`make_e0_table.py`, `make_e1_figure.py`, `label_influence.py`), which were not rerun |
 | `scripts/check_e4_vs_e3.py` | exit 0 |
 
 ## 3. Filtered public history, rehearsal (E-72)
 
-`scripts/make_public_history.py --out <scratch>` on the repository at `3a5b519`: 193 commits cloned as a mirror and rewritten with `git filter-repo --path docs/source --invert-paths`. Checks: 0 commits touch `docs/source`; no tree contains it; tags `prereg-v1`, `prereg-v2` and `prereg-v3` survive; the number of commits is unchanged (193); the largest blob is 415,219 bytes (`data/manifest.json`); no secret-shaped text in any revision. The script printed `public history: OK (nothing was pushed)` and wrote a map of 193 old and new hashes. The repository before filtering is 13 MB.
+`scripts/make_public_history.py --out <scratch>` on the repository at `3a5b519`: 193 commits cloned as a mirror and rewritten with `git filter-repo --path docs/source --invert-paths`. Checks: 0 commits touch `docs/source`; no tree contains it; tags `prereg-v1`, `prereg-v2` and `prereg-v3` survive; the number of commits is unchanged (193); the largest blob is 415,219 bytes (`data/manifest.json`); no match in any revision for the secret patterns the script scans (AWS access key ids, GitHub tokens of the `ghp_`, `gho_`, `ghu_`, `ghs_`, `ghr_` and `github_pat_` forms, PyPI tokens, private-key blocks); a pattern scan finds those shapes only and is not a proof that no secret exists. The script printed `public history: OK (nothing was pushed)` and wrote a map of 193 old and new hashes. The repository before filtering is 13 MB.
 
-## 4. The deploy step of `docs.yml`, simulated
+## 4. The deploy step of `docs.yml`, simulated (no ledger row: a behaviour check, not a measured value)
 
 The shell of the `deploy` job was run, unchanged, against a scratch repository with a bare remote, four times: a branch build (creates the `gh-pages` branch), a tag build (adds `v0.1.0/`), a later branch build with new content (replaces `latest/` and keeps `v0.1.0/`), and the same content again (nothing to publish). Result: `gh-pages` holds `.nojekyll`, `index.html`, `latest/`, `v0.1.0/`, `versions.html` and `versions.json`; three commits were made, the fourth run made none. Not simulated: the GitHub token and Pages hosting.
 

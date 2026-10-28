@@ -1,0 +1,956 @@
+[
+  {
+    "id": "2610.35484v1",
+    "title": "Evaluating Bayesian deep learning for robust biomedical time-series classification under distribution shift: A sleep scoring case study",
+    "abstract": "In biomedical time-series classification, machine learning models often suffer from deteriorating accuracy and calibration due to distribution shift. We investigate to what degree Bayesian-inspired deep learning improves robustness through Bayesian model averaging (BMA). Using rodent sleep scoring as a case study, we evaluate BMA under distribution shifts in genotype, laboratory, and species. We systematically compare nine approximate inference methods spanning single- and multi-basin approaches across two neural network backbones on in-distribution (ID) data and five out-of-distribution (OOD) datasets. In our results, multi-basin methods perform best, outperforming baselines and single-basin methods. Compared with point estimates, BMA generally improves OOD accuracy and calibration across both architectures, while yielding only modest ID gains. It also often improves selective prediction and OOD and artifact detection, but, interestingly, not inter-rater disagreement detection.",
+    "published": "2026-10-26",
+    "authors": [
+      "Mads Birch S\u00f8rensen",
+      "Ulrike Richter",
+      "Francois Gastambide",
+      "Michael Riis Andersen"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.26852v1",
+    "title": "CoopUQ: Robust Multi-Robot Social Navigation via Uncertainty-Aware Cooperative Forecasting",
+    "abstract": "Reinforcement learning enables mobile robots to make fast and scalable navigation decisions in constrained human-shared environments. However, directly extending single-robot approaches to multi-robot settings often fails to ensure safety and efficiency, especially under occlusions and out-of-distribution (OOD) scenarios, where individual robots may overlook potential risks or make inaccurate predictions. Leveraging cooperation effectively for both prediction and navigation remains a major challenge. We propose CoopUQ, a multi-robot social navigation framework that bridges uncertainty-aware cooperative occupancy forecasting and robust decision making. CoopUQ predicts future occupancy grid maps through cross-robot spatiotemporal feature fusion and further leverages forecasts and their uncertainty to guide policy via constrained multi-agent reinforcement learning, where the cost penalizes navigation through regions predicted to be occupied or highly uncertain. This design enables the policy to adapt its risk sensitivity under distribution shifts. Experimental results across multiple Unity3D-based simulation environments with both in-distribution and OOD settings, including diverse layouts, pedestrian densities, and rushing behavior, demonstrate improved prediction performance and safety over representative baselines. Real-robot experiments further demonstrate its robustness across various scenes. Our code and videos are available at https://coopuq.github.io/.",
+    "published": "2026-10-19",
+    "authors": [
+      "Zehao Wang",
+      "Jianpeng Yao",
+      "Yuping Wang",
+      "Yiping Li",
+      "Jiaqi Li",
+      "Zhixu Li",
+      "Kanghoon Lee",
+      "Jinfeng Wang",
+      "Cong Liu",
+      "Zhaowei Tan",
+      "Jinkyoo Park",
+      "Jiachen Li"
+    ],
+    "categories": [
+      "cs.RO",
+      "cs.AI",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.26987v1",
+    "title": "Dynamic Dual-Feedback Conformal Inference for Time Series Forecasting",
+    "abstract": "Quantifying uncertainty in time series forecasting is particularly demanding because sequential data exhibit temporal dependence and are prone to distributional changes. Conformal inference has emerged as a powerful uncertainty quantification approach through the construction of prediction sets. Recent advances have introduced online conformal methods that adaptively adjust prediction thresholds through feedback mechanisms. However, the existing feedback mechanism typically relies solely on miscoverage indicators (actual feedback), whether the true label falls within the interval at each time step, while overlooking the empirical prediction threshold (estimated feedback) that is derived from the oracle conformal method. In this paper, we propose Dynamic Dual-feedback Conformal Inference (DDCI), which incorporates a dual-feedback mechanism consisting of actual feedback and estimated feedback. The former drives the primary adjustment of the intervals based on true observations, while the latter dampens excessive expansions or contractions by leveraging empirical thresholds from conformal inference during updates. By balancing these two signals, DDCI achieves more stable and narrower prediction intervals in sequential settings while maintaining near-nominal coverage in practice.",
+    "published": "2026-10-19",
+    "authors": [
+      "Songlin Du",
+      "Ling Luo",
+      "Uwe Aickelin"
+    ],
+    "categories": [
+      "stat.ML",
+      "cs.AI",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.24761v1",
+    "title": "Heart Signal (ECG) as Vibration Signature for Human Authentication Using TinyML",
+    "abstract": "Ensuring data security in the era of Artificial Intelligence (AI) and deepfake technology requires robust biometric systems. Conventional methods such as facial recognition, iris scans, fingerprints, and voice recognition are increasingly vulnerable to spoofing and provide only one-time authentication at login. This study introduces an Electrocardiogram (ECG) based authentication framework, compared with Photoplethysmography (PPG), leveraging Tiny Machine Learning (TinyML) for deployment on resource-constrained microcontroller units (MCUs). The proposed method enables continuous authentication, offering ongoing verification throughout device usage, which conventional biometrics cannot achieve. It also serves as a password-free solution, reducing risks of credential loss, theft, or reuse. However, ECG signals vary with physical activity, health conditions, age, and emotional states, requiring robust signal processing and learning algorithms. To address this, efficient TinyML models were designed to mitigate recognition errors from noisy real-time data. Experiments used single-lead ECG signals (Lead I) from UofTDB, MIT-BIH Arrhythmia, MIT-BIH Noise Stress Test, and PTB databases. Spectrograms and spectral features were extracted to train Deep Neural Network (DNN), 1D CNN, and 2D CNN models within the Edge Impulse platform, achieving 98% accuracy. The trained model was converted into TinyML format and deployed on an Espressif ESP-EYE (ESP32, 240 MHz). Support Vector Machine (SVM) models were also applied for benchmarking. By analyzing the number of heartbeats required for reliable recognition, the results show that averaging multiple signals improves tolerance to noise and enhances accuracy. Overall, ECG-based authentication demonstrates strong potential as a secure, real-time, and continuously verifiable method for personal identification on wearable and edge devices.",
+    "published": "2026-10-17",
+    "authors": [
+      "Yogeswar Reddy Thota",
+      "Student Member",
+      " IEEE",
+      "Hanan Alsmadi",
+      "Student Member",
+      " IEEE",
+      "Tooraj Nikoubin",
+      "Senior Member",
+      " IEEE"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.AR"
+    ],
+    "topics": [
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.23298v1",
+    "title": "How the elastic axis folds the transonic flutter boundary: shock energy transfer and conformally calibrated active learning",
+    "abstract": "Isogai's case A, a pitch-plunge aerofoil whose elastic axis lies half a chord ahead of the leading edge, has a folded transonic flutter boundary in inviscid flow: near the bottom of the transonic dip several flutter speeds coexist at one Mach number. We map this boundary, and the family obtained by moving the elastic axis, with coupled unsteady Euler simulations, a Gaussian-process surrogate of the damping coefficient trained by batch active learning, and split conformal prediction on independent random simulations, which turns the surrogate into stability calls with a distribution-free error rate. Three failure modes of time-domain damping labels that leave no trace in the residuals are documented, and the half-degree mean incidence left by the common one-degree start is shown to raise the flutter speed at the dip by 2.8%, more than any numerical setting. With 80 simulations the learned case A boundary labels 64 of 65 independent runs correctly, and calibrated calls are wrong in at most 1.6% of cases. Over Mach number, elastic axis and flutter speed index, 193 simulations and 40 calibration runs show that the fold exists only for elastic axes more than about 0.4 chord ahead of the leading edge; it closes between 0.39 and 0.33 chord ahead, on two meshes. Chordwise energy budgets, closed against the solver loads and the growth rate within a few per cent, explain the boundary. The lower branch is crossed through the reduced frequency at unchanged shock phase. On the upper branch the shock is pinned at the trailing edge, and moving the elastic axis aft brings the pivot of the flutter mode towards the section, so that the damping of the supersonic surface falls faster than the residual shock input and the fold closes.",
+    "published": "2026-10-16",
+    "authors": [
+      "Ashray Saxena",
+      "Sharad Shrivastava"
+    ],
+    "categories": [
+      "physics.flu-dyn",
+      "cs.LG"
+    ],
+    "topics": [
+      "analyst budget",
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2610.20907v1",
+    "title": "From Detection to Decision: Calibration and Deferral for Prompt-Injection Detection",
+    "abstract": "Prompt-injection defenses are commonly evaluated as binary detectors, although deployed LLM applications must make operational decisions about whether to allow, block, or escalate potentially malicious inputs. Recent probabilistic decision models aim to support such decisions through calibrated confidence estimates, but their reliability under distribution shift remains uncertain. We evaluate a native probabilistic decision model (Jev), two Llama Prompt Guard 2 classifiers (22M and 86M), and an LLM-based judge on 47,611 held-out examples spanning direct and indirect prompt injections, hard-benign inputs, obfuscation, and distribution shift. Using separate development and calibration splits, we assess detection performance, probability calibration, and allow-block-defer policies under a frozen evaluation protocol. The LLM judge achieves the highest overall discrimination (AUROC 0.897), followed by Jev (0.871), Prompt Guard 2 86M (0.757), and Prompt Guard 2 22M (0.714). However, Jev's native probabilities do not consistently outperform post-hoc calibrated classifier scores, and temperature scaling improves calibration without improving discrimination. At an empirical false-negative-rate target of 1%, all evaluated gate-reviewer systems require more than 91.8% escalation and incur substantial false-positive rates. These findings demonstrate that probabilistic outputs alone do not establish reliable security decisions under distribution shift. Effective LLM security systems must jointly evaluate detection, calibration, reviewer behavior, and operational decision policies.",
+    "published": "2026-10-14",
+    "authors": [
+      "Qianlong Lan",
+      "Anuj Kaul",
+      "Vinothini Pandurangan",
+      "Indranil Sanyal"
+    ],
+    "categories": [
+      "cs.CR"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2610.19189v1",
+    "title": "Adaptive Computation with Conformal Certification",
+    "abstract": "Scientific imaging data involving medical (e.g., 3D radiographic, microscopic images) and astronomical sensors pose different challenges from natural images. One key challenge is that these datasets are often orders of magnitude larger than natural images. Efficient training and inference on such data is challenging due to the increased hardware requirements, often needing bespoke solutions. Moreover, the relevant objects such as tumors and astronomical phenomena are sparsely distributed with respect to the background information. Standard efficiency techniques like quantization and pruning apply uniform scaling of all regions, potentially compromising the precision/fidelity of predictions. Thus, efficient methods that reduce computational requirements without losing resolution for relevant parts of the data and with uncertainty estimates on predictions are essential. We present \\textit{Conformal Adaptation} with risk guarantees for uncertainty-aware sparse computations. Our formalism is general, spanning dense pixel-level classification and regression tasks where hierarchical models predict at low resolution, certify the signal using conformal risk control, and refine the certified predictions. We benchmark our method on multiple tasks such as 3D medical image segmentation, 2D galaxy flux prediction, and 1D calcium spike rate prediction, achieving $2.5$--$72\\times$ wall-clock speedup across the various tasks, including on commodity CPUs.",
+    "published": "2026-10-13",
+    "authors": [
+      "Shehtab Zaman",
+      "Aneesh Rangnekar",
+      "Nancy Lee",
+      "Harini Veeraraghavan"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.17251v1",
+    "title": "HybridDualPathNet: Cross-Fusion Attention of EfficientNetV2 and Swin Transformer for Brain MRI Classification of Alzheimer's and Parkinson's Disease",
+    "abstract": "Separating Alzheimer's Disease (AD), Parkinson's Disease (PD), and Healthy Controls (HC) using structural MRI remains challenging because disease signatures overlap and model performance can be strongly affected by data partitioning. We present HybridDualPathNet, a hybrid architecture combining EfficientNetV2-S for local features and Swin-Tiny for global context through a Cross-Fusion Attention (CFA) module. We evaluate the model in two experiments. First, on the Kaggle APD-3-Class dataset using an image-level split, the model achieves 98.25% accuracy. Second, on a combined Kaggle and Alzheimer's Disease Neuroimaging Initiative (ADNI) dataset containing 17,859 slices, we use a per-source split with patient-wise separation for ADNI subjects. In this setting, the model achieves 73.37% standard accuracy and a macro AUC of 0.880. Source-stratified evaluation reveals a substantial domain gap, with 91.2% accuracy on Kaggle test images and 59.2% on ADNI test images. Temperature scaling reduces expected calibration error from 0.130 to 0.015, while split-conformal prediction achieves 89.5% coverage. Saliency analyses using Grad-CAM++, Integrated Gradients, and occlusion indicate that model activations concentrate on brain tissue. These results highlight the importance of patient-level separation, cross-dataset evaluation, and uncertainty estimation when assessing MRI classification systems. The findings also show that strong performance on a single dataset does not necessarily translate to reliable generalization across imaging cohorts.",
+    "published": "2026-10-12",
+    "authors": [
+      "Jarpula Nirjala",
+      "Rahul Patel"
+    ],
+    "categories": [
+      "cs.CV",
+      "cs.LG",
+      "cs.SE"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.14365v1",
+    "title": "ConformalGuard: False-Positive-Controlled Action Gating for LM Classifiers",
+    "abstract": "Language model classifiers are increasingly deployed for high-stakes decisions such as phishing screening, content moderation, and fraud triage, yet validation-set thresholds provide no finite-sample control of deployment-time false positives. We present ConformalGuard, a model-agnostic calibration layer that wraps a fixed scoring function with finite-sample control over the rate at which legitimate inputs trigger an intervention tier. Our contribution is empirical and operational, not a new conformal theorem: zero-shot LM API scores can be coarse enough (10--11 unique values here) to make temperature scaling and isotonic regression operationally identical to raw thresholding for low-FPR action gating. We compare these methods with conformal calibration for fine-tuned BERT, Claude Sonnet 4, and GPT-4o on public email corpora. For Claude, conformal calibration reduces FPR from 0.040 to 0.008 while recall falls from 0.938 to 0.875. For deterministic GPT-4o scores, the 1% operating point is too conservative to deploy (recall 0.564); three-run stochastic averaging raises recall to 0.732 at FPR 0.005. At 2% prevalence with BERT, conformal calibration removes 25 false-positive reviews per 10,000 emails (95% CI [10, 43]). The guarantee is legitimate-event-rate control under exchangeability; discrimination, workload effects, and robustness to shift remain empirical.",
+    "published": "2026-10-09",
+    "authors": [
+      "Bishnu Bista",
+      "Dhanraj Haibatrao Jadhav",
+      "Vibha Choudhary",
+      "Gaurav Saxena",
+      "Arun Pandiyan Perumal",
+      "Arjun Subedi",
+      "Jignesh Ammineni"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.08353v1",
+    "title": "Uncertainty Quantification Is Indispensable for Reliable Connectome-Based Graph Learning: A Narrative Review and Case Study",
+    "abstract": "While graph neural networks (GNNs) have shown substantial promise in connectome-based diagnostic classification, deterministic models inevitably suppress pipeline-induced noise and model ambiguities, yielding overconfident predictions. Although uncertainty quantification (UQ) is widely adopted in voxel-level segmentation, its role in connectomic graph learning remains largely unaddressed. This paper presents a comprehensive narrative review of UQ frameworks tailored to connectome graph learning alongside an empirical case study demonstrating the perils of uncalibrated predictions. We delineate sources of aleatoric and epistemic uncertainty across neuroimaging pipelines and review prominent UQ paradigms, from Bayesian approximations and ensemble methods to evidential learning and conformal prediction. In our case study, a temporal Graph Attention Network (GAT) trained on dynamic functional connectivity (dFC) matrices from the SUDMEX CONN dataset achieves 80.0% diagnostic accuracy (F1 = 0.794) for Cocaine Use Disorder. However, a post-hoc uncertainty audit via Monte Carlo dropout reveals severe overconfidence (ECE = 0.127), with misclassified subjects assigned prediction confidences up to 95%. This empirical divergence between discrimination and calibration underscores the confidence paradox in deep connectomics. Our findings establish that rigorous UQ, calibration, and selective prediction mechanisms are indispensable for deploying trustworthy graph-based biomarkers in clinical neuroscience.",
+    "published": "2026-10-06",
+    "authors": [
+      "Mansooreh Pakravan"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.07386v1",
+    "title": "NetAgent: Multi-Task Agentic Network Traffic Analysis Made Practical",
+    "abstract": "Network traffic analysis is central to network security, spanning tasks from intrusion detection to encrypted traffic classification. Existing approaches either train task-specific models that generalize poorly or rely on costly traffic foundation models that still struggle under distribution shift. We present NetAgent, the first agentic framework for multi-task traffic analysis. Through a carefully designed agent loop, NetAgent supports complex task understanding, on-the-fly decomposition and orchestration, dynamic replanning, and long-horizon analysis, without task-specific training. It introduces five key designs: (1) knowledge-augmented workflow planning that maps attack knowledge to traffic features to bridge the semantic gap; (2) a comprehensive tool action space with 150+ verified tools extracted from 50+ published systems; (3) a unified code execution space for flexible action composition; (4) a three-tier memory for long-term knowledge consolidation; and (5) sandboxing and runtime repair for reliable execution. Across 9 major benchmarks, NetAgent outperforms all baselines (23 single-task and 5 multi-task) on nearly all tasks and generalizes substantially better to unseen traffic distribution (90.04% F1 vs. 2.74% and 3.04% for the best single-task and multi-task baselines) and under realistic background shift (4.85-point F1 drop vs. 74.88-point and 74.80-point drop for the best single-task and multi-task baselines). These results reveal that existing methods owe much of their reported success to overfitting dataset-specific patterns and degrade sharply in realistic network environments, while NetAgent's agentic design remains accurate, generalizable, and robust.",
+    "published": "2026-10-05",
+    "authors": [
+      "Hao Fu",
+      "Dawn Song",
+      "Peng Gao"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.NI"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2610.07323v1",
+    "title": "ATLAS-AL: Adaptive Trust-Region for Latent Adversarial Searches via Active Learning",
+    "abstract": "Security evaluation of learning-based systems requires more than just testing the system against a fixed collection of attacks. It requires adaptive mechanisms that can efficiently discover \\textit{sets} of inputs that induce model failure. We introduce ATLAS (Adaptive Trust-Regions for Latent Adversarial Searches), which is a query-based framework that discovers adversarial input sets for black-box learning systems. ATLAS casts attack generation as an active learning level set estimation problem then combines calibrated approximations with a local-global sampling architecture to find regions of the input space that contain adversarial examples. Once discovered, ATLAS is designed to sample points within these adversarial regions to build adversarial sets that accurately represent the state of robustness of the target model. When applied on toy experiments, we find that ATLAS is able to recover more of the adversarial region under a limited query budget than does previous work. When applied to standard and adversarially trained MNIST, CIFAR, and ImageNet model targets, ATLAS produces better representative attacks than other query-based black-box attacks (NES, SignHunter, BayesOpt). ATLAS represents an automated red-teaming framework that can be used for both analyzing the robustness of learning-based systems under development and continuous auditing to see how the robustness of a system changes over time.",
+    "published": "2026-10-05",
+    "authors": [
+      "Marsalis Gibson",
+      "Claire Tomlin",
+      "Shankar Sastry"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.CR",
+      "cs.CV"
+    ],
+    "topics": [
+      "analyst budget"
+    ]
+  },
+  {
+    "id": "2610.05810v2",
+    "title": "Online AutoML: Evaluating Poisoning Attacks on Cost-Utility Adversarial Training Defence Strategy for IoT Networks",
+    "abstract": "Machine learning (ML)-powered poisoning attack vectors are adversarial maneuvers whereby an attacker intentionally inserts, corrupts, or alters training data to distort an ML model's learning process. The objective is to diminish model efficacy, instill biases, induce misclassifications, or include concealed backdoors that may be attacked during implementation. In streaming contexts, poisoning attacks pose significant risks since models perpetually update based on incoming streams of data. An assailant may incrementally introduce harmful samples into this data stream, leading the model to assimilate erroneous features over time without timely identification. Therefore, this study is aimed at evaluating the efficacy of the adversarial training (AT) defense approach against poisoning attacks (label flip and noise injection) using an online AutoML pipeline for Internet of Things (IoT) networks. Specifically, poisoning attacks (label flip and noise injection) were applied to streaming-capable AutoML learners (Hoeffding Tree (HT), Leveraging Bagging (LB), Adaptive Random Forest (ARF), Hoeffding Adaptive Tree (HAT), and Streaming Random Patches (SRP)). Under the strongest poisoning rate (PR = 1.0), AT-SRP achieved the highest F1-score against label flip poisoning (0.904), while AT-LB achieved the highest F1-score against noise-injection poisoning (0.933). Finally, several drift detection methods were used for rolling accuracy and prequential evaluation.",
+    "published": "2026-10-05",
+    "authors": [
+      "Chukwunonso Henry Nwokoye",
+      "Khalil El-Khatib",
+      "Li Yang"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.05352v1",
+    "title": "Rethinking Tabular Foundation Models On Data Streams",
+    "abstract": "Tabular foundation models (TFMs) outperform established machine learning models on tabular benchmarks through in-context learning. Building on this success, interest is growing in applying them to data streams, where data arrive continuously and evolve over time. On a stream, a TFM adapts by updating its context rather than its parameters, so its accuracy and cost depend on which examples it keeps and how often it rebuilds its context. We therefore present a systematic study of TFMs on data streams, covering memory management, computational cost, and stream-specific challenges such as concept drift and delayed labels. We find that TFMs achieve the highest predictive performance and that simply retaining the most recent examples is as effective as existing memory management techniques. They also recover faster than streaming learners after drift and keep the highest accuracy under label delay. This accuracy, however, comes at a high serving cost, since a nearly unchanged context is re-encoded at every prediction. These results point to architectural efficiency as the way forward for in-context stream learning.",
+    "published": "2026-10-04",
+    "authors": [
+      "Nilesh Verma",
+      "Daniel Nowak-Assis",
+      "Afonso Louren\u00e7o",
+      "Albert Bifet",
+      "Bernhard Pfahringer",
+      "Maroua Bahri",
+      "Nick Jin Sean Lim"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ],
+    "topics": [
+      "label delay",
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2610.04499v1",
+    "title": "Homogeneous Semantic Alignment and Hierarchical Expert Routing for Radiology Report Generation",
+    "abstract": "Radiology report generation (RRG) aims to convert medical images into diagnostic texts to assist in clinical decision-making and alleviate the workload of physicians. Although existing methods have made extensive progress in cross-modal interaction and the incorporation of external priors, the distribution shift of underlying representations and the undifferentiated rigid coupling of heterogeneous information cause weak visual abnormality cues to be easily diluted by massive text priors and generation inertia during decoding. To overcome this bottleneck, inspired by cognitive science, we propose a novel two-stage Homogeneous Semantic Alignment and Hierarchical Expert Routing (HSA-HER) framework. First, the model introduces an explicit homogeneous distribution constraint in the underlying latent space to effectively eliminate the cross-modal distribution shift between visual and textual features, thereby extracting purified visual features as semantic anchors that accurately align with diseases. Second, for heterogeneous clinical evidence composed of visual features, local entities, and global retrievals, we design a hierarchical expert routing mechanism guided by these disease semantic anchors. This mechanism abandons the undifferentiated rigid coupling paradigm. Specifically, it dynamically activates expert networks to perform targeted mining and semantic reconstruction on multi-source evidence, and adaptively allocates fusion weights. Extensive experiments on three mainstream benchmark datasets demonstrate that HSA-HER achieves state-of-the-art performance, accurately depicting complex imaging details and key diagnostic information.",
+    "published": "2026-10-03",
+    "authors": [
+      "Erjian Zhang",
+      "Jiayuan Ma",
+      "Liejun Wang",
+      "Yikemaiti Sataer",
+      "Xiaoming Tao",
+      "Zhiqing Guo"
+    ],
+    "categories": [
+      "cs.CV",
+      "cs.CL",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.04319v1",
+    "title": "GrayShield: Bit-Level Sanitization for Transformer Model Supply-Chain Security",
+    "abstract": "Transformer models such as BERT and Vision Transformer~(ViT) achieve strong performance via densely parameterized attention backbones. However, the least significant bits~(LSBs) of their 32-bit floating-point weights can be abused as covert channels to conceal malicious payloads, posing a serious threat to the AI model supply chain. We propose \\GS (\\GSabbr), a lightweight, post-training, zero-data sanitization method that completely replaces the declared mantissa-LSB channel with a Gray-code-guided low-transition sequence. Complete payload-independent overwrite, whether keyed or public, makes the sanitized target bits independent of the embedded payload and gives that declared channel zero capacity. Gray coding supplies overwrite structure, while a keyed per-tensor phase supplies pattern diversity. Benchmarked against seven post-training defenses on four Transformer model presets and two real-world malware payloads, \\GSabbr maintains sub-$1\\%$ accuracy impact and achieves $49.96\\pm0.66$ percentage-point Recovery Reduction (RR) under five implemented attacker variants. Because pre-defense recovery is effectively $100\\%$, RR near 50 percentage points corresponds to post-sanitization bit accuracy at binary chance. Its main empirical advantage is stable near-chance sanitization with substantially smaller weight-distribution shift than the evaluated near-chance baselines PatternMask (PM) and Post-Training Quantization (PTQ).",
+    "published": "2026-10-03",
+    "authors": [
+      "Armstrong Foundjem",
+      "Tsung-Hsien Chuang",
+      "Foutse Khomh",
+      "Mohamed Amine Merzouk"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.AI"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2610.02357v1",
+    "title": "Conformal Prediction for Time Series with Deep Sequence Models",
+    "abstract": "Recent advances in deep learning for time series prediction have amplified the need for reliable uncertainty quantification. Conformal prediction has gained attention as a distribution-free framework for constructing prediction intervals with coverage guarantees. However, its coverage guarantees rely on data exchangeability, an assumption generally violated in time series. Active research has focused on developing conformal prediction methods for time series that overcome this limitation. While deep sequence models, such as recurrent neural networks and Transformers, have often been used in conformal prediction for time series, limited work has systematically studied how deep sequence models can be utilized in conformal prediction for time series. In this work, we systematically investigate the use of deep sequence models in conformal prediction for time series through three approaches: conditional quantile regression, conditional quantile function estimation, and localized conformal prediction. We provide a theoretical analysis establishing asymptotic conditional coverage guarantees for all three approaches under suitable assumptions. Through comprehensive experiments on real-world datasets, we demonstrate the effectiveness of leveraging deep sequence models into conformal prediction for time series.",
+    "published": "2026-10-01",
+    "authors": [
+      "Junghwan Lee",
+      "Jonghyeok Lee",
+      "Yao Xie"
+    ],
+    "categories": [
+      "stat.ML",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.00649v1",
+    "title": "On Evaluating Quantum Kernel Robustness for Low-Resource Cross-Corpus Audio Deepfake Detection",
+    "abstract": "Synthetic speech detection is critical for audio security, but performance can degrade when labeled data are scarce and evaluation conditions differ from training. This study examines quantum kernel methods and lightweight neural models for cross-corpus audio deepfake detection under limited training data. We compare a Quantum Support Vector Machine (QSVM), a classical support vector machine (SVM), and a multilayer perceptron (MLP), all trained on frozen wav2vec 2.0 embeddings using a strict budget of 200 training samples. To match the qubit budget of near-term quantum hardware, embeddings are reduced to four dimensions using principal component analysis, and all models use the same reduced features. Experiments on ASVspoof 2019, ASVspoof 5, the ADD 2023 Challenge, and the In-the-Wild dataset show that under severe domain shift from ASVspoof 2019 to ADD 2023, the MLP degrades to near-random performance, with an area under the curve of approximately 50% and an equal error rate of 50.0%. In contrast, the QSVM maintains meaningful discrimination, achieving an area under the curve of 76.0% and an equal error rate of 27.0%. This advantage is not consistent across transfer directions. When trained on ADD 2023, the QSVM falls below chance on two of three transfers, while the MLP performs better. These results suggest that quantum kernel methods can be competitive under severe cross-corpus shifts and strict low-resource constraints, but do not provide a consistent advantage under near-domain transfer. We interpret these findings as an empirical characterization of quantum kernel inductive bias under distribution shift, rather than evidence of quantum advantage, since the four-qubit kernel can be simulated exactly on classical hardware.",
+    "published": "2026-09-30",
+    "authors": [
+      "Lisan Al Amin",
+      "Lei Zhang",
+      "Vandana P. Janeja"
+    ],
+    "categories": [
+      "cs.SD",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.39934v2",
+    "title": "Reliability-Aware Checkpoint Selection for Domain Generalization",
+    "abstract": "Checkpoint selection in domain generalization often relies on source-validation accuracy, yet the selected checkpoint need not provide reliable probabilities on unseen target domains. Source-target distribution shifts can alter accuracy rankings, while accuracy alone does not measure predictive probability quality. We identify an empirical selection opportunity within fixed training trajectories: reselecting among checkpoints with near-optimal source accuracy can improve mean target probability quality with small observed changes in mean target accuracy. We study accuracy-constrained reliability selection (AC), which retains checkpoints within a tolerance of the best source-validation accuracy and ranks them by source reliability. Our reference rule aggregates within-set normalized negative log-likelihood (NLL) and class-wise calibration error (CwECE) using $D_\\infty$. AC uses no target data and requires neither additional training nor weight averaging. We evaluate five domain generalization training algorithms on three benchmarks, using PACS to develop the objectives and a 0.5-percentage-point tolerance. In exploratory aggregation comparisons on 360 OfficeHome and TerraIncognita runs, the reference rule reduces mean target soft-bin squared-gap ECE and CwECE by 0.240% and 0.182%, respectively, and NLL by 0.030 relative to Source-Acc. Mean target accuracy changes by +0.213 percentage points. These results identify opportunities for reliability-aware reselection, while the additional benefit of joint over single-objective ranking remains unresolved.",
+    "published": "2026-09-30",
+    "authors": [
+      "Jinshi Liu",
+      "Jiahao Li",
+      "Pan Liu",
+      "Yanfeng Li",
+      "Rui Qian",
+      "Zhao Tong",
+      "Yue Sun",
+      "Tao Tan"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.CV"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.39473v1",
+    "title": "Beyond the Shadows of Plato's Cave: Evaluating False Memory in Autonomous Agents via Counterfactual Reasoning",
+    "abstract": "Autonomous agents increasingly rely on memory to generalize beyond their training environments. However, agents are bounded by what they have seen and believed, and leveraging such memories in unseen environments can introduce biases into their internal beliefs. We formalize this phenomenon as \\textit{false memory}, which can arise from spurious correlations, environment shifts, and knowledge conflicts. Despite its importance, false memory is difficult to evaluate because it stems from agent internal beliefs and is easily confounded with ordinary generalization failures. Therefore, we propose FAME, a training-free framework that evaluates false memory through the evolution of agent beliefs under counterfactual reasoning. Specifically, counterfactual scenarios reveal how beliefs change as the latent concept of memory shifts under hypothetical interventions; thus, measuring the resulting concept drift provides a signal for distinguishing faithful versus false memory. Such concepts can be estimated from agent hidden states before answer generation, avoiding the need for reward design or answer sampling. Empirical experiments reveal that simply monitoring answers often fails to detect false memory, while FAME achieves AUROCs of 76.2% - 96.7% across false-memory settings, and outperforms the best baseline by 3.4% - 23.3% across realistic benchmarks, spanning math reasoning (GSM-Symbolic), code generation (GitChameleon), and complex reasoning (BigBench-Hard). We further release corresponding counterfactual templates and facilitate future research on false memory.",
+    "published": "2026-09-30",
+    "authors": [
+      "Quan M. Tran",
+      "Zhuo Huang",
+      "Zhen Fang",
+      "Jing Zhang",
+      "Mingming Gong",
+      "Tongliang Liu"
+    ],
+    "categories": [
+      "cs.AI",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.37298v1",
+    "title": "Scaling Full Conformal Image Classifiers",
+    "abstract": "Conformal prediction provides set-valued predictions with distribution-free coverage guarantees, making it attractive for high-stakes image classification. However, split conformal prediction is data-inefficient, while full conformal prediction (FCP), despite its stronger statistical efficiency, is computationally prohibitive at scale because it requires candidate-specific model refits at test time. We address this limitation by leveraging zero-shot vision-language models (VLMs) to guide scalable FCP in large label spaces. We introduce Targeted Full Conformal Prediction (T-FCP), which uses a lightweight inductive conformal predictor to prune unlikely labels and applies FCP only to the remaining candidates, reducing computation while retaining the formal guarantee of the combined conformal procedure. We further propose Stabilized Online LDA (SO-LDA), an efficient VLM adaptation solver based on rank-one inverse-covariance updates. Across multiple benchmarks, including ImageNet, T-FCP enables practical full-conformal image classification with modest test-time overhead, yielding efficient prediction sets and more stable empirical coverage than split conformal alternatives.",
+    "published": "2026-09-29",
+    "authors": [
+      "Julio Silva-Rodr\u00edguez",
+      "Ender Konukoglu"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.CV"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.14017v1",
+    "title": "Barycentric Anchored Weight Search for Robust Model Merging",
+    "abstract": "We propose Barycentric Anchored Search, a post-hoc weight-space procedure for improving fine-tuned vision models under distribution shift without additional gradient training or increased inference cost. Given a pre-trained initialization and two checkpoints fine-tuned on a source dataset, the method constructs barycentric candidate weights and performs a small derivative-free search along directions connecting each candidate to the pre-trained model. Candidate weights are selected using a small validation subset of one or more out-of-distribution (OOD) datasets; the selected model is then evaluated on the held-out portions of those datasets, on additional OOD benchmarks, and on the ImageNet validation set to quantify the robustness-accuracy trade-off. The method is inspired by simplex-based derivative-free optimization, including Nelder-Mead and Torczon multidirectional search, but is specialized to the geometry of neural network weight merging. Unlike Model Soup, which typically benefits from many fine-tuned checkpoints, and unlike Model Stock, which applies a fixed geometric merge, our approach uses only two fine-tuned checkpoints and iteratively adapts the merge using validation feedback from OOD data. Experiments with CLIP ViT-B/32 show that the proposed search substantially improves performance on held-out OOD data, including ImageNet-A, ImageNet-R, and ImageNet-Sketch, while keeping ImageNet accuracy competitive. The resulting weights also improve transfer to OOD datasets not used during candidate selection, outperforming the original fine-tuned checkpoints, naive model soups, and Model Stock in our evaluations. These results suggest that lightweight optimization in anchored weight space provides a practical alternative to fixed weight-averaging rules, geometric merging, or single-model selection.",
+    "published": "2026-09-29",
+    "authors": [
+      "Antoni Buades",
+      "Jose-Luis Lisani"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.AI",
+      "cs.CV"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.37165v1",
+    "title": "Disentangling Spurious Correlations in Vision-Language-Action Models via Predicting Domain-Invariant Latent Lookahead",
+    "abstract": "Vision-Language-Action (VLA) models remain brittle under visual distribution shifts, often relying on spurious correlations tied to domain-specific factors rather than task-relevant structure. We propose Domain-Invariant Latent Lookahead (DILL), a representation-learning framework that mitigates shortcut learning in VLA policies. Our key idea is to supervise policies with domain-invariant future latents learned from domain-transformed trajectory data. A Task-Domain Encoder is trained with contrastive objectives and Gaussian disentanglement regularization to separate task-relevant structure from domain-specific visual variation. The learned encoder then provides future latents for VLA policy learning through lookahead prediction and domain disentanglement, encouraging the policy to focus on task-relevant structure rather than incidental visual factors. Counterfactual task-view evaluations show that DILL reduces shortcut reliance, while LIBERO-Plus evaluations demonstrate improved visual robustness, with 69.1% average success, 11.4 percentage points above the strongest baseline. Real-world manipulation experiments further support DILL's applicability beyond controlled simulation. Complementary latent-space diagnostics show that these behavioral gains are accompanied by representations that better preserve task-consistent structure while suppressing domain-specific variation. Our project page is available at https://dill-vla.github.io/.",
+    "published": "2026-09-29",
+    "authors": [
+      "Junghyun Kim",
+      "Ngseo Kim",
+      "ChungWoo Lee",
+      "Seoyeon Lee",
+      "Woo-Jeong Baek",
+      "Adam Zhou",
+      "Chip Huyen",
+      "Jun-Ki Lee",
+      "Gi-Cheon Kang",
+      "Byoung-Tak Zhang"
+    ],
+    "categories": [
+      "cs.RO",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.35703v1",
+    "title": "A Unified Uncertainty Representation for Graph Neural Networks via Doubly-Spectral Stochastic Expansion",
+    "abstract": "Reliable deployment of graph neural networks requires calibration, out-of-distribution (OOD) detection, and robustness to distribution shift, yet existing methods address these needs with separate models and objectives. We model uncertain node embeddings as random graph signals: graph Fourier filters capture structural variation, and a scalar orthogonal-polynomial chaos coordinate captures latent stochastic variation. The resulting doubly-spectral stochastic (DSS) expansion supplies task-matched readouts from one representation: the mean coefficient encodes class evidence for the energy-based OOD score, the higher-order coefficients encode structured logit variation, and quadrature averaging over the chaos coordinate defines the single predictive distribution used for prediction and calibration. A capacity theorem shows that, under a full-rank feature assumption, a restricted subfamily matches the chaos coefficients of any Gaussian-latent random graph signal, with exponentially decaying truncation error under a growth condition; the task-level claims are established empirically. DSS-GNN has two deployment modes: standalone, or as a residual branch beside a deterministic encoder (DSS-Hybrid). Standalone DSS-GNN achieves the lowest Brier score among the compared uncertainty-aware baselines on all 14 node classification benchmarks without post-hoc correction; DSS-Hybrid achieves the best AUROC on most node-OOD settings, competitive cross-graph OOD detection, and the strongest shifted accuracy on all 7 GOOD concept-shift benchmarks under standard empirical risk minimization (ERM). Cross-evaluating both modes on all three tasks shows that each remains effective on the other's tasks, with documented exceptions, and yields explicit deployment guidance.",
+    "published": "2026-09-28",
+    "authors": [
+      "Fred Xu",
+      "Thomas Markovich",
+      "Florence Regol",
+      "Yizhou Sun"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.34638v1",
+    "title": "Correction-space Cross-variate Interaction for Test-time Adaptation in Time Series Forecasting",
+    "abstract": "Test-time adaptation (TTA) is a promising paradigm for handling distribution shift in time-series forecasting (TSF), where models adapt at inference time, often leveraging delayed observed data to refine predictions. In the multivariate setting, distribution shifts often exhibit cross-variate dependencies, yet existing TSF-TTA methods adapt each variate independently and ignore this cross-variate structure. Exploiting such structure motivates cross-variate interaction, but coupling variates through backbone predictions introduces direct pathways for mixing uncorrected errors across variates, a concern under the delayed supervision of TSF-TTA. We identify the \\emph{interaction space} as a key design choice, and show that acting on adapter corrections that refine backbone outputs, the \\emph{correction space}, rather than on the predictions themselves, avoids directly propagating backbone errors across variates. We build on this to propose \\textsc{CoRe} (\\textsc{Co}rrection-space Interaction \\textsc{Re}finement), realizing correction-space interaction through (i) Shared-anchor Correction Refinement (SCR), which combines each variate's correction with a shared anchor through a parameter-efficient bottleneck, and (ii) input-conditioned spectral gating, which adaptively modulates the refinement from the current input window. Across seven backbones, six datasets, and four prediction horizons, \\textsc{CoRe} reduces MSE by 25.82\\% on average over backbones and 10.57\\% over the state-of-the-art TSF-TTA method, with stronger gains at medium-to-long horizons and modest computational overhead. Data and code are available at: https://github.com/yyddou/CoReTTA",
+    "published": "2026-09-28",
+    "authors": [
+      "Yuanyuan Deng",
+      "Mykola Pechenizkiy",
+      "Songgaojun Deng"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.33340v1",
+    "title": "RAEGL: Risk-Aware Evidence-Gated Learning for Selective Contextual Routing under Temporal Shift",
+    "abstract": "Contextual specialization can improve forecasting accuracy, but a correction selected on one historical interval may become unreliable under temporal distribution shift. To address this issue, we propose RAEGL, a Risk-Aware Evidence-Gated Learning framework for selective contextual forecasting. RAEGL retains a validated global predictor by default and activates a contextual residual only when pre-deployment evidence supports its use. The framework separates candidate selection from gate calibration and jointly evaluates randomization significance, practically meaningful gain, and temporal stability. Experiments on real-world audits and controlled panels show how RAEGL can prevent harmful contextual deployment while making conservative opportunity costs explicit. In a reconstructed Our World in Data audit, exact fallback avoids RMSE degradations of 0.0960 and 0.0239 caused by two validation-selected corrections. In a sealed World Development Indicators evaluation, a region-based correction passes the randomization test but is withheld because its gain is only 0.000092, its country-clustered 95% confidence interval crosses zero, and only 0.02% of bootstrap replicates reach the practical threshold. In controlled panels, the stability- and support-aware extension activates in 97.2% of strong, stable-context runs while rejecting all high-drift settings. These results support RAEGL as an auditable, evidence-based mechanism for managing contextual deployment risk and as a conservative alternative to validation-driven contextual selection.",
+    "published": "2026-09-27",
+    "authors": [
+      "Yifan Guo"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2610.02232v1",
+    "title": "Generalizable single-cell perturbation response prediction using energy-guided flow matching",
+    "abstract": "Predicting phenotypic and transcriptional responses to perturbations at single-cell resolution provides a powerful tool for probing biological systems. However, existing methods typically rely on fixed mappings learned during training, making it challenging to calibrate distribution shifts or adapt to novel perturbation conditions during inference. Here, we present scEGFlow, an energy-guided flow matching framework that dynamically bridges control and perturbed cellular states. scEGFlow models continuous transitions from control cell populations to perturbed states using conditional flow matching. It then applies condition-specific energy gradients to correct and steer these predictions, enabling flexible adjustments without retraining the flow model. Evaluations across benchmarks spanning imaging phenotypes and transcriptomic profiles show that scEGFlow outperforms existing methods in reconstructing response distributions under both seen and unseen perturbation conditions, faithfully preserving cellular manifold geometry and population heterogeneity. This advantage is notable when adapting to new conditions with only a few measured cells, consistently improving prediction accuracy. Furthermore, scEGFlow accurately recapitulates perturbation-induced up- and down-regulation patterns across consensus gene expression signatures, where energy guidance improves the agreement between predicted and observed regulatory directions. Ultimately, these findings demonstrate that scEGFlow provides a modular, generalizable, and steerable solution for single-cell perturbation modeling. By grounding generative flows in learned biological landscapes, this architecture establishes a new computational paradigm for navigating and manipulating cellular behavior in silico.",
+    "published": "2026-09-27",
+    "authors": [
+      "Jianan Wei",
+      "Jiajun Hong",
+      "Guikun Chen",
+      "Ning Yang",
+      "Lifeng Fan",
+      "Wenguan Wang"
+    ],
+    "categories": [
+      "q-bio.GN",
+      "cs.LG",
+      "q-bio.CB"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.33037v2",
+    "title": "Byzantine-Robust Federated RAG via Aligned Calibration and Fixed-Membership Conformal Prediction",
+    "abstract": "Retrieval-augmented generation (RAG) lets language models answer questions more accurately by consulting relevant documents. Many valuable collections, such as medical records, cannot be pooled because of privacy rules. Federated RAG leaves each collection with its owner, or node, which scores candidate answers from its own documents; a central hub combines the scores. Some nodes, called Byzantine, may be compromised, faulty, or misled by instructions hidden in documents, and report arbitrary scores. Conformal prediction returns a set containing the correct answer with a chosen probability, using a cutoff set in a calibration step on questions with known answers. An unknown group of nodes, no larger than a declared bound, may misreport both in this step and at query time. Existing methods assume every node is honest or protect only the calibration step. We observe that the honest nodes are the same in both steps. The hub therefore has all nodes score the same calibration questions, and keeps a candidate only if some plausible group of honest nodes, using its own scores in both steps, would keep it. We prove that the resulting sets contain the correct answer with the chosen probability in finite samples, whatever the Byzantine nodes report. No method using the same information can return smaller sets without risking the loss of an answer the honest nodes support. If nodes fail at random, the guarantee weakens only by the probability that more nodes fail than declared. In simulations, on real question-answering tasks including medical exams, and with language models as nodes, some hijacked, our sets reached the target whenever no more nodes misbehaved than declared, while plain averaging could miss it. They were also clearly smaller than those of simpler methods with the same protection, most of all when the declared bound was generous, so a cautious bound costs little.",
+    "published": "2026-09-27",
+    "authors": [
+      "Prasanjit Dubey",
+      "Aritra Guha",
+      "Xiaoming Huo"
+    ],
+    "categories": [
+      "stat.ML",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.31981v1",
+    "title": "Evasion Attacks on Cost-Utility-Based Adversarial Training for Online AutoML in IoT Networks",
+    "abstract": "As Internet of Things (IoT) networks increasingly depend on machine learning for anomaly, malware, intrusion detection, and network monitoring, such systems have become attractive targets for evasion attacks. Evasion attacks pose a major security risk because an adversary intentionally modifies input data to mislead a trained model into producing incorrect predictions while evading detection. This study evaluates the impact of black-box evasion attacks on a cost-utility-based adversarial training defense strategy in an Online AutoML context for IoT networks. Specifically, evasion attacks were applied to online learners, including Hoeffding Tree (HT), Leveraging Bagging (LB), Streaming Random Patches (SRP), Hoeffding Adaptive Tree (HAT), and Adaptive Random Forest (ARF). By developing naive and adversarially trained (AT) versions of these online learners, we generated clean and adversarial accuracies for each model. The results show that the AT versions of LB and SRP performed best, achieving the highest adversarial accuracy (0.985) and high clean accuracy (0.993) at the highest cost budget of 1.00, with a maximum accuracy reduction of only 0.8%. Finally, drift detection was conducted using the Early Drift Detection Method (EDDM).",
+    "published": "2026-09-25",
+    "authors": [
+      "Chukwunonso Henry Nwokoye",
+      "Wajiha Zaheer",
+      "Khalil El-Khatib",
+      "Li Yang"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.28996v1",
+    "title": "DistillGuard: Malicious NPM Package Detection and API Attack Chain Analysis via Static Graph and LLM Distillation",
+    "abstract": "The Node.js ecosystem heavily relies on NPM packages, and software supply chain attacks targeting malicious NPM packages are rampant. Malicious code primarily triggers during package installation, import, and runtime. Traditional static analysis fails to understand code semantics; machine learning-based methods rely on feature extraction, which suffers from concept drift; existing LLM solutions suffer from high invocation costs, high data security risks, and poor performance. To overcome these limitations, we propose DistillGuard, a lightweight malicious NPM package detection framework that combines static graph semantic analysis and LLM knowledge distillation. DistillGuard first acquires multi-granular features through three static analysis modules. Then, it leverages online LLM to distill high-quality security knowledge and structured labels. Finally, it uses LoRa to efficiently fine-tune the open-source Qwen3-8B model to support offline deployment. Experiments show that DistillGuard achieves an accuracy of 95.3\\%, a precision of 99.4\\%, and an F1 score of 93.8\\%, outperforming state-of-the-art tools, improving the F1-score by 11.1 to 30.0 percentage points over the baselines. Our empirical research further reveals the stages of malicious attacks and the distribution of malicious behaviors. We also summarized eight typical API attack chains for malicious activities, providing practical insights for NPM supply chain security defense.",
+    "published": "2026-09-24",
+    "authors": [
+      "Siyuan Pang",
+      "Yepeng Yao",
+      "Zhengwei Jiang",
+      "Zijing Fan",
+      "Baoxu Liu"
+    ],
+    "categories": [
+      "cs.CR"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.26352v1",
+    "title": "HYDRA: Proactive Android Malware Drift Adaptation via Hierarchical Graph Contrastive Learning",
+    "abstract": "Concept drift, driven by the rapid evolution of Android malware, severely degrades the performance of machine learning detectors. Current adaptation strategies are often reactive, responding only after performance has dropped and imposing a significant manual annotation burden, or they are proactive but rely on unstable adversarial training and incomplete, single-level graph representations. To overcome these limitations, we propose HYDRA (Hybrid Drift Adaptation), a proactive adaptation framework that learns drift-invariant representations from hierarchically structured data. HYDRA first models applications using a hybrid graph structure, combining fine-grained Control Flow Graphs (CFGs) and coarse-grained Function Call Graphs (FCGs) to capture comprehensive behavioral patterns. It then introduces a novel cross-domain contrastive learning objective that aligns historical (source) and new (target) data distributions. By generating pseudo-labels for unlabeled target samples, our method pulls representations of semantically similar applications together, regardless of their domain, within a single, stable optimization process. This approach unifies feature learning and domain alignment, eliminating the need for complex adversarial objectives. Extensive experiments on large-scale, time-ordered malware datasets demonstrate that HYDRA achieves substantially lower False Negative and False Positive Rates than state-of-the-art baselines while requiring up to 87.5% fewer labeled samples. Our work thus offers a robust and efficient solution to combat concept drift in security applications.",
+    "published": "2026-09-22",
+    "authors": [
+      "Han Chen",
+      "Hanchen Wang",
+      "Hongmei Chen",
+      "Lu Qin",
+      "Wenjie Zhang",
+      "Ying Zhang"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.25340v1",
+    "title": "Concept Drift from a Causal Perspective",
+    "abstract": "Concept drift is a common phenomenon in real-world data streams, in which changes in the data-generating distribution can degrade predictive model performance. Most existing definitions characterize drift as changes in the joint distribution $P(\\mathbf{x}, y)$, without distinguishing which component of the data-generating process has changed. In this work, we introduce a causal perspective on concept drift based on Structural Causal Models (SCMs). We propose a taxonomy that categorizes drift events by their causal origin, including changes in exogenous variables, endogenous mechanisms, confounders, and target-generating processes. Building on this framework, we develop an SCM-based data stream generator that simulates controlled mechanism-level drift events. Our experiments empirically characterize the distributional effects of each drift type and show that drifts with different causal origins induce distinct patterns of distribution shift and predictive behavior. Furthermore, by integrating causal discovery methods, we use our framework to construct data streams grounded in real-world dependency structures, enabling more realistic and informative evaluation scenarios. We also demonstrate that leveraging the generated data can improve downstream performance. These results highlight the importance of accounting for causal structure when studying and evaluating adaptive learning methods, and establish a foundation for causally-aware evaluation in non-stationary environments.",
+    "published": "2026-09-21",
+    "authors": [
+      "Eduardo V. L. Barboza",
+      "Jean Paul Barddal",
+      "Robert Sabourin",
+      "Rafael M. O. Cruz"
+    ],
+    "categories": [
+      "cs.LG",
+      "stat.ME"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.24280v1",
+    "title": "Temporal Generalization and Explanation Stability of Control Flow Graph Neural Networks for Malware Detection",
+    "abstract": "Malware detection is a critical task in cybersecurity, and graph neural networks over control flow graphs have shown promising results for it. However, detectors are usually evaluated on a random split of a corpus collected over a single period, which cannot show how well a model generalizes to later samples. This study addresses that limitation with a strict temporal split: every model is trained on one period and scored once on a later one. Two corpora of control flow graphs, each node carrying 37 features, were extracted statically from 1,989 Windows portable executables: 459 graphs from 2024-2025 for training and 223 from 2026 for evaluation. Twelve variants and a flat-feature control were trained on the earlier corpus. The choice of message-passing operator changes robustness to the shift significantly, and every pairwise gap that survives correction separates an aggregating architecture from one built around a learned attentional readout. The ranking also reverses: the flat control, which sees node features but no topology, is the best in-distribution model and among the worst across the boundary, so a conventional benchmark would have rejected message passing. Neither recalibration nor ensembling substitutes for the operator choice. Attributions do not shift, but explanation validity is architecture-specific, and the most accurate operator on the later corpus is the hardest to explain. An architecture derived from the finding matches the best searched operator without search. The shift affects both malware and benign classes alike, so these are results about robustness to distribution shift, not malware evolution.",
+    "published": "2026-09-21",
+    "authors": [
+      "Md. Asif Sajeed",
+      "Md. Nazrul Islam Mondal",
+      "Md Ashraful Hossen Akash"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.AI",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2610.02225v1",
+    "title": "The Price of Greenwashing: Algorithmic Verification and Market Discipline using Conformal Machine Learning",
+    "abstract": "While corporate sustainability mandates are expanding, the systemic reliance on self-reported emissions data exposes financial markets to pervasive greenwashing. Current literature relies heavily on subjective ESG ratings or textual sentiment analysis, leaving a critical econometric gap in objectively quantifying physical climate realities. To resolve this information asymmetry, we fuse U.S. SEC financial fundamentals with facility-level EPA greenhouse gas registries to establish a mathematically guaranteed baseline of physical corporate emissions. Leveraging a gradient boosting architecture and Mondrian Conformal Prediction, we quantify the shortfall between self-reported data and this algorithmic baseline into a novel Conformal-Weighted Continuous Divergence (CWCD) metric. Evaluating this divergence via a cross-sectional lead-lag econometric design, we uncover a robust mechanism of market discipline: algorithmic emissions divergence exhibits a severe, statistically significant negative relationship with subsequent market valuation (Tobin's Q) and operational profitability (ROA). Providing definitive evidence against the market blindness hypothesis, this study proves that institutional capital actively prices environmental deception not merely as an ethical lapse, but as a leading indicator of fundamental corporate mismanagement. Ultimately, these findings provide the quantitative justification necessary for asset managers and regulators to deploy algorithmic auditing infrastructure at scale.",
+    "published": "2026-09-19",
+    "authors": [
+      "Sourav Bose",
+      "Taoufik Bouraoui"
+    ],
+    "categories": [
+      "cs.LG",
+      "econ.EM"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.21197v1",
+    "title": "Reliability-Centered Evaluation of Sparse Longitudinal CT Lesion-Size Forecasting with Conformal Interval Calibration and Gompertz-Inspired Regularization",
+    "abstract": "Sparse longitudinal CT follow-up limits lesion-size forecasting when only a few prior observations are available. We constructed a five-visit DLT-derived same-lesion trajectory benchmark from DeepLesion and Deep Lesion Tracker (DLT), yielding 205 trajectories from 129 patients. We compared an exploratory conventional sparse-to-final analysis with a primary fixed visit-index horizon design predicting the common log change from T3 to T4 while progressively adding earlier observations, evaluating predictive accuracy, uncertainty reliability, post-hoc conformal interval calibration, subgroup performance, and Gompertz-inspired trajectory regularization. The evaluated methods showed partially overlapping point-prediction accuracy but distinct uncertainty behavior. Mean held-out RMSE across ten training seeds was 0.4726, 0.4305, 0.4499, and 0.4513 for m = 1, 2, 3, 4, indicating the lowest mean RMSE at m = 2; additional history did not improve RMSE. At m = 4, raw Cohort-Level Feature GP coverage was near the 95% nominal level, whereas MC Dropout, Deep Ensemble, and residual-scale intervals were conservative. Patient-level conformal calibration generally produced near-nominal or conservative coverage at the cost of wider intervals. Patient-grouped development cross-validation selected lambda* = 0 for the Gompertz-inspired term. A global population reference frequently opposed lesion-level change directions, and prediction difficulty varied across anatomical subgroups. Overall, additional historical observations provided limited predictive benefit once the prediction horizon was controlled, while predictive accuracy, uncertainty reliability, and trajectory consistency did not necessarily improve together, and should be evaluated jointly in sparse longitudinal imaging.",
+    "published": "2026-09-18",
+    "authors": [
+      "Lingfei Kong"
+    ],
+    "categories": [
+      "cs.LG",
+      "q-bio.QM",
+      "stat.ME"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.21103v1",
+    "title": "NetInspector: Measuring and Improving LLM Capabilities for Reliable Intent-Based Networking Policy Generation",
+    "abstract": "Modern networks are large in scale and heterogeneous in configuration, making manual policy management increasingly impractical. Intent-Based Networking (IBN) addresses this by automating the translation of high-level operator goals into low-level network configurations. Yet existing IBN systems rely on static heuristics and fixed-feature classifiers that generalize poorly to distribution shifts such as new service definitions or evolving phrasing in operator requests. Large Language Models (LLMs), with strong reasoning and translation capabilities demonstrated across many domains, are a natural candidate for IBN policy generation. However, it is unclear whether LLMs can be reliably applied to this task, nor whether their use mitigates or worsens the underlying security risk. In this work, we show that while fine-tuned LLMs excel at intent translation, they exhibit false negative rates when checking whether a proposed intent violates an existing security policy. The root cause is not a lack of logical reasoning capability, but LLMs lack of persistent grounding in network topology and group hierarchy. Motivated by this finding, we introduce NetInspector, a three-layer agentic framework that enforces a verify-then-act protocol, decoupling information retrieval from reasoning so that the LLM focuses on symbolic reasoning while every policy decision is grounded in verifiable network facts retrieved from a live Environment Layer before approval. On NetInspector-Bench, a 2,224-sample synthetic benchmark spanning campus, enterprise, and WAN topologies, NetInspector reduces FNR by over 30\\% relative to ungrounded baselines and remains robust under linguistic distribution shifts.",
+    "published": "2026-09-17",
+    "authors": [
+      "Yuxuan Zhang",
+      "Hongxin Hu",
+      "Guofei Gu"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.NI"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.19873v1",
+    "title": "AURA: Adaptive Uncertainty-Routed Analysis for Email Threat Detection",
+    "abstract": "Email spam and phishing attacks remain a critical security threat. Adversaries increasingly exploit large language models to craft contextually convincing malicious messages, and existing spam detection systems often struggle to keep pace. Generalization across diverse and evolving attack scenarios is limited, which reduces effectiveness once these systems are deployed in practice. This paper introduces Adaptive Uncertainty-Routed Analysis (AURA), a multimodal email threat detection system that analyzes both the content of an email and its embedded URLs. AURA is built around two layers: the first quantifies prediction uncertainty from a URL classifier, and only ambiguous messages are escalated to a fine-tuned transformer encoder for semantic analysis. The system is evaluated on eight heterogeneous training corpora together with two held-out real-world corpora spanning a decade of adversarial campaigns. AURA reaches a macro F1-score of 0.9858 in-distribution, and on NazPhish-Eval and GuenterTrap-Eval it maintains 0.9502 and 0.9436, respectively, which is evidence of robust generalization under genuine distribution shift.",
+    "published": "2026-09-17",
+    "authors": [
+      "Omran Berjawi",
+      "Walid fahs",
+      "Rida Khatoun"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.17748v1",
+    "title": "SAM-on-the-Curve: Sharpness-Aware Mode Connectivity for Robust Weight-Space Interpolation",
+    "abstract": "Deep neural networks that are independently trained to similar performance can be connected by low-loss parametric curves in weight space, a phenomenon known as Mode Connectivity (MC). This geometric property underpins practical techniques such as weight averaging, model ensembling, and model merging. We argue that low-loss connectivity is an incomplete geometric criterion: it controls loss only along a one-dimensional trajectory while leaving the surrounding weight-space neighborhood unconstrained, so the optimized curve may traverse sharp ridges that become fragile under distribution shift. We therefore reformulate mode connectivity as a neighborhood-robust path optimization problem, seeking a curve whose entire local neighborhood maintains low loss. We propose Sharp Mode Connectivity (SMC), which applies a first-order sharpness-aware approximation to the resulting minimax functional, enforcing flatness along the entire curve rather than only on it. We derive a practical optimization algorithm for connectivity paths under this sharpness-aware objective. Under severe blur corruptions from CIFAR-10-C, SMC achieves up to 6.09\\% absolute accuracy improvement over standard MC. Remarkably, SMC produces negative loss barriers, meaning that models obtained at interior points of the optimized path can outperform the average endpoint loss. These results, validated across ResNet-18, VGG16-BN, and ViT-Tiny on CIFAR-10 and ImageNet-100, establish path-wise flatness as a practical principle for robust weight-space interpolation.",
+    "published": "2026-09-15",
+    "authors": [
+      "Alejandro Calatrava",
+      "Xu Zhang",
+      "Ren Wang"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.15017v1",
+    "title": "PIDS-Bench: Evaluating Prompt-Injection Detectors Under Over-Defense, Obfuscation, and Distribution Shift",
+    "abstract": "Prompt-injection detectors are typically evaluated using aggregate F1 on in-distribution test data, which offers limited insight into behavior under distribution shift, particularly on the benign side of the decision boundary, where false positives impose direct operational cost yet are seldom measured. We present PIDS-Bench, a frozen multi-axis benchmark that jointly evaluates attack detection and benign false-positive behavior at fixed thresholds, spanning in-distribution inputs, hard-benign prompts that mimic injection structure without malicious intent, obfuscated attacks, and domain and structural distribution shifts. We evaluate seven detectors (learned baselines, external prompt-injection classifiers, and broad-safety comparators) alongside a rule-based lower-bound reference. Multi-axis evaluation exposes a failure mode that aggregate F1 conceals. A detector exceeding F1 = 0.98 on the held-out split still misclassifies roughly one-third of an externally-sourced benign subset drawn from public corpora and restricted to security-adjacent content. Across a full threshold sweep and five training seeds, no internal detector reaches an operating point satisfying F1 >= 0.95 and hard-benign FPR <= 0.10 together on this stress distribution. Decomposing by provenance, we find that hard-negative augmentation nearly eliminates over-defense on curated stress inputs but leaves it substantially intact on externally-sourced prompts, a pattern we term provenance-sensitive over-defense. The asymmetry holds across both fine-tuned architectures and does not diminish as the augmentation pool grows, with the externally-sourced FPR remaining far above the 0.10 target. Whether augmentation matched to the externally-sourced distribution would close this gap is untested; threshold calibration and curated-style augmentation alone do not.",
+    "published": "2026-09-14",
+    "authors": [
+      "Yusuf Khalid Shire",
+      "Sang-Chul Kim"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.AI"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.14531v1",
+    "title": "Multi-source conformal prediction: leveraging heterogeneity via localization",
+    "abstract": "Many modern prediction tasks involve data from multiple heterogeneous sources, while the test distribution may differ substantially from any individual source. Although heterogeneity poses challenges, it also offers an opportunity: different sources may provide complementary information, with some regions of the feature space better represented in one source than another. We propose Multi-Source Randomly Localized Conformal Prediction (MS-RLCP), which builds on the local coverage properties of randomly localized conformal prediction (RLCP) (Hore and Barber, 2025) and extends it to multiple sources through data-adaptive source selection. Under the widely adopted assumption of a shared response distribution conditional on the features across sources and the test population, we establish finite-sample coverage bounds using an interpretable notion of envelope distribution that captures their aggregate feature-space representation. Our analysis allows the test feature distribution to be absolutely continuous with respect to the envelope, extending beyond mixtures of source distributions. Under additional regularity conditions, we also establish asymptotic test-conditional coverage. Simulations and real-world experiments demonstrate the effectiveness of MS-RLCP across varying levels of data heterogeneity.",
+    "published": "2026-09-13",
+    "authors": [
+      "Rohan Hore",
+      "Anirban Chatterjee",
+      "Sayantan Choudhury"
+    ],
+    "categories": [
+      "stat.ML",
+      "cs.LG",
+      "stat.ME"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.13511v1",
+    "title": "A Three-Axis Stress Test of LLM vs Classical ML for Network Intrusion Detection under Distribution Shift and Adversarial Evasion",
+    "abstract": "Large language models are increasingly benchmarked against classical machine learning for network intrusion detection (NIDS), almost always using same-dataset evaluation, and that protocol turns out to be incomplete. Evaluating XGBoost and RoBERTa-LoRA on two independently collected NetFlow v2 networks across three axes (same-dataset performance, cross-dataset transfer, and adversarial evasion) reveals no universal winner. The two models are statistically tied same-dataset. XGBoost wins decisively under cross-dataset distribution shift, by 15 points of F1 and 25 points of balanced accuracy; on the target network RoBERTa-LoRA's false positive rate reaches 0.78, leaving it barely above chance despite a superficially moderate F1. RoBERTa-LoRA wins decisively under adversarial evasion, by roughly 17 points of F1 at a representative mid-range perturbation strength, while both models hold false positive rates below 0.01 throughout. The model an evaluator would recommend therefore depends entirely on which axis is tested, not on same-dataset accuracy alone. A staged feature-leakage ablation improves cross-dataset transfer non-monotonically, indicating the leakage signal is distributed across the feature representation rather than confined to a few columns, and cross-dataset transfer between our two networks is strongly directional. These results argue for evaluating NIDS models along multiple independent robustness axes, and with more than one metric per axis.",
+    "published": "2026-09-11",
+    "authors": [
+      "Muhammad Ebad Atif",
+      "Muhammad Haider Ali"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.AI",
+      "cs.CR"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.12386v1",
+    "title": "Split Conformal Prediction with Label-Shift-Adjusted Bayesian Scores",
+    "abstract": "Conformal prediction provides distribution-free uncertainty quantification under exchangeability. However, this assumption is violated by label shift, where the marginal distribution of labels changes while the conditional distribution of inputs given labels remains stable. Under such shifts, standard conformal procedures no longer maintain their intended coverage behavior. Existing approaches address this via importance weighting. They pair the reweighting with residual-based nonconformity scores that ignore predictive uncertainty. The resulting intervals have uniform width. Bayesian conformal methods produce adaptive intervals by leveraging predictive distributions. They evaluate conformity under the source predictive, which is misaligned with the target domain under label shift. We propose the \\emph{Label-Shift-Adjusted Bayesian Score} (LSA score), a nonconformity score derived from a posterior predictive tilting identity. This identity shows that the target predictive is an importance-weighted transformation of the source predictive. We use it to derive a direct correction to the Bayesian score. We evaluate the method on molecular property prediction under controlled label shift. The LSA score consistently yields shorter intervals than residual-based and source-based Bayesian scores. Coverage in the target domain remains comparable. Under stronger shift, all methods incur some coverage loss due to pseudo-label-based density-ratio estimation. The LSA score is defined for any source predictive with a tractable log-density. We instantiate it with Bayesian Ridge Regression, where the correction admits a closed form.",
+    "published": "2026-09-11",
+    "authors": [
+      "Hyeonsu Lee",
+      "Juyeon Kim",
+      "Erkhembayar Jadamba",
+      "Seungjin Choi",
+      "Hyunjin Shin"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.31637v1",
+    "title": "FIDAL: Diversity-Aware Federated Active Learning Under Real-World Distribution Shifts",
+    "abstract": "Federated learning enables collaborative model training across institutions without centralizing data, yet high annotation costs, domain shifts, and class imbalance remain major obstacles, especially when irrelevant out-of-distribution (OOD) samples dilute the labeled data. Existing active learning methods target uncertainty or diversity within in-distribution (ID) data and overlook unknown samples in federated clinical settings. We propose FIDAL, an open-set federated active learning framework that combines calibrated global-local evidential uncertainty, support-set diversity weighting, and adaptive OOD rejection. The rejection gate thresholds a foundation-model Gaussian-coverage signal per client and per round with Otsu's criterion, so that highly informative ID samples are queried while irrelevant outliers are excluded without any hand-tuned threshold. Evaluated on three multi-center medical imaging benchmarks (dermatology, histopathology, and mammography with organically occurring artifacts) in realistic open-set scenarios, FIDAL outperforms detector-based open-set methods by up to about 12 percentage points of balanced accuracy and is the only method on the accuracy-ID purity Pareto front of all three benchmarks. At an equal query budget it spends at least 1.3 times fewer annotations on OOD samples than every accuracy-matched baseline, saving an estimated 7-29 hours of expert reading on the mammography benchmark. By labeling only a fraction of the data pool, it matches or exceeds fully supervised performance across modalities. These results highlight the value of integrating uncertainty, diversity, and OOD rejection in open-set federated active learning for medicine.",
+    "published": "2026-09-10",
+    "authors": [
+      "David Due\u00f1as Gaviria",
+      "Shadi Albarqouni"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.CV"
+    ],
+    "topics": [
+      "analyst budget",
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.11918v1",
+    "title": "General Quantification of Covariate and Concept Shifts",
+    "abstract": "Generalization under distribution shift remains a core challenge in modern machine learning, yet existing learning bound theory is limited to narrow, idealized settings and is non-estimable from samples. In this paper, we bridge the gap between theory and practical applications. We first show that existing definition of concept shift breaks when the source and target supports mismatch. Leveraging entropic optimal transport, we propose a key notion: $\u03b3^{*}\\!$-concept shifts, and derive a general error bound unifying covariate and $\u03b3^{*}\\!$-concept shifts, which applies to broad loss functions, label spaces, and stochastic labeling. We further develop estimators for these shifts with concentration guarantees, and the DataShifts algorithm, which can quantify distribution shifts and estimate the error bound in most applications - a rigorous and general tool for analyzing learning error under distribution shift.",
+    "published": "2026-09-10",
+    "authors": [
+      "Hongbo Chen",
+      "Li Charlie Xia"
+    ],
+    "categories": [
+      "cs.LG",
+      "cs.AI",
+      "stat.ML"
+    ],
+    "topics": [
+      "conformal / drift monitoring",
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.11882v2",
+    "title": "From Specs to Apps: Verifying and Monitoring Models of Signal and WhatsApp",
+    "abstract": "The Signal protocol is a prominent messaging protocol that secures communication for billions of users. It powers WhatsApp, the most widely used messaging application worldwide, and the Signal app, popular among privacy-conscious users. Extensive research in the computational and Dolev-Yao settings provides strong formal security guarantees for the protocol itself. However, a gap remains between the guarantees of the protocol specification and the implementation's actual behavior at runtime. In this work, we bridge this gap by applying SpecMon, a recently proposed runtime monitor, to check whether observed executions conform to formal protocol models. To this end, we instrument two applications (WhatsApp Web and Signal Desktop) to capture their interactions with the network and the cryptographic components. Using this instrumentation, we develop two multiset-rewrite models that are compatible with Tamarin, thus enabling verification. We derive the first model of WhatsApp Web's implementation of the Signal protocol and the most detailed model to date of Signal's original protocol. Monitoring establishes that observed executions conform to these models, relative to the trusted event extraction and the symbolic abstraction. For the core components of the Signal protocol, we verify authentication and secrecy properties. Finally, monitoring reveals previously undocumented differences between the original libsignal library and WhatsApp's fork. We evaluate our methodology and demonstrate its reproducibility. Developing the WhatsApp Web model, instrumenting the app, adding fuzzing, and running the experiments took three person-weeks. We also demonstrate efficient monitoring of real-world applications and detection of deliberately injected security faults, with low overhead in our measured setting.",
+    "published": "2026-09-10",
+    "authors": [
+      "Moustafa Said",
+      "Aurora Naska",
+      "Kevin Morio",
+      "Robert K\u00fcnnemann"
+    ],
+    "categories": [
+      "cs.CR"
+    ],
+    "topics": [
+      "time-aware evaluation"
+    ]
+  },
+  {
+    "id": "2609.08623v1",
+    "title": "Navigating the Latent Manifold: Proactive Concept Drift Adaptation for Resilient NIDS",
+    "abstract": "Network intrusion detection systems (NIDS) are critical for cybersecurity, safeguarding services and data from potential attacks. However, existing AI-based NIDS often assume static data distributions and fail to handle concept drift, leading to degraded performance and increased false positives in dynamic network environments. To address this issue, we propose DriftXpert, a novel NIDS for drift-adaptive detection. Specifically, we propose a decoupled two-stage offline adaptive framework. In Phase 1, we introduce an unsupervised anomaly metric based on latent manifold deviation. By performing outlier analysis within the latent space, the framework achieves high-sensitivity detection of network traffic concept drift. In Phase 2, to mitigate catastrophic forgetting under non-stationary distributions, we design a representation consistency alignment strategy. This strategy constrains the feature mapping between the legacy model and the drifted distribution, ensuring the model captures emerging attack characteristics while retaining discriminative power over known patterns. Furthermore, we incorporate cross-epoch neuron weight aggregation and selective freezing mechanisms to enable fine-grained knowledge transfer in the parameter space, effectively balancing model plasticity and stability. Extensive experiments on public datasets demonstrate that DriftXpert effectively adapts to drifted data without catastrophic forgetting. Furthermore, real-world evaluations on enterprise network further confirm its robustness and practical applicability, contributing to improved security protection for millions of users.",
+    "published": "2026-09-08",
+    "authors": [
+      "Chao Zha",
+      "Zifeng Kang",
+      "Tian Liu",
+      "Dakun Shen",
+      "Ruyun Zhang"
+    ],
+    "categories": [
+      "cs.CR"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.05165v1",
+    "title": "Conformal Prediction for Offensive Security",
+    "abstract": "Despite its introduction more than a quarter century ago, Conformal Prediction (CP) has seen surprisingly few applications to the cyber security world thus far. In particular, we observe that, while CP has been employed as a defensive measure in many recent works, its use for carrying out attacks (i.e., for offensive security) is hard to trace in the literature. We explore this gap, by presenting initial findings in two key areas of offensive security: Privacy-Preserving Machine Learning, and network traffic analysis.",
+    "published": "2026-09-04",
+    "authors": [
+      "Giovanni Cherubin"
+    ],
+    "categories": [
+      "cs.CR",
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.03464v1",
+    "title": "Mind the Gap: Robustness Risks in PII Detection Systems",
+    "abstract": "Personally Identifiable Information (PII) detection is a foundational component of data protection infrastructure where missed entities constitute direct privacy and security risks. Although modern PII systems report strong performance on standard benchmarks, we show that these evaluations mask substantial robustness failures under realistic distribution shifts encountered in deployment. Rather than comparing state-of-the-art accuracy, we study how different PII detection paradigms fail under noisy, unstructured, and informal inputs. We construct a stress test benchmark spanning seven categories of natural distribution shift and evaluate representative systems from three widely deployed architectural families: encoder-based NER (SpaCy), rule-based hybrid detection (Presidio), and generative LLM extraction (Qwen2.5-3B). All three exhibit significant degradation on out-of-distribution inputs, but with distinct and complementary failure modes. Encoder models primarily fail on unseen surface forms and boundary detection, rule-based systems fail on non-standard formats, and LLMs exhibit entity-type confusion and generation instability. These results show that aggregate benchmark scores obscure deployment-critical weaknesses and that no single architecture is uniformly reliable across PII categories. Motivated by these findings, we propose a hybrid detection pipeline with a QA-driven feedback loop for iterative risk mitigation, and release our benchmark to support OOD-aware evaluation of PII systems.",
+    "published": "2026-09-03",
+    "authors": [
+      "Adeel Zafar",
+      "Slawomir Nowaczyk"
+    ],
+    "categories": [
+      "cs.LG"
+    ],
+    "topics": [
+      "conformal / drift monitoring"
+    ]
+  },
+  {
+    "id": "2609.22233v1",
+    "title": "SCALE: Simulation-Calibrated Amortized Learning for Energy Materials (A hybrid architecture connecting deterministic modeling, real-world data, and transformer-scale inference for accelerated energy-materials discovery)",
+    "abstract": "Energy systems face converging pressures for security, affordability, resilience, and sustainability, creating a need for faster discovery of deployable energy materials. Here we introduce SCALE (Simulation-Calibrated Amortized Learning for Energy Materials), a physics-grounded, real-world-data-calibrated learning architecture that connects deterministic scientific operators, experimental calibration, expanded calibrated label generation, and transformer-scale inference. SCALE converts selected high-cost mechanistic computation and measured evidence into reusable models for rapid screening, ranking, inverse design, and active learning. We formulate the framework, identify ten method-based application regimes, and demonstrate SCALE for solid-state metal-hydride hydrogen-storage capacity prediction. In this implementation, a hydride phase-equilibrium capacity operator is calibrated against 381 measured ML-HydPARK capacity anchors and used to generate 5,000 candidate-condition-prototype teacher labels. A crystallographically anchored periodic-graph representation preserves atomic sites, periodic neighbor relationships, and local metal environments absent from formula-only encodings. An edge-biased graph transformer with 2.90 million parameters reproduces calibrated teacher labels with five-fold surrogate fidelity of MAE 0.0582 wt% H2, RMSE 0.0833 wt% H2, R2 = 0.9927, and Pearson r = 0.9963. Post hoc attention analysis suggests that SCALE learns chemically organized element groupings and metal-metal relationships consistent with established hydride chemistry, without chemistry-group labels as supervision. Once trained, SCALE shifts million-candidate evaluation from repeated deterministic workflow execution to batched learned inference, reducing per-candidate screening cost by approximately 10^7-10^8 while retaining links to simulation and experimental evidence.",
+    "published": "2026-09-03",
+    "authors": [
+      "Kuan Huang",
+      "Bo Bai"
+    ],
+    "categories": [
+      "cs.LG",
+      "cond-mat.mtrl-sci"
+    ],
+    "topics": [
+      "analyst budget"
+    ]
+  }
+]

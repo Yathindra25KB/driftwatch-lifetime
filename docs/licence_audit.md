@@ -44,7 +44,7 @@ Read from the installed metadata of every package in `uv.lock` by `scripts/list_
 | anyio | 4.15.1 | MIT | License-Expression | transitive |
 | babel | 2.18.0 | BSD-3-Clause | License | transitive |
 | beautifulsoup4 | 4.15.0 | MIT License | License | transitive |
-| certifi | 2026.7.22 | MPL-2.0 | License | transitive |
+| certifi | 2026.10.23 | MPL-2.0 | License | transitive |
 | cfgv | 3.5.0 | MIT | License | transitive |
 | charset-normalizer | 3.5.2 | MIT | License | transitive |
 | click | 8.5.0 | BSD-3-Clause | License-Expression | transitive |
@@ -52,20 +52,20 @@ Read from the installed metadata of every package in `uv.lock` by `scripts/list_
 | colorama | 0.4.6 | BSD License | classifier | transitive |
 | contourpy | 1.4.0 | BSD-3-Clause | License-Expression | transitive |
 | cycler | 0.12.1 | BSD License | classifier | transitive |
-| distlib | 0.4.3 | PSF-2.0 | License | transitive |
+| distlib | 0.4.4 | PSF-2.0 | License | transitive |
 | docutils | 0.22.4 | Public Domain; BSD-2-Clause (installed files) | reviewed (docs/licence_audit.md) | transitive |
-| filelock | 4.0.12 | MIT | License-Expression | transitive |
-| fonttools | 4.66.1 | MIT | License | transitive |
+| filelock | 4.2.4 | MIT | License-Expression | transitive |
+| fonttools | 4.67.0 | MIT | License | transitive |
 | fsspec | 2026.9.0 | BSD-3-Clause | License-Expression | transitive |
 | furo | 2025.12.19 | MIT License | classifier | direct, documentation |
 | gdown | 6.4.2 | MIT | License | direct, runtime |
 | h11 | 0.16.0 | MIT | License | transitive |
 | hf-xet | 1.7.0 | Apache-2.0 | License-Expression | transitive |
-| httpcore2 | 2.13.1 | BSD-3-Clause | License-Expression | transitive |
-| httpx2 | 2.13.1 | BSD-3-Clause | License-Expression | transitive |
+| httpcore2 | 2.16.0 | BSD-3-Clause | License-Expression | transitive |
+| httpx2 | 2.16.0 | BSD-3-Clause | License-Expression | transitive |
 | httpx2-jsfetch | not installed | UNKNOWN | - | transitive |
-| huggingface-hub | 2.2.0 | Apache-2.0 | License | direct, runtime |
-| hypothesis | 6.168.5 | MPL-2.0 | License-Expression | direct, development |
+| huggingface-hub | 2.3.0 | Apache-2.0 | License | direct, runtime |
+| hypothesis | 6.170.12 | MPL-2.0 | License-Expression | direct, development |
 | identify | 2.6.20 | MIT | License | transitive |
 | idna | 3.20 | BSD-3-Clause | License-Expression | transitive |
 | imagesize | 2.0.1 | MIT | License-Expression | transitive |
@@ -80,33 +80,33 @@ Read from the installed metadata of every package in `uv.lock` by `scripts/list_
 | mdit-py-plugins | 0.6.1 | MIT License | classifier | transitive |
 | mdurl | 0.1.2 | MIT License | classifier | transitive |
 | myst-parser | 5.1.0 | MIT License | classifier | direct, documentation |
-| narwhals | 2.27.1 | MIT | License-Expression | transitive |
+| narwhals | 2.28.0 | MIT | License-Expression | transitive |
 | nodeenv | 1.11.0 | BSD | License | transitive |
-| numpy | 2.5.3 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | License-Expression | direct, runtime |
+| numpy | 2.5.4 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 | License-Expression | direct, runtime |
 | packaging | 26.3 | Apache-2.0 OR BSD-2-Clause | License-Expression | transitive |
-| pandas | 3.0.6 | BSD License | classifier | direct, runtime |
-| pillow | 12.3.0 | MIT-CMU | License-Expression | transitive |
-| platformdirs | 4.12.4 | MIT | License-Expression | transitive |
-| pluggy | 1.6.0 | MIT | License | transitive |
-| pre-commit | 4.6.2 | MIT | License | direct, development |
+| pandas | 3.1.0 | BSD-3-Clause | License-Expression | direct, runtime |
+| pillow | 13.0.0 | MIT-CMU | License-Expression | transitive |
+| platformdirs | 4.13.6 | MIT | License-Expression | transitive |
+| pluggy | 1.7.0 | MIT | License | transitive |
+| pre-commit | 4.7.0 | MIT | License | direct, development |
 | psutil | 7.2.2 | BSD-3-Clause | License | direct, runtime |
 | pyarrow | 26.0.0 | Apache-2.0 | License-Expression | direct, runtime |
 | pygments | 2.21.0 | BSD-2-Clause | License-Expression | transitive |
 | pyparsing | 3.3.3 | MIT | License-Expression | transitive |
 | pysocks | 1.7.1 | BSD | License | transitive |
 | pytest | 9.1.1 | MIT | License-Expression | direct, development |
-| python-dateutil | 2.9.0.post0 | Dual License | License | transitive |
-| python-discovery | 1.6.1 | MIT License | classifier | transitive |
+| python-dateutil | 3.0.0 | Dual License | License | transitive |
+| python-discovery | 1.6.5 | MIT | License-Expression | transitive |
 | pyyaml | 6.0.3 | MIT | License | direct, runtime |
 | requests | 2.34.2 | Apache-2.0 | License | transitive |
 | roman-numerals | 4.1.0 | 0BSD OR CC0-1.0 | License-Expression | transitive |
-| ruff | 0.16.10 | MIT | License-Expression | direct, development |
+| ruff | 0.17.3 | MIT | License-Expression | direct, development |
 | scikit-learn | 1.9.1 | BSD-3-Clause | License-Expression | direct, runtime |
 | scipy | 1.18.1 | BSD License | classifier | direct, runtime |
 | six | 1.17.0 | MIT | License | transitive |
 | snowballstemmer | 3.1.1 | BSD-3-Clause | License | transitive |
 | sortedcontainers | 2.4.0 | Apache 2.0 | License | transitive |
-| soupsieve | 3.0 | MIT | License-Expression | transitive |
+| soupsieve | 3.0.4 | MIT | License-Expression | transitive |
 | sphinx | 9.1.1 | BSD-2-Clause | License-Expression | direct, documentation |
 | sphinx-basic-ng | 1.0.0b2 | MIT License | classifier | transitive |
 | sphinxcontrib-applehelp | 2.0.0 | BSD License | classifier | transitive |
@@ -118,11 +118,11 @@ Read from the installed metadata of every package in `uv.lock` by `scripts/list_
 | sphinxcontrib-serializinghtml | 2.0.0 | BSD License | classifier | transitive |
 | threadpoolctl | 3.7.0 | BSD-3-Clause | License-Expression | transitive |
 | tqdm | 4.70.1 | MPL-2.0 AND MIT | License | transitive |
-| truststore | 0.10.4 | MIT | License-Expression | transitive |
+| truststore | 0.10.5 | MIT | License-Expression | transitive |
 | typing-extensions | 4.16.0 | PSF-2.0 | License-Expression | transitive |
 | tzdata | 2026.5 | Apache-2.0 | License | transitive |
 | urllib3 | 2.8.0 | MIT | License-Expression | transitive |
-| virtualenv | 21.14.6 | MIT | License-Expression | transitive |
+| virtualenv | 21.15.0 | MIT | License-Expression | transitive |
 
 Notes:
 
@@ -130,7 +130,7 @@ Notes:
 - **Weak copyleft (MPL-2.0):** certifi, hypothesis, tqdm. `hypothesis` is a development dependency. MPL-2.0 is file-level copyleft; none of these packages is modified or bundled into a distribution by this repository, which installs them from PyPI.
 - **Composite or dual expressions** (for example `numpy`: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0; `packaging`: Apache-2.0 OR BSD-2-Clause; `python-dateutil`: "Dual License", BSD-3-Clause or Apache-2.0 per its own text) are as the packages state them.
 - **No package is GPL or AGPL, as installed.** One metadata label needed a human reading, and the lister carries a version-pinned override for it (`REVIEWED` in `scripts/list_licences.py`, tied to the exact version, so a new version is read from its metadata again): `docutils` 0.22.4 reports "Public Domain; BSD License; GNU General Public License (GPL)" because its source tarball ships one GPL-3 file (`tools/editors/emacs/rst.el`, an Emacs mode) that is not part of the installed package; the files that are installed are public domain or BSD-2-Clause (its `COPYING.rst`, read 27 Oct 2026). `docutils` is a documentation-build dependency only.
-- **Vague labels, read on 27 Oct 2026:** `nodeenv` 1.11.0 ships a BSD-style three-clause licence text; `python-dateutil` 2.9.0.post0 ships an Apache-2.0 licence for contributions after 2017-12-01 and a BSD-3-Clause licence for older ones (its own "dual license" text); `PySocks` 1.7.1 states "BSD" in its metadata and ships no licence file (read from metadata only). All three are permissive; none is bundled into the wheel.
+- **Vague labels, read on 27 Oct 2026:** `nodeenv` 1.11.0 ships a BSD-style three-clause licence text; `python-dateutil` ships an Apache-2.0 licence for newer contributions and a BSD-3-Clause licence that applies to all code (its own "dual license" text; read for 2.9.0.post0 on 27 Oct 2026 and again for 3.0.0, the version the 28 Oct 2026 dependency refresh resolves to, with the same structure); `PySocks` 1.7.1 states "BSD" in its metadata and ships no licence file (read from metadata only). All three are permissive; none is bundled into the wheel.
 - **Runtime fetch of Mermaid.** The documentation site draws its diagrams with Mermaid (MIT), which the page loads from `cdn.jsdelivr.net` at view time (version pinned by `sphinxcontrib-mermaid`). It is not vendored in the repository or the wheel; offline, the diagrams show as their source text.
 
 ## 5. Ethics review
