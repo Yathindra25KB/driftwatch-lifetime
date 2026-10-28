@@ -35,7 +35,7 @@ The public repository will be `Yathindra25KB/driftwatch-lifetime`, created from 
 
 ## 4. Dependencies
 
-Read from the installed metadata of every package in `uv.lock` by `scripts/list_licences.py` (no network; rerun with `uv run python scripts/list_licences.py`). 83 packages: 11 direct runtime, 4 direct development, 4 direct documentation (the `docs` group, used only to build the site and never part of the wheel), the rest transitive. The runtime dependencies are the only ones a user of the wheel installs.
+Read from the installed metadata of every package in `uv.lock` by `scripts/list_licences.py` (no network; rerun with `uv run python scripts/list_licences.py`). 84 packages (85 entries in the lock, the project itself excluded): 11 direct runtime, 4 direct development, 4 direct documentation (the `docs` group, used only to build the site and never part of the wheel), the rest transitive. The runtime dependencies are the only ones a user of the wheel installs.
 
 | Package | Version | Licence | Read from | Kind |
 |---|---|---|---|---|
