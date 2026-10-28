@@ -1,6 +1,6 @@
 [project]
 name = "driftwatch-lifetime"
-version = "0.1.0"
+version = "0.1.0rc1"
 description = "Time-aware study of malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring."
 readme = "README.md"
 license = "MIT"
@@ -36,10 +36,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Security",
-    # PyPI rejects any upload carrying a "Private ::" classifier. Removed only in the
-    # release commit, after the licence, ethics and claims audits and the researcher's
-    # explicit go (ADR-0003, docs/RELEASING.md).
-    "Private :: Do Not Upload",
+    # Rehearsal branch for TestPyPI only: the "Private ::" classifier of main is removed here
+    # because TestPyPI rejects it too (ADR-0003, docs/RELEASING.md). Never merge this branch.
 ]
 
 [project.urls]
