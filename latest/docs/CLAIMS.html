@@ -1673,6 +1673,38 @@
 <td><p>[measured]</p></td>
 <td><p>2026-10-28</p></td>
 </tr>
+<tr class="row-even"><td><p>E-76</p></td>
+<td><p>The public repository Yathindra25KB/driftwatch-lifetime was created from a filtered copy of the development history and its first workflows ran on GitHub’s runners</p></td>
+<td><p>207 commits rewritten with docs/source removed (0 commits touch it, no tree contains it, tags prereg-v1 to prereg-v3 kept, commit count unchanged), 207 old-to-new hashes in the map; only main and the three tags were pushed; CI on main (including the slow suite and the Windows smoke) and the docs workflow (strict build, link check, and the deploy job that created the gh-pages branch) succeeded on the first push; the deep page /latest/docs/architecture/index.html answered HTTP 200</p></td>
+<td><p>docs/commit_map.csv; GitHub Actions runs 40743821507 (docs) and 40743999106 (CI) in the public repository</p></td>
+<td><p>95c4019</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-77</p></td>
+<td><p>TestPyPI rehearsal: release.yml dispatched with target testpypi on branch release/0.1.0rc1 (version 0.1.0rc1, no Private classifier) before any publisher was registered</p></td>
+<td><p>build job succeeded; the wheel smoke (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">smoke</span></code> from the installed wheel in a fresh environment, no checkout) succeeded on ubuntu-latest and on windows-latest; the upload job was refused with <code class="docutils literal notranslate"><span class="pre">invalid-publisher:</span> <span class="pre">valid</span> <span class="pre">token,</span> <span class="pre">but</span> <span class="pre">no</span> <span class="pre">corresponding</span> <span class="pre">publisher</span></code>, and the identity token’s claims named repository Yathindra25KB/driftwatch-lifetime and environment testpypi, so nothing was uploaded and the failure is exactly the missing registration</p></td>
+<td><p>GitHub Actions run 40744366757 in the public repository</p></td>
+<td><p>d568d78</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-even"><td><p>E-78</p></td>
+<td><p>arxiv-audit.yml dispatched on GitHub (since 2026-09-01)</p></td>
+<td><p>run succeeded and opened issue 1 with 50 keyword candidates (cs.CR and cs.LG, 2026-09-01 to 2026-10-28); candidates not yet read</p></td>
+<td><p>GitHub Actions run 40744762191 and issue 1 in the public repository</p></td>
+<td><p>95c4019</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-79</p></td>
+<td><p>The first live documentation deploy had a defect: the version folder had no index.html, so /latest/ returned HTTP 404 while deep pages answered 200</p></td>
+<td><p>fixed by a redirect page copied to the root of each version folder (html_extra_path); the fix is in the public repository’s pull request 2</p></td>
+<td><p>docs/conf.py; docs/_extra/index.html</p></td>
+<td><p>f688c0a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
 </tbody>
 </table>
 </div>
