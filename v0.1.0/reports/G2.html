@@ -1,0 +1,555 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Gate G3 evidence (Phases 6 and 7)" href="G3.html"><link rel="prev" title="Gate G1 evidence (Phase 4)" href="G1.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Gate G2 evidence (Phase 5) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/reports/G2.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/reports/G2.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="gate-g2-evidence-phase-5">
+<h1>Gate G2 evidence (Phase 5)<a class="headerlink" href="#gate-g2-evidence-phase-5" title="Link to this heading">¶</a></h1>
+<p><strong>Gate:</strong> G2, end of week 8 (Sun 6 Dec 2026). Question: does the simulator with label delay and budget run end to end on at least one dataset, so that the delay and budget grid may start? (Stop rule: if not, cut to one dataset and one model.)
+<strong>Prepared:</strong> 13 Oct 2026, by Claude Code (engineering lead), from the Phase 5 code and tests, <code class="docutils literal notranslate"><span class="pre">reports/tables/*.csv</span></code>, docs/CLAIMS.md (S-01 to S-06, E-13 to E-21) and ADR-0007. Reviewed by the leakage-reviewer (first pass: 13 findings, no leak; fixes applied; <strong>the second pass did not complete</strong>, see Process) and by the stats-reviewer (12 findings; applied).
+<strong>The gate decision is the researcher’s</strong> (CLAUDE.md). This file states which criteria the evidence meets, which it does not, and what is open. Nothing here reads a detector result as a finding about decay recovery: the diagnostics count changed decisions and do not compute AUT.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>Criteria 1, 2, 4 to 7 and 9 are met on both datasets. Criterion 3 is partly met: no leak was found, but the second leakage-review pass over the fixes did not complete (usage limit) and three items are carried. Criterion 8 (the pool ADR accepted) is <strong>open</strong>: ADR-0007 is PROPOSED and only the researcher accepts it. The stop rule (cut to one dataset and one model) is not triggered.</p>
+<p>Two things need the researcher before the grid is run, and neither is a defect of the simulator:</p>
+<ol class="arabic simple">
+<li><p><strong>Which comparator carries RQ1.</strong> E0’s window-level comparator and E1’s per-slot matched comparator give different gaps on LAMDA (0.14 to 0.15 against 0.03 to 0.04) for the same fitted model, so the registered 0.05 band is passed or failed depending on the definition. G1’s criterion 1 was marked met on E0’s number. See “Open decision A”.</p></li>
+<li><p><strong>Parallel runs do not fit the approved memory cap.</strong> Two BODMAS runs in two threads crossed 1.5 GiB; the single-run E1 BODMAS peak is 1.47 GiB (98% of the cap). The grid has to run one run at a time, or the cap has to change. See “Open decision B”.</p></li>
+</ol>
+</section>
+<section id="criteria">
+<h2>Criteria<a class="headerlink" href="#criteria" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Criterion (Phase 5 prompt, PHASES.md G2)</p></th>
+<th class="head"><p>Result</p></th>
+<th class="head"><p>Met</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Simulator with delay and budget runs end to end on at least one dataset</p></td>
+<td><p>Periodic retraining every 3 slots, d = 0, random selection at 0.5% and 5%, on LAMDA (16 windows, 3 seeds, LR and LightGBM) and BODMAS (6 windows, 3 seeds); never-retrain baselines and E1 on both (CLAIMS E-13, E-14, E-16, E-17). 288 LAMDA refits per arm, longest 9.9 s</p></td>
+<td><p><strong>Yes, both</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test_queue_delay</span></code> passes for d in {0, 1, 2, 3}, including property tests; nothing lost or duplicated</p></td>
+<td><p>21 tests; 150 generated scenarios; queued = released + ignored; release exactly at t + 1 + d (S-01)</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Spy test passes; leakage-reviewer reports nothing unresolved on queue, pool, runner</p></td>
+<td><p>Spy test passes at component and runner level, with the E1 comparator on and off (S-02). First review: no temporal leak; findings 1, 3, 4, 5, 6, 7, 8, 9 fixed with tests; 2 is this ADR; <strong>carried, not fixed:</strong> 11 (no feature-vector hash through queue and pool, so the E0 “seen before” mask is still built from the initial window only), 12 (calibration share is logged and not yet consumed), 13 (<code class="docutils literal notranslate"><span class="pre">code_version</span></code> ignores untracked files)</p></td>
+<td><p><strong>Partly: no leak found; second review pass of the fixes not completed; three carried items listed</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>Same config and seed reproduce identical per-slot predictions; an interrupted run resumes cleanly</p></td>
+<td><p>Tests (S-05) and a real-data check (S-06): a BODMAS arm killed after 3 of 18 units, resumed, same predictions sha256 as the uninterrupted run made at another commit</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Regression fixture reproduces the qualitative ordering</p></td>
+<td><p>Never worst, more labels help, longer delay hurts; three deliberate breakages are each caught (S-03, S-04)</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>E1 figure exists and regenerates from stored predictions with no model fits</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">reports/figures/e1_random_vs_time.png</span></code>; the script imports no model code (tested) and reads stored predictions plus the stored slot and window tables; regenerated three times during review</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>Fit-time and memory rules</p></td>
+<td><p>Longest initial fit 8.6 s, longest refit 9.9 s (60 s rule). Memory: one run at a time fits (BODMAS E1 peak 1.47 GiB, LAMDA 0.82 GiB); parallel runs do not (E-20)</p></td>
+<td><p>Yes, with Open decision B</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>Pool ADR accepted</p></td>
+<td><p>ADR-0007 is PROPOSED. New-label weight 1 and no truncation were the researcher’s choices (11 Oct 2026); budget base, retrain anchor and the other rules are proposed and await acceptance</p></td>
+<td><p><strong>Open (researcher)</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p>reports/G2.md exists</p></td>
+<td><p>This file</p></td>
+<td><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="open-decision-a-the-rq1-comparator">
+<h2>Open decision A: the RQ1 comparator<a class="headerlink" href="#open-decision-a-the-rq1-comparator" title="Link to this heading">¶</a></h2>
+<p>The same fitted comparator model scored two ways (CLAIMS E-19; E1’s window table reproduces E-02 and E-03 exactly):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>E0 window-level comparator</p></th>
+<th class="head"><p>E1 per-slot comparator</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Test rows</p></td>
+<td><p>all held-out rows of the pooled window, including the training-era slots</p></td>
+<td><p>held-out rows of the evaluation slots only</p></td>
+</tr>
+<tr class="row-odd"><td><p>C3</p></td>
+<td><p>one malware cap over the pool</p></td>
+<td><p>per slot, checked</p></td>
+</tr>
+<tr class="row-even"><td><p>Aggregation</p></td>
+<td><p>F1 pooled over rows, minus AUT</p></td>
+<td><p>per-slot F1, then AUT, per window</p></td>
+</tr>
+<tr class="row-odd"><td><p>LAMDA gap (LR; LightGBM)</p></td>
+<td><p>0.152; 0.137</p></td>
+<td><p>0.029; 0.040</p></td>
+</tr>
+<tr class="row-even"><td><p>BODMAS gap (LR; LightGBM)</p></td>
+<td><p>0.028; -0.000</p></td>
+<td><p>0.035; 0.006</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Steps between the two LAMDA LR numbers (E-19): pooled F1 over all held-out rows 0.831; over evaluation-slot rows only, 0.727; mean of per-slot F1, 0.708; time-aware AUT, 0.679. The part due to the training-era rows and the part due to the single global C3 draw are not separated, because the comparator’s predictions were not stored in E0.</p>
+<p>What the E1 comparator does not yet show cleanly (E-18): its slots reach a lower ratio than the time-aware slots on LAMDA (0.075 against 0.084) because the random draw removes proportionally more malware than benign from slots near the target. On the cells where both series reached the target the per-slot gap is larger (LAMDA 0.062 LR, 0.042 LightGBM). So the E1 gap is probably biased downward and the E0 gap upward; neither is a “leakage-only” quantity.</p>
+<p>What can be said: the gap depends strongly on the definition, the pre-registered band is passed under one definition and not under the other on LAMDA, and both were seen before the tag. What cannot be said: that the gap is “mostly temporal leakage”, or that it is large or small. The choice of the primary comparator is the researcher’s. It should be written into the PREREG RQ1 row and an ADR as made after seeing both, with the definitional reason (a comparator matched per slot is the one that matches “same data, same C3 ratio”), and both numbers reported. A stratified within-slot hold-out (each slot loses the same share of malware and benign) would remove the ratio depletion; that would be a new comparator, an ADR and a rerun. G1’s criterion 1 (“gap of at least 0.05 on one dataset”) is comparator-dependent: met on E0’s definition, not on E1’s mean gap.</p>
+</section>
+<section id="open-decision-b-memory-and-parallelism">
+<h2>Open decision B: memory and parallelism<a class="headerlink" href="#open-decision-b-memory-and-parallelism" title="Link to this heading">¶</a></h2>
+<p>The memory watchdog measures the process, so concurrent runs add up. Two BODMAS arms in two threads were failed by the watchdog (E-20); one at a time they fit. The BODMAS E1 run came within 27 MiB of the cap (1.47 GiB of 1.5 GiB). Choices for the researcher: run the grid sequentially (default <code class="docutils literal notranslate"><span class="pre">--workers</span> <span class="pre">1</span></code>), shrink BODMAS runs (the shrink order in PREREG: delay 2, budget 0.5%, windows, seeds), or raise the cap with the knowledge that the machine has 7.25 GB. I have not changed the cap.</p>
+</section>
+<section id="what-the-label-influence-diagnostic-does-and-does-not-say">
+<h2>What the label-influence diagnostic does and does not say<a class="headerlink" href="#what-the-label-influence-diagnostic-does-and-does-not-say" title="Link to this heading">¶</a></h2>
+<p>At 0.5% and 5% of the slot, after the first refit, retraining changes the 0.5 decision on 0.88% and 2.11% of LAMDA rows for LR and 0.71% and 0.99% for LightGBM; on BODMAS 0.22% and 0.45% (LR) and 0.19% and 0.22% (LightGBM) (E-13, E-14). Among malware rows on LAMDA at 5%: 7.7% (LR) and 4.4% (LightGBM) (E-15). These are counts of decision changes. There is no noise-floor arm, no split into fixed and introduced errors, no AUT. ADR-0007 therefore records the design as chosen (weight 1, no truncation), reports the counts, and does not use the word “modest”. Whether weight 1 is enough to make the budget axis informative is answered by the grid, not by this table.</p>
+</section>
+<section id="other-caveats-the-researcher-should-weigh">
+<h2>Other caveats the researcher should weigh<a class="headerlink" href="#other-caveats-the-researcher-should-weigh" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>BODMAS delay axis.</strong> With nE = 6 and period 3 there is one useful refit; at d = 3 periodic equals never (tested), at d = 2 only slot-0 labels have arrived. Delay contrasts on BODMAS are limited by ADR-0005’s geometry.</p></li>
+<li><p><strong>The BODMAS AUT alarm from G1 is still open.</strong> E1 on BODMAS inherits it; its per-slot gaps (0.006 to 0.035) are small against an AUT of 0.91 to 0.98.</p></li>
+<li><p><strong>Windows overlap.</strong> LAMDA’s 16 windows are roughly four independent 12-month blocks. The E1 ranges and sign counts (E-17) are descriptive; no interval is reported.</p></li>
+<li><p><strong>Seeds are not replicates for LR.</strong> Five seeds are five C3 draws and comparator splits.</p></li>
+<li><p><strong>Figure positions are not time since training.</strong> One calendar month sits at the same position in every window of a stride-aligned run; the sawtooth at positions 4, 7, 10 on LAMDA is month composition, not drift. The figure carries a note.</p></li>
+<li><p><strong>The pool mixes C3-subsampled arrived rows and raw initial rows</strong> (two priors); a property of the design (ADR-0007).</p></li>
+<li><p><strong>Per-slot C3 draw keys differ</strong> between the time-aware series (seed, slot) and the E1 comparator (seed, window, slot), which adds window-to-window noise to the gap but not bias.</p></li>
+<li><p><strong>Duplicates.</strong> LAMDA has 6.3% evaluated rows repeating a training-window vector (E-10). The pool does not yet carry feature-vector hashes, so repeats between arrived labels and later slots are not counted (carried item).</p></li>
+<li><p><strong>Reruns.</strong> Diagnostic runs were rerun after leakage-review code changes (ADR-0007 run log, E-21); the shares are identical.</p></li>
+<li><p><strong>Parallel threads and the shared initial-model cache</strong> are tested only on synthetic data. A cache key bound to training-row content was added after the review.</p></li>
+</ol>
+</section>
+<section id="process">
+<h2>Process<a class="headerlink" href="#process" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Components were written test first (queue, selectors, policies, pool, config, store, runner); three deliberate breakages are each caught (S-04).</p></li>
+<li><p>The leakage review found no temporal leak and one latent cache-key hazard, fixed with a test; the stats review found that the comparator definition moves the RQ1 verdict (above), that “same C3 ratio” had been asserted rather than shown (now columns in the table), and that two sentences overstated the diagnostics (corrected).</p></li>
+<li><p><strong>The second leakage-review pass over the fixes (commit 0117287 and later) was started and stopped by an API usage limit before it reported.</strong> The fixes are covered by tests and by deliberate-breakage checks (S-04), but they have had no independent second look. Rerun the leakage-reviewer on <code class="docutils literal notranslate"><span class="pre">b3ff456..HEAD</span></code> before relying on criterion 3.</p></li>
+<li><p>Evidence runs used clean commit <code class="docutils literal notranslate"><span class="pre">2bd12d6</span></code> (<code class="docutils literal notranslate"><span class="pre">--require-clean</span></code>); the tables come from <code class="docutils literal notranslate"><span class="pre">scripts/make_e1_figure.py</span></code> and <code class="docutils literal notranslate"><span class="pre">scripts/label_influence.py</span></code> at commit <code class="docutils literal notranslate"><span class="pre">980ab15</span></code>, committed at <code class="docutils literal notranslate"><span class="pre">e170e7b</span></code>.</p></li>
+</ul>
+</section>
+<section id="what-the-researcher-still-decides">
+<h2>What the researcher still decides<a class="headerlink" href="#what-the-researcher-still-decides" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Accept, amend or reject ADR-0007 (hard rule 7 spirit: before any grid run).</p></li>
+<li><p>Open decision A: the primary RQ1 comparator and the 0.05 band, before <code class="docutils literal notranslate"><span class="pre">prereg-v1</span></code>.</p></li>
+<li><p>Open decision B: sequential grid, shrink, or a different cap.</p></li>
+<li><p>Whether BODMAS’s <code class="docutils literal notranslate"><span class="pre">nE</span> <span class="pre">=</span> <span class="pre">6</span></code> stays (it caps the delay axis there) or a longer window is worth an ADR.</p></li>
+<li><p>Gate G2 itself.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="G3.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Gate G3 evidence (Phases 6 and 7)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="G1.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Gate G1 evidence (Phase 4)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Gate G2 evidence (Phase 5)</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#criteria">Criteria</a></li>
+<li><a class="reference internal" href="#open-decision-a-the-rq1-comparator">Open decision A: the RQ1 comparator</a></li>
+<li><a class="reference internal" href="#open-decision-b-memory-and-parallelism">Open decision B: memory and parallelism</a></li>
+<li><a class="reference internal" href="#what-the-label-influence-diagnostic-does-and-does-not-say">What the label-influence diagnostic does and does not say</a></li>
+<li><a class="reference internal" href="#other-caveats-the-researcher-should-weigh">Other caveats the researcher should weigh</a></li>
+<li><a class="reference internal" href="#process">Process</a></li>
+<li><a class="reference internal" href="#what-the-researcher-still-decides">What the researcher still decides</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

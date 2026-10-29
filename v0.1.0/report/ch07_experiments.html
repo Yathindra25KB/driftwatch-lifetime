@@ -1,0 +1,702 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 8: Discussion and limitations (partial draft)" href="ch08_discussion.html"><link rel="prev" title="Chapter 6: Method (draft)" href="ch06_method.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 7: Experiments and results (draft) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/report/ch07_experiments.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/report/ch07_experiments.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-7-experiments-and-results-draft">
+<h1>Chapter 7: Experiments and results (draft)<a class="headerlink" href="#chapter-7-experiments-and-results-draft" title="Link to this heading">¶</a></h1>
+<blockquote>
+<div><p>Status: draft written by Claude Code in Phase 6 for the researcher to rewrite, verify and defend. Every number carries a claim id from <code class="docutils literal notranslate"><span class="pre">docs/CLAIMS.md</span></code> (file and commit there). The analysis was registered before the grid was run (tag <code class="docutils literal notranslate"><span class="pre">prereg-v1</span></code>; chapter 3 explains the method); results are reported as measured, flat ones included. Wording follows the registered rule: a contrast is <strong>detected</strong> when its 95% interval excludes zero in the hypothesised direction, and “equivalent” means the whole interval lies within plus or minus 0.01 of A-AUT. <strong>[researcher: verify]</strong> marks sentences whose reading of a number you should check. E3 (selection) is in section 7.5 and E4 (drift monitors) in section 7.6.</p>
+</div></blockquote>
+<section id="what-was-run">
+<h2>7.1 What was run<a class="headerlink" href="#what-was-run" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Experiment</p></th>
+<th class="head"><p>What</p></th>
+<th class="head"><p>Data</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>E0</p></td>
+<td><p>Baselines: LR and LightGBM, never retrained, time-aware windows, A-AUT; random-split comparator</p></td>
+<td><p>LAMDA, BODMAS</p></td>
+<td><p>done</p></td>
+</tr>
+<tr class="row-odd"><td><p>E1</p></td>
+<td><p>Random split against time-aware per evaluation slot, both comparators</p></td>
+<td><p>LAMDA, BODMAS</p></td>
+<td><p>done</p></td>
+</tr>
+<tr class="row-even"><td><p>E2</p></td>
+<td><p>Delay x budget grid under never and periodic(3) retraining, random selection</p></td>
+<td><p>LAMDA, BODMAS</p></td>
+<td><p>done: all 54 cells complete, none failed [E-26]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E3</p></td>
+<td><p>Uncertainty and credibility selection against random under delay</p></td>
+<td><p>LAMDA, BODMAS</p></td>
+<td><p>done: 56 cells complete, none failed [E-40]</p></td>
+</tr>
+<tr class="row-even"><td><p>E4</p></td>
+<td><p>Drift monitors: monitor-triggered retraining against periodic(3) and against a matched-count control; monitor quality</p></td>
+<td><p>LAMDA, BODMAS</p></td>
+<td><p>done: 76 cells complete, none failed [E-48]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>All runs use the windows of ADR-0005 (LAMDA four training and twelve evaluation months, stride three; BODMAS three training and six evaluation two-week slots, stride two), a 10% target malware ratio per evaluation slot, a fixed threshold of 0.5, and the two models with the fixed hyperparameters of the registration [P-02, P-03]. Seeds are draws of the C3 subsample and of the selection (chapter 3).</p>
+</section>
+<section id="e0-and-e1-the-time-aware-baseline-and-the-random-split-gap-rq1">
+<h2>7.2 E0 and E1: the time-aware baseline and the random-split gap (RQ1)<a class="headerlink" href="#e0-and-e1-the-time-aware-baseline-and-the-random-split-gap-rq1" title="Link to this heading">¶</a></h2>
+<p><strong>Time-aware A-AUT with no retraining.</strong> On BODMAS the logistic model scores 0.912 and LightGBM 0.977; on LAMDA 0.678 and 0.760 [E-02, E-03]. The same figures are reproduced by the E1 time-aware series and by the never arm of E2 [E-16, E-27, E-28]. The BODMAS values exceed 0.90, which the protocol treats as a leakage alarm until explained. The real-data canary passes on LAMDA and is inconclusive on BODMAS (no gap to close), unchanged when it was re-run on the final code [E-09, E-22]. BODMAS evaluates only 20 distinct two-week slots, about nine months in two stretches [E-12], and no explanation beyond that is claimed here <strong>[researcher: verify and decide how to word the open alarm]</strong>.</p>
+<p><strong>The gap, under two definitions.</strong> RQ1 registered the gap between random-split F1 and time-aware AUT against a band of 0.05, with the per-slot matched comparator as primary (ADR-0008). Both readings were seen before registration (CLAIMS E-19) and both are reported [E-35]. The primary comparator was therefore chosen after its number and the window-level one were known, and it is biased downwards on LAMDA because it reaches a lower malware ratio than the time-aware series [E-18]; the choice favours the “gap below the band” reading, and the LAMDA LR interval below still contains 0.05:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset, model [E-35]</p></th>
+<th class="head"><p>Per-slot matched gap (primary), 95% interval</p></th>
+<th class="head"><p>Window-level E0 gap (secondary), 95% interval</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>LAMDA, LR</p></td>
+<td><p>0.0295 [-0.0125, 0.0768]</p></td>
+<td><p>0.1523 [0.0988, 0.1759]</p></td>
+</tr>
+<tr class="row-odd"><td><p>LAMDA, LightGBM</p></td>
+<td><p>0.0403 [0.0240, 0.0481]</p></td>
+<td><p>0.1369 [0.0909, 0.1595]</p></td>
+</tr>
+<tr class="row-even"><td><p>BODMAS, LR</p></td>
+<td><p>0.0354 [0.0271, 0.0395]</p></td>
+<td><p>0.0282 [0.0135, 0.0382]</p></td>
+</tr>
+<tr class="row-odd"><td><p>BODMAS, LightGBM</p></td>
+<td><p>0.0057 [0.0013, 0.0074]</p></td>
+<td><p>-0.0002 [-0.0082, 0.0068]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Under the primary comparator no cell reaches the 0.05 band, not even its point estimate; under the window-level comparator both LAMDA models are above it with the lower end of the interval above it too, and both BODMAS models are below. The two comparators differ in what they score (the window-level one includes held-out rows of the training-era slots and one global C3 draw), and the per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA [E-18, P-14]. The honest statement is that <strong>the size of the gap depends on how the comparator is defined, that it is not established as large under the registered primary definition, and that the data do not show it to be caused by temporal leakage alone</strong> [E-19].</p>
+</section>
+<section id="e2-label-delay-and-analyst-budget-rq2">
+<h2>7.3 E2: label delay and analyst budget (RQ2)<a class="headerlink" href="#e2-label-delay-and-analyst-budget-rq2" title="Link to this heading">¶</a></h2>
+<p><strong>Set-up.</strong> Periodic retraining every third evaluation slot, labels arriving after <code class="docutils literal notranslate"><span class="pre">d</span></code> extra slots, a budget of 0.5%, 1%, 2% or 5% of the evaluated slot (about 22 to 218 labels per slot on LAMDA and 14 to 141 on BODMAS) [E-28, E-27], random selection, retraining on the initial window plus arrived labels. Absolute counts at 5%: LAMDA 218 labels queried per slot, 2,619 per window, of which 2,393 arrive before the window ends; BODMAS 141 per slot, 844 per window, 705 arrived [E-37].</p>
+<p><strong>Cell values.</strong> A-AUT on LAMDA moves from 0.679 (LR) and 0.760 (LightGBM) with no retraining to 0.694 and 0.781 with periodic retraining at 5% of the slot and no extra delay [E-28]. On BODMAS the same arms are 0.912 and 0.977 and 0.915 and 0.977 [E-27]. The full 4 x 4 grids, with the standard deviation over windows in every cell, are <code class="docutils literal notranslate"><span class="pre">reports/figures/e2_heatmap_lamda.png</span></code> and <code class="docutils literal notranslate"><span class="pre">e2_heatmap_bodmas.png</span></code>.</p>
+<p><strong>Registered contrasts, 10 seeds.</strong> Differences of A-AUT with 95% intervals; the two delay contrasts compare delay 0 with delay 3 [E-29, E-30]:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Contrast [E-29, E-30]</p></th>
+<th class="head"><p>LAMDA, LR</p></th>
+<th class="head"><p>LAMDA, LightGBM</p></th>
+<th class="head"><p>BODMAS, LR</p></th>
+<th class="head"><p>BODMAS, LightGBM</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>C-D1, delay 0 minus 3 at 1%</p></td>
+<td><p>0.0032 [-0.0011, 0.0077] equivalent</p></td>
+<td><p>0.0046 [0.0025, 0.0057] detected, inside the margin</p></td>
+<td><p>0.0010 [-0.0001, 0.0023] equivalent</p></td>
+<td><p>0.0001 [-0.0005, 0.0008] equivalent</p></td>
+</tr>
+<tr class="row-odd"><td><p>C-D2, delay 0 minus 3 at 5%</p></td>
+<td><p>0.0114 [0.0047, 0.0171] detected</p></td>
+<td><p>0.0131 [0.0083, 0.0151] detected</p></td>
+<td><p>0.0027 [0.0019, 0.0036] detected, inside the margin</p></td>
+<td><p>0.0001 [-0.0005, 0.0008] equivalent</p></td>
+</tr>
+<tr class="row-even"><td><p>C-P, periodic (d=0, 5%) minus never</p></td>
+<td><p>0.0168 [0.0071, 0.0243] detected</p></td>
+<td><p>0.0197 [0.0124, 0.0224] detected</p></td>
+<td><p>0.0027 [0.0019, 0.0036] detected, inside the margin</p></td>
+<td><p>0.0001 [-0.0005, 0.0008] equivalent</p></td>
+</tr>
+<tr class="row-odd"><td><p>C-B, 5% minus 0.5% at d=0</p></td>
+<td><p>0.0131 [0.0061, 0.0191] detected</p></td>
+<td><p>0.0165 [0.0104, 0.0187] detected</p></td>
+<td><p>0.0025 [0.0014, 0.0031] detected, inside the margin</p></td>
+<td><p>0.0012 [0.0001, 0.0020] detected, inside the margin</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>On BODMAS the C-D2 and C-P columns are the same comparison, and C-D1 is periodic at 1% against never: with one useful refit per window, periodic retraining at delay 3 equals never retraining by construction (chapter 3, section 3.7) [P-12]. They are therefore one finding, not three, and the BODMAS delay numbers measure a delay in a single refit. The same holds at Chow’s stride [E-36]. <strong>[researcher: verify this reading of the BODMAS columns.]</strong></p>
+<p><strong>In plain units.</strong> On LAMDA at 5% of the slot (218 labels per slot) each extra slot of delay costs 0.0038 [0.0016, 0.0057] A-AUT for LR and 0.0044 [0.0028, 0.0050] for LightGBM; at 1% (44 labels per slot) the cost is 0.0011 [-0.0004, 0.0026] and 0.0015 [0.0008, 0.0019] [E-30]. The slope over the four delays at each budget grows with the budget on LAMDA for both models and on BODMAS for LR (for LightGBM on LAMDA 0.0007, 0.0016, 0.0026 and 0.0046 at 0.5%, 1%, 2% and 5%) [E-33]. That growth with budget is a description of five-seed point estimates whose intervals overlap; the registration has no contrast for it, so it is exploratory and no mechanism is claimed. Between neighbouring budgets on LAMDA, LightGBM gains 0.0166, 0.0081 and 0.0072 A-AUT per 100 extra labels per slot (0.5% to 1%, 1% to 2%, 2% to 5%); the registered concavity, gain 0.5% to 1% minus gain 2% to 5%, is 0.0095 [0.0029, 0.0144], whose interval excludes zero: diminishing returns are detected in one of the four strata (LAMDA, LightGBM). For LAMDA LR it is 0.0033 [-0.0132, 0.0194] and for BODMAS 0.0038 [-0.0008, 0.0086] (LR) and 0.0080 [-0.0008, 0.0162] (LightGBM), not detected [E-34].</p>
+<p><strong>Reading against the hypotheses (RQ2).</strong> On LAMDA the registered pattern is seen in both models at 5%: AUT falls with delay, rises with budget, and periodic retraining at 5% is above never retraining. At 1% the delay effect is detected for LightGBM (inside the margin) and not for LR. On BODMAS the effects are at most 0.003 A-AUT, inside the margin. For LightGBM the delay and retraining contrasts are equivalent to zero (intervals inside plus or minus 0.01); its one budget contrast, C-B, is borderline (0.0012 [0.0001, 0.0020], lower end 0.0001) and was not checked at Chow’s stride, so it is uncorroborated [E-29]. The geometry limits what BODMAS can say. The effects on LAMDA are small in absolute terms: 0.011 to 0.020 A-AUT for contrasts whose arms differ by hundreds of labels per slot, against standard deviations over windows of about 0.05 to 0.07 [E-28]. They are measured with intervals that exclude zero, not with a claim that they matter operationally <strong>[researcher: decide how to word the practical significance]</strong>.</p>
+<p><strong>Supporting checks.</strong> The seed-level Wilcoxon p-values of the 16 primary contrasts and their Holm adjustment over the fixed family are in the ledger [E-31]; they are conditional on the realised windows and measure subsample noise only. The same four contrasts on seeds 0 to 4 [E-32], and at Chow’s stride with fewer windows [E-36], agree in direction and size; the 5-seed rows are nested in the 10-seed set and are not a replication. At Chow’s stride the LAMDA LR contrast C-P is not detected (0.0103 [-0.0016, 0.0207]), the only primary-type contrast that changes verdict.</p>
+<p><strong>Recovery.</strong> Drop events (a fall of 0.05 below the trailing three-slot mean) on LAMDA: LR 1.58 per window and seed series, recovered within the window in 73% of cases with no retraining and 81% with periodic retraining at 5%; LightGBM 1.40 and 1.46 events, recovered in 80% and 84%. On BODMAS drops are rare (LR 0.27 per series, recovered 38% both with and without retraining; LightGBM 0.03 to 0.07) [E-38]. These are descriptive counts.</p>
+<p><strong>Failures and artifacts.</strong> No cell failed and none was rerun for its result. The LAMDA never cell was restarted once (two “started” events in the ledger) after the driver stopped on a transient failure to read the code version, not because of a result; it resumed from its checkpoints at the same code version [E-26]. One LAMDA cell spanned an eight-hour computer standby; its wall time and one timed fit are artifacts, annotated in the ledger, and its predictions are unaffected [E-26].</p>
+</section>
+<section id="what-e2-does-not-show">
+<h2>7.4 What E2 does not show<a class="headerlink" href="#what-e2-does-not-show" title="Link to this heading">¶</a></h2>
+<p>See chapter 8, section 8.2. In particular: no delay curve on BODMAS, no independent replication on LAMDA (about four independent blocks), no statement about why a flat result is flat at the smallest budgets, and no result about selection or monitors.</p>
+</section>
+<section id="e3-selection-under-delay-rq3">
+<h2>7.5 E3: selection under delay (RQ3)<a class="headerlink" href="#e3-selection-under-delay-rq3" title="Link to this heading">¶</a></h2>
+<p><strong>Set-up.</strong> Registered in <code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v2.md</span></code> (tag <code class="docutils literal notranslate"><span class="pre">prereg-v2</span></code>) before the first E3 result. Three arms spend the same number of labels in every slot: random, uncertainty (probability closest to 0.5) and credibility (lowest Mondrian p-value of the predicted class). A random reserved slice (20% of the budget) feeds the calibration buffer; rows a selector chose never do, and calibration rows never train the model (ADR-0009). Periodic retraining every third slot, delays 0 and 3, budgets 1% and 2%, both models. BODMAS and LAMDA each ran 28 cells, with seeds 0 to 9 on the 12 Main cells and seeds 0 to 4 on the ablation and score cells; the LAMDA seeds 5 to 9 (12 cells) were added on 20 Oct 2026 after the five-seed results had been read, on the researcher’s go and as the addendum allows, and none of the 56 cells failed or was rerun for a result [E-40]. Because the initial model is fitted without its calibration hold-out, <strong>E3 values are comparable only with each other, never with E2 values</strong> (ADR-0009). The primary contrast is the interaction <code class="docutils literal notranslate"><span class="pre">I_S(B)</span></code>, the advantage of selector <code class="docutils literal notranslate"><span class="pre">S</span></code> over random at delay 0 minus its advantage at delay 3; the hypothesis predicts a positive value.</p>
+<p><strong>BODMAS: the interaction is not a test of shrinkage.</strong> At delay 3 periodic retraining equals never retraining on BODMAS, so the advantage at delay 3 is zero by construction and <code class="docutils literal notranslate"><span class="pre">I_S</span></code> equals the advantage at delay 0 [E-41, E-44]. With 10 seeds and 6 windows the eight BODMAS interactions (two selectors, two budgets, two models; four per model) are 0.0030 to 0.0079 A-AUT with intervals that exclude zero, the lowest interval end being 0.0000 to four decimals (logistic regression, uncertainty, 1%), and every logistic-regression row is inside the 0.01 margin [E-41]. This reports that, at delay 0 and 28 to 56 labels per slot, A-AUT was 0.003 to 0.008 higher with selection than with random choice on BODMAS (interval upper ends up to 0.012), not that the advantage shrinks with delay. The logistic-regression, uncertainty, 1% interval excludes zero by about 0.00002 and is borderline; the bootstrap means of the logistic-regression rows lie below their point estimates [E-41]. The Holm-adjusted Wilcoxon p of these rows is 0.0312, and for BODMAS it tests an advantage at delay 0, not a shrinkage [E-41].</p>
+<p><strong>LAMDA: the informative dataset.</strong> Over 16 windows and ten seeds the advantage of both selectors over random at delay 0 is 0.0109 to 0.0177 A-AUT, and every interval excludes zero; at delay 3 it is 0.0015 to 0.0095, and for logistic regression the verdict is “equivalent” in three of four rows (uncertainty at 1%, 0.0027 [-0.0052, 0.0060]; credibility at 1%, 0.0015 [-0.0057, 0.0042]; credibility at 2%, 0.0032 [-0.0033, 0.0059]) [E-43]. “Equivalent” here means only that the interval includes zero and lies within plus or minus 0.01; that margin is as large as most of the delay-0 advantages, so these verdicts carry little information and the contrast between “detected at delay 0” and “equivalent at delay 3” is not itself a test. The registered statistic is the interaction, and it is positive in all eight selector, budget and model rows, with intervals that exclude zero: 0.0094 to 0.0118 for logistic regression and 0.0061 to 0.0077 for LightGBM, the latter inside the 0.01 margin in three of four rows, at 43.6 labels per slot (1%) and 87.3 (2%) [E-42]. The advantage of a selector over random was therefore smaller after a delay of three slots than with none in this sample, in both models. The seed-level Wilcoxon test has the smallest p-value it can return with ten paired seeds (0.002) in every row, and its Holm-adjusted value over the family of 16 is 0.0312 for all of them, LAMDA and BODMAS alike [E-42]. Five cautions apply. (i) The eight rows are not eight replications: they share the random arm, the windows and the seeds, and LAMDA’s 16 windows are about four independent blocks; the lowest interval ends (0.0020 to 0.0023 for LightGBM) should not be read as excluding zero with confidence, and the intervals are likely too narrow, not conservative. (ii) The Wilcoxon test is on seed-level means conditional on the realised windows; it measures subsample noise, not window-to-window variation, so the adjusted p-value does not support more than the bootstrap interval does. (iii) The addendum registers seeds 0 to 4 for the Main cells and makes seeds 5 to 9 on LAMDA conditional on hours; they were added on 20 Oct 2026 after the five-seed rows had been read (interactions 0.0064 to 0.0116), and the ten-seed rows contain the five-seed ones, so they are not a replication. The table keeps both sets [E-42]. (iv) A positive advantage remains at delay 3 for LightGBM (0.0072 to 0.0095), so the sample shows a reduced advantage, not none [E-43]. (v) Only two delays were run; no shape of the decay is claimed.</p>
+<p><strong>What the advantage is made of.</strong> Selection changes the class mix of the labels that reach the pool: at delay 0, 2% of the slot, the share of malware among the arrived training labels is 0.085 for random selection and 0.266 (uncertainty) or 0.193 (credibility) for logistic regression on LAMDA, and 0.303 for credibility with LightGBM [E-47]. The registration states that this is not corrected. The advantage of a selector over random therefore combines picking informative rows with a change of class prior, and the study does not separate the two. Descriptively, the one arm whose arrived class mix is close to random’s (credibility with the centroid score: malware share 0.082 on LAMDA LightGBM, against 0.085) has an A-AUT below random’s (0.7593 against 0.7647; logistic regression 0.6478 against 0.6676) [E-46, E-47, E-43]; no interval was computed, and this supports, without resolving, the class-prior reading. The uncertainty and credibility arms differ by about 0.005 or less with no interval, and <strong>no claim is made that conformal credibility adds anything over probability-based uncertainty.</strong></p>
+<p><strong>Reserved-slice ablation (descriptive).</strong> With credibility selection at delay 0 and 2%, reserving 10%, 20% and 40% of the budget for random calibration labels gives LAMDA advantages of 0.0181, 0.0153 and 0.0143 (logistic regression) and 0.0177, 0.0160 and 0.0141 (LightGBM); the point estimates fall as the reserved share rises, the intervals overlap, and differences between shares were not estimated, so no trend is claimed [E-45]. Prediction-set coverage with a reserved slice is 0.878 to 0.899 against the nominal 0.90, below it in every one of the twelve rows and lowest on LAMDA LightGBM [E-45].</p>
+<p><strong>The trap arm.</strong> The arm with no reserved slice feeds the calibration buffer from the selected rows on purpose. Its prediction-set coverage rises above nominal (0.93 to 0.96) and its credibility is inflated (mean 0.73 and 0.76 on LAMDA against 0.51 and 0.58 with a reserved slice) [E-45]: these values are consistent with the exchangeability argument that calibration on selected rows is biased, but they are confounded in the same way as the A-AUT below, because an arm that never retrains also has different probabilities and p-values, so no cause is assigned. Its A-AUT is below random (-0.0117 [-0.0136, -0.0075] LightGBM and -0.0134 [-0.0305, -0.0012] logistic regression on LAMDA) [E-45], <strong>but this number is not evidence about calibration contamination.</strong> In the implementation every label released to the trap arm goes to the calibration buffer and none to the training pool, so the arm never retrains; its A-AUT difference mixes the contamination with the absence of retraining (CLAIMS E-45; <code class="docutils literal notranslate"><span class="pre">docs/reviews/leakage-review-e3.md</span></code>). Nothing is read from this arm as evidence about contamination. <strong>[researcher: decide whether to register an addendum and rerun the two trap cells (one per dataset, each with both models) with the released labels also entering the pool.]</strong></p>
+<p><strong>Nonconformity score (descriptive, point estimates only; no interval was computed and no difference between scores is tested).</strong> The centroid-distance score has a lower A-AUT than the probability score in three of four strata at delay 0, 2% (LAMDA LightGBM 0.7593 against 0.7806, LAMDA logistic regression 0.6478 against 0.6829, BODMAS LightGBM 0.9724 against 0.9772) and a value 0.0006 higher in the fourth (BODMAS logistic regression 0.9128 against 0.9122); its prediction sets are larger (mean size 1.64 to 1.69 against 0.96 to 1.05 on LAMDA) and, for logistic regression on LAMDA, undercover (0.7912) [E-46]. No score was tuned after the registration.</p>
+<p><strong>Failures and artifacts.</strong> No cell was dropped. One LAMDA centroid cell failed once with an operating-system memory error while a table job was running and was retried with the reason logged; one LAMDA cell carries a 60-second flag that is the computer-standby artifact described in section 7.3 [E-40].</p>
+<p><strong>What E3 does not show.</strong> No statement about drift monitors (E4); no delay curve (two delays); no independent LAMDA replication beyond ten seeds of one platform and about four independent blocks of windows; no separation of selection from class-prior change; nothing about the trap arm’s A-AUT. Chen et al.’s credibility-based selection and Transcendent are cited as related work, not re-implemented, and nothing here claims selection under a budget is new.</p>
+</section>
+<section id="e4-drift-monitors-and-retraining-rq4">
+<h2>7.6 E4: drift monitors and retraining (RQ4)<a class="headerlink" href="#e4-drift-monitors-and-retraining-rq4" title="Link to this heading">¶</a></h2>
+<p><strong>Set-up.</strong> E4 was registered in <code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v3.md</span></code> (tag <code class="docutils literal notranslate"><span class="pre">prereg-v3</span></code>) together with ADR-0010, before the first E4 result [P-17, E-48].</p>
+<ul class="simple">
+<li><p><strong>Arms.</strong> Four drift monitors (section 6.12) each drive a monitor-triggered arm. Each monitor arm has a matched-count control that refits as often, at evenly spaced slots. Periodic(3) and never-retrain arms complete the set.</p></li>
+<li><p><strong>Grid.</strong> Budget 1% of the slot, delays 0 and 3, both models, seeds 0 to 9, chosen before any result.</p></li>
+<li><p><strong>Labels.</strong> Every arm uses random selection with the same seeded draws, so every arm spent the same labels in every slot: 523.25 per window on LAMDA and 168.33 on BODMAS [E-50, E-51].</p></li>
+<li><p><strong>Runs.</strong> All 76 cells completed and none failed [E-48]. As a check, the periodic cells reproduce the stored E3 random-arm predictions exactly in all 8 pairs [E-49].</p></li>
+<li><p><strong>Comparability.</strong> E4 values compare with E3’s random arm, not with E2.</p></li>
+</ul>
+<p>There are two primary contrasts, and a positive value favours the monitor [P-17]:</p>
+<ul class="simple">
+<li><p><strong>M-P:</strong> the monitor arm minus periodic(3), at matched labels spent.</p></li>
+<li><p><strong>M-C:</strong> the monitor arm minus its matched-count control, at matched retrains. This isolates when the refits happen.</p></li>
+</ul>
+<p><strong>RQ4: no monitor beat periodic retraining.</strong> No M-P row has an interval above zero, on either dataset, for either model, monitor or delay [E-59, E-60]. Monitor-triggered retraining was never better than retraining every third slot at the same labels spent. The table counts verdicts per dataset. “Reversed” means the interval lies wholly below zero and reaches past −0.01. “Below zero, within margin” means the interval lies below zero but inside ±0.01, so there is no change larger than 0.01. Both readings are two-sided descriptions beyond the registered RQ4 answer, and neither has family-wise control (see Statistics below).</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>M-P verdict (16 rows per dataset)</p></th>
+<th class="head"><p>LAMDA</p></th>
+<th class="head"><p>BODMAS</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Detected positive (monitor better)</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reversed</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>Below zero, within margin</p></td>
+<td><p>3</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>Not detected</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>Equivalent (inside ±0.01)</p></td>
+<td><p>9</p></td>
+<td><p>12</p></td>
+</tr>
+<tr class="row-odd"><td><p>Claim</p></td>
+<td><p>E-59</p></td>
+<td><p>E-60</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>On LAMDA [E-59]:</p>
+<ul class="simple">
+<li><p><strong>Reversed.</strong> Only logistic regression with KS:</p>
+<ul>
+<li><p>at delay 0: −0.0089 [−0.0225, −0.0002], with 1.90 refits per window against periodic’s 3.00. The KS arm refitted less often, which may explain more of this than detection does.</p></li>
+<li><p>at delay 3: −0.0052 [−0.0136, −0.0007], at about the same number of refits (1.98 against 2.00).</p></li>
+</ul>
+</li>
+<li><p><strong>Below zero, within margin:</strong> LightGBM with KS at delay 0, LightGBM with p-uniformity at delay 0, and logistic regression with MMD at delay 3.</p></li>
+<li><p><strong>Largest point estimate for a monitor:</strong> the domain classifier with logistic regression at delay 0, 0.0006 [−0.0008, 0.0025], with 4.31 refits per window against 3.00.</p></li>
+</ul>
+<p>On BODMAS, every M-P estimate lies between −0.0004 and 0.0004 [E-60].</p>
+<ul class="simple">
+<li><p>At delay 3, KS, MMD and the domain classifier produce one and the same arm (one refit before slot 4), so their three rows are one comparison.</p></li>
+<li><p>The four logistic-regression rows that lie below zero at delay 3 are therefore two distinct comparisons, both inside the margin.</p></li>
+<li><p>Counting distinct comparisons, 7 M-P rows lie below zero across the two datasets, not 9.</p></li>
+<li><p>On BODMAS, periodic(3) has one useful refit per window and none at delay 3, so M-P there partly compares more refits with fewer.</p></li>
+</ul>
+<p><strong>When the refits happened did not matter on LAMDA, where it could be tested.</strong> All 16 LAMDA M-C rows are equivalent, between −0.0023 and 0.0008 [E-61]. The matched control refitted at exactly the monitor’s slots in only 0% to 28% of window-seed pairs, so these rows do compare different timings at the same number of refits [E-61].</p>
+<p>On BODMAS the test is weaker [E-62]:</p>
+<ul class="simple">
+<li><p>In the two domain-classifier rows at delay 0, the monitor alarms in every slot and refits at slots 2 and 4. That is exactly the control’s schedule, so the rows test nothing and are marked not informative.</p></li>
+<li><p>Elsewhere the shared share reaches 0.75.</p></li>
+<li><p>The rows below zero are the delay-3 logistic-regression rows: the same-arm trio and p-uniformity, all inside the margin.</p></li>
+</ul>
+<p>The matched control refitted as often as its source in every window [E-61, E-62]. The registration argues that a control which knows each window’s refit count is conservative for the monitor. That argument is not a measured property.</p>
+<p><strong>The monitors alarmed in most slots and found drops no better than chance would.</strong> On the never arm, the primary reading [E-63]:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Monitor</p></th>
+<th class="head"><p>LAMDA alarm rate</p></th>
+<th class="head"><p>Precision</p></th>
+<th class="head"><p>Always alarming</p></th>
+<th class="head"><p>Recall</p></th>
+<th class="head"><p>Random alarms at the same rate</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>KS</p></td>
+<td><p>0.617</p></td>
+<td><p>0.462 and 0.538</p></td>
+<td><p>0.443 and 0.489</p></td>
+<td><p>0.743 and 0.775</p></td>
+<td><p>0.935 and 0.927</p></td>
+</tr>
+<tr class="row-odd"><td><p>MMD</p></td>
+<td><p>0.796 and 0.785</p></td>
+<td><p>0.449 and 0.486</p></td>
+<td><p>0.443 and 0.489</p></td>
+<td><p>0.942 and 0.916</p></td>
+<td><p>0.987 and 0.980</p></td>
+</tr>
+<tr class="row-even"><td><p>Domain classifier</p></td>
+<td><p>0.997</p></td>
+<td><p>0.444 and 0.490</p></td>
+<td><p>0.443 and 0.489</p></td>
+<td><p>1.000</p></td>
+<td><p>1.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>p-uniformity</p></td>
+<td><p>0.562 and 0.687</p></td>
+<td><p>0.461 and 0.465</p></td>
+<td><p>0.443 and 0.489</p></td>
+<td><p>0.796 and 0.876</p></td>
+<td><p>0.906 and 0.955</p></td>
+</tr>
+<tr class="row-even"><td><p>Claim</p></td>
+<td><p>E-63</p></td>
+<td><p>E-63</p></td>
+<td><p>E-63</p></td>
+<td><p>E-63</p></td>
+<td><p>E-63</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In each cell the first value is LightGBM and the second logistic regression. The two baseline columns are exploratory and were not registered:</p>
+<ul class="simple">
+<li><p><strong>Always alarming:</strong> the precision of a monitor that alarms in every slot.</p></li>
+<li><p><strong>Random alarms at the same rate:</strong> the expected recall of alarms raised at random at the monitor’s own alarm rate.</p></li>
+</ul>
+<p>Read against the baselines:</p>
+<ul class="simple">
+<li><p><strong>Precision</strong> is within 0.05 of the always-alarm value, and below it for MMD and p-uniformity with logistic regression [E-63].</p></li>
+<li><p><strong>Recall</strong> is below what random alarms at the same rate would reach, for KS, MMD and p-uniformity. Their alarms cluster in some windows rather than at drops.</p></li>
+</ul>
+<p>LAMDA has 28 to 32 distinct drop slots over its 16 windows [E-63]. On BODMAS, every drop event of the never arm falls in one window, the same window for all ten seeds (one or two distinct slots). BODMAS precision and recall are therefore reported as counts, without intervals, and say nothing general [E-63]. This is the “large slots” limit named in the registration: with a few hundred rows per side and real drift between months, the tests reject in most slots.</p>
+<p>Inside the monitor arms, alarm rates are lower than on the never arm. On LAMDA at delay 0: KS 0.242, MMD 0.326, domain classifier 0.544 [E-64]. This is consistent with rule R, which resets the reference after each refit. It is not a like-for-like comparison, because drop events there come from each arm’s own F1, which its refits change [E-64]. Under delay 3 many triggered events found no new label and were no-ops: 1.62 per window for the domain classifier on LAMDA, against 1.00 for periodic(3) [E-58].</p>
+<p><strong>Statistics.</strong> Each family has 32 contrasts, and a two-sided Wilcoxon test with 10 paired seeds cannot return less than 2/1024. So the smallest Holm-adjusted p that any E4 contrast can reach is 0.0625 [P-18, P-11], and no row can pass a 0.05 Holm threshold whatever its effect. Under the five-seed fallback the floor would be higher still. A raw p at its floor means only that all ten seed means share a sign, given the realised windows. This consequence was not written into addendum v3, whose wording suggests the ten-seed design escapes the floor; it is stated here after the results [P-18]. The registered decision rule is the bootstrap interval. Without family-wise control, the single reversed cells are not evidence that a monitor harms a detector. The eight monitor and delay rows of a stratum share the periodic arm, the windows and the seeds, and M-P and M-C share the monitor arm, so the rows are not independent tests. <strong>[researcher: verify the reading of the reversed rows and of the exploratory baselines.]</strong></p>
+<p><strong>What E4 does not show.</strong></p>
+<ul class="simple">
+<li><p><strong>That monitors are useless.</strong> Monitor-triggered retraining matched periodic retraining within the margin in most rows and was never better. Where it was worse, it was mostly within the margin [E-59, E-60].</p></li>
+<li><p><strong>That “equivalent” means “as good as periodic”.</strong> At this budget the whole difference between never retraining and retraining every third slot is small: on LAMDA at delay 0, 0.7534 against 0.7598 (LightGBM) and 0.6546 against 0.6655 (logistic regression); on BODMAS 0.9692 against 0.9692 and 0.9083 against 0.9079 [E-50, E-51]. The margin of 0.01 is about as large as that difference, so a monitor arm inside the margin of periodic retraining is also nearly inside the margin of never retraining. The reading of E4 rests on the signs and positions of the intervals, and on none being above zero, not on the word “equivalent”.</p></li>
+<li><p><strong>How the monitors behave at a lower alarm rate.</strong> The thresholds were frozen and not tuned (CLAUDE.md rule 10). A monitor tuned until it wins would no longer be a pre-registered test.</p></li>
+<li><p><strong>Whether alarm timing helps a monitor that saturates.</strong> Where the control shares the monitor’s schedule, M-C does not test timing [E-62].</p></li>
+<li><p><strong>Any result on other platforms, for label-based detectors, or for monitor-triggered labelling.</strong> The registration excludes all three.</p></li>
+</ul>
+</section>
+<section id="an-exploratory-reading-of-lifetime-from-the-stored-e2-curves">
+<h2>7.7 An exploratory reading of “lifetime” from the stored E2 curves<a class="headerlink" href="#an-exploratory-reading-of-lifetime-from-the-stored-e2-curves" title="Link to this heading">¶</a></h2>
+<p>This section answers the review’s point that the report never says how many slots a detector lasts. It is exploratory: it was not registered, it reads a committed table (<code class="docutils literal notranslate"><span class="pre">reports/tables/e2_per_slot.csv</span></code>) and runs no experiment, and it would be reported whatever it showed [E-68]. Lifetime is read here as the first slot at which the mean F1 over windows and seeds is at least 0.05 below its value at the first slot, the same size as the drop in E4, together with the slope of mean F1 per slot.</p>
+<p>For the never-retrained detector on LAMDA (slots are months), mean F1 falls by 0.05 from slot 1 at slot 7 for both LightGBM and logistic regression, and the slope is -0.0066 per slot for LightGBM and -0.0084 for logistic regression [E-68]. With periodic retraining at delay 0 and budget 5% the slope is about half (-0.0032 and -0.0056) and the 0.05 fall is not reached within 12 slots [E-68]. On BODMAS (slots are two weeks) neither detector falls by 0.05 within the six slots, and the slopes are small (-0.0010 for LightGBM, -0.0039 for logistic regression) [E-68].</p>
+<p>Three limits apply. The curves are not monotonic: LAMDA LightGBM has a higher mean F1 at slot 3 than at slot 1, so “first falls below” depends on which slot is taken as the start [E-68]. F1 at a fixed threshold also moves with the share of malware in a slot, so a fall is not an effect of age alone [E-66]. The averages are over windows that are not independent (about four blocks on LAMDA [P-12]), and no interval is given. Read this as a description of the stored curves in the unit the title asks about, not as a tested result.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ch08_discussion.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 8: Discussion and limitations (partial draft)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ch06_method.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 6: Method (draft)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 7: Experiments and results (draft)</a><ul>
+<li><a class="reference internal" href="#what-was-run">7.1 What was run</a></li>
+<li><a class="reference internal" href="#e0-and-e1-the-time-aware-baseline-and-the-random-split-gap-rq1">7.2 E0 and E1: the time-aware baseline and the random-split gap (RQ1)</a></li>
+<li><a class="reference internal" href="#e2-label-delay-and-analyst-budget-rq2">7.3 E2: label delay and analyst budget (RQ2)</a></li>
+<li><a class="reference internal" href="#what-e2-does-not-show">7.4 What E2 does not show</a></li>
+<li><a class="reference internal" href="#e3-selection-under-delay-rq3">7.5 E3: selection under delay (RQ3)</a></li>
+<li><a class="reference internal" href="#e4-drift-monitors-and-retraining-rq4">7.6 E4: drift monitors and retraining (RQ4)</a></li>
+<li><a class="reference internal" href="#an-exploratory-reading-of-lifetime-from-the-stored-e2-curves">7.7 An exploratory reading of “lifetime” from the stored E2 curves</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

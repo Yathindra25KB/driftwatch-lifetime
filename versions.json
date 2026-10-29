@@ -3,5 +3,10 @@
     "name": "latest",
     "url": "latest/",
     "note": "built from main"
+  },
+  {
+    "name": "v0.1.0",
+    "url": "v0.1.0/",
+    "note": "release"
   }
 ]

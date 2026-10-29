@@ -1,0 +1,647 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy" href="ADR-0005-windows-and-size-gate.html"><link rel="prev" title="ADR-0003: PyPI distribution name" href="ADR-0003-package-name.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>ADR-0004: Slot definition, minimum-size gate and gap handling - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/docs/DECISIONS/ADR-0004-slot-definition.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/docs/DECISIONS/ADR-0004-slot-definition.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="adr-0004-slot-definition-minimum-size-gate-and-gap-handling">
+<h1>ADR-0004: Slot definition, minimum-size gate and gap handling<a class="headerlink" href="#adr-0004-slot-definition-minimum-size-gate-and-gap-handling" title="Link to this heading">¶</a></h1>
+<p><strong>Status:</strong> ACCEPTED (by the researcher, 10 Oct 2026)
+<strong>Date:</strong> 2026-10-10
+<strong>Deciders:</strong> Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
+<strong>Phase:</strong> 2</p>
+<p>This ADR fixes the open value “slot length per dataset, minimum-size gate, gap handling” in PROTOCOL §5. It uses only the data inventory: occupancy, timestamps, gaps and duplicates. No model has been trained and no result has been seen. Values left to Phase 3 (nT, nE, stride, the C3 sensitivity ratio) are named, not decided. The text reflects the leakage review of 10 Oct 2026 (cache v2).</p>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<p>Evidence, all from <code class="docutils literal notranslate"><span class="pre">reports/data_inventory.md</span></code>, its tables in <code class="docutils literal notranslate"><span class="pre">reports/tables/</span></code>, and <code class="docutils literal notranslate"><span class="pre">reports/data_inventory_notes.md</span></code> (cache v2, 10 Oct 2026):</p>
+<p><strong>Timestamps</strong></p>
+<ul class="simple">
+<li><p><strong>LAMDA.</strong> The slotting time is AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code> (the date the APK entered AndroZoo), at second resolution, for all 1,008,381 apps. <code class="docutils literal notranslate"><span class="pre">year_month</span></code> agrees with it for every row.</p></li>
+<li><p><strong>BODMAS malware.</strong> First-seen instants from 2019-08-29 to 2020-09-30.</p></li>
+<li><p><strong>BODMAS benign.</strong> Benign rows are dated by day in collection batches:</p>
+<ul>
+<li><p>85.8% are date-only;</p></li>
+<li><p>in the study window the median is 150 rows per day and the regular maximum is 599;</p></li>
+<li><p>outlier round dates: 2020-01-01 (5,877 rows), 2015-01-01, 2018-02-01 and 2018-03-19;</p></li>
+<li><p>13,514 rows fall before the first malware week.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Occupancy (gate M as defined in option 3)</strong></p>
+<ul>
+<li><p><strong>LAMDA months.</strong></p>
+<ul class="simple">
+<li><p>The span 2013-06 to 2025-01 has 140 slots: 20 empty, 97 passing M = 50.</p></li>
+<li><p>The longest passing run is <strong>62 months, 2018-11 to 2023-12</strong>; its weakest month has 114 malware and 933 benign.</p></li>
+<li><p>Month sizes range from a few hundred to 55,000 apps.</p></li>
+</ul>
+</li>
+<li><p><strong>LAMDA quarters.</strong> 48 slots: 5 empty, 6 partly empty, 34 passing M = 50. The longest run is <strong>29 quarters, 2017Q4 to 2024Q4</strong>.</p></li>
+<li><p><strong>BODMAS, study window 2019-W35 to 2020-W40 (58 ISO weeks, no empty week):</strong></p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Length</p></th>
+<th class="head"><p>Slots</p></th>
+<th class="head"><p>Fail M = 50</p></th>
+<th class="head"><p>Also fail without the 2020-01-01 placeholder rows</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1 week</p></td>
+<td><p>58</p></td>
+<td><p>9</p></td>
+<td><p>+1 (2019-12-30)</p></td>
+</tr>
+<tr class="row-odd"><td><p>2 weeks</p></td>
+<td><p>29</p></td>
+<td><p>2 (2020-01-13 and 2020-01-27: 27 and 14 benign)</p></td>
+<td><p>+1 (2019-12-30: 6,200 benign, 5,877 of them placeholders)</p></td>
+</tr>
+<tr class="row-even"><td><p>4 weeks</p></td>
+<td><p>15</p></td>
+<td><p>2 (2020-01-13; 2020-09-21, which is partly empty because the data ends)</p></td>
+<td><p>none</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+</ul>
+<p><strong>Gaps</strong></p>
+<ul class="simple">
+<li><p>LAMDA has 17 consecutive empty months from 2014-09 to 2016-01 (the “2015 gap”), plus 2013-07, 2013-08 and 2017-06.</p></li>
+<li><p>BODMAS has no empty week in the window.</p></li>
+</ul>
+<p><strong>Duplicates</strong></p>
+<ul class="simple">
+<li><p><strong>LAMDA.</strong> 23.7% of rows (238,576) repeat a feature vector seen in an earlier month. 2,177 vectors carry both labels (54,835 rows).</p></li>
+<li><p><strong>BODMAS.</strong> 4 rows repeat an earlier week’s vector.</p></li>
+</ul>
+<p><strong>Label-revealing metadata.</strong> <code class="docutils literal notranslate"><span class="pre">family</span></code>, <code class="docutils literal notranslate"><span class="pre">vt_count</span></code> and <code class="docutils literal notranslate"><span class="pre">category</span></code> each separate the classes perfectly, and so does BODMAS time of day (benign dates are midnight; malware times are not).</p>
+<p><strong>Rules in force</strong></p>
+<ul class="simple">
+<li><p>C1–C3 (PROTOCOL §2, §4).</p></li>
+<li><p>Hard rule 4: selectors, policies and monitors never see labels.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.claude/rules/data.md</span></code>: rolling windows never span a data gap; slots that fail the gate are skipped and logged.</p></li>
+<li><p>Delay d ∈ {0, 1, 2, 3} slots and retraining every 3 slots (PROTOCOL §2).</p></li>
+<li><p>Mismatch D2: delay is promised “per month” but measured in slots.</p></li>
+</ul>
+</section>
+<section id="options-considered">
+<h2>Options considered<a class="headerlink" href="#options-considered" title="Link to this heading">¶</a></h2>
+<section id="lamda-slot-length">
+<h3>1. LAMDA slot length<a class="headerlink" href="#lamda-slot-length" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. Month.</strong></p>
+<ul>
+<li><p>Pros:</p>
+<ul>
+<li><p>The delay unit equals the guide’s “per month” promise, which resolves D2 for Android.</p></li>
+<li><p>The longest passing run of 62 slots gives many rolling windows for A-AUT.</p></li>
+<li><p>Drops are dated more precisely.</p></li>
+</ul>
+</li>
+<li><p>Cons: many small or unbalanced months outside 2018-11 to 2023-12, and per-slot F1 is noisier.</p></li>
+</ul>
+</li>
+<li><p><strong>B. Quarter.</strong></p>
+<ul>
+<li><p>Pros: smoother counts.</p></li>
+<li><p>Cons:</p>
+<ul>
+<li><p>Only 29 slots in the longest run.</p></li>
+<li><p>d = 3 means 9 months of delay, beyond the 1–3 months the guide motivates.</p></li>
+<li><p>Retraining every 3 slots means once every 9 months.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>C. Year</strong> (the guide’s fallback). Not needed: the 1.5 GB cap held (peak 0.93 GB at most), the timestamps are usable, and 12 yearly slots with a 2015 hole would leave almost no rolling windows.</p></li>
+</ul>
+</section>
+<section id="bodmas-slot-length-within-the-study-window">
+<h3>2. BODMAS slot length (within the study window)<a class="headerlink" href="#bodmas-slot-length-within-the-study-window" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. 1 week.</strong> 58 slots, but 9 or 10 fail and the longest run is 25.</p></li>
+<li><p><strong>B. 2 weeks.</strong> 29 slots. 2 fail, or 3 without the placeholder rows. d = 3 means 6 weeks of delay.</p></li>
+<li><p><strong>C. 4 weeks.</strong> 15 slots, 2 failing, which leaves runs too short for an initial K = 3–4 window plus a meaningful evaluation tail.</p></li>
+</ul>
+</section>
+<section id="minimum-size-gate">
+<h3>3. Minimum-size gate<a class="headerlink" href="#minimum-size-gate" title="Link to this heading">¶</a></h3>
+<p>A slot passes when C3 subsampling to 10% malware keeps at least M malware (n_malware ≥ M and n_benign ≥ 9M), and the slot has no empty base unit.</p>
+<ul class="simple">
+<li><p><strong>M = 30.</strong> The most slots pass, but per-slot F1 rests on 30 positives.</p></li>
+<li><p><strong>M = 50.</strong> The LAMDA monthly run barely changes from M = 30 (62 vs 66), and each slot holds at least 500 samples after C3.</p></li>
+<li><p><strong>M = 100.</strong> It costs BODMAS 1-week slots heavily and changes nothing for 2-week slots or LAMDA’s longest monthly run.</p></li>
+</ul>
+</section>
+<section id="gaps-failing-and-partly-empty-slots">
+<h3>4. Gaps, failing and partly empty slots<a class="headerlink" href="#gaps-failing-and-partly-empty-slots" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A.</strong> Empty, gate-failing and partly empty slots are all <strong>gaps</strong>. A rolling window (training plus evaluation slots) never contains or bridges one.</p></li>
+<li><p><strong>B.</strong> Let windows bridge failing slots. This contradicts the data rule and hides C2 problems.</p></li>
+</ul>
+</section>
+<section id="bodmas-placeholder-dated-rows">
+<h3>5. BODMAS placeholder-dated rows<a class="headerlink" href="#bodmas-placeholder-dated-rows" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. Keep them.</strong> Then <code class="docutils literal notranslate"><span class="pre">2w:2019-12-30</span></code> passes, but most of its benign rows carry no meaningful date (C1 and C2 risk).</p></li>
+<li><p><strong>B. Exclude benign rows</strong> whose date-only timestamp is shared by at least 1,000 rows. That rule flags 2020-01-01, 2015-01-01, 2018-02-01 and 2018-03-19, and only 2020-01-01 lies in the window. The rows stay in the cache, flagged; Phase 3’s slicer drops them, and <code class="docutils literal notranslate"><span class="pre">2w:2019-12-30</span></code> becomes a failing slot.</p></li>
+</ul>
+</section>
+<section id="duplicate-feature-vectors">
+<h3>6. Duplicate feature vectors<a class="headerlink" href="#duplicate-feature-vectors" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. Keep all rows</strong>, report the per-slot share seen in earlier slots, and run one pre-declared E0 sensitivity that removes from evaluation the rows whose vector appeared in the actual training pool (past only).</p></li>
+<li><p><strong>B. Drop cross-slot duplicates everywhere.</strong> This changes the population the detector faces.</p></li>
+<li><p><strong>C. Ignore them.</strong> The guardrails forbid this.</p></li>
+</ul>
+</section>
+</section>
+<section id="decision-accepted-by-the-researcher-10-oct-2026">
+<h2>Decision (accepted by the researcher, 10 Oct 2026)<a class="headerlink" href="#decision-accepted-by-the-researcher-10-oct-2026" title="Link to this heading">¶</a></h2>
+<p>The researcher chose: LAMDA month; BODMAS 2 weeks from 2019-08-26; M = 50 with strict gaps; exclude placeholder-dated benign rows; and the remaining items as written (answers recorded in the Phase 2 session, 10 Oct 2026).</p>
+<ol class="arabic">
+<li><p><strong>LAMDA: monthly slots (option 1A).</strong> Calendar months in UTC, keyed by AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code>. Quarters stay available for a sensitivity check, not for the headline.</p></li>
+<li><p><strong>BODMAS: 2-week slots (option 2B)</strong> in the study window from <strong>2019-08-26</strong> (Monday of ISO week 2019-W35, the first week with malware) to 2020-10-04.</p>
+<ul class="simple">
+<li><p>The slots are anchored explicitly at 2019-08-26 (<code class="docutils literal notranslate"><span class="pre">build_slots(...,</span> <span class="pre">anchor=...)</span></code>), so slot ids do not move when early rows are dropped.</p></li>
+<li><p>The 13,514 benign rows dated before the window are outside the study. They stay in the cache and are reported in the data card.</p></li>
+</ul>
+</li>
+<li><p><strong>Gate M = 50</strong> for both datasets, recomputed after C3 subsampling at whatever ratio Phase 3 fixes (logged when it changes which slots pass).</p></li>
+<li><p><strong>Gaps (option 4A).</strong> Empty, gate-failing and partly empty slots are gaps. Windows never span them, and every skipped slot is logged with its counts. This produces:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p>Passing segments (M = 50)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>LAMDA months</p></td>
+<td><p>2018-11 to 2023-12 (62); 2013-09 to 2014-08 (12); 2017-10 to 2018-04 (7); 2017-01 to 2017-04 (4); shorter ones in the inventory</p></td>
+</tr>
+<tr class="row-odd"><td><p>BODMAS 2-week, with decision 5</p></td>
+<td><p>2019-08-26 to 2019-12-29 (9); 2020-02-10 to 2020-10-04 (17)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Phase 3 (ADR-0005) chooses nT, nE and the stride, and therefore which segments are long enough. The headline LAMDA window lies in 2018-11 to 2023-12. 2015 is never interpolated or bridged.</p>
+</li>
+<li><p><strong>Placeholder dates (option 5B).</strong> Exclude benign rows whose date-only timestamp is shared by at least 1,000 rows (<code class="docutils literal notranslate"><span class="pre">ts_date_only</span></code> and <code class="docutils literal notranslate"><span class="pre">ts_tie_count</span></code> in the cache). The 1,000 threshold sits above every regular batch day in the window (maximum 599).</p></li>
+<li><p><strong>Duplicates (option 6A).</strong></p>
+<ul class="simple">
+<li><p>Keep the rows and report the seen-before share per evaluation slot.</p></li>
+<li><p>The E0 sensitivity removes evaluation rows whose vector appears in that window’s training pool (past only, never “appears in several slots”).</p></li>
+<li><p>Label-conflicting vectors stay as published and are counted.</p></li>
+</ul>
+</li>
+<li><p><strong>Label-free view.</strong> Selectors, policies and monitors receive only <code class="docutils literal notranslate"><span class="pre">SlotData.public()</span></code> (features and row ids). <code class="docutils literal notranslate"><span class="pre">meta</span></code>, which includes <code class="docutils literal notranslate"><span class="pre">ts</span></code>, <code class="docutils literal notranslate"><span class="pre">family</span></code>, <code class="docutils literal notranslate"><span class="pre">vt_count</span></code> and <code class="docutils literal notranslate"><span class="pre">category</span></code>, and <code class="docutils literal notranslate"><span class="pre">y</span></code> reach only the label queue and the metrics. Phase 5 adds the spy test.</p></li>
+<li><p><strong>Hold-outs.</strong> Any time-ordered hold-out (calibration, early stopping) is cut at slot boundaries, never by row position inside a slot. Within a BODMAS slot, row order is linked to class through midnight benign dates.</p></li>
+<li><p><strong>Delay units (D2).</strong> LAMDA delay is reported in months (1 slot = 1 month). BODMAS delay is reported in slots and in days (1 slot = 14 days), so the “per month” statement applies to LAMDA only, unless Phase 6 converts with stated assumptions.</p></li>
+</ol>
+</section>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Easier.</strong></p>
+<ul>
+<li><p>Phase 3 gets unambiguous slot IDs (<code class="docutils literal notranslate"><span class="pre">month:YYYY-MM</span></code>, <code class="docutils literal notranslate"><span class="pre">2w:YYYY-MM-DD</span></code>) from loaders that already exist.</p></li>
+<li><p>Every gate decision traces back to a CSV row, and the exclusions are per-row flags rather than edits to the data.</p></li>
+</ul>
+</li>
+<li><p><strong>Harder or riskier.</strong></p>
+<ul>
+<li><p>The LAMDA headline excludes 2013–2018 and 2024–2025. Early drift is studied only in shorter segments or in the quarterly sensitivity check.</p></li>
+<li><p>BODMAS offers two short segments (9 and 17 slots), so its A-AUT will rest on few windows.</p></li>
+<li><p>The BODMAS benign timestamp semantics (Q2) remain a threat to validity for C1 on Windows.</p></li>
+</ul>
+</li>
+<li><p><strong>Revisit when:</strong> the researcher rejects a choice; Phase 3 fixes nT/nE or the C3 sensitivity ratio (re-run the gate tables); the LAMDA or BODMAS authors answer Q1 or Q2; or a new dataset version arrives (a new manifest entry, then rerun the inventory and update this ADR by addendum).</p></li>
+</ul>
+</section>
+<section id="addendum-1-phase-3-11-oct-2026-what-label-free-view-means-for-item-7">
+<h2>Addendum 1 (Phase 3, 11 Oct 2026): what “label-free view” means for item 7<a class="headerlink" href="#addendum-1-phase-3-11-oct-2026-what-label-free-view-means-for-item-7" title="Link to this heading">¶</a></h2>
+<p>Decision 7 named <code class="docutils literal notranslate"><span class="pre">SlotData.public()</span></code> as the view for selectors, policies and monitors. The Phase 3 leakage review (docs/reviews/slicer-review.md, findings 1 and pass-2 finding 1) showed that this view keeps the dataset’s own <code class="docutils literal notranslate"><span class="pre">row_id</span></code> and row order: on BODMAS the id is the time rank, and within a day the order is linked to class through midnight benign dates; on LAMDA the id encodes the source file. Item 7 is therefore amended, not reversed:</p>
+<ul class="simple">
+<li><p>Selectors, policies and monitors receive only <code class="docutils literal notranslate"><span class="pre">EvalSlot.public()</span></code> from the slicer, an <code class="docutils literal notranslate"><span class="pre">OpaqueSlot</span></code>: features in a seeded, label-independent order, and handles <code class="docutils literal notranslate"><span class="pre">0..n-1</span></code>. Handles are slot-local and are resolved only by the label queue and the metrics, with the slot id they came with.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SlotData.public()</span></code> and <code class="docutils literal notranslate"><span class="pre">PublicSlot</span></code> stay for loader-level code and must not be handed to selectors, policies or monitors.</p></li>
+<li><p>The Phase 5 spy test must assert this type boundary (sentinel labels that raise on any read).
+No slot, gate or gap decision changes.</p></li>
+</ul>
+</section>
+<section id="evidence-and-references">
+<h2>Evidence and references<a class="headerlink" href="#evidence-and-references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reports/data_inventory.md</span></code>.</p></li>
+<li><p>Tables: <code class="docutils literal notranslate"><span class="pre">reports/tables/data_lamda_slots_{month,quarter}.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">data_bodmas_slots_{1w,2w,4w}.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">data_bodmas_benign_days.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">data_*_duplicates_per_slot.csv</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reports/data_inventory_notes.md</span></code> (Q1–Q7, leakage review).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/manifest.json</span></code>: LAMDA HF commit <code class="docutils literal notranslate"><span class="pre">ad9614bd…</span></code>, BODMAS Drive file IDs, all hashes, archived cache v1.</p></li>
+<li><p>Clean rebuild of cache v2: 1,088 files byte-identical; <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">verify</span></code> OK.</p></li>
+<li><p>PROTOCOL §2, §5, D2, D9, D10, D13, D14; <code class="docutils literal notranslate"><span class="pre">.claude/rules/data.md</span></code>; CLAUDE.md hard rule 4.</p></li>
+<li><p>LAMDA paper arXiv 2505.18551 (accessed 10 Oct 2026); BODMAS page https://whyisyoung.github.io/BODMAS/ (accessed 10 Oct 2026).</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ADR-0005-windows-and-size-gate.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ADR-0003-package-name.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ADR-0003: PyPI distribution name</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ADR-0004: Slot definition, minimum-size gate and gap handling</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#options-considered">Options considered</a><ul>
+<li><a class="reference internal" href="#lamda-slot-length">1. LAMDA slot length</a></li>
+<li><a class="reference internal" href="#bodmas-slot-length-within-the-study-window">2. BODMAS slot length (within the study window)</a></li>
+<li><a class="reference internal" href="#minimum-size-gate">3. Minimum-size gate</a></li>
+<li><a class="reference internal" href="#gaps-failing-and-partly-empty-slots">4. Gaps, failing and partly empty slots</a></li>
+<li><a class="reference internal" href="#bodmas-placeholder-dated-rows">5. BODMAS placeholder-dated rows</a></li>
+<li><a class="reference internal" href="#duplicate-feature-vectors">6. Duplicate feature vectors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decision-accepted-by-the-researcher-10-oct-2026">Decision (accepted by the researcher, 10 Oct 2026)</a></li>
+<li><a class="reference internal" href="#consequences">Consequences</a></li>
+<li><a class="reference internal" href="#addendum-1-phase-3-11-oct-2026-what-label-free-view-means-for-item-7">Addendum 1 (Phase 3, 11 Oct 2026): what “label-free view” means for item 7</a></li>
+<li><a class="reference internal" href="#evidence-and-references">Evidence and references</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

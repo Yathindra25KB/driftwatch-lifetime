@@ -1,0 +1,488 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="DriftWatch phase ledger" href="../PHASES.html"><link rel="prev" title="Statistics review of the E3 tables and text" href="stats-review-e3.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Statistics review: E4 (RQ4, drift monitors) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/docs/reviews/stats-review-e4.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/docs/reviews/stats-review-e4.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="statistics-review-e4-rq4-drift-monitors">
+<h1>Statistics review: E4 (RQ4, drift monitors)<a class="headerlink" href="#statistics-review-e4-rq4-drift-monitors" title="Link to this heading">¶</a></h1>
+<p><strong>Reviewer:</strong> stats-reviewer subagent (read-only), 21 Oct 2026, on branch <code class="docutils literal notranslate"><span class="pre">phase-09-monitors-e4</span></code> at 4a5d20b. It covered:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics/e4_tables.py</span></code>, <code class="docutils literal notranslate"><span class="pre">metrics/monitor_scores.py</span></code>, <code class="docutils literal notranslate"><span class="pre">scripts/make_e4.py</span></code>, <code class="docutils literal notranslate"><span class="pre">scripts/check_e4_vs_e3.py</span></code>;</p></li>
+<li><p>the E4 tables and figure;</p></li>
+<li><p>CLAIMS P-17, P-18 and E-48 to E-57;</p></li>
+<li><p>chapter 7, section 7.6.</p></li>
+</ul>
+<p><strong>Verdict:</strong> no blocker.</p>
+<ul class="simple">
+<li><p>The registered contrasts are computed correctly: pairing, the two-stage bootstrap, the 0.01 margin, and Holm within each family of 32.</p></li>
+<li><p>The claim rows reproduce the CSVs.</p></li>
+<li><p>The headline “no monitor beat periodic(3)” is supported.</p></li>
+</ul>
+<p>Six major findings concern interpretation. They are resolved in 3b889b7 (code and tables) and in the commit that follows it (claims and text). CLAIMS E-59 to E-64 supersede E-52 to E-57, and E-65 adds the A-AUT standard deviation.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Severity</p></th>
+<th class="head"><p>Finding</p></th>
+<th class="head"><p>Resolution</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>major</p></td>
+<td><p>M-C does not test timing where a monitor saturates: its control then has the monitor’s exact schedule.</p></td>
+<td><p>Every contrast row now carries <code class="docutils literal notranslate"><span class="pre">identical_schedule_share</span></code>. An M-C row with share 1.0 is labelled <code class="docutils literal notranslate"><span class="pre">not_informative_identical_schedule</span></code> (BODMAS domain classifier, delay 0). Chapter 7 says that timing was tested on LAMDA (identical schedules in 0% to 28% of window-seed pairs) and that on BODMAS the test is weak [E-61, E-62].</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>major</p></td>
+<td><p>At BODMAS delay 3, three monitors give the same arm, so their rows are one comparison counted three times.</p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">same_arm_as</span></code> column. E-60, E-62 and chapter 7 count distinct comparisons: 7 M-P rows below zero, not 9.</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>major</p></td>
+<td><p>“Reversed” overstated rows inside the margin, and E4 has no working family-wise control.</p></td>
+<td><p>A new verdict label, <code class="docutils literal notranslate"><span class="pre">reversed_within_margin</span></code>: no change larger than 0.01, interval below 0. Only LAMDA logistic regression with KS at delays 0 and 3 is “reversed”. Chapter 7 calls these two-sided descriptive readings without family-wise control, and attributes the KS reversal at delay 0 to refit frequency (1.90 against 3.00 refits per window).</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>major</p></td>
+<td><p>BODMAS monitor quality rests on about one drop window, so its intervals are artefacts.</p></td>
+<td><p>The table counts <code class="docutils literal notranslate"><span class="pre">n_distinct_drop_slots</span></code> and <code class="docutils literal notranslate"><span class="pre">n_windows_with_drops</span></code>. Below 3 drop windows it gives counts only, with no interval. BODMAS: one window, one or two slots [E-63].</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>major</p></td>
+<td><p>Ratio replicates were dropped silently, and unevenly between precision and recall.</p></td>
+<td><p>One replicate set for every ratio (replicates with a drop and an alarm). <code class="docutils literal notranslate"><span class="pre">n_boot_used</span></code> is recorded, and rows that lost more than 2.5% of replicates are flagged.</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>major</p></td>
+<td><p>Precision and recall had no chance baseline.</p></td>
+<td><p>Two exploratory columns, both labelled as not registered: <code class="docutils literal notranslate"><span class="pre">baseline_always_alarm_precision</span></code> and <code class="docutils literal notranslate"><span class="pre">baseline_random_recall_at_rate</span></code>. On LAMDA, precision is within 0.05 of always alarming, and recall is below random alarms at the same rate for KS, MMD and p-uniformity [E-63].</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>minor</p></td>
+<td><p>The addendum understates the Holm floor.</p></td>
+<td><p>Chapter 7 states the floor (0.0625 with 10 seeds, higher under the 5-seed fallback), says what a floor-level raw p means, and says this was stated after the results [P-18].</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>minor</p></td>
+<td><p>Per-dataset minima were called “family” minima.</p></td>
+<td><p>E-59 to E-62 say “among these rows” and give the family minimum of 0.0625.</p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p>minor</p></td>
+<td><p>Seed blocks were not checked for equal windows.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collect</span></code> raises when two seed sets cover different windows.</p></td>
+</tr>
+<tr class="row-odd"><td><p>10</p></td>
+<td><p>minor</p></td>
+<td><p>Seed intersection was used silently; the Holm family shrank when a dataset was absent.</p></td>
+<td><p>Contrasts align on seeds 0 to 9 and set <code class="docutils literal notranslate"><span class="pre">seed_fallback</span></code> otherwise. The Holm family is the requested datasets, with a missing contrast at p = 1.</p></td>
+</tr>
+<tr class="row-even"><td><p>11</p></td>
+<td><p>minor</p></td>
+<td><p>The labels check ran in one direction only.</p></td>
+<td><p>It now checks both directions.</p></td>
+</tr>
+<tr class="row-odd"><td><p>12</p></td>
+<td><p>minor</p></td>
+<td><p>Bootstrap diagnostics and provenance were missing.</p></td>
+<td><p>Added: <code class="docutils literal notranslate"><span class="pre">boot_mean_minus_point</span></code>, <code class="docutils literal notranslate"><span class="pre">block_len_effective</span></code>, <code class="docutils literal notranslate"><span class="pre">window_stage_coarse</span></code>, <code class="docutils literal notranslate"><span class="pre">n_boot</span></code>, <code class="docutils literal notranslate"><span class="pre">boot_seed</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>13</p></td>
+<td><p>minor</p></td>
+<td><p>A-AUT was given without its SD.</p></td>
+<td><p>E-65.</p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p>minor</p></td>
+<td><p>Trigger-context drop events come from each arm’s own F1.</p></td>
+<td><p>E-64 and chapter 7 say so; the fall in alarm rate is described as consistent with rule R, not as measured cause.</p></td>
+</tr>
+<tr class="row-even"><td><p>15</p></td>
+<td><p>minor</p></td>
+<td><p>“Conservative for the monitor” is an argument, not a measurement.</p></td>
+<td><p>Attributed to the addendum in E-61, E-62 and chapter 7.</p></td>
+</tr>
+<tr class="row-odd"><td><p>16</p></td>
+<td><p>minor</p></td>
+<td><p>Chapter 8 said the monitors were not run.</p></td>
+<td><p>Chapter 8 updated for E4.</p></td>
+</tr>
+<tr class="row-even"><td><p>17</p></td>
+<td><p>note</p></td>
+<td><p>Rows in a stratum are dependent.</p></td>
+<td><p>Stated in E-59 to E-62 and in chapter 7.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Also changed after the review: every A-AUT panel of the figure spans at least 0.02 (twice the margin), so differences far inside the margin no longer look large.</p>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../PHASES.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">DriftWatch phase ledger</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="stats-review-e3.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Statistics review of the E3 tables and text</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

@@ -1,0 +1,570 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Chapter 7: Experiments and results (draft)" href="ch07_experiments.html"><link rel="prev" title="Chapter 5: Related work (draft)" href="ch05_related_work.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 6: Method (draft) - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/report/ch06_method.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/report/ch06_method.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-6-method-draft">
+<h1>Chapter 6: Method (draft)<a class="headerlink" href="#chapter-6-method-draft" title="Link to this heading">¶</a></h1>
+<blockquote>
+<div><p>Status: draft written by Claude Code for the researcher to rewrite and defend; completed for Tiers 1 and 2 on 22 Oct 2026. Every section describes code that exists and is tested at the commits named in docs/PHASES.md (sections 6.1 to 6.9: the simulator; 6.10: the grid; 6.11: the conformal layer; 6.12: the drift monitors). No result number appears here. Protocol constants (slot length, delay, budget, period) are quoted from docs/PROTOCOL.md; they are settings, not measurements. Anything not yet checked against the source is marked [verify].</p>
+</div></blockquote>
+<section id="what-the-simulator-is-for">
+<h2>6.1 What the simulator is for<a class="headerlink" href="#what-the-simulator-is-for" title="Link to this heading">¶</a></h2>
+<p>The experiments need one instrument that can answer a single question many times: <em>if a detector is trained on a window of data and then used, slot by slot, on later data, how well does it do when true labels arrive late, only a few can be bought per slot, and retraining is allowed only on labels that have arrived?</em> The simulator streams one rolling window under a label delay, a per-slot analyst budget, a selector and a retraining policy. Its main design commitment is that the delay lives in exactly one place, so that no other part of the code can quietly use a label early.</p>
+<p>Terms used in this chapter.</p>
+<ul class="simple">
+<li><p><strong>Slot</strong>: a fixed calendar interval. One calendar month for LAMDA, two weeks for BODMAS (ADR-0004, PROTOCOL.md section 2). [P-02]</p></li>
+<li><p><strong>Window</strong>: <code class="docutils literal notranslate"><span class="pre">nT</span></code> consecutive training slots followed by <code class="docutils literal notranslate"><span class="pre">nE</span></code> evaluation slots (ADR-0005). The model is trained on the first part and used on the second.</p></li>
+<li><p><strong>C1, C2, C3</strong>: the three TESSERACT constraints, implemented as assertions that raise (hard rule 2). C1: every training sample is older than every evaluation sample. C2: each evaluation slot holds malware and benign samples from its own time window. C3: each evaluation slot is brought to the target malware ratio by seeded subsampling of malware only (pendlebury2019tesseract).</p></li>
+<li><p><strong>Delay <code class="docutils literal notranslate"><span class="pre">d</span></code></strong>: the number of whole slots a requested label takes to arrive, beyond the next slot (section 6.3).</p></li>
+<li><p><strong>Budget</strong>: the number of labels the analyst may request in one slot, set as a percentage of that slot.</p></li>
+<li><p><strong>AUT</strong> and <strong>A-AUT</strong>: area under the F1-versus-time curve within one window, and its mean over windows (ADR-0006).</p></li>
+</ul>
+</section>
+<section id="data-flow">
+<h2>6.2 Data flow<a class="headerlink" href="#data-flow" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> slicer                              one run = one window x seed x model x policy x delay x budget
+ train: TrainWindow (raw rows, labels allowed here)
+ eval:  EvalSlot 0..nE-1  --wrapped at once--&gt;  SealedSlot  (held only by the queue and the metric door)
+                                                   |
+  for s = 0 .. nE-1:                                |
+  +------------------------------------------------------------------------------------------+
+  | 1 RELEASE   queue.release(s)    labels queried at s-1-d arrive, pool.add(...)            |
+  | 2 RETRAIN?  policy(s)           fires only if new labels arrived since the last fit      |
+  |             fit(pool = initial window + arrived labels)                                  |
+  | 3 SCORE     predict on the label-free public view; metrics read the true labels          |
+  | 4 SELECT    selector(public view, n)          sees features and slot-local handles only  |
+  | 5 QUERY     queue.query(s, handles)          release slot = s + 1 + d, ignored if &gt;= nE  |
+  +------------------------------------------------------------------------------------------+
+</pre></div>
+</div>
+<p>The order inside a slot is the stream order: a slot is scored (step 3) before any label queried in that slot exists (step 5), and a label queried in slot <code class="docutils literal notranslate"><span class="pre">s</span></code> cannot be released earlier than slot <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">+</span> <span class="pre">1</span></code>. [S-01]</p>
+</section>
+<section id="the-label-queue-and-the-delay-rule">
+<h2>6.3 The label queue and the delay rule<a class="headerlink" href="#the-label-queue-and-the-delay-rule" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">sim/queue.py</span></code> is the only module that knows <code class="docutils literal notranslate"><span class="pre">d</span></code>. A label requested while evaluation slot <code class="docutils literal notranslate"><span class="pre">t</span></code> is being streamed becomes usable from slot <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">+</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">d</span></code>; <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">=</span> <span class="pre">0</span></code> therefore means “available at the next slot”. Queue timeline for <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">=</span> <span class="pre">1</span></code>, retraining every three slots:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">slot</span> <span class="n">index</span>   <span class="mi">0</span>    <span class="mi">1</span>    <span class="mi">2</span>    <span class="mi">3</span>    <span class="mi">4</span>    <span class="mi">5</span>
+ <span class="n">query</span>        <span class="n">Q0</span>   <span class="n">Q1</span>   <span class="n">Q2</span>   <span class="n">Q3</span>   <span class="n">Q4</span>   <span class="n">Q5</span>
+ <span class="n">usable</span>            <span class="o">-</span>    <span class="n">Q0</span>   <span class="n">Q1</span>   <span class="n">Q2</span>   <span class="n">Q3</span>        <span class="n">usable</span> <span class="kn">from</span><span class="w"> </span><span class="nn">t</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">d</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="mi">2</span>
+ <span class="n">retrain</span>                     <span class="n">R</span><span class="o">@</span><span class="mi">3</span>
+                                                 <span class="n">R</span><span class="o">@</span><span class="mi">3</span> <span class="n">sees</span> <span class="n">Q0</span> <span class="ow">and</span> <span class="n">Q1</span><span class="p">;</span> <span class="n">Q2</span> <span class="n">arrives</span> <span class="n">at</span> <span class="n">slot</span> <span class="mi">4</span>
+                                                 <span class="n">Q4</span> <span class="ow">and</span> <span class="n">Q5</span> <span class="n">would</span> <span class="n">arrive</span> <span class="n">at</span> <span class="n">slots</span> <span class="mi">6</span> <span class="ow">and</span> <span class="mi">7</span><span class="p">:</span> <span class="n">ignored</span>
+</pre></div>
+</div>
+<p>Rules, all enforced by tests (<code class="docutils literal notranslate"><span class="pre">tests/test_queue_delay.py</span></code>, including property-based tests for <code class="docutils literal notranslate"><span class="pre">d</span></code> in {0, 1, 2, 3}): [S-01]</p>
+<ol class="arabic simple">
+<li><p>A queried label is released exactly once, at slot <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">+</span> <span class="pre">1</span> <span class="pre">+</span> <span class="pre">d</span></code>, never earlier.</p></li>
+<li><p>A label whose release slot is at or after the last slot of the window has no slot left to inform. It is <strong>ignored and counted</strong> (<code class="docutils literal notranslate"><span class="pre">n_ignored_after_end</span></code>). A window is an independent run; nothing carries into the next window.</p></li>
+<li><p>Nothing is lost or invented: queued labels equal released plus ignored.</p></li>
+<li><p>A selection is tagged with the slot it was made for; the queue refuses handles from another slot.</p></li>
+</ol>
+<p>The held-back labels are <em>sealed</em>. <code class="docutils literal notranslate"><span class="pre">SealedSlot</span></code> wraps the evaluation slot so that the true labels leave it by two doors only: the queue (which hands them back after the delay) and the scoring call used by the metric code. Selectors and policies receive an <code class="docutils literal notranslate"><span class="pre">OpaqueSlot</span></code> (features plus slot-local integer handles in a seeded, label-independent order) and a slot index; they cannot import the types that hold labels. A spy test replaces the label arrays with objects that record who reads them and fails on any use but indexing; every recorded read comes from the queue module, and selectors and policies read nothing (<code class="docutils literal notranslate"><span class="pre">tests/test_sim_sealed.py</span></code>, and the same check at the runner level in <code class="docutils literal notranslate"><span class="pre">tests/test_runner_sim.py</span></code>).</p>
+</section>
+<section id="budget-and-selection">
+<h2>6.4 Budget and selection<a class="headerlink" href="#budget-and-selection" title="Link to this heading">¶</a></h2>
+<p>The budget for a slot is a percentage of the <strong>evaluated slot after C3 subsampling</strong>, because that is the slot the selector can see. The number of labels is <code class="docutils literal notranslate"><span class="pre">floor(pct</span> <span class="pre">/</span> <span class="pre">100</span> <span class="pre">*</span> <span class="pre">n</span> <span class="pre">+</span> <span class="pre">1/2)</span></code>, capped at the slot size; both the percentage and the absolute count are stored with every slot row. The settings are 0.5, 1, 2 and 5 percent (PROTOCOL.md section 2). [P-05]</p>
+<p>Selection is behind a small interface, <code class="docutils literal notranslate"><span class="pre">select(public_slot,</span> <span class="pre">n,</span> <span class="pre">rng,</span> <span class="pre">scores=None)</span></code>. Three selectors sit behind it: uniform random selection without replacement (E1, E2, and the reference arm of E3 and E4), uncertainty (the probability closest to 0.5) and credibility (the lowest Mondrian p-value of the predicted class, section 6.11); the last two use the same call through the <code class="docutils literal notranslate"><span class="pre">scores</span></code> argument. The random generator depends on the seed and the slot identity only, so a small budget selects a subset of the rows a larger budget selects: comparisons across budgets are paired. A reserved random calibration slice (a share of the budget, default 20 percent) has no effect in E1 and E2 and feeds the calibration buffer in E3 and E4. [P-05]</p>
+</section>
+<section id="retraining-and-the-training-pool">
+<h2>6.5 Retraining and the training pool<a class="headerlink" href="#retraining-and-the-training-pool" title="Link to this heading">¶</a></h2>
+<p>A retraining policy decides <em>when</em>. There are four. <strong>Never</strong> trains once. <strong>Periodic</strong> fires before scoring evaluation slots 3, 6, 9, … counted from the first evaluation slot of the window (decision D7, ADR-0007). <strong>Monitor-triggered</strong> retrains after a drift monitor alarms (section 6.12). <strong>Matched-count</strong> refits as often as a monitor-triggered arm did in the same window, at evenly spaced slots; it is the control of E4. A scheduled event with no new label since the last fit is logged as a no-op and does not refit. [P-16, P-17]</p>
+<p>The pool a retraining fits on is <strong>the initial training window plus every label that has arrived</strong>, each row weighted once, never truncated (ADR-0007; chosen by the researcher before any grid run, and not by looking at AUT). Three consequences are stated up front. First, arrived rows are C3-subsampled evaluation rows (close to the target malware ratio), while the initial rows are raw, so the pool mixes two class priors; this is a property of the design, not a defect to be tuned away. Second, with weight 1 and a budget of at most 5 percent per slot, arrived labels are a small share of the pool; a diagnostic that counts how many decisions change after retraining (not AUT) is reported next to the design for that reason (<code class="docutils literal notranslate"><span class="pre">scripts/label_influence.py</span></code>; numbers in docs/CLAIMS.md E-13 to E-15). It counts changed decisions only, has no noise-floor comparison, and says nothing yet about detection quality. Third, scalers and any thresholds are fitted on the current pool only (hard rule 5); the threshold is fixed at 0.5 (ADR-0006).</p>
+<p>C1 is re-asserted for every scored slot against the whole pool, including released rows.</p>
+</section>
+<section id="runs-determinism-and-resumption">
+<h2>6.6 Runs, determinism and resumption<a class="headerlink" href="#runs-determinism-and-resumption" title="Link to this heading">¶</a></h2>
+<p>One YAML file describes one run; the run is identified by a hash of the configuration, the code version and the lock file (hard rule 6). Per-row predictions are stored, so every table and figure is regenerated from stored predictions. [S-05]</p>
+<ul class="simple">
+<li><p><strong>Determinism.</strong> The same configuration and seed give identical per-slot predictions (<code class="docutils literal notranslate"><span class="pre">tests/test_runner_sim.py</span></code>). C3 draws, public shuffles and selector draws are each seeded from the seed and the slot identity. [S-05]</p></li>
+<li><p><strong>Resumption.</strong> The unit of work is one window of one seed of one variant. A finished unit is checkpointed and marked done last; a run that is killed can be resumed (<code class="docutils literal notranslate"><span class="pre">--resume</span></code>), skips finished units, and writes tables identical to an uninterrupted run with no duplicate rows. Resuming needs a clean working tree, so the same hash cannot mix code states.</p></li>
+<li><p><strong>Initial-model cache.</strong> The initial model for a (dataset, training window, model, seed) is fitted once and shared across runs in the same process; the seed is part of the key only for models that use it.</p></li>
+<li><p><strong>Parallelism</strong> is across runs, one thread per run, never inside a run. On the 8 GB development machine this is bounded by memory, not by cores: the approved memory cap is per process, so two concurrent BODMAS runs exceed it (section 6.7).</p></li>
+</ul>
+</section>
+<section id="limits-stated-before-results">
+<h2>6.7 Limits stated before results<a class="headerlink" href="#limits-stated-before-results" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Short windows on BODMAS.</strong> With six evaluation slots and a retraining period of three, a window has one useful retraining event (before slot 3). At <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">=</span> <span class="pre">3</span></code> no label queried in slots 0 to 2 has arrived by then, so periodic retraining equals never retraining on BODMAS at <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">=</span> <span class="pre">3</span></code> (shown in <code class="docutils literal notranslate"><span class="pre">tests/test_runner_sim.py</span></code>). Delay contrasts on BODMAS are therefore limited by construction (ADR-0005 window geometry, ADR-0007 pool and retrain anchor), and results must be read with that in mind [P-12].</p></li>
+<li><p><strong>Comparator.</strong> E0’s random-split comparator was not matched per slot. E1 uses a per-slot matched comparator (section 6.8) and E0 numbers are not reused for RQ1 attribution.</p></li>
+<li><p><strong>Memory.</strong> Runs are limited to the researcher-approved cap; parallel runs share it.</p></li>
+<li><p><strong>Added later, each with its own limits stated before its results:</strong> the conformal layer and the two selectors (section 6.11, <code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v2.md</span></code>) and the drift monitors (section 6.12, <code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v3.md</span></code>) [P-17].</p></li>
+</ul>
+</section>
+<section id="the-e1-comparator">
+<h2>6.8 The E1 comparator<a class="headerlink" href="#the-e1-comparator" title="Link to this heading">¶</a></h2>
+<p>E1 asks how much of a detector’s apparent quality is an artefact of a random split. Both series use the same windows, the same models and the same C3 target ratio.</p>
+<ul class="simple">
+<li><p><strong>Time-aware series</strong>: the detector trained on the initial window, never retrained, scored on each evaluation slot (C1 holds).</p></li>
+<li><p><strong>Random-split series</strong>: a detector trained on a random draw from the window’s pooled raw rows, with the same number of malware and benign rows as the time-aware training window, scored on the held-out rows of each evaluation slot; malware in each held-out slot is subsampled to the target ratio with the same C3 check. It violates C1 by design.</p></li>
+</ul>
+<p>The figure shows F1 per evaluation slot for both series, from stored predictions only; the script fits nothing and imports no model code (<code class="docutils literal notranslate"><span class="pre">scripts/make_e1_figure.py</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/test_make_e1_figure.py</span></code>). The random-split series has fewer rows per slot than the time-aware series (it scores only the rows it did not train on), so its per-slot values are noisier.</p>
+</section>
+<section id="threats-to-validity-of-the-instrument">
+<h2>6.9 Threats to validity of the instrument<a class="headerlink" href="#threats-to-validity-of-the-instrument" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The synthetic regression fixture reproduces an ordering (never retraining is worst, more labels help, longer delay hurts). It is a test of mechanics, not evidence; its numbers are never reported.</p></li>
+<li><p>The pool mixes C3-subsampled and raw rows (section 6.5).</p></li>
+<li><p>Random selection draws about the base rate of malware, so at small budgets few malware labels arrive; selection that targets uncertain samples changes the class mix of the labels that arrive, which is what E3 measures and reports (chapter 7, section 7.5).</p></li>
+<li><p>Seeds are not independent replicates for the logistic model (it ignores the seed); they differ only in the C3 draw, the selector draw and the comparator split [P-12].</p></li>
+</ul>
+</section>
+<section id="the-grid-its-ledger-and-the-statistics">
+<h2>6.10 The grid, its ledger and the statistics<a class="headerlink" href="#the-grid-its-ledger-and-the-statistics" title="Link to this heading">¶</a></h2>
+<p>The delay-by-budget grid (E2) is run by one command, <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">grid</span></code>, from a grid file that is a run config plus a <code class="docutils literal notranslate"><span class="pre">grid:</span></code> block (<code class="docutils literal notranslate"><span class="pre">docs/GRID.md</span></code>). Each dataset expands into 27 runs: 16 periodic cells over four delays and four budgets, six headline cells repeated with further seeds, four cells at Chow’s window stride, and one never-retrain run [P-15]. The never run is made once per dataset because it does not depend on delay or budget; a test pins that its predictions equal those of a simulation with policy never at any delay and budget.</p>
+<ul class="simple">
+<li><p><strong>One cell, one run, one hash.</strong> A cell expands into an ordinary run config with scalar delay and budget; its hash covers the config, the code version and the lock file. A cell’s results are one directory with the predictions, slot table, window table and run record.</p></li>
+<li><p><strong>Ledger.</strong> Progress is an append-only JSON-lines file: started, complete (with directory, wall time, longest fit, peak memory), failed (with the reason), retry, invalidated. A completed cell is skipped, a failed cell is kept as failed and is never rerun because of what its result looks like, and a ledger that holds cells of another commit is refused. The commit is read once when the grid starts and pinned: modules are loaded once, so a cell must not be labelled with code that did not run.</p></li>
+<li><p><strong>Frozen worktree.</strong> The grid ran from a git worktree at the registered commit, so that work on the main tree could not change the code version mid-grid.</p></li>
+<li><p><strong>Smoke grid.</strong> A one-seed, one-window run of every cost shape prints timing only and an extrapolation to the full grid in hours and chunks; it writes to its own root and is never read as a result.</p></li>
+<li><p><strong>Statistics.</strong> Windows are resampled in blocks, then seeds within windows; arms of a contrast share the same indices; the contrasts, units and decision rule are those of the registration (chapter 3). The tables are rebuilt from stored predictions and checked against the slot table; two runs of the table and figure scripts give byte-identical outputs, and the scripts import no model code.</p></li>
+</ul>
+</section>
+<section id="the-conformal-layer-and-selection">
+<h2>6.11 The conformal layer and selection<a class="headerlink" href="#the-conformal-layer-and-selection" title="Link to this heading">¶</a></h2>
+<p>E3 (RQ3) adds a calibration set and two selectors behind the same selector interface. The registration (<code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v2.md</span></code>, locked by tag <code class="docutils literal notranslate"><span class="pre">prereg-v2</span></code>) fixed the values before any run; the results are in chapter 7, section 7.5.</p>
+<ul class="simple">
+<li><p><strong>Mondrian p-values.</strong> For class <code class="docutils literal notranslate"><span class="pre">c</span></code>, the p-value of a sample is <code class="docutils literal notranslate"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">#{calibration</span> <span class="pre">samples</span> <span class="pre">of</span> <span class="pre">class</span> <span class="pre">c</span> <span class="pre">with</span> <span class="pre">score</span> <span class="pre">&gt;=</span> <span class="pre">s_c(x)})</span> <span class="pre">/</span> <span class="pre">(n_c</span> <span class="pre">+</span> <span class="pre">1)</span></code>; the credibility of a sample is the p-value of its predicted class. Hand-worked examples, a uniformity check over fresh calibration sets and a demonstration that a calibration set made of selected samples inflates the p-values are tests (<code class="docutils literal notranslate"><span class="pre">tests/test_conformal.py</span></code>).</p></li>
+<li><p><strong>Scores.</strong> One minus the model’s probability of the class, or the distance to the class centroid in the detector’s feature space; the centroids come from the current training pool only.</p></li>
+<li><p><strong>Calibration data.</strong> The initial calibration set is a time-ordered hold-out of the initial window that the model was not fitted on; later calibration labels come only from a random reserved slice of each slot’s budget and arrive through the label queue, so the delay applies to them. A sample that a selector chose never enters the calibration buffer, and a test fails if one does (ADR-0009).</p></li>
+<li><p><strong>Equal labels spent.</strong> In every slot every arm spends the same number of labels: the reserved slice plus the selector’s choice; the runner asserts the equality.</p></li>
+<li><p><strong>Recalibration.</strong> Scores are recomputed under the model in force in every slot in which calibration rows arrived or the model was refitted, with a minimum number of rows per class; below it the previous calibration is kept and the skip is counted. A credibility selector with no calibration falls back to random for that slot and says so.</p></li>
+</ul>
+</section>
+<section id="drift-monitors-and-monitor-triggered-retraining">
+<h2>6.12 Drift monitors and monitor-triggered retraining<a class="headerlink" href="#drift-monitors-and-monitor-triggered-retraining" title="Link to this heading">¶</a></h2>
+<p>E4 (RQ4) asks whether retraining when a drift monitor alarms does better than retraining every three slots. The registration (<code class="docutils literal notranslate"><span class="pre">docs/prereg/addendum-v3.md</span></code>, locked by tag <code class="docutils literal notranslate"><span class="pre">prereg-v3</span></code> before any E4 result) and ADR-0010 fixed every value below. The results are in chapter 7.</p>
+<ul>
+<li><p><strong>One alarm interface.</strong> A <em>drift monitor</em> looks at one evaluation slot after it has been scored and decides whether that slot looks unlike a <em>reference</em>: data the model in force already knows. Every monitor is called as <code class="docutils literal notranslate"><span class="pre">update(slot</span> <span class="pre">view,</span> <span class="pre">state)</span> <span class="pre">-&gt;</span> <span class="pre">alarm</span></code>. The slot view holds:</p>
+<ul class="simple">
+<li><p>the slot’s features;</p></li>
+<li><p>the model’s malware probabilities;</p></li>
+<li><p>the features of the calibration rows that have already arrived.</p></li>
+</ul>
+<p>It has no label field. A test permutes every label that the runner holds and finds the monitors’ outputs unchanged. Another test fails if a monitor module imports anything that holds labels. Every value in this section is registered [P-17].</p>
+</li>
+<li><p><strong>The four monitors.</strong> Each tests at a significance level of 0.01 per slot, on seeded samples of a few hundred rows per side.</p>
+<ul class="simple">
+<li><p><em>KS:</em> a two-sample Kolmogorov-Smirnov test on each of the 20 features that best separate the classes in the initial training window, with a Holm correction over the 20 tests.</p></li>
+<li><p><em>MMD:</em> maximum mean discrepancy with a Gaussian kernel and a permutation threshold. The detectors have no learned embedding, so the input is a 16-dimensional SVD projection of the features plus the model’s score.</p></li>
+<li><p><em>Domain classifier:</em> a logistic regression asked to tell the reference from the slot, scored by cross-validated AUC against a permutation null computed once per window.</p></li>
+<li><p><em>p-uniformity:</em> compares the slot’s label-free conformal scores with those of the calibration rows, which tests whether the conformal p-values have stayed uniform.</p></li>
+</ul>
+</li>
+<li><p><strong>Reference.</strong> At first the reference is the newest part of the initial window. After a refit it becomes the newest slot whose labels were in the training pool at that refit. Under a label delay of <code class="docutils literal notranslate"><span class="pre">d</span></code> slots, that is at most <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">−</span> <span class="pre">1</span> <span class="pre">−</span> <span class="pre">d</span></code>, so the reference is older than the latest data. This is intended, not a defect.</p></li>
+<li><p><strong>Policy.</strong> An alarm on slot <code class="docutils literal notranslate"><span class="pre">s</span></code> causes a retrain before slot <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">+</span> <span class="pre">1</span></code>, provided at least two slots have passed since the last refit. If no new label has arrived, the event is logged as a no-op. An alarm is never carried forward.</p></li>
+<li><p><strong>Matched comparisons.</strong> Every arm uses random selection with the same seeded draws, so every arm spends the same labels in every slot; the tables check this. A second control matches the number of retrains: it refits as often as the monitor arm did in each window, at evenly spaced slots chosen without looking at data. Monitor-triggered retraining is compared with periodic retraining (matched labels) and with this control (matched retrains, which isolates timing). The control knows each window’s refit count in advance, which favours it, so this comparison is conservative for the monitor.</p></li>
+<li><p><strong>Monitor quality.</strong> A <em>drop event</em> is a slot whose F1 falls at least 0.05 below the mean of the three slots before it, the same definition as for recovery time. An alarm detects a drop if it comes within two slots of it. From these:</p>
+<ul class="simple">
+<li><p><em>alarm precision</em> is the share of alarms that detect a drop;</p></li>
+<li><p><em>alarm recall</em> is the share of drops detected;</p></li>
+<li><p><em>detection delay</em> is the number of slots from drop to alarm.</p></li>
+</ul>
+<p>True labels enter only this scoring, never a monitor. The primary reading comes from the never-retrain arm, where all four monitors observe without acting.</p>
+</li>
+<li><p><strong>Bounded compute.</strong> The statistics that do not depend on the model (KS and the domain classifier) are cached per window and shared across arms. A cached value equals a freshly computed one; a test pins this.</p></li>
+<li><p><strong>Changed before the registration.</strong> Two monitor designs failed the synthetic no-drift checks and were replaced before any real-data run, as recorded in ADR-0010:</p>
+<ul class="simple">
+<li><p>p-uniformity: a one-sample test of the p-values against the uniform distribution ignored the finite calibration set, so it was replaced by the two-sample form;</p></li>
+<li><p>MMD: a reference-only standardisation broke the permutation test.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ch07_experiments.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 7: Experiments and results (draft)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ch05_related_work.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 5: Related work (draft)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 6: Method (draft)</a><ul>
+<li><a class="reference internal" href="#what-the-simulator-is-for">6.1 What the simulator is for</a></li>
+<li><a class="reference internal" href="#data-flow">6.2 Data flow</a></li>
+<li><a class="reference internal" href="#the-label-queue-and-the-delay-rule">6.3 The label queue and the delay rule</a></li>
+<li><a class="reference internal" href="#budget-and-selection">6.4 Budget and selection</a></li>
+<li><a class="reference internal" href="#retraining-and-the-training-pool">6.5 Retraining and the training pool</a></li>
+<li><a class="reference internal" href="#runs-determinism-and-resumption">6.6 Runs, determinism and resumption</a></li>
+<li><a class="reference internal" href="#limits-stated-before-results">6.7 Limits stated before results</a></li>
+<li><a class="reference internal" href="#the-e1-comparator">6.8 The E1 comparator</a></li>
+<li><a class="reference internal" href="#threats-to-validity-of-the-instrument">6.9 Threats to validity of the instrument</a></li>
+<li><a class="reference internal" href="#the-grid-its-ledger-and-the-statistics">6.10 The grid, its ledger and the statistics</a></li>
+<li><a class="reference internal" href="#the-conformal-layer-and-selection">6.11 The conformal layer and selection</a></li>
+<li><a class="reference internal" href="#drift-monitors-and-monitor-triggered-retraining">6.12 Drift monitors and monitor-triggered retraining</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

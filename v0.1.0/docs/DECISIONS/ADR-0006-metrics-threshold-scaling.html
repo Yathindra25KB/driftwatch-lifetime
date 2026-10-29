@@ -1,0 +1,527 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules" href="ADR-0007-pool-composition-and-budget.html"><link rel="prev" title="ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy" href="ADR-0005-windows-and-size-gate.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/docs/DECISIONS/ADR-0006-metrics-threshold-scaling.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/docs/DECISIONS/ADR-0006-metrics-threshold-scaling.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="adr-0006-metrics-decision-threshold-scaling-policy-a-aut-windows-and-e0-hyperparameters">
+<h1>ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters<a class="headerlink" href="#adr-0006-metrics-decision-threshold-scaling-policy-a-aut-windows-and-e0-hyperparameters" title="Link to this heading">¶</a></h1>
+<p><strong>Status:</strong> ACCEPTED by the researcher on 2026-10-15, as written (answer given in the Phase 8 decision session; no value changed). Values frozen on 2026-10-11, before any E0 AUT existed, when the researcher delegated the open choices (“do what feels best and logical”): LightGBM <code class="docutils literal notranslate"><span class="pre">fast</span></code>, fixed 0.5 threshold, ADR-0005 headline windows with Chow’s stride secondary, sanity band left <code class="docutils literal notranslate"><span class="pre">[verify]</span></code>. Formal acceptance (PROPOSED to ACCEPTED) stays with the researcher at phase closeout; nothing below was chosen by looking at an AUT.
+<strong>Date:</strong> 2026-10-11
+<strong>Deciders:</strong> Yathindra (researcher, approves); Claude Code (engineering lead, proposes)
+<strong>Phase:</strong> 4</p>
+<p>This ADR fixes the open values “decision threshold, scaling policy, A-AUT window formula” in PROTOCOL section 5 and settles D5, D6 and D17. It also records the model hyperparameters that docs/PREREG.md lists before E0 runs. No E0 evaluation slot has been scored. The only model runs so far are timing and convergence probes on training windows (<code class="docutils literal notranslate"><span class="pre">scripts/bench_fit.py</span></code>), which print no scores.</p>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Metrics (PROTOCOL section 3).</strong> Per-slot F1 of the malware class, FPR and FNR at a fixed threshold, AUT, A-AUT, labels spent, recovery time.</p></li>
+<li><p><strong>AUT (D17).</strong> The guide writes <code class="docutils literal notranslate"><span class="pre">AUT(f,</span> <span class="pre">N)</span> <span class="pre">=</span> <span class="pre">1/(N-1)</span> <span class="pre">*</span> <span class="pre">sum</span> <span class="pre">(f_k</span> <span class="pre">+</span> <span class="pre">f_{k+1})</span> <span class="pre">/</span> <span class="pre">2</span></code>. The TESSERACT arXiv v4 comment (accessed 2026-10-11) says earlier versions of Eq. (4) carried an extra 1/N factor, a typo, and that the results rely on numpy’s area under the curve.</p></li>
+<li><p><strong>A-AUT windows (Chow et al., arXiv 2506.23814v2, accessed 2026-10-11).</strong> A-AUT is the mean and standard deviation of AUT over rolling windows (Eq. 1). For nE &gt;= nT, training windows start every nT slots and <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">=</span> <span class="pre">floor((|D|</span> <span class="pre">-</span> <span class="pre">nE)</span> <span class="pre">/</span> <span class="pre">nT)</span></code> (Eq. 2-4). For nE &lt; nT (appendix A-E) windows advance by nE and <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">=</span> <span class="pre">floor((|D|</span> <span class="pre">-</span> <span class="pre">nT)</span> <span class="pre">/</span> <span class="pre">nE)</span></code> (Eq. 6-8). Both are <code class="docutils literal notranslate"><span class="pre">stride</span> <span class="pre">=</span> <span class="pre">min(nT,</span> <span class="pre">nE)</span></code>. The paper does not say which standard deviation it reports.</p></li>
+<li><p><strong>ADR-0005 (accepted)</strong> fixes LAMDA nT 4, nE 12, stride 3 and BODMAS nT 3, nE 6, stride 2. Chow’s stride would be 4 and 3. nT &gt; nE does not occur in either dataset.</p></li>
+<li><p><strong>Decision threshold (D5).</strong> The guide says only “a fixed decision threshold”. The Phase 4 prompt gives 0.5 and allows a tuned threshold only from the final training slot.</p></li>
+<li><p><strong>Recovery time (D6).</strong> “Slots until F1 returns to 90% of its pre-drop level after a drop event” needs a drop-event rule; the guide gives one only “for example”.</p></li>
+<li><p><strong>Training prevalence.</strong> Training windows are raw (ADR-0004, ADR-0005): the largest windows are 63% malware (LAMDA) and 35% (BODMAS), and across the ADR-0005 rolling windows the training prior runs from 8% to 73% on LAMDA and 35% to 55% on BODMAS (measured in E0, CLAIMS E-08), while evaluation slots are at most 10%.</p></li>
+</ul>
+</section>
+<section id="options-considered">
+<h2>Options considered<a class="headerlink" href="#options-considered" title="Link to this heading">¶</a></h2>
+<section id="decision-threshold">
+<h3>1. Decision threshold<a class="headerlink" href="#decision-threshold" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. Fixed 0.5 for every model, dataset and window</strong> (default of the Phase 4 prompt).</p></li>
+<li><p><strong>B. Tuned on the final training slot.</strong> Allowed by the prompt, but the model has already been fitted on that slot, so the threshold is in-sample unless the model is fitted on the earlier slots only; that changes what “the model” is.</p></li>
+<li><p><strong>C. Prior-shift corrected.</strong> Move the threshold so that the decision is optimal at the evaluation ratio, from the training window’s class balance and the C3 ratio only. No labels beyond the training window are used, but it is a different detector from a fixed 0.5.</p></li>
+</ul>
+</section>
+<section id="scaling-for-logistic-regression">
+<h3>2. Scaling for logistic regression<a class="headerlink" href="#scaling-for-logistic-regression" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. StandardScaler fitted in <code class="docutils literal notranslate"><span class="pre">fit</span></code> on the training window; centred only for dense features.</strong> Sparse LAMDA stays sparse.</p></li>
+<li><p><strong>B. MaxAbsScaler.</strong> Bounded on the training window, sparse-friendly, but squashes heavy-tailed EMBER-style features.</p></li>
+<li><p><strong>C. No scaling on LAMDA.</strong> Counts 0 to 17 are on one scale already, but features then have unequal regularisation.</p></li>
+</ul>
+</section>
+<section id="spread-of-a-aut">
+<h3>3. Spread of A-AUT<a class="headerlink" href="#spread-of-a-aut" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. Sample standard deviation (ddof = 1)</strong>, with the number of windows reported next to it.</p></li>
+<li><p><strong>B. Population standard deviation (ddof = 0).</strong></p></li>
+</ul>
+</section>
+<section id="lightgbm-profile-in-e0">
+<h3>4. LightGBM profile in E0<a class="headerlink" href="#lightgbm-profile-in-e0" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>A. <code class="docutils literal notranslate"><span class="pre">fast</span></code></strong> (63 bins, half the features per tree, 80% row bagging).</p></li>
+<li><p><strong>B. <code class="docutils literal notranslate"><span class="pre">default</span></code></strong> (library defaults).</p></li>
+</ul>
+</section>
+</section>
+<section id="decision-proposed">
+<h2>Decision (proposed)<a class="headerlink" href="#decision-proposed" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p><strong>AUT</strong> is the guide’s formula, implemented as the mean of the trapezoids between consecutive slots (equal to <code class="docutils literal notranslate"><span class="pre">np.trapezoid(f,</span> <span class="pre">dx</span> <span class="pre">=</span> <span class="pre">1/(N-1))</span></code>). A test pins the equivalence, the hand-computed examples and constant F1. AUT needs at least two evaluation slots.</p></li>
+<li><p><strong>A-AUT</strong> is <code class="docutils literal notranslate"><span class="pre">(mean,</span> <span class="pre">sample</span> <span class="pre">std</span> <span class="pre">over</span> <span class="pre">windows,</span> <span class="pre">n</span> <span class="pre">windows)</span></code>, option 3A. The headline windows are ADR-0005’s. E0 also reports A-AUT at Chow’s stride <code class="docutils literal notranslate"><span class="pre">min(nT,</span> <span class="pre">nE)</span></code> as a labelled secondary column (LAMDA 12 windows, BODMAS 4), so the figure is comparable with the literature’s window geometry. The slicer reproduces Chow’s windows exactly at that stride (test). Windows overlap, so the std understates uncertainty; effect sizes with bootstrap intervals over slots come in Phase 6.</p></li>
+<li><p><strong>Threshold: fixed 0.5</strong> (option 1A). A sample is called malware when P(malware) is strictly above 0.5. Any tuned threshold, now or later, may use only the final training slot and must be a new ADR. Option 1C is listed for the researcher: it would raise the threshold on training windows with a high malware share (up to 73% on LAMDA), and E0 shows how large that spread is. It is not used in E0.</p></li>
+<li><p><strong>Scaling: option 2A.</strong> Trees get no scaling. The scaler is created inside <code class="docutils literal notranslate"><span class="pre">fit</span></code> from the training rows only; a fitted model carries its window id, and scoring under another id raises. Zero-variance features are left unscaled and no clipping is applied. Dense features stay float32 (moments are accumulated in float64) to fit the 1.5 GB memory cap.</p></li>
+<li><p><strong>Per-slot scores</strong> are F1 of the malware class, FPR and FNR from the confusion counts of the slot after C3. A slot needs both classes (C2 guarantees it). <strong>Labels spent</strong> is the number of analyst queries; it is 0 in E0 and the initial training labels are reported separately as <code class="docutils literal notranslate"><span class="pre">n_train_rows</span></code>.</p></li>
+<li><p><strong>Drop event and recovery (D6).</strong> A drop at slot t is F1 at least 0.05 below the mean of the three slots before it; that mean is the pre-drop level. Recovery is the first later slot with F1 at least 0.90 of the level; the time is the number of slots from the drop. A drop that never recovers inside the window is censored. Events do not overlap: scanning resumes after a recovery and stops at a censored drop. In E0 (never retrain) recovery is reported only as a count of events and of recoveries.</p></li>
+<li><p><strong>Random-split comparators (amended before any E0 result, after the leakage review).</strong> For each window, the training and evaluation rows are pooled and the same models and hyperparameters are fitted on a random training set of the same size as the time-aware window; the rest is the test set, with malware subsampled to the same ratio by the same malware-only rule (C3, checked, counts stored). The comparator violates C1 by design: it is what a time-blind evaluation reports. Two draws are stored:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">matched</span></code> (headline, column <code class="docutils literal notranslate"><span class="pre">f1_random_split</span></code>).</strong> The training set has the same numbers of malware and benign rows as the time-aware window, so the class prior is identical and only time differs.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">pooled</span></code> (secondary, column <code class="docutils literal notranslate"><span class="pre">f1_random_pooled</span></code>).</strong> A plain random subset of the pool, whose class prior is the pool’s. The first version of the runner had only this draw; the review noted that the gap against it mixes a prior effect with decay (the time-aware prior is the window’s own, up to 63% malware on LAMDA 2013).</p></li>
+</ul>
+<p>Both compare a pooled F1 against the mean of per-slot F1 (AUT); this is the guide’s comparison and is stated in the report. Neither is matched per slot: test malware is capped once over the whole pool, so months with very large malware counts weigh more than in the time-aware path (E0: comparator test ratio 0.098 against 0.084 on LAMDA). The gap is therefore “time-aware minus a time-blind evaluation”, and RQ1’s attribution to temporal leakage needs a per-slot-matched comparator that E0 does not provide.</p>
+</li>
+<li><p><strong>Hyperparameters (fixed here and in docs/PREREG.md, never tuned):</strong></p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Model</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Note</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Logistic regression</p></td>
+<td><p>L2, C = 1.0, lbfgs, tol 1e-4, max_iter 1000, no class weights, threshold 0.5</p></td>
+<td><p>sklearn defaults except max_iter (default 100). A convergence-only probe on LAMDA’s largest training window (no scores printed) stopped at the 300-iteration cap and converged at 325, so the cap is 1000. A fit that reaches the cap is recorded as <code class="docutils literal notranslate"><span class="pre">converged</span> <span class="pre">=</span> <span class="pre">false</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>LightGBM <code class="docutils literal notranslate"><span class="pre">fast</span></code></p></td>
+<td><p>100 trees, learning rate 0.1, 31 leaves, min child samples 20, max_bin 63, colsample_bytree 0.5, subsample 0.8 with bagging every tree, deterministic, col-wise, 4 threads</p></td>
+<td><p>Used in E0 (option 4A)</p></td>
+</tr>
+<tr class="row-even"><td><p>LightGBM <code class="docutils literal notranslate"><span class="pre">default</span></code></p></td>
+<td><p>the library defaults: 100 trees, learning rate 0.1, 31 leaves, min child samples 20, max_bin 255, no sampling</p></td>
+<td><p>Timed only</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Seeds for E0 are 0 to 4 (guide section 10: 5 seeds for the grid). A seed fixes the C3 malware draw, the random split and the LightGBM bagging; the logistic fit does not depend on it, so one fit serves every seed.</p>
+</li>
+<li><p><strong>Fit time and memory</strong> (bench, commit afa9b34, 8 cores / 16 threads, 7.25 GB RAM): at the largest training window the slowest configured fit is 3.5 s, so the 60 s rule holds with margin and no subsampling or grid shrink is needed (CLAIMS B-01, B-05). With the two comparators the random-split step peaked at 1.37 GB in the bench; the full BODMAS E0 run’s resident peak was 1.40 GiB (about 7% under the 1.5 GiB cap) and LAMDA’s 0.90 GiB (CLAIMS E-01).</p></li>
+</ol>
+</section>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Easier.</strong> One metric module and one window formula that Phases 5 to 9 reuse. The slicer, the formula and the paper’s worked examples agree under test.</p></li>
+<li><p><strong>Harder or riskier.</strong></p>
+<ul>
+<li><p><strong>Prevalence shift.</strong> A model fitted at 8 to 73% malware (LAMDA) or 35 to 55% (BODMAS) and judged at 10% or less with a fixed 0.5 threshold is not prevalence-adjusted. FPR and F1 on a 10% slot will look worse than on a balanced one. This is a property of the protocol and is reported, not tuned away (option 1C stays available as a later ADR).</p></li>
+<li><p><strong>Rare-feature scaling.</strong> Dividing a rare LAMDA feature by its small training-window standard deviation can give very large values at test time. It is a stated limitation of option 2A, not something patched after seeing results.</p></li>
+<li><p><strong>Headline stride differs from Chow’s</strong> on both datasets. The secondary column exists so the difference can be read off.</p></li>
+<li><p><strong>LightGBM results are guaranteed identical only for a fixed thread count</strong>; the count is part of the config and the run record.</p></li>
+<li><p><strong>Recovery time reads gradual decay badly.</strong> The target is 0.90 of the pre-drop level, so a drop of 0.05 is already above it whenever the level exceeds 0.5, and recovery is “one slot” if the next slot is near the level. A slow decay of less than 0.05 below the 3-slot mean per slot yields zero events. For a never-retrain baseline, zero events must not be read as “no drift”; the AUT and the per-slot curve carry that.</p></li>
+<li><p><strong>Overlapping windows and few BODMAS windows</strong> make the std over windows and the bootstrap interval descriptive, not inferential.</p></li>
+</ul>
+</li>
+<li><p><strong>Process note (11 Oct 2026).</strong> A first E0 run started at commit 5893df7 was stopped before any of its output was read, because the leakage review found the comparator confound above and gaps in what the comparator stored. It was replaced by a run of the amended code; no result was seen or used to choose between the two.</p></li>
+<li><p><strong>Revisit when:</strong> the researcher rejects a value; the Phase 4 real-data canary does not pass; Phase 5 fixes the training pool (ADR-0007), which may change the training prevalence; a package pin changes (rerun E0 under <code class="docutils literal notranslate"><span class="pre">maintain</span></code>).</p></li>
+</ul>
+</section>
+<section id="evidence-and-references">
+<h2>Evidence and references<a class="headerlink" href="#evidence-and-references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tests/test_aut.py</span></code> (constant F1, hand-computed trapezoids, Chow Eq. 2-4, 6-10, slicer agreement), <code class="docutils literal notranslate"><span class="pre">tests/test_metrics_slot.py</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/test_models.py</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/test_runner_e0.py</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reports/tables/fit_times.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">scripts/bench_fit.py</span></code> (commit afa9b34).</p></li>
+<li><p>Chow et al., arXiv 2506.23814v2, HTML accessed 2026-10-11, section V and appendix A-E. Pendlebury et al., arXiv 1807.07838v4, comments field accessed 2026-10-11.</p></li>
+<li><p>ADR-0004, ADR-0005; PROTOCOL sections 2 to 5, D1, D5, D6, D17; Build Guide sections 3, 6, 9, 10.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ADR-0007-pool-composition-and-budget.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ADR-0005-windows-and-size-gate.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a><ul>
+<li><a class="reference internal" href="#context">Context</a></li>
+<li><a class="reference internal" href="#options-considered">Options considered</a><ul>
+<li><a class="reference internal" href="#decision-threshold">1. Decision threshold</a></li>
+<li><a class="reference internal" href="#scaling-for-logistic-regression">2. Scaling for logistic regression</a></li>
+<li><a class="reference internal" href="#spread-of-a-aut">3. Spread of A-AUT</a></li>
+<li><a class="reference internal" href="#lightgbm-profile-in-e0">4. LightGBM profile in E0</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decision-proposed">Decision (proposed)</a></li>
+<li><a class="reference internal" href="#consequences">Consequences</a></li>
+<li><a class="reference internal" href="#evidence-and-references">Evidence and references</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

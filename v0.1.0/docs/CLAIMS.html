@@ -1,0 +1,1788 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab" href="GRID.html"><link rel="prev" title="DriftWatch pre-registration" href="PREREG.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>DriftWatch claims ledger - DriftWatch 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/docs/CLAIMS.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/docs/CLAIMS.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="driftwatch-claims-ledger">
+<h1>DriftWatch claims ledger<a class="headerlink" href="#driftwatch-claims-ledger" title="Link to this heading">¶</a></h1>
+<p>Every number or claim of consequence that appears in the README, the report (<code class="docutils literal notranslate"><span class="pre">report/</span></code>) or the paper (<code class="docutils literal notranslate"><span class="pre">paper/</span></code>) must have a row here first.</p>
+<section id="rules">
+<h2>Rules<a class="headerlink" href="#rules" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>No row, no claim.</strong> A number without a row is written as <code class="docutils literal notranslate"><span class="pre">[verify]</span></code> or left out.</p></li>
+<li><p><strong>Traceable.</strong> Each row names the result file that produced the value and the commit that produced that file. For external facts it names the source and the access date.</p></li>
+<li><p><strong>Tagged.</strong> <code class="docutils literal notranslate"><span class="pre">[verified]</span></code> means checked against a source or a stored result. <code class="docutils literal notranslate"><span class="pre">[verify]</span></code> means still to check. <code class="docutils literal notranslate"><span class="pre">[estimate]</span></code> means a planning number. <code class="docutils literal notranslate"><span class="pre">[measured]</span></code> means a timing or size from a run on this machine.</p></li>
+<li><p><strong>Never evidence:</strong> toy, sandbox or synthetic-fixture numbers, including the guide’s sandbox table in §7. They may appear only as labelled code-behaviour checks.</p></li>
+<li><p><strong>Never “first”.</strong> No contribution is claimed as “first”. State what was measured.</p></li>
+<li><p><strong>Corrections append.</strong> A changed value gets a new row that names the claim it supersedes; old rows are never edited away.</p></li>
+<li><p><strong>Regenerable.</strong> Values from experiments must regenerate from stored per-slot predictions with <code class="docutils literal notranslate"><span class="pre">scripts/make_tables.py</span></code> (Phase 6 onward).</p></li>
+<li><p><strong>Commit hashes.</strong> The commits cited in this ledger, in <code class="docutils literal notranslate"><span class="pre">docs/PHASES.md</span></code> and in the decision records are hashes of the private development history. The public history was made from it by removing one folder of unlicensed course documents (<code class="docutils literal notranslate"><span class="pre">docs/source</span></code>), which changes every hash. <code class="docutils literal notranslate"><span class="pre">docs/commit_map.csv</span></code> maps each old hash (column <code class="docutils literal notranslate"><span class="pre">old</span></code>) to its public hash (column <code class="docutils literal notranslate"><span class="pre">new</span></code>). The tags <code class="docutils literal notranslate"><span class="pre">prereg-v1</span></code> to <code class="docutils literal notranslate"><span class="pre">prereg-v3</span></code> were carried over and point at the rewritten commits whose content is unchanged.</p></li>
+</ol>
+</section>
+<section id="ledger">
+<h2>Ledger<a class="headerlink" href="#ledger" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Claim ID</p></th>
+<th class="head"><p>Statement</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Source file</p></th>
+<th class="head"><p>Commit</p></th>
+<th class="head"><p>Tag</p></th>
+<th class="head"><p>Access date</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-01</p></td>
+<td><p>LAMDA size and class counts (Baseline subset, HF commit ad9614bd)</p></td>
+<td><p>1,008,381 apps; 369,906 malware; 638,475 benign</p></td>
+<td><p>reports/data_inventory.md</p></td>
+<td><p>ade5116</p></td>
+<td><p>[verified] (matches arXiv 2505.18551 Table 2)</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-02</p></td>
+<td><p>LAMDA feature count, storage and density</p></td>
+<td><p>4,561 int8 features (values 0-17); 1.63% non-zero</p></td>
+<td><p>reports/data_inventory.md</p></td>
+<td><p>ade5116</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>D-03</p></td>
+<td><p>LAMDA slotting timestamp</p></td>
+<td><p>AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code> (seconds) for 100% of rows; <code class="docutils literal notranslate"><span class="pre">year_month</span></code> equals its month for every row</p></td>
+<td><p>reports/data_inventory.md; reports/data_inventory_notes.md §1</p></td>
+<td><p>18b189d</p></td>
+<td><p>[measured]; meaning of <code class="docutils literal notranslate"><span class="pre">added</span></code> [verify]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-04</p></td>
+<td><p>LAMDA empty months in 2013-06..2025-01</p></td>
+<td><p>20, including 2014-09..2016-01 (17 consecutive); 2025 holds January only</p></td>
+<td><p>reports/tables/data_lamda_slots_month.csv</p></td>
+<td><p>ade5116</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>D-05</p></td>
+<td><p>LAMDA duplicate feature vectors</p></td>
+<td><p>679,423 distinct vectors; 238,576 rows (23.7%) repeat a vector from an earlier month; 2,177 vectors with both labels (54,835 rows)</p></td>
+<td><p>reports/data_inventory.md</p></td>
+<td><p>ade5116</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-06</p></td>
+<td><p>LAMDA cache build on the 8 GB laptop</p></td>
+<td><p>peak 0.85 GB (cap 1.5 GB), 93.1 s, cache 119.6 MB, raw 340.5 MB</p></td>
+<td><p>reports/data_inventory.md (from data/manifest.json build record)</p></td>
+<td><p>ade5116</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>D-07</p></td>
+<td><p>BODMAS size and features</p></td>
+<td><p>134,435 samples (57,293 malware, 77,142 benign); 2,381 float32 features; 27.6% non-zero</p></td>
+<td><p>reports/data_inventory.md</p></td>
+<td><p>ade5116</p></td>
+<td><p>[verified] against the BODMAS page; density [measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-08</p></td>
+<td><p>BODMAS timestamps by class</p></td>
+<td><p>malware 2019-08-29..2020-09-30 (second resolution); benign 2007-01-01..2020-09-30, 85.8% at midnight, 5,877 at 2020-01-01 00:00:00, 13,514 before 2019-W35</p></td>
+<td><p>reports/data_inventory.md; reports/data_inventory_notes.md §1</p></td>
+<td><p>18b189d</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>D-09</p></td>
+<td><p>BODMAS cache build</p></td>
+<td><p>peak 0.55 GB (cap 1.5 GB), 23.1 s, cache 1,230.5 MB, raw 265.5 MB</p></td>
+<td><p>reports/data_inventory.md</p></td>
+<td><p>ade5116</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-10</p></td>
+<td><p>Clean rebuild reproducibility</p></td>
+<td><p>all 1,088 cache files byte-identical to data/manifest.json; <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">verify</span></code> 0 problems</p></td>
+<td><p>reports/data_inventory_notes.md §7</p></td>
+<td><p>18b189d</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>D-11</p></td>
+<td><p>LAMDA cache v2 build (supersedes D-06)</p></td>
+<td><p>peak 0.87 GB (cap 1.5 GB; clean rebuild 0.93 GB), 93.1 s, cache 119.7 MB</p></td>
+<td><p>reports/data_inventory.md; reports/data_inventory_notes.md §3</p></td>
+<td><p>83ffb87</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-12</p></td>
+<td><p>BODMAS cache v2 build (supersedes D-09)</p></td>
+<td><p>peak 0.56 GB (cap 1.5 GB), 23.4 s, cache 1,231.2 MB</p></td>
+<td><p>reports/data_inventory.md</p></td>
+<td><p>83ffb87</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>D-13</p></td>
+<td><p>Clean rebuild reproducibility, cache v2 (supersedes D-10)</p></td>
+<td><p>all 1,088 cache files byte-identical to data/manifest.json; <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">verify</span></code> 0 problems on both roots</p></td>
+<td><p>reports/data_inventory_notes.md §7</p></td>
+<td><p>83ffb87</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-14</p></td>
+<td><p>BODMAS benign timestamps are daily batches</p></td>
+<td><p>66,167 benign rows date-only; study-window median 150 rows/day (regular max 599); placeholder candidates (date-only ts shared by &gt;= 1,000 rows) 9,545 rows, of which 5,877 at 2020-01-01</p></td>
+<td><p>reports/tables/data_bodmas_benign_days.csv; reports/data_inventory_notes.md §1</p></td>
+<td><p>83ffb87</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-even"><td><p>W-01</p></td>
+<td><p>LAMDA usable runs at 10%, M = 50 (cap and flag)</p></td>
+<td><p>97 usable months in 10 runs; longest 62 (2018-11..2023-12), of which 31 months hold under 10% malware (36 of 97 overall)</p></td>
+<td><p>reports/window_options.md; reports/tables/window_segments_lamda.csv</p></td>
+<td><p>4ce5cba</p></td>
+<td><p>[measured] (slot counts only)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>W-02</p></td>
+<td><p>BODMAS usable runs at 10%, M = 50, placeholder rows excluded</p></td>
+<td><p>26 usable 2-week slots in 2 runs (9 and 17); none below 10%</p></td>
+<td><p>reports/window_options.md; reports/tables/window_segments_bodmas.csv</p></td>
+<td><p>4ce5cba</p></td>
+<td><p>[measured] (slot counts only)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>W-03</p></td>
+<td><p>Sensitivity-ratio reach (M = 50)</p></td>
+<td><p>5%: 95 usable LAMDA months, 8 below target, longest run 47; 20%: 97 usable, 50 below target; BODMAS 5%: 0 below, 20%: 1 below</p></td>
+<td><p>reports/window_options.md</p></td>
+<td><p>4ce5cba</p></td>
+<td><p>[measured] (slot counts only)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>W-04</p></td>
+<td><p>Full-dataset slicing pass, nT 4, nE 12, stride 1, 10%, M = 50</p></td>
+<td><p>LAMDA: 47 windows, 564 evaluation slots, 28.6 s, peak 0.40 GB, 0 densified; BODMAS: 2 windows, 24 evaluation slots, 2.9 s, peak 0.69 GB; no C1-C3 violation</p></td>
+<td><p>reports/slicing_run.md</p></td>
+<td><p>4ce5cba</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>W-05</p></td>
+<td><p>Slicer mutation checks</p></td>
+<td><p>12 of 12 deliberate breakages caught by the constraint, slicer, property and cache suites; baseline green</p></td>
+<td><p>reports/mutation_matrix.md</p></td>
+<td><p>448e20d</p></td>
+<td><p>[measured] (code-behaviour check, not evidence about detectors)</p></td>
+<td><p>2026-10-10</p></td>
+</tr>
+<tr class="row-odd"><td><p>W-06</p></td>
+<td><p>Slicer mutation checks after the leakage review (supersedes W-05)</p></td>
+<td><p>14 of 14 deliberate breakages caught; baseline 112 tests green</p></td>
+<td><p>reports/mutation_matrix.md</p></td>
+<td><p>ee4bcd0</p></td>
+<td><p>[measured] (code-behaviour check, not evidence about detectors)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>W-07</p></td>
+<td><p>Slicer mutation checks after the second review pass (supersedes W-06)</p></td>
+<td><p>15 of 15 deliberate breakages caught; baseline 120 tests green</p></td>
+<td><p>reports/mutation_matrix.md</p></td>
+<td><p>9b27b58</p></td>
+<td><p>[measured] (code-behaviour check, not evidence about detectors)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>M-01</p></td>
+<td><p>Chow et al. A-AUT window formula</p></td>
+<td><p>A-AUT = (mean, std) of AUT over windows (Eq. 1). nE &gt;= nT: windows advance by nT, k = floor((</p></td>
+<td><p>D</p></td>
+<td><p>-nE)/nT) (Eq. 2-4). nE &lt; nT: advance by nE, k = floor((</p></td>
+<td><p>D</p></td>
+<td><p>-nT)/nE) (Eq. 6-8). Both are stride min(nT, nE)</p></td>
+</tr>
+<tr class="row-even"><td><p>M-02</p></td>
+<td><p>TESSERACT AUT normalisation</p></td>
+<td><p>arXiv v4 comments: published Eq. (4) had an extra 1/N factor (typo); results rely on numpy’s area under the curve. The guide’s 1/(N-1) form equals np.trapezoid(f, dx=1/(N-1)) (pinned by tests/test_aut.py)</p></td>
+<td><p>docs/DECISIONS/ADR-0006-metrics-threshold-scaling.md (source: arXiv 1807.07838v4 abstract page)</p></td>
+<td><p>b077f05</p></td>
+<td><p>[verified] (comment text); equivalence [measured] by test</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>B-01</p></td>
+<td><p>Largest E0 training windows (plan counts)</p></td>
+<td><p>BODMAS 17,873 rows (6,316 malware) x 2,381 float32 features; LAMDA 50,382 rows (31,835 malware) x 4,561 int8 sparse features</p></td>
+<td><p>reports/tables/fit_times.csv</p></td>
+<td><p>afa9b34</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>B-02</p></td>
+<td><p>Fit time at the largest window, BODMAS (median of 3, this laptop)</p></td>
+<td><p>LR 1.30 s; LightGBM fast 3.47 s; LightGBM default 8.02 s; repeated fits byte-identical; peak 0.86 / 0.67 / 0.67 GB</p></td>
+<td><p>reports/tables/fit_times.csv</p></td>
+<td><p>afa9b34</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>B-03</p></td>
+<td><p>Fit time at the largest window, LAMDA (median of 3, this laptop)</p></td>
+<td><p>LR 2.47 s (converged at 325 iterations, cap 1000); LightGBM fast 1.23 s; LightGBM default 0.75 s; repeated fits byte-identical; peak 0.20 to 0.27 GB</p></td>
+<td><p>reports/tables/fit_times.csv</p></td>
+<td><p>afa9b34</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>B-05</p></td>
+<td><p>Fit time and memory after the comparator amendment (supersedes B-02 to B-04; same windows, 3 repeats)</p></td>
+<td><p>BODMAS: LR 1.35 s, LightGBM fast 3.54 s, default 8.55 s; random-split step (two comparators, both models) 11.64 s, peak 1.37 GB on 46,544 pooled rows. LAMDA: LR 2.57 s, fast 1.23 s, default 0.87 s; random-split step 12.41 s, peak 0.50 GB on 154,703 pooled rows. Every fit under 60 s; peaks under the 1.5 GB cap</p></td>
+<td><p>reports/tables/fit_times.csv</p></td>
+<td><p>92018af</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-01</p></td>
+<td><p>E0 evidence runs (clean commit, five seeds, <code class="docutils literal notranslate"><span class="pre">--require-clean</span></code>)</p></td>
+<td><p>BODMAS: config hash 608f15e1a6628732eb71e3e2fc1bac3ede1c704f874649b320fd1f9abc9b7957, 180 window rows, 1,160 slot rows, 3,185,890 predictions, predictions sha256 0b3824ffb4850ddf8060430b16e0a62490b73912a067d040eeffe667387698b0, 965.7 s, resident peak 1.40 GiB. LAMDA: 613c0f98e507a8ad9d2ea70d340da5107aeb3820c773d46083d4ba167395341f, 420, 5,370, 23,210,920, 19b1132ef14bf11132e61e77d4bccf5c494e753830e80749db36a0794aa38bfb, 2,200.3 s, peak 0.90 GiB</p></td>
+<td><p>results/e0/608f15e1a6628732/run.json, results/e0/613c0f98e507a8ad/run.json (not committed)</p></td>
+<td><p>cd72d83</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>E-02</p></td>
+<td><p>BODMAS headline, ADR-0005 windows (6), 10%, five seeds: A-AUT(F1) mean ± std over windows; prior-matched random-split F1; gap, per-window range and 95% moving-block bootstrap</p></td>
+<td><p>LR 0.912 ± 0.018; 0.940; 0.028; 0.000 to 0.057; 0.014 to 0.038. LightGBM fast 0.977 ± 0.012; 0.977; -0.000; -0.024 to 0.013; -0.008 to 0.007</p></td>
+<td><p>reports/tables/e0_baselines.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured] (windows overlap: descriptive)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-03</p></td>
+<td><p>LAMDA headline, ADR-0005 windows (16), 10%, five seeds (same columns as E-02)</p></td>
+<td><p>LR 0.678 ± 0.058; 0.831; 0.152; 0.041 to 0.244; 0.100 to 0.175. LightGBM fast 0.760 ± 0.070; 0.897; 0.137; 0.046 to 0.302; 0.091 to 0.160</p></td>
+<td><p>reports/tables/e0_baselines.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured] (windows overlap: descriptive)</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>E-04</p></td>
+<td><p>A-AUT at Chow’s stride min(nT, nE) (PROTOCOL D18)</p></td>
+<td><p>LAMDA (12 windows): LR 0.683 ± 0.060, LightGBM 0.761 ± 0.063. BODMAS (4 windows): LR 0.912 ± 0.023, LightGBM 0.977 ± 0.015. Within 0.01 of E-02 and E-03 in every cell</p></td>
+<td><p>reports/tables/e0_baselines.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-05</p></td>
+<td><p>A-AUT at the 5% sensitivity ratio</p></td>
+<td><p>LAMDA (11 windows): LR 0.625 ± 0.048, LightGBM 0.743 ± 0.072. BODMAS (6 windows): LR 0.846 ± 0.034, LightGBM 0.960 ± 0.024. Lower than at 10% in all four cells; the LAMDA 5% windows differ from the 10% windows</p></td>
+<td><p>reports/tables/e0_baselines.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>E-06</p></td>
+<td><p>Gap against the pooled-prior comparator, beside the prior-matched one (E-02, E-03)</p></td>
+<td><p>LAMDA: LR 0.154, LightGBM 0.139. BODMAS: LR 0.032, LightGBM 0.001. Both comparators share the global malware cap (not matched per slot)</p></td>
+<td><p>reports/tables/e0_baselines.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-07</p></td>
+<td><p>Single-run protocol (train on the first nT slots of a run, evaluate the rest), AUT averaged unweighted over runs</p></td>
+<td><p>LAMDA (3 runs): LR 0.720, LightGBM 0.784. BODMAS (2 runs): LR 0.897, LightGBM 0.971</p></td>
+<td><p>reports/tables/e0_baselines.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>E-08</p></td>
+<td><p>Operating point and prevalence (10%, ADR-0005 windows)</p></td>
+<td><p>Mean FPR / FNR: LAMDA LR 0.036 / 0.291, LightGBM 0.020 / 0.269; BODMAS LR 0.017 / 0.035, LightGBM 0.004 / 0.014. Training prior across rolling windows: LAMDA 0.080 to 0.730, BODMAS 0.353 to 0.550. LAMDA: 29 of 57 distinct evaluated months (51%) and 45% of window-slot cells below the 10% target; comparator test ratio 0.098 against 0.084 time-aware. LightGBM F1 on LAMDA 2023-10 / 2023-11: 0.49 / 0.91 at slot ratios 0.052 / 0.100</p></td>
+<td><p>reports/tables/e0_baselines.csv; reports/tables/e0_per_slot.csv</p></td>
+<td><p>results cd72d83; tables 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-09</p></td>
+<td><p>Real-data leakage canary (nearest-centroid, ADR-0005 windows)</p></td>
+<td><p>LAMDA, 4 windows: AUT 0.446 (true timestamps), 0.632 (shuffled), random-split F1 0.631, closure 1.00, PASS, exit 0. BODMAS, 6 windows: 0.368, 0.358, 0.360, NO_GAP, exit 3 (inconclusive)</p></td>
+<td><p>reports/tables/e0_canary.csv; results/canary/*.json (not committed)</p></td>
+<td><p>script 5893df7 (unchanged since Phase 3); table 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>E-10</p></td>
+<td><p>Evaluated rows repeating a feature vector of their training window (rolling, LR, seed 0, per window-slot cell; time-aware path only)</p></td>
+<td><p>BODMAS 0 of 101,247; LAMDA 52,985 of 838,012 (6.3%)</p></td>
+<td><p>reports/tables/e0_repeats.csv</p></td>
+<td><p>results cd72d83; table 2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-11</p></td>
+<td><p>Reproducibility: seed 0 of every variant rerun from the same configs on the same commit</p></td>
+<td><p>16 of 16 cell prediction hashes equal; 120 of 120 window rows equal on AUT and on every comparator column (BODMAS 8 cells, 36 rows; LAMDA 8 cells, 84 rows)</p></td>
+<td><p>scripts/compare_runs.py output on results/e0_rerun (not committed)</p></td>
+<td><p>cd72d83</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>E-12</p></td>
+<td><p>Context numbers for the E0 report</p></td>
+<td><p>BODMAS evaluates 20 distinct two-week slots (about nine months, two stretches). Pooling a mean of slot F1 against one pooled F1 favours the comparator by about 0.01 to 0.02 on LAMDA (back-of-envelope from stored FPR, FNR and prevalence) and about 0 on BODMAS</p></td>
+<td><p>docs/DECISIONS/ADR-0005-windows-and-size-gate.md (20 slots); stats review of 11 Oct 2026 (pooling)</p></td>
+<td><p>2e1702a</p></td>
+<td><p>slot count [verified]; pooling effect [estimate]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>T-01</p></td>
+<td><p>Fast test suite at the Phase 4 evidence commit</p></td>
+<td><p>669 passed, 1 deselected; ruff check and format clean</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">pytest</span> <span class="pre">-q</span></code>; <code class="docutils literal notranslate"><span class="pre">ruff</span> <span class="pre">check</span> <span class="pre">.</span></code></p></td>
+<td><p>2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-even"><td><p>B-04</p></td>
+<td><p>Random-split step (all configured models, largest pooled window) and machine</p></td>
+<td><p>BODMAS 5.55 s, peak 1.12 GB on 46,544 pooled rows; LAMDA 6.58 s, peak 0.42 GB on 154,703; 8 cores / 16 threads, 7.25 GB RAM; every configured fit under the 60 s rule</p></td>
+<td><p>reports/tables/fit_times.csv</p></td>
+<td><p>afa9b34</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-11</p></td>
+</tr>
+<tr class="row-odd"><td><p>S-01</p></td>
+<td><p>Queue rule under test: a label queried in slot t is usable from slot t+1+d, released exactly once, ignored and counted when t+1+d is at or after the number of evaluation slots; queued = released + ignored</p></td>
+<td><p>d in {0, 1, 2, 3}, parametrised and 150 property-based scenarios; 21 tests</p></td>
+<td><p>tests/test_queue_delay.py</p></td>
+<td><p>b3ff456</p></td>
+<td><p>[measured] (code-behaviour check, not evidence about detectors)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>S-02</p></td>
+<td><p>Sealed labels: with y, ts and row_id replaced by spies, every read comes from sim/queue.py; selectors and policies read none; selectors, policies and the pool cannot import the label holders</p></td>
+<td><p>spy test at component level and at runner level (E1 comparator on and off); import-boundary test</p></td>
+<td><p>tests/test_sim_sealed.py; tests/test_runner_sim.py</p></td>
+<td><p>0117287</p></td>
+<td><p>[measured] (code-behaviour check)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>S-03</p></td>
+<td><p>Regression fixture (toy stream of 24 slots, 1,500 rows, 40 features, 10% malware, 5 seeds): never retraining is the worst arm; more labels per slot help; a longer delay hurts; deleting arrived labels from the pool breaks 3 of 4 assertions</p></td>
+<td><p>ordering only, no numbers kept</p></td>
+<td><p>tests/test_runner_regression.py</p></td>
+<td><p>d92c998</p></td>
+<td><p>[measured] (synthetic mechanics test; its numbers are never evidence)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>S-04</p></td>
+<td><p>Deliberate-breakage checks of the simulator tests</p></td>
+<td><p>3 of 3 caught: arrived labels never reach the pool; in-loop C1 assertion removed; comparator rows not filtered from the E0 table</p></td>
+<td><p>tests/test_runner_regression.py; tests/test_runner_sim.py; tests/test_make_e0_table.py</p></td>
+<td><p>0117287</p></td>
+<td><p>[measured] (code-behaviour check)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>S-05</p></td>
+<td><p>Determinism and resume: same config and seed give identical predictions; a run killed after two of four units resumes to the same predictions hash with no duplicate rows</p></td>
+<td><p>predictions sha256 equal; 0 duplicate (seed, window, slot, row, model) keys</p></td>
+<td><p>tests/test_runner_sim.py</p></td>
+<td><p>86b69fd</p></td>
+<td><p>[measured] (code-behaviour check)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>E-13</p></td>
+<td><p>Label-influence diagnostic, LAMDA (periodic every 3 slots, d = 0, random selection, weight 1, no truncation, 3 seeds, 16 windows): share of scored rows, from each arm’s first actual refit, whose 0.5 decision differs from never retraining, at 0.5% / 5% of the slot</p></td>
+<td><p>LR 0.88% / 2.11% (16,451 / 39,449 of 1,872,651 rows); LightGBM 0.71% / 0.99% (13,284 / 18,554). Labels arrived by window end: 239 / 2,393 on average; initial pool 29,422 rows on average</p></td>
+<td><p>reports/tables/label_influence_lamda.csv; results/li 04f986e9313f4538 (never), dbe4452622b192ac (0.5%), 4ac3d383dfdba007 (5%)</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured] (counts decision changes only; not an effect on AUT or F1; seeds and overlapping windows are not independent replicates)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-14</p></td>
+<td><p>Same diagnostic, BODMAS (3 seeds, 6 windows)</p></td>
+<td><p>LR 0.22% / 0.45% (327 / 672 of 149,982 rows); LightGBM 0.19% / 0.22% (287 / 324). Labels arrived: 70 / 705 on average; initial pool 14,116 rows. Identical table from the earlier runs at fa614c3 (34add4eca4bad834, 457d6a929177e93f, be725cfde75ff0d6)</p></td>
+<td><p>reports/tables/label_influence_bodmas.csv; results/li ed348555adec05b6, 8076e24d690b20ad, 82c36f8d16241725</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured] (same caveats as E-13)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>E-15</p></td>
+<td><p>Changed decisions by true class at 5% of the slot (E-13, E-14 runs) and the spread over windows of the overall share</p></td>
+<td><p>LAMDA: malware rows 7.70% (LR) and 4.40% (LightGBM) against benign rows 1.60% and 0.68% (156,393 malware rows scored per model); per-window share 1.19% to 3.12% (LR), 0.47% to 2.89% (LightGBM). BODMAS: malware 0.51% and 0.71%, benign 0.44% and 0.16%; per-window 0.28% to 0.57% and 0.12% to 0.47%</p></td>
+<td><p>reports/tables/label_influence_lamda.csv; label_influence_bodmas.csv</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured] (no noise floor or placebo arm exists; direction of change not split)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-16</p></td>
+<td><p>E1 time-aware series reproduces E0’s A-AUT (same windows, five seeds, never retrained)</p></td>
+<td><p>LAMDA LR 0.6785 (E0 0.678), LightGBM 0.7599 (0.760); BODMAS LR 0.9122 (0.912), LightGBM 0.9769 (0.977)</p></td>
+<td><p>reports/tables/e1_summary.csv</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>E-17</p></td>
+<td><p>E1 per-slot matched random-split series: AUT of the random-split series minus AUT of the time-aware series, mean over windows (sd; per-window range; windows with a positive difference)</p></td>
+<td><p>BODMAS LightGBM 0.006 (0.006; -0.001 to 0.013; 5 of 6), LR 0.035 (0.011; 0.025 to 0.054; 6 of 6). LAMDA LightGBM 0.040 (0.052; -0.073 to 0.157; 14 of 16), LR 0.029 (0.085; -0.182 to 0.120; 12 of 16)</p></td>
+<td><p>reports/tables/e1_summary.csv; reports/figures/e1_random_vs_time.png</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured]; exploratory, not the registered RQ1 estimand; no interval (windows overlap, about four independent blocks on LAMDA)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-18</p></td>
+<td><p>Ratio actually reached by each series in E-17, and the gap on cells where both series reached the target</p></td>
+<td><p>LAMDA: mean achieved ratio 0.084 (time-aware) and 0.075 (random split); below-target share 45% and 47%; mean rows per slot 4,365 and 3,257; gap on the 475 cells at target in both series: LR 0.062, LightGBM 0.042. BODMAS: 0.0998 and 0.0997; 0% and 0.6%; 2,812 and 1,926 rows; 179 cells at target: LR 0.034, LightGBM 0.006</p></td>
+<td><p>reports/tables/e1_summary.csv</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured] (per-slot F1 differences, not AUT; the random split removes more malware than benign from slots that were near target, which lowers its ratio)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>E-19</p></td>
+<td><p>Why E0’s gap and E-17’s differ, from the E1 run (same fitted comparator model): E0-style gap (window-level pooled comparator F1 minus time-aware AUT) against the random-split F1 pooled over evaluation-slot rows and the mean of per-slot F1</p></td>
+<td><p>LAMDA LR: E0-style gap 0.152; random-split F1 pooled over evaluation rows 0.727, mean per-slot 0.708, time-aware AUT 0.679. LightGBM: 0.137; 0.812; 0.800; 0.760. BODMAS LR: 0.028; 0.947; 0.947; 0.912. LightGBM: -0.000; 0.982; 0.982; 0.977. Reproduces E-02 and E-03</p></td>
+<td><p>reports/tables/e1_summary.csv</p></td>
+<td><p>results 2bd12d6; table e170e7b</p></td>
+<td><p>[measured]; the part due to held-out training-era rows and the part due to one global C3 draw are not separated (those predictions were not stored)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-20</p></td>
+<td><p>Memory of the Phase 5 runs against the 1.5 GiB cap (1,610,612,736 B)</p></td>
+<td><p>BODMAS E1 (45ea4054625ca825): peak working set 1,581,977,600 B (1.47 GiB, 98.2% of the cap). LAMDA E1 (df138cc96fa91622): own sampled peak 875,352,064 B (0.82 GiB); its recorded 1,582,047,232 B is the process-lifetime peak shared with the BODMAS run. Label-influence arms, process peak: BODMAS never 0.93 GiB, periodic 1.37 GiB; LAMDA never 0.66 GiB, periodic 0.86 GiB. Two BODMAS arms run with two workers in one process crossed the cap (reported peak 1.50 GB; run_failed.json in 9cf4f42b768ba56d and d17a45cd639f8c2f, code 716608f)</p></td>
+<td><p>results/e1/<em>/run.json; results/li/</em>/run.json</p></td>
+<td><p>2bd12d6 (failures 716608f)</p></td>
+<td><p>[measured] (the watchdog measures the process, so the failure does not show that one run alone exceeds the cap)</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>E-21</p></td>
+<td><p>Run log of the Phase 5 diagnostics on BODMAS: three runs at 716608f failed on the memory cap (two workers); three runs at fa614c3 completed; three runs at 2bd12d6 completed and are the ones cited</p></td>
+<td><p>the fa614c3 and 2bd12d6 label-influence tables are identical; the rerun followed leakage-review code changes (0117287), not a result</p></td>
+<td><p>results/li (hashes in E-13, E-14, E-20); docs/DECISIONS/ADR-0007</p></td>
+<td><p>716608f, fa614c3, 2bd12d6</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>S-06</p></td>
+<td><p>Real-data resume check: a BODMAS arm (configs/li_bodmas_b0.5.yaml) was killed 40 s in with 3 of 18 units finished, then resumed on a later commit</p></td>
+<td><p>predictions sha256 59cef8dace6bf3b6154d633a5fbb0980734c82b74233b1594491e375ec20b0cb, equal to the uninterrupted run 8076e24d690b20ad made at 2bd12d6</p></td>
+<td><p>results/resume_check/d3b9f565159f1333 (not committed)</p></td>
+<td><p>42da088</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>P-01</p></td>
+<td><p>Evaluation slots and their C3 draws depend on seed and slot only, so arms of a contrast share test rows</p></td>
+<td><p>per-slot draw keyed by (seed, slot id); same rows in every grid cell</p></td>
+<td><p>src/driftwatch/data/constraints.py; tests/test_grid.py; leakage reviews of 13 and 15 Oct 2026</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified] code reading and tests</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-02</p></td>
+<td><p>Rolling windows (nT, nE, stride)</p></td>
+<td><p>LAMDA 4, 12, 3; BODMAS 3, 6, 2</p></td>
+<td><p>PREREG (prereg-v1); docs/DECISIONS/ADR-0005</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>P-03</p></td>
+<td><p>Fixed decision threshold</p></td>
+<td><p>0.5, malware when P &gt; 0.5</p></td>
+<td><p>PREREG (prereg-v1); ADR-0006</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-04</p></td>
+<td><p>AUT and A-AUT definitions</p></td>
+<td><p>AUT = 1/(N-1) sum (f_k + f_{k+1})/2; A-AUT = mean and sample std (ddof 1) over windows</p></td>
+<td><p>docs/PROTOCOL.md section 4; src/driftwatch/metrics/aut.py</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>P-05</p></td>
+<td><p>Budget as a percentage of the evaluated slot after C3, count floor(pct/100 * n + 1/2); grid budgets 0.5, 1, 2, 5%</p></td>
+<td><p>as stated</p></td>
+<td><p>PREREG (prereg-v1); ADR-0007 (accepted 15 Oct 2026)</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-06</p></td>
+<td><p>Recovery time definition</p></td>
+<td><p>F1 back to 90% of the pre-drop level; drop = fall of at least 0.05 below the trailing 3-slot mean</p></td>
+<td><p>PREREG (prereg-v1); src/driftwatch/metrics/slot.py</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>P-07</p></td>
+<td><p>Primary contrasts C-D1, C-D2, C-P, C-B per dataset and model</p></td>
+<td><p>as in the PREREG RQ2 row</p></td>
+<td><p>PREREG (prereg-v1)</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-08</p></td>
+<td><p>Two-stage bootstrap: moving blocks of windows of length ceil(nE/stride) (LAMDA 4, BODMAS 3), then seeds within windows; 10,000 replicates; percentile 95% interval; bootstrap seed 20261215</p></td>
+<td><p>as stated</p></td>
+<td><p>PREREG (prereg-v1); src/driftwatch/metrics/stats.py</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>P-09</p></td>
+<td><p>Effect-size units</p></td>
+<td><p>AUT lost per slot of delay (contrast / 3, and OLS slope over d = 0..3); AUT gained per 100 extra labels per evaluated slot</p></td>
+<td><p>PREREG (prereg-v1); src/driftwatch/metrics/stats.py</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-10</p></td>
+<td><p>Decision rule and equivalence margin</p></td>
+<td><p>detected when the 95% interval excludes 0 in the hypothesised direction; margin 0.01 AUT (estimate confirmed by the researcher 15 Oct 2026); RQ1 band 0.05</p></td>
+<td><p>PREREG (prereg-v1)</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[estimate] margin and band</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>P-11</p></td>
+<td><p>Smallest two-sided exact Wilcoxon p-value with n paired seeds</p></td>
+<td><p>0.0625 for 5 pairs; 2/1024 = 0.00195 for 10 pairs</p></td>
+<td><p>tests/test_stats.py; docs/PROTOCOL.md section 4 (guide section 10)</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-12</p></td>
+<td><p>Known limits written before the results: BODMAS one useful refit per window and periodic equals never at d = 3; LAMDA 16 windows are about four independent blocks; seeds are C3 and selector draws; repeats of feature vectors are counted per slot, not removed</p></td>
+<td><p>as stated</p></td>
+<td><p>PREREG (prereg-v1), “Known limits”; ADR-0007; ADR-0008</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>P-13</p></td>
+<td><p>Share of scored rows whose 0.5 decision changed after retraining, at 0.5% and 5% of the slot</p></td>
+<td><p>0.2% to 2.1% across datasets and models (E-13 and E-14 give each value)</p></td>
+<td><p>docs/CLAIMS.md E-13, E-14</p></td>
+<td><p>2bd12d6</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-14</p></td>
+<td><p>The per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA</p></td>
+<td><p>mean achieved ratio 0.075 against 0.084 (E-18)</p></td>
+<td><p>docs/CLAIMS.md E-18</p></td>
+<td><p>2bd12d6</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-13</p></td>
+</tr>
+<tr class="row-even"><td><p>P-15</p></td>
+<td><p>The E2 grid expands to 27 runs per dataset: 16 periodic cells (4 delays x 4 budgets, seeds 0-4), 6 headline cells with seeds 5-9, 4 Chow-stride cells, 1 never run (seeds 0-9, both window variants)</p></td>
+<td><p>27 per dataset, 54 in all</p></td>
+<td><p>configs/e2_lamda.yaml; configs/e2_bodmas.yaml; tests/test_grid.py</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-16</p></td>
+<td><p>Retrain events of the periodic policy: before evaluation slots 3, 6, 9, … counted from the first evaluation slot of the window; an event with no label arrived since the last fit is logged as a no-op, not refitted; labels whose release slot falls after the window are ignored and counted</p></td>
+<td><p>as stated</p></td>
+<td><p>PREREG (prereg-v1), “Training-pool design”; ADR-0007 (accepted 15 Oct 2026); tests/test_runner_sim.py</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-22</p></td>
+<td><p>Leakage canary re-run with the final analysis and simulator code, same windows as Phase 4 (nearest-centroid, ADR-0005 windows)</p></td>
+<td><p>LAMDA, 4 windows: AUT 0.446 (true timestamps), 0.632 (shuffled), random-split F1 0.631, closure 1.00, PASS. BODMAS, 6 windows: 0.368, 0.358, 0.360, NO_GAP (inconclusive). Spec digests and every value equal those of E-09</p></td>
+<td><p>results/canary/lamda-adr0005-p6.json; results/canary/bodmas-adr0005-p6.json (not committed)</p></td>
+<td><p>5893df7 (script, unchanged) on the Phase 6 tree</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-23</p></td>
+<td><p>E2 grid on BODMAS: completeness and cost</p></td>
+<td><p>27 of 27 cells complete, 0 failed, all at code version c26aa5f; 1.2 h of cell wall time in total; longest fit 14.0 s (60 s rule not triggered); peak 1.38 GiB (cap 1.5 GiB)</p></td>
+<td><p>results/e2/bodmas/ledger.jsonl (not committed)</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>G-01</p></td>
+<td><p>Published sanity values of the guide (Table IV of arXiv 2506.23814, F1-based AUT over 12-month windows, Android data that is not LAMDA or BODMAS): Drebin 0.88 (0.02) on APIGraph 2014 to 2018 and 0.72 (0.06) on Transcendent-style data; DeepDrebin 0.90 (0.03) and 0.70 (0.10); HCC 0.91 (0.01) and 0.72 (0.06)</p></td>
+<td><p>context only, never a target</p></td>
+<td><p>docs/source/DriftWatch_Build_Guide_v2.pdf p. 9 (text extracted with pypdf)</p></td>
+<td><p>c26aa5f</p></td>
+<td><p>[verified] against the guide; not re-checked against the arXiv paper</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-24</p></td>
+<td><p>Clean-clone reproduction of Table 1 on BODMAS (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">reproduce</span> <span class="pre">table1</span></code>): fresh clone of the repository, locked environment, BODMAS fetched into its own data root, E0 config run, table compared with <code class="docutils literal notranslate"><span class="pre">reports/tables/e0_baselines.csv</span></code></p></td>
+<td><p>MATCH on 8 rows: largest difference in the time-aware columns 0.0000 (tolerance 0.002); largest difference in the random-split comparator columns 0.0056 (tolerance 0.02: the comparator draw is keyed by the manifest hash and differs after a rebuild); the 3 raw files equal the committed manifest byte for byte; run 1,632 s, total 1,874 s, process peak 1.41 GiB, while two other long jobs ran on the machine; code version 0fe40b4, lock sha256 2c5a7dfa5000f370ed1b4c1bba4c86c689a18a5bcce570be8b996fddddbca00e, Windows 11, Python 3.12.13</p></td>
+<td><p>reports/reproduction/table1_2026-10-15.json in the clone (copied to results/logs/clean_clone_repro2.log; not committed)</p></td>
+<td><p>0fe40b4</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-even"><td><p>E-25</p></td>
+<td><p>E3 grid on BODMAS (reduced grid, prereg-v2): completeness and cost</p></td>
+<td><p>28 of 28 cells complete, 0 failed, all at code version f38858e, first event after the tag (tag 2026-10-15 21:17 IST, first cell 21:19 IST); 1.2 h of cell wall time; longest fit 7.6 s; peak 1.14 GiB (cap 1.5 GiB)</p></td>
+<td><p>results/e3/bodmas/ledger.jsonl (not committed)</p></td>
+<td><p>f38858e</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-15</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-26</p></td>
+<td><p>E2 grid completeness (planned against completed against failed)</p></td>
+<td><p>BODMAS: 27 of 27 cells complete, 0 failed, code version(s) [‘c26aa5f’]; LAMDA: 27 of 27 cells complete, 0 failed, code version(s) [‘c26aa5f’]; longest real fit 14.0 s (BODMAS) and 31.8 s (LAMDA), 60 s rule not triggered; one cell (LAMDA periodic-d3-b1-s5-9, 16 Oct) spanned an eight-hour Modern Standby, so its wall time and one timed ‘fit’ (16,639 s) are suspend artifacts, annotated in the ledger (the concurrent E3 grid had the same artifact in one of its cells, 16,630 s); the LAMDA never cell has two ‘started’ events (15 Oct, 10:56 and 12:15 UTC) because the driver stopped on a transient code-version lookup failure and resumed from checkpoints at the same code version, not because of a result; peak memory 1.38 GiB (BODMAS) and 0.95 GiB (LAMDA), cap 1.5 GiB; cell wall time 1.2 h (BODMAS) and 17.6 h (LAMDA, including the 8.4 h standby cell)</p></td>
+<td><p>reports/tables/e2_ledger.csv; results/e2/*/ledger.jsonl (not committed)</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-27</p></td>
+<td><p>E2 BODMAS A-AUT(F1) per arm, five seeds, ADR-0005 windows (6 windows): mean over windows, sd over windows, mean labels queried per slot</p></td>
+<td><p>lr never 0.912 (sd 0.018); lr periodic d=0 B=0.5% 0.912 (sd 0.019; 13.9 labels per slot); lr periodic d=0 B=1% 0.913 (sd 0.019; 28.1 labels per slot); lr periodic d=0 B=2% 0.914 (sd 0.019; 56.3 labels per slot); lr periodic d=0 B=5% 0.915 (sd 0.018; 140.7 labels per slot); lr periodic d=3 B=5% 0.912 (sd 0.018; 140.7 labels per slot); lgbm never 0.977 (sd 0.012); lgbm periodic d=0 B=0.5% 0.976 (sd 0.013; 13.9 labels per slot); lgbm periodic d=0 B=1% 0.977 (sd 0.012; 28.1 labels per slot); lgbm periodic d=0 B=2% 0.977 (sd 0.012; 56.3 labels per slot); lgbm periodic d=0 B=5% 0.977 (sd 0.011; 140.7 labels per slot); lgbm periodic d=3 B=5% 0.977 (sd 0.012; 140.7 labels per slot). The full 4 x 4 grid is in the table</p></td>
+<td><p>reports/tables/e2_aaut.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-28</p></td>
+<td><p>E2 LAMDA A-AUT(F1) per arm, five seeds, ADR-0005 windows (16 windows): mean over windows, sd over windows, mean labels queried per slot</p></td>
+<td><p>lr never 0.679 (sd 0.058); lr periodic d=0 B=0.5% 0.682 (sd 0.058; 21.8 labels per slot); lr periodic d=0 B=1% 0.683 (sd 0.058; 43.6 labels per slot); lr periodic d=0 B=2% 0.687 (sd 0.055; 87.3 labels per slot); lr periodic d=0 B=5% 0.694 (sd 0.050; 218.3 labels per slot); lr periodic d=3 B=5% 0.684 (sd 0.054; 218.3 labels per slot); lgbm never 0.760 (sd 0.069); lgbm periodic d=0 B=0.5% 0.763 (sd 0.068; 21.8 labels per slot); lgbm periodic d=0 B=1% 0.767 (sd 0.066; 43.6 labels per slot); lgbm periodic d=0 B=2% 0.772 (sd 0.064; 87.3 labels per slot); lgbm periodic d=0 B=5% 0.781 (sd 0.059; 218.3 labels per slot); lgbm periodic d=3 B=5% 0.767 (sd 0.065; 218.3 labels per slot). The full 4 x 4 grid is in the table</p></td>
+<td><p>reports/tables/e2_aaut.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-29</p></td>
+<td><p>E2 BODMAS, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT difference with 95% two-stage bootstrap interval (C-D1 and C-D2: delay 0 minus delay 3 at 1% and 5%; C-P: periodic d=0 B=5% minus never; C-B: B=5% minus B=0.5% at d=0), verdict by the registered rule, effect size in plain units</p></td>
+<td><p>lr C-D1 0.0010 [-0.0001, 0.0023] equivalent = 0.0003 [-0.0000, 0.0008] AUT lost per slot of delay, labels per slot 28.1 against 28.1; lr C-D2 0.0027 [0.0019, 0.0036] detected_within_margin = 0.0009 [0.0006, 0.0012] AUT lost per slot of delay, labels per slot 140.7 against 140.7; lr C-P 0.0027 [0.0019, 0.0036] detected_within_margin = 0.0019 [0.0014, 0.0025] AUT gained per 100 extra labels per slot, labels per slot 140.7 against 0.0; lr C-B 0.0025 [0.0014, 0.0031] detected_within_margin = 0.0020 [0.0011, 0.0025] AUT gained per 100 extra labels per slot, labels per slot 140.7 against 13.9; lgbm C-D1 0.0001 [-0.0005, 0.0008] equivalent = 0.0000 [-0.0002, 0.0003] AUT lost per slot of delay, labels per slot 28.1 against 28.1; lgbm C-D2 0.0001 [-0.0005, 0.0008] equivalent = 0.0000 [-0.0002, 0.0003] AUT lost per slot of delay, labels per slot 140.7 against 140.7; lgbm C-P 0.0001 [-0.0005, 0.0008] equivalent = 0.0001 [-0.0003, 0.0006] AUT gained per 100 extra labels per slot, labels per slot 140.7 against 0.0; lgbm C-B 0.0012 [0.0001, 0.0020] detected_within_margin = 0.0009 [0.0001, 0.0016] AUT gained per 100 extra labels per slot, labels per slot 140.7 against 13.9. Note: on BODMAS delay 3 equals never by construction, so C-D2 and C-P are one comparison and C-D1 is periodic (d=0, 1%) against never; lgbm C-B is borderline (lower end 0.0001) and not checked at Chow’s stride</p></td>
+<td><p>reports/tables/e2_contrasts.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-30</p></td>
+<td><p>E2 LAMDA, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT difference with 95% two-stage bootstrap interval (C-D1 and C-D2: delay 0 minus delay 3 at 1% and 5%; C-P: periodic d=0 B=5% minus never; C-B: B=5% minus B=0.5% at d=0), verdict by the registered rule, effect size in plain units</p></td>
+<td><p>lr C-D1 0.0032 [-0.0011, 0.0077] equivalent = 0.0011 [-0.0004, 0.0026] AUT lost per slot of delay, labels per slot 43.6 against 43.6; lr C-D2 0.0114 [0.0047, 0.0171] detected = 0.0038 [0.0016, 0.0057] AUT lost per slot of delay, labels per slot 218.3 against 218.3; lr C-P 0.0168 [0.0071, 0.0243] detected = 0.0077 [0.0033, 0.0111] AUT gained per 100 extra labels per slot, labels per slot 218.3 against 0.0; lr C-B 0.0131 [0.0061, 0.0191] detected = 0.0066 [0.0031, 0.0097] AUT gained per 100 extra labels per slot, labels per slot 218.3 against 21.8; lgbm C-D1 0.0046 [0.0025, 0.0057] detected_within_margin = 0.0015 [0.0008, 0.0019] AUT lost per slot of delay, labels per slot 43.6 against 43.6; lgbm C-D2 0.0131 [0.0083, 0.0151] detected = 0.0044 [0.0028, 0.0050] AUT lost per slot of delay, labels per slot 218.3 against 218.3; lgbm C-P 0.0197 [0.0124, 0.0224] detected = 0.0090 [0.0057, 0.0103] AUT gained per 100 extra labels per slot, labels per slot 218.3 against 0.0; lgbm C-B 0.0165 [0.0104, 0.0187] detected = 0.0084 [0.0053, 0.0095] AUT gained per 100 extra labels per slot, labels per slot 218.3 against 21.8</p></td>
+<td><p>reports/tables/e2_contrasts.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-31</p></td>
+<td><p>E2 supporting check: seed-level Wilcoxon signed-rank p (10 paired seeds, floor 0.00195) and Holm-adjusted p over the fixed family of 16 primary contrasts; seed-level and conditional on the realised windows, not a second test</p></td>
+<td><p>bodmas lr: p C-D1 0.1309, C-D2 0.0020, C-P 0.0020, C-B 0.0020; Holm C-D1 0.5234, C-D2 0.0312, C-P 0.0312, C-B 0.0312; bodmas lgbm: p C-D1 0.5566, C-D2 0.7695, C-P 0.7695, C-B 0.0840; Holm C-D1 1.0000, C-D2 1.0000, C-P 1.0000, C-B 0.4199; lamda lr: p C-D1 0.0098, C-D2 0.0020, C-P 0.0020, C-B 0.0020; Holm C-D1 0.0586, C-D2 0.0312, C-P 0.0312, C-B 0.0312; lamda lgbm: p C-D1 0.0020, C-D2 0.0020, C-P 0.0020, C-B 0.0020; Holm C-D1 0.0312, C-D2 0.0312, C-P 0.0312, C-B 0.0312</p></td>
+<td><p>reports/tables/e2_contrasts.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-32</p></td>
+<td><p>E2 the same four contrasts on seeds 0 to 4 only (nested in the 10-seed set, so not a replication)</p></td>
+<td><p>bodmas lr: C-D1 0.0011 [-0.0003, 0.0028] equivalent, C-D2 0.0030 [0.0017, 0.0042] detected_within_margin, C-P 0.0030 [0.0017, 0.0042] detected_within_margin, C-B 0.0028 [0.0011, 0.0035] detected_within_margin; bodmas lgbm: C-D1 0.0005 [-0.0004, 0.0013] equivalent, C-D2 0.0005 [-0.0007, 0.0016] equivalent, C-P 0.0005 [-0.0007, 0.0016] equivalent, C-B 0.0013 [-0.0007, 0.0022] equivalent; lamda lr: C-D1 0.0027 [-0.0007, 0.0065] equivalent, C-D2 0.0106 [0.0037, 0.0164] detected, C-P 0.0159 [0.0050, 0.0243] detected, C-B 0.0124 [0.0044, 0.0190] detected; lamda lgbm: C-D1 0.0047 [0.0026, 0.0057] detected_within_margin, C-D2 0.0134 [0.0084, 0.0156] detected, C-P 0.0206 [0.0133, 0.0233] detected, C-B 0.0171 [0.0104, 0.0195] detected</p></td>
+<td><p>reports/tables/e2_contrasts.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-33</p></td>
+<td><p>E2 OLS slope of A-AUT over delay 0 to 3 at each budget (five seeds), as AUT lost per slot of delay with 95% interval; on BODMAS this is a delay in one refit, not a curve</p></td>
+<td><p>bodmas lr: AUT lost per slot of delay (positive = falls) B=0.5% 0.0000 [-0.0002, 0.0005] at 13.9 labels per slot, B=1% 0.0004 [-0.0001, 0.0009] at 28.1 labels per slot, B=2% 0.0005 [0.0001, 0.0009] at 56.3 labels per slot, B=5% 0.0010 [0.0006, 0.0014] at 140.7 labels per slot; bodmas lgbm: AUT lost per slot of delay (positive = falls) B=0.5% -0.0001 [-0.0004, 0.0002] at 13.9 labels per slot, B=1% 0.0001 [-0.0001, 0.0003] at 28.1 labels per slot, B=2% 0.0001 [-0.0001, 0.0002] at 56.3 labels per slot, B=5% 0.0001 [-0.0002, 0.0005] at 140.7 labels per slot; lamda lr: AUT lost per slot of delay (positive = falls) B=0.5% 0.0007 [-0.0001, 0.0014] at 21.8 labels per slot, B=1% 0.0007 [-0.0006, 0.0021] at 43.6 labels per slot, B=2% 0.0019 [-0.0001, 0.0038] at 87.3 labels per slot, B=5% 0.0034 [0.0007, 0.0059] at 218.3 labels per slot; lamda lgbm: AUT lost per slot of delay (positive = falls) B=0.5% 0.0007 [0.0002, 0.0010] at 21.8 labels per slot, B=1% 0.0016 [0.0009, 0.0020] at 43.6 labels per slot, B=2% 0.0026 [0.0014, 0.0032] at 87.3 labels per slot, B=5% 0.0046 [0.0027, 0.0053] at 218.3 labels per slot</p></td>
+<td><p>reports/tables/e2_secondary.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-34</p></td>
+<td><p>E2 budget response at delay 0, 10 seeds: AUT gained per 100 extra labels per slot between neighbouring budgets, and the concavity (gain 0.5% to 1% minus gain 2% to 5%; positive = diminishing returns) with 95% intervals</p></td>
+<td><p>bodmas lr: 0.5-&gt;1 0.0054 [0.0007, 0.0100], 1-&gt;2 0.0014 [-0.0031, 0.0049], 2-&gt;5 0.0016 [0.0006, 0.0022], gain(0.5-&gt;1) minus gain(2-&gt;5) 0.0038 [-0.0008, 0.0086]; bodmas lgbm: 0.5-&gt;1 0.0083 [-0.0001, 0.0159], 1-&gt;2 -0.0007 [-0.0022, 0.0011], 2-&gt;5 0.0002 [-0.0009, 0.0011], gain(0.5-&gt;1) minus gain(2-&gt;5) 0.0080 [-0.0008, 0.0162]; lamda lr: 0.5-&gt;1 0.0086 [-0.0082, 0.0229], 1-&gt;2 0.0097 [0.0035, 0.0160], 2-&gt;5 0.0053 [0.0020, 0.0076], gain(0.5-&gt;1) minus gain(2-&gt;5) 0.0033 [-0.0132, 0.0194]; lamda lgbm: 0.5-&gt;1 0.0166 [0.0083, 0.0219], 1-&gt;2 0.0081 [0.0040, 0.0097], 2-&gt;5 0.0072 [0.0046, 0.0081], gain(0.5-&gt;1) minus gain(2-&gt;5) 0.0095 [0.0029, 0.0144]</p></td>
+<td><p>reports/tables/e2_secondary.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-35</p></td>
+<td><p>RQ1 as registered (prereg-v1): gap between random-split F1 and time-aware AUT, mean over windows, five seeds, 95% two-stage interval, against the 0.05 band; per-slot matched comparator (primary) and E0 window-level comparator (secondary)</p></td>
+<td><p>lamda lgbm per-slot matched 0.0403 [0.0240, 0.0481] point at or above 0.05: False, lower end at or above 0.05: False; lamda lgbm E0 window-level 0.1369 [0.0909, 0.1595] point at or above 0.05: True, lower end at or above 0.05: True; lamda lr per-slot matched 0.0295 [-0.0125, 0.0768] point at or above 0.05: False, lower end at or above 0.05: False; lamda lr E0 window-level 0.1523 [0.0988, 0.1759] point at or above 0.05: True, lower end at or above 0.05: True; bodmas lgbm per-slot matched 0.0057 [0.0013, 0.0074] point at or above 0.05: False, lower end at or above 0.05: False; bodmas lgbm E0 window-level -0.0002 [-0.0082, 0.0068] point at or above 0.05: False, lower end at or above 0.05: False; bodmas lr per-slot matched 0.0354 [0.0271, 0.0395] point at or above 0.05: False, lower end at or above 0.05: False; bodmas lr E0 window-level 0.0282 [0.0135, 0.0382] point at or above 0.05: False, lower end at or above 0.05: False</p></td>
+<td><p>reports/tables/e2_rq1.csv (from the E1 runs results/e1)</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-36</p></td>
+<td><p>E2 secondary check at Chow’s window stride (seeds 0 to 4): C-D1, C-D2 and C-P</p></td>
+<td><p>bodmas lr (4 windows): C-D1 0.0008 [-0.0009, 0.0025] equivalent, C-D2 0.0027 [0.0012, 0.0035] detected_within_margin, C-P 0.0027 [0.0012, 0.0035] detected_within_margin; bodmas lgbm (4 windows): C-D1 -0.0003 [-0.0008, 0.0003] equivalent, C-D2 -0.0003 [-0.0019, 0.0021] equivalent, C-P -0.0003 [-0.0019, 0.0021] equivalent; lamda lr (12 windows): C-D1 0.0006 [-0.0026, 0.0035] equivalent, C-D2 0.0102 [0.0022, 0.0178] detected, C-P 0.0103 [-0.0016, 0.0207] not_detected; lamda lgbm (12 windows): C-D1 0.0036 [0.0017, 0.0047] detected_within_margin, C-D2 0.0120 [0.0065, 0.0156] detected, C-P 0.0163 [0.0094, 0.0197] detected. Note: on BODMAS C-D2 and C-P are the same comparison (delay 3 equals never by construction)</p></td>
+<td><p>reports/tables/e2_chow_secondary.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-37</p></td>
+<td><p>E2 absolute label counts and pool facts (LR, five seeds)</p></td>
+<td><p>bodmas: at B=5%, d=0 140.7 labels queried per slot, 844 per window, 705 arrived and 140 ignored because they would arrive after the window, 1 retrains per window, final pool 14821 rows, share of evaluated rows repeating a pool vector 0.000 (initial window only 0.000), mean achieved malware ratio 0.100, share of slots below target 0.000; lamda: at B=5%, d=0 218.3 labels queried per slot, 2619 per window, 2393 arrived and 226 ignored because they would arrive after the window, 3 retrains per window, final pool 31815 rows, share of evaluated rows repeating a pool vector 0.087 (initial window only 0.063), mean achieved malware ratio 0.084, share of slots below target 0.453; lamda at d=3: 2 retrains per window (1 no-op events)</p></td>
+<td><p>reports/tables/e2_labels_spent.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-39</p></td>
+<td><p>Regeneration check on the real E2 results: <code class="docutils literal notranslate"><span class="pre">make_tables.py</span></code> and <code class="docutils literal notranslate"><span class="pre">make_figures.py</span></code> run again into fresh directories from the stored predictions with no model fits</p></td>
+<td><p>sha256 identical to the committed files for all 9 tables and all 4 figures (exit 0); the first run took about 5 minutes (LAMDA predictions are read in batches)</p></td>
+<td><p>results/logs/determinism_check.log (not committed); scripts/make_tables.py; scripts/make_figures.py</p></td>
+<td><p>5d02663</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-even"><td><p>E-40</p></td>
+<td><p>E3 grid completeness (planned against complete against failed) and equal labels spent</p></td>
+<td><p>bodmas: 28 complete, 0 planned and not run, 0 failed; lamda: 28 complete, 0 planned and not run, 0 failed; longest real fit 39.1 s (60 s rule not triggered by a real fit); one LAMDA cell (uncertainty, d=0, B=2%, reserved 0.20) carries a 60 s flag (a timed ‘fit’ of 16,630 s) that is the Modern Standby artifact of E-26, annotated in the ledger, cell kept; one LAMDA centroid cell failed once with an operating-system MemoryError while a table job ran and was retried with the reason logged (failed event and retry event in the ledger); all E3 cells ran at code version f38858e (tag prereg-v2); the Main cells of both datasets have seeds 0 to 9 (LAMDA seeds 5 to 9, 12 cells, were added on 20 Oct 2026 on the researcher’s go, 0 failed); the ablation and score cells have seeds 0 to 4; labels spent are equal across random, uncertainty and credibility in every slot and cell (runner assertion and table check)</p></td>
+<td><p>reports/tables/e3_ledger.csv; results/e3/*/ledger.jsonl (not committed)</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-41</p></td>
+<td><p>E3 BODMAS, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 seeds, 6 windows, A-AUT difference with 95% two-stage interval. adv_S(d=3,B) is zero by construction on BODMAS (periodic equals never at delay 3), so I_S equals adv_S(d=0,B) and is not a test of shrinkage with delay; the Holm-adjusted Wilcoxon p tests an advantage at delay 0, not a shrinkage; the bootstrap means of the logistic-regression rows lie below the point estimates</p></td>
+<td><p>bodmas lr uncertainty B=1%: 0.0030 [0.0000, 0.0035] detected_within_margin, 28.1 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lr uncertainty B=2%: 0.0045 [0.0018, 0.0055] detected_within_margin, 56.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lr credibility B=1%: 0.0047 [0.0012, 0.0055] detected_within_margin, 28.1 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lr credibility B=2%: 0.0052 [0.0023, 0.0059] detected_within_margin, 56.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lgbm uncertainty B=1%: 0.0073 [0.0010, 0.0117] detected, 28.1 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lgbm uncertainty B=2%: 0.0079 [0.0023, 0.0122] detected, 56.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lgbm credibility B=1%: 0.0074 [0.0011, 0.0117] detected, 28.1 labels per slot, Holm-adjusted Wilcoxon p 0.0312; bodmas lgbm credibility B=2%: 0.0076 [0.0016, 0.0112] detected, 56.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312</p></td>
+<td><p>reports/tables/e3_contrasts.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-even"><td><p>E-42</p></td>
+<td><p>E3 LAMDA, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 seeds (seeds 0 to 9 after the 20 Oct 2026 addition of seeds 5 to 9), 16 windows, A-AUT difference with 95% two-stage interval. The rows share the random arm, windows and seeds and are not independent replications; LAMDA’s 16 windows are about four independent blocks; the Wilcoxon test is on seed-level paired means conditional on the realised windows (subsample noise only), and its smallest possible p with ten paired seeds is 0.002. The earlier five-seed set (seeds 0 to 4, labelled seed_robustness in the table, nested in the ten) gave interactions 0.0064 to 0.0116 and could not pass Holm (smallest p 0.0625)</p></td>
+<td><p>lamda lr uncertainty B=1%: 0.0118 [0.0043, 0.0178] detected, 43.6 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lr uncertainty B=2%: 0.0102 [0.0027, 0.0154] detected, 87.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lr credibility B=1%: 0.0094 [0.0049, 0.0116] detected, 43.6 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lr credibility B=2%: 0.0112 [0.0056, 0.0147] detected, 87.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lgbm uncertainty B=1%: 0.0061 [0.0021, 0.0078] detected_within_margin, 43.6 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lgbm uncertainty B=2%: 0.0077 [0.0023, 0.0095] detected_within_margin, 87.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lgbm credibility B=1%: 0.0067 [0.0020, 0.0087] detected_within_margin, 43.6 labels per slot, Holm-adjusted Wilcoxon p 0.0312; lamda lgbm credibility B=2%: 0.0077 [0.0021, 0.0103] detected, 87.3 labels per slot, Holm-adjusted Wilcoxon p 0.0312</p></td>
+<td><p>reports/tables/e3_contrasts.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-43</p></td>
+<td><p>E3 lamda, per-delay advantage adv_S(d,B) of the selector over random at equal labels spent, seeds 0-9, A-AUT difference with 95% interval (descriptive; the verdict word ‘equivalent’ means the interval lies within plus or minus 0.01, and on BODMAS the delay-3 rows are zero by construction)</p></td>
+<td><p>lamda lr uncertainty B=1% d=0: 0.0145 [0.0071, 0.0173] detected; lamda lr uncertainty B=1% d=3: 0.0027 [-0.0052, 0.0060] equivalent; lamda lr uncertainty B=2% d=0: 0.0177 [0.0082, 0.0216] detected; lamda lr uncertainty B=2% d=3: 0.0075 [0.0025, 0.0089] detected_within_margin; lamda lr credibility B=1% d=0: 0.0109 [0.0016, 0.0139] detected; lamda lr credibility B=1% d=3: 0.0015 [-0.0057, 0.0042] equivalent; lamda lr credibility B=2% d=0: 0.0144 [0.0051, 0.0175] detected; lamda lr credibility B=2% d=3: 0.0032 [-0.0033, 0.0059] equivalent; lamda lgbm uncertainty B=1% d=0: 0.0135 [0.0069, 0.0150] detected; lamda lgbm uncertainty B=1% d=3: 0.0074 [0.0042, 0.0078] detected_within_margin; lamda lgbm uncertainty B=2% d=0: 0.0172 [0.0091, 0.0191] detected; lamda lgbm uncertainty B=2% d=3: 0.0095 [0.0058, 0.0101] detected; lamda lgbm credibility B=1% d=0: 0.0139 [0.0067, 0.0159] detected; lamda lgbm credibility B=1% d=3: 0.0072 [0.0041, 0.0079] detected_within_margin; lamda lgbm credibility B=2% d=0: 0.0167 [0.0085, 0.0194] detected; lamda lgbm credibility B=2% d=3: 0.0091 [0.0055, 0.0103] detected</p></td>
+<td><p>reports/tables/e3_contrasts.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-even"><td><p>E-44</p></td>
+<td><p>E3 bodmas, per-delay advantage adv_S(d,B) of the selector over random at equal labels spent, seeds 0-9, A-AUT difference with 95% interval (descriptive; the verdict word ‘equivalent’ means the interval lies within plus or minus 0.01, and on BODMAS the delay-3 rows are zero by construction)</p></td>
+<td><p>bodmas lr uncertainty B=1% d=0: 0.0030 [0.0000, 0.0035] detected_within_margin; bodmas lr uncertainty B=1% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lr uncertainty B=2% d=0: 0.0045 [0.0018, 0.0055] detected_within_margin; bodmas lr uncertainty B=2% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lr credibility B=1% d=0: 0.0047 [0.0012, 0.0055] detected_within_margin; bodmas lr credibility B=1% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lr credibility B=2% d=0: 0.0052 [0.0023, 0.0059] detected_within_margin; bodmas lr credibility B=2% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lgbm uncertainty B=1% d=0: 0.0073 [0.0010, 0.0117] detected; bodmas lgbm uncertainty B=1% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lgbm uncertainty B=2% d=0: 0.0079 [0.0023, 0.0122] detected; bodmas lgbm uncertainty B=2% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lgbm credibility B=1% d=0: 0.0074 [0.0011, 0.0117] detected; bodmas lgbm credibility B=1% d=3: 0.0000 [0.0000, 0.0000] equivalent; bodmas lgbm credibility B=2% d=0: 0.0076 [0.0016, 0.0112] detected; bodmas lgbm credibility B=2% d=3: 0.0000 [0.0000, 0.0000] equivalent</p></td>
+<td><p>reports/tables/e3_contrasts.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-45</p></td>
+<td><p>E3 reserved-slice ablation at d=0, B=2%, credibility selection, seeds 0 to 4: A-AUT advantage over random with 95% interval and calibration diagnostics. The reserved share 0 row is the deliberate trap demonstration; in the code the trap arm sends every released label to the calibration buffer and none to the pool, so it never retrains, so neither its A-AUT difference nor its coverage and credibility isolate the effect of the contaminated calibration (leakage review, docs/reviews/leakage-review-e3.md)</p></td>
+<td><p>lamda lgbm reserved share 0 (trap): advantage -0.0117 [-0.0136, -0.0075], set coverage 0.9505 (nominal 0.90), mean credibility 0.733; lamda lgbm reserved share 0.1: advantage 0.0177 [0.0083, 0.0212], set coverage 0.8775 (nominal 0.90), mean credibility 0.505; lamda lgbm reserved share 0.2: advantage 0.0160 [0.0072, 0.0191], set coverage 0.8801 (nominal 0.90), mean credibility 0.505; lamda lgbm reserved share 0.4: advantage 0.0141 [0.0061, 0.0170], set coverage 0.8823 (nominal 0.90), mean credibility 0.506; lamda lr reserved share 0 (trap): advantage -0.0134 [-0.0305, -0.0012], set coverage 0.9328 (nominal 0.90), mean credibility 0.763; lamda lr reserved share 0.1: advantage 0.0181 [0.0087, 0.0214], set coverage 0.8994 (nominal 0.90), mean credibility 0.582; lamda lr reserved share 0.2: advantage 0.0153 [0.0056, 0.0189], set coverage 0.8989 (nominal 0.90), mean credibility 0.580; lamda lr reserved share 0.4: advantage 0.0143 [0.0066, 0.0173], set coverage 0.8995 (nominal 0.90), mean credibility 0.574; bodmas lgbm reserved share 0 (trap): advantage 0.0004 [-0.0017, 0.0018], set coverage 0.9636 (nominal 0.90), mean credibility 0.567; bodmas lgbm reserved share 0.1: advantage 0.0076 [0.0019, 0.0117], set coverage 0.8858 (nominal 0.90), mean credibility 0.494; bodmas lgbm reserved share 0.2: advantage 0.0074 [0.0014, 0.0118], set coverage 0.8885 (nominal 0.90), mean credibility 0.494; bodmas lgbm reserved share 0.4: advantage 0.0071 [0.0013, 0.0114], set coverage 0.8892 (nominal 0.90), mean credibility 0.497; bodmas lr reserved share 0 (trap): advantage 0.0002 [-0.0005, 0.0010], set coverage 0.9561 (nominal 0.90), mean credibility 0.612; bodmas lr reserved share 0.1: advantage 0.0052 [0.0022, 0.0059], set coverage 0.8933 (nominal 0.90), mean credibility 0.530; bodmas lr reserved share 0.2: advantage 0.0051 [0.0023, 0.0057], set coverage 0.8931 (nominal 0.90), mean credibility 0.531; bodmas lr reserved share 0.4: advantage 0.0056 [0.0025, 0.0066], set coverage 0.8939 (nominal 0.90), mean credibility 0.532</p></td>
+<td><p>reports/tables/e3_ablation.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-even"><td><p>E-46</p></td>
+<td><p>E3 nonconformity-score comparison at d=0, B=2%, credibility selection, reserved share 0.20, seeds 0 to 4 (descriptive)</p></td>
+<td><p>lamda lgbm probability: A-AUT 0.7806, set coverage 0.8801, mean set size 0.96, arrived malware share 0.303; lamda lgbm centroid: A-AUT 0.7593, set coverage 0.8624, mean set size 1.69, arrived malware share 0.082; lamda lr probability: A-AUT 0.6829, set coverage 0.8989, mean set size 1.05, arrived malware share 0.193; lamda lr centroid: A-AUT 0.6478, set coverage 0.7912, mean set size 1.64, arrived malware share 0.091; bodmas lgbm probability: A-AUT 0.9772, set coverage 0.8885, mean set size 0.89, arrived malware share 0.297; bodmas lgbm centroid: A-AUT 0.9724, set coverage 0.8923, mean set size 1.60, arrived malware share 0.423; bodmas lr probability: A-AUT 0.9122, set coverage 0.8931, mean set size 0.90, arrived malware share 0.179; bodmas lr centroid: A-AUT 0.9128, set coverage 0.8579, mean set size 1.62, arrived malware share 0.221</p></td>
+<td><p>reports/tables/e3_score.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-47</p></td>
+<td><p>E3 selection arms at d=0, B=2%, reserved share 0.20, probability score, seeds 0 to 4: class mix of the arrived training labels and conformal prediction-set coverage by selector (descriptive; selection changes the class prior of the pool, as registered)</p></td>
+<td><p>lamda lr credibility: arrived malware share 0.193, set coverage 0.8989, A-AUT 0.6829; lamda lr random: arrived malware share 0.085, set coverage 0.8914, A-AUT 0.6676; lamda lr uncertainty: arrived malware share 0.266, set coverage 0.8998, A-AUT 0.6870; lamda lgbm credibility: arrived malware share 0.303, set coverage 0.8801, A-AUT 0.7806; lamda lgbm random: arrived malware share 0.085, set coverage 0.8824, A-AUT 0.7647; lamda lgbm uncertainty: arrived malware share 0.401, set coverage 0.8790, A-AUT 0.7812; bodmas lr credibility: arrived malware share 0.179, set coverage 0.8931, A-AUT 0.9122; bodmas lr random: arrived malware share 0.097, set coverage 0.8912, A-AUT 0.9071; bodmas lr uncertainty: arrived malware share 0.164, set coverage 0.8921, A-AUT 0.9114; bodmas lgbm credibility: arrived malware share 0.297, set coverage 0.8885, A-AUT 0.9772; bodmas lgbm random: arrived malware share 0.097, set coverage 0.8872, A-AUT 0.9698; bodmas lgbm uncertainty: arrived malware share 0.257, set coverage 0.8887, A-AUT 0.9778</p></td>
+<td><p>reports/tables/e3_selection.csv</p></td>
+<td><p>346f35b (results f38858e)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-20</p></td>
+</tr>
+<tr class="row-even"><td><p>E-38</p></td>
+<td><p>E2 drop events (fall of at least 0.05 below the trailing 3-slot mean) and recovery (F1 back to 90% of the pre-drop level), descriptive only</p></td>
+<td><p>bodmas lr: drop events per window-seed series never 0.27 (recovered 0.38), periodic d=0 B=5% 0.27 (recovered 0.38); bodmas lgbm: drop events per window-seed series never 0.03 (recovered 1.00), periodic d=0 B=5% 0.07 (recovered 0.75); lamda lr: drop events per window-seed series never 1.58 (recovered 0.73), periodic d=0 B=5% 1.58 (recovered 0.81); lamda lgbm: drop events per window-seed series never 1.40 (recovered 0.80), periodic d=0 B=5% 1.46 (recovered 0.84)</p></td>
+<td><p>reports/tables/e2_recovery.csv</p></td>
+<td><p>5d02663 (results c26aa5f)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-16</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-17</p></td>
+<td><p>E4 design registered before any E4 result (addendum v3, tag prereg-v3 on 1d302ea, 20 Oct 2026 17:52 IST; ADR-0010 accepted)</p></td>
+<td><p>alpha 0.01 per slot for every monitor; 500 rows per side (MMD 200); KS on the 20 features with the largest standardised class-mean difference, Holm over 20; MMD on a 16-component SVD projection plus the score logit, 199 permutations; domain classifier 5-fold CV AUC against a 99-draw null per window; p-uniformity two-sample KS against the calibration scores; minimum gap 2 slots; drop event 0.05 below the trailing 3-slot mean, alarm match within 2 slots; budget 1%; delays 0 and 3; seeds 0-9; 19 arms x 2 seed sets = 38 cells per dataset</p></td>
+<td><p>docs/prereg/addendum-v3.md; docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.md; configs/e4_*.yaml</p></td>
+<td><p>1d302ea</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>P-18</p></td>
+<td><p>Smallest Holm-adjusted Wilcoxon p in an E4 family: 32 contrasts, 10 paired seeds, smallest raw two-sided p 2/1024 (P-11), so the smallest adjusted p is 32 x 2/1024. No E4 contrast can pass a 0.05 Holm threshold; the registered decision rule is the bootstrap interval, and the Wilcoxon is a supporting check only. This consequence was not written in addendum v3 and is stated after the results</p></td>
+<td><p>0.0625</p></td>
+<td><p>docs/CLAIMS.md P-11; reports/tables/e4_contrasts.csv</p></td>
+<td><p>b0552f2</p></td>
+<td><p>[verified]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-48</p></td>
+<td><p>E4 grid completeness, resources and registration order; every cell ran at code version 1d302ea (tag prereg-v3); first E4 ledger event 2026-10-20T14:54:24+00:00 (UTC), after the tag; labels spent are equal across all arms of a model in every slot (table check)</p></td>
+<td><p>bodmas: 38 of 38 complete, 0 failed, peak memory 1.29 GB, longest fit 23.9 s, 3.3 h of cell time; lamda: 38 of 38 complete, 0 failed, peak memory 0.94 GB, longest fit 7.0 s, 13.0 h of cell time</p></td>
+<td><p>reports/tables/e4_ledger.csv; results/e4/*/ledger.jsonl (not committed)</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-49</p></td>
+<td><p>E4 periodic cells reproduce the stored E3 random-arm predictions exactly (same predictions_sha256) at delays 0 and 3, budget 1%, seeds 0-4 and 5-9, although run at a later code version</p></td>
+<td><p>8 of 8 pairs match</p></td>
+<td><p>reports/tables/e4_e3_crosscheck.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-50</p></td>
+<td><p>E4 lamda, A-AUT per arm (seeds 0-9, 16 windows, mean over windows) with mean actual refits per window; every arm spent 523.25 labels per window (equal by construction and checked); E4 numbers compare with E3’s random arm, not with E2</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.7595, 4.31 refits per window; lgbm matched-domain_clf d=3: A-AUT 0.7553, 3.99 refits per window; lgbm matched-ks d=0: A-AUT 0.7572, 1.90 refits per window; lgbm matched-ks d=3: A-AUT 0.7549, 1.98 refits per window; lgbm matched-mmd d=0: A-AUT 0.7582, 2.57 refits per window; lgbm matched-mmd d=3: A-AUT 0.7550, 2.62 refits per window; lgbm matched-p_uniformity d=0: A-AUT 0.7591, 3.12 refits per window; lgbm matched-p_uniformity d=3: A-AUT 0.7549, 2.76 refits per window; lgbm monitor-domain_clf d=0: A-AUT 0.7593, 4.31 refits per window; lgbm monitor-domain_clf d=3: A-AUT 0.7548, 3.99 refits per window; lgbm monitor-ks d=0: A-AUT 0.7572, 1.90 refits per window; lgbm monitor-ks d=3: A-AUT 0.7545, 1.98 refits per window; lgbm monitor-mmd d=0: A-AUT 0.7579, 2.57 refits per window; lgbm monitor-mmd d=3: A-AUT 0.7545, 2.62 refits per window; lgbm monitor-p_uniformity d=0: A-AUT 0.7583, 3.12 refits per window; lgbm monitor-p_uniformity d=3: A-AUT 0.7546, 2.76 refits per window; lgbm never: A-AUT 0.7534, 0.00 refits per window; lgbm periodic d=0: A-AUT 0.7598, 3.00 refits per window; lgbm periodic d=3: A-AUT 0.7548, 2.00 refits per window; lr matched-domain_clf d=0: A-AUT 0.6666, 4.31 refits per window; lr matched-domain_clf d=3: A-AUT 0.6599, 3.99 refits per window; lr matched-ks d=0: A-AUT 0.6558, 1.90 refits per window; lr matched-ks d=3: A-AUT 0.6556, 1.98 refits per window; lr matched-mmd d=0: A-AUT 0.6613, 2.55 refits per window; lr matched-mmd d=3: A-AUT 0.6571, 2.61 refits per window; lr matched-p_uniformity d=0: A-AUT 0.6646, 3.70 refits per window; lr matched-p_uniformity d=3: A-AUT 0.6589, 3.27 refits per window; lr monitor-domain_clf d=0: A-AUT 0.6661, 4.31 refits per window; lr monitor-domain_clf d=3: A-AUT 0.6604, 3.99 refits per window; lr monitor-ks d=0: A-AUT 0.6566, 1.90 refits per window; lr monitor-ks d=3: A-AUT 0.6552, 1.98 refits per window; lr monitor-mmd d=0: A-AUT 0.6593, 2.55 refits per window; lr monitor-mmd d=3: A-AUT 0.6567, 2.61 refits per window; lr monitor-p_uniformity d=0: A-AUT 0.6622, 3.70 refits per window; lr monitor-p_uniformity d=3: A-AUT 0.6582, 3.27 refits per window; lr never: A-AUT 0.6546, 0.00 refits per window; lr periodic d=0: A-AUT 0.6655, 3.00 refits per window; lr periodic d=3: A-AUT 0.6603, 2.00 refits per window</p></td>
+<td><p>reports/tables/e4_policies.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-51</p></td>
+<td><p>E4 bodmas, A-AUT per arm (seeds 0-9, 6 windows, mean over windows) with mean actual refits per window; every arm spent 168.33 labels per window (equal by construction and checked); E4 numbers compare with E3’s random arm, not with E2</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.9695, 2.00 refits per window; lgbm matched-domain_clf d=3: A-AUT 0.9693, 1.00 refits per window; lgbm matched-ks d=0: A-AUT 0.9695, 1.87 refits per window; lgbm matched-ks d=3: A-AUT 0.9693, 1.00 refits per window; lgbm matched-mmd d=0: A-AUT 0.9695, 1.47 refits per window; lgbm matched-mmd d=3: A-AUT 0.9693, 1.00 refits per window; lgbm matched-p_uniformity d=0: A-AUT 0.9697, 1.80 refits per window; lgbm matched-p_uniformity d=3: A-AUT 0.9693, 0.97 refits per window; lgbm monitor-domain_clf d=0: A-AUT 0.9695, 2.00 refits per window; lgbm monitor-domain_clf d=3: A-AUT 0.9695, 1.00 refits per window; lgbm monitor-ks d=0: A-AUT 0.9695, 1.87 refits per window; lgbm monitor-ks d=3: A-AUT 0.9695, 1.00 refits per window; lgbm monitor-mmd d=0: A-AUT 0.9694, 1.47 refits per window; lgbm monitor-mmd d=3: A-AUT 0.9695, 1.00 refits per window; lgbm monitor-p_uniformity d=0: A-AUT 0.9694, 1.80 refits per window; lgbm monitor-p_uniformity d=3: A-AUT 0.9695, 0.97 refits per window; lgbm never: A-AUT 0.9692, 0.00 refits per window; lgbm periodic d=0: A-AUT 0.9692, 1.00 refits per window; lgbm periodic d=3: A-AUT 0.9692, 0.00 refits per window; lr matched-domain_clf d=0: A-AUT 0.9078, 2.00 refits per window; lr matched-domain_clf d=3: A-AUT 0.9083, 1.00 refits per window; lr matched-ks d=0: A-AUT 0.9078, 1.87 refits per window; lr matched-ks d=3: A-AUT 0.9083, 1.00 refits per window; lr matched-mmd d=0: A-AUT 0.9079, 1.48 refits per window; lr matched-mmd d=3: A-AUT 0.9083, 1.00 refits per window; lr matched-p_uniformity d=0: A-AUT 0.9078, 1.95 refits per window; lr matched-p_uniformity d=3: A-AUT 0.9083, 0.97 refits per window; lr monitor-domain_clf d=0: A-AUT 0.9078, 2.00 refits per window; lr monitor-domain_clf d=3: A-AUT 0.9079, 1.00 refits per window; lr monitor-ks d=0: A-AUT 0.9078, 1.87 refits per window; lr monitor-ks d=3: A-AUT 0.9079, 1.00 refits per window; lr monitor-mmd d=0: A-AUT 0.9078, 1.48 refits per window; lr monitor-mmd d=3: A-AUT 0.9079, 1.00 refits per window; lr monitor-p_uniformity d=0: A-AUT 0.9080, 1.95 refits per window; lr monitor-p_uniformity d=3: A-AUT 0.9079, 0.97 refits per window; lr never: A-AUT 0.9083, 0.00 refits per window; lr periodic d=0: A-AUT 0.9079, 1.00 refits per window; lr periodic d=3: A-AUT 0.9083, 0.00 refits per window</p></td>
+<td><p>reports/tables/e4_policies.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-52</p></td>
+<td><p>E4 lamda, registered primary contrast M-P = monitor-triggered minus periodic(3) at matched labels spent; A-AUT difference with 95% two-stage interval, seeds 0-9; positive favours the monitor; verdict words as in v1 (‘equivalent’ = interval inside +-0.01). Smallest Holm-adjusted Wilcoxon p in the family 0.0625 (floor 0.0625, P-18)</p></td>
+<td><p>lgbm ks d=0: -0.0026 [-0.0050, -0.0003] reversed, refits per window 1.90 vs 3.00; lgbm ks d=3: -0.0003 [-0.0012, 0.0007] equivalent, refits per window 1.98 vs 2.00; lgbm mmd d=0: -0.0019 [-0.0041, 0.0000] equivalent, refits per window 2.57 vs 3.00; lgbm mmd d=3: -0.0003 [-0.0011, 0.0003] equivalent, refits per window 2.62 vs 2.00; lgbm domain_clf d=0: -0.0005 [-0.0021, 0.0007] equivalent, refits per window 4.31 vs 3.00; lgbm domain_clf d=3: 0.0001 [-0.0006, 0.0005] equivalent, refits per window 3.99 vs 2.00; lgbm p_uniformity d=0: -0.0014 [-0.0030, -0.0003] reversed, refits per window 3.12 vs 3.00; lgbm p_uniformity d=3: -0.0001 [-0.0009, 0.0005] equivalent, refits per window 2.76 vs 2.00; lr ks d=0: -0.0089 [-0.0225, -0.0002] reversed, refits per window 1.90 vs 3.00; lr ks d=3: -0.0052 [-0.0136, -0.0007] reversed, refits per window 1.98 vs 2.00; lr mmd d=0: -0.0063 [-0.0149, 0.0002] not_detected, refits per window 2.55 vs 3.00; lr mmd d=3: -0.0036 [-0.0082, -0.0008] reversed, refits per window 2.61 vs 2.00; lr domain_clf d=0: 0.0006 [-0.0008, 0.0025] equivalent, refits per window 4.31 vs 3.00; lr domain_clf d=3: 0.0001 [-0.0023, 0.0026] equivalent, refits per window 3.99 vs 2.00; lr p_uniformity d=0: -0.0033 [-0.0127, 0.0027] not_detected, refits per window 3.70 vs 3.00; lr p_uniformity d=3: -0.0021 [-0.0058, 0.0003] equivalent, refits per window 3.27 vs 2.00</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-53</p></td>
+<td><p>E4 bodmas, registered primary contrast M-P = monitor-triggered minus periodic(3) at matched labels spent; A-AUT difference with 95% two-stage interval, seeds 0-9; positive favours the monitor; verdict words as in v1 (‘equivalent’ = interval inside +-0.01). On BODMAS periodic has one useful refit per window and none at delay 3, so M-P there is partly a ‘more refits’ contrast. Smallest Holm-adjusted Wilcoxon p in the family 0.0977 (floor 0.0625, P-18)</p></td>
+<td><p>lgbm ks d=0: 0.0003 [-0.0008, 0.0014] equivalent, refits per window 1.87 vs 1.00; lgbm ks d=3: 0.0004 [-0.0002, 0.0013] equivalent, refits per window 1.00 vs 0.00; lgbm mmd d=0: 0.0002 [-0.0008, 0.0011] equivalent, refits per window 1.47 vs 1.00; lgbm mmd d=3: 0.0004 [-0.0002, 0.0013] equivalent, refits per window 1.00 vs 0.00; lgbm domain_clf d=0: 0.0003 [-0.0008, 0.0013] equivalent, refits per window 2.00 vs 1.00; lgbm domain_clf d=3: 0.0004 [-0.0002, 0.0013] equivalent, refits per window 1.00 vs 0.00; lgbm p_uniformity d=0: 0.0002 [-0.0008, 0.0012] equivalent, refits per window 1.80 vs 1.00; lgbm p_uniformity d=3: 0.0004 [-0.0002, 0.0012] equivalent, refits per window 0.97 vs 0.00; lr ks d=0: -0.0001 [-0.0010, 0.0003] equivalent, refits per window 1.87 vs 1.00; lr ks d=3: -0.0004 [-0.0008, -0.0001] reversed, refits per window 1.00 vs 0.00; lr mmd d=0: -0.0001 [-0.0009, 0.0004] equivalent, refits per window 1.48 vs 1.00; lr mmd d=3: -0.0004 [-0.0008, -0.0001] reversed, refits per window 1.00 vs 0.00; lr domain_clf d=0: -0.0001 [-0.0009, 0.0004] equivalent, refits per window 2.00 vs 1.00; lr domain_clf d=3: -0.0004 [-0.0008, -0.0001] reversed, refits per window 1.00 vs 0.00; lr p_uniformity d=0: 0.0001 [-0.0009, 0.0005] equivalent, refits per window 1.95 vs 1.00; lr p_uniformity d=3: -0.0004 [-0.0008, -0.0000] reversed, refits per window 0.97 vs 0.00</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-54</p></td>
+<td><p>E4 lamda, registered primary contrast M-C = monitor-triggered minus its matched-count control at matched retrains (the control knows each window’s refit count: conservative for the monitor); A-AUT difference with 95% two-stage interval, seeds 0-9; positive favours the monitor; verdict words as in v1 (‘equivalent’ = interval inside +-0.01). Matched-control refit shortfall: 0.00 of windows at most. Smallest Holm-adjusted Wilcoxon p in the family 0.2832 (floor 0.0625, P-18)</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0009, 0.0014] equivalent, refits per window 1.90 vs 1.90; lgbm ks d=3: -0.0004 [-0.0008, 0.0002] equivalent, refits per window 1.98 vs 1.98; lgbm mmd d=0: -0.0003 [-0.0015, 0.0010] equivalent, refits per window 2.57 vs 2.57; lgbm mmd d=3: -0.0005 [-0.0012, 0.0001] equivalent, refits per window 2.62 vs 2.62; lgbm domain_clf d=0: -0.0002 [-0.0011, 0.0005] equivalent, refits per window 4.31 vs 4.31; lgbm domain_clf d=3: -0.0004 [-0.0007, 0.0001] equivalent, refits per window 3.99 vs 3.99; lgbm p_uniformity d=0: -0.0007 [-0.0019, 0.0000] equivalent, refits per window 3.12 vs 3.12; lgbm p_uniformity d=3: -0.0002 [-0.0007, 0.0002] equivalent, refits per window 2.76 vs 2.76; lr ks d=0: 0.0008 [-0.0015, 0.0034] equivalent, refits per window 1.90 vs 1.90; lr ks d=3: -0.0004 [-0.0024, 0.0014] equivalent, refits per window 1.98 vs 1.98; lr mmd d=0: -0.0021 [-0.0080, 0.0029] equivalent, refits per window 2.55 vs 2.55; lr mmd d=3: -0.0004 [-0.0024, 0.0013] equivalent, refits per window 2.61 vs 2.61; lr domain_clf d=0: -0.0005 [-0.0015, 0.0007] equivalent, refits per window 4.31 vs 4.31; lr domain_clf d=3: 0.0005 [-0.0003, 0.0014] equivalent, refits per window 3.99 vs 3.99; lr p_uniformity d=0: -0.0023 [-0.0090, 0.0017] equivalent, refits per window 3.70 vs 3.70; lr p_uniformity d=3: -0.0007 [-0.0045, 0.0030] equivalent, refits per window 3.27 vs 3.27</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-55</p></td>
+<td><p>E4 bodmas, registered primary contrast M-C = monitor-triggered minus its matched-count control at matched retrains (the control knows each window’s refit count: conservative for the monitor); A-AUT difference with 95% two-stage interval, seeds 0-9; positive favours the monitor; verdict words as in v1 (‘equivalent’ = interval inside +-0.01). Matched-control refit shortfall: 0.00 of windows at most. Smallest Holm-adjusted Wilcoxon p in the family 0.0625 (floor 0.0625, P-18)</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0003, 0.0002] equivalent, refits per window 1.87 vs 1.87; lgbm ks d=3: 0.0002 [-0.0003, 0.0010] equivalent, refits per window 1.00 vs 1.00; lgbm mmd d=0: -0.0002 [-0.0007, 0.0003] equivalent, refits per window 1.47 vs 1.47; lgbm mmd d=3: 0.0002 [-0.0003, 0.0010] equivalent, refits per window 1.00 vs 1.00; lgbm domain_clf d=0: 0.0000 [0.0000, 0.0000] equivalent, refits per window 2.00 vs 2.00; lgbm domain_clf d=3: 0.0002 [-0.0003, 0.0010] equivalent, refits per window 1.00 vs 1.00; lgbm p_uniformity d=0: -0.0003 [-0.0008, 0.0002] equivalent, refits per window 1.80 vs 1.80; lgbm p_uniformity d=3: 0.0002 [-0.0004, 0.0010] equivalent, refits per window 0.97 vs 0.97; lr ks d=0: -0.0000 [-0.0003, 0.0002] equivalent, refits per window 1.87 vs 1.87; lr ks d=3: -0.0004 [-0.0007, -0.0001] reversed, refits per window 1.00 vs 1.00; lr mmd d=0: -0.0001 [-0.0005, 0.0003] equivalent, refits per window 1.48 vs 1.48; lr mmd d=3: -0.0004 [-0.0007, -0.0001] reversed, refits per window 1.00 vs 1.00; lr domain_clf d=0: 0.0000 [0.0000, 0.0000] equivalent, refits per window 2.00 vs 2.00; lr domain_clf d=3: -0.0004 [-0.0007, -0.0001] reversed, refits per window 1.00 vs 1.00; lr p_uniformity d=0: 0.0001 [-0.0001, 0.0003] equivalent, refits per window 1.95 vs 1.95; lr p_uniformity d=3: -0.0003 [-0.0007, -0.0000] reversed, refits per window 0.97 vs 0.97</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-56</p></td>
+<td><p>E4 monitor quality observing the never arm (primary): alarm precision, recall and detection delay against drop events from true labels (F1 at least 0.05 below the trailing 3-slot mean; alarm within 2 slots); alarm rate per scored slot; 95% two-stage intervals of pooled-count ratios; seeds 0-9; descriptive</p></td>
+<td><p>lamda lgbm ks: alarm rate 0.617, precision 0.462 [0.354, 0.546], recall 0.743 [0.421, 0.966], mean delay 0.18 slots, 226 drops, 888 alarms; lamda lgbm mmd: alarm rate 0.796, precision 0.449 [0.328, 0.546], recall 0.942 [0.892, 0.985], mean delay 0.24 slots, 226 drops, 1146 alarms; lamda lgbm domain_clf: alarm rate 0.997, precision 0.444 [0.327, 0.529], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 226 drops, 1436 alarms; lamda lgbm p_uniformity: alarm rate 0.562, precision 0.461 [0.315, 0.555], recall 0.796 [0.566, 0.912], mean delay 0.31 slots, 226 drops, 809 alarms; lamda lr ks: alarm rate 0.617, precision 0.538 [0.445, 0.648], recall 0.775 [0.443, 0.972], mean delay 0.18 slots, 249 drops, 888 alarms; lamda lr mmd: alarm rate 0.785, precision 0.486 [0.379, 0.608], recall 0.916 [0.820, 0.977], mean delay 0.21 slots, 249 drops, 1131 alarms; lamda lr domain_clf: alarm rate 0.997, precision 0.490 [0.401, 0.590], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 249 drops, 1436 alarms; lamda lr p_uniformity: alarm rate 0.687, precision 0.465 [0.357, 0.583], recall 0.876 [0.757, 0.940], mean delay 0.39 slots, 249 drops, 989 alarms; bodmas lgbm ks: alarm rate 1.000, precision 0.100 [0.000, 0.200], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lgbm mmd: alarm rate 1.000, precision 0.100 [0.000, 0.200], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lgbm domain_clf: alarm rate 1.000, precision 0.100 [0.000, 0.200], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lgbm p_uniformity: alarm rate 0.872, precision 0.102 [0.000, 0.190], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 157 alarms; bodmas lr ks: alarm rate 1.000, precision 0.056 [0.000, 0.111], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lr mmd: alarm rate 1.000, precision 0.056 [0.000, 0.111], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lr domain_clf: alarm rate 1.000, precision 0.056 [0.000, 0.111], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lr p_uniformity: alarm rate 0.806, precision 0.069 [0.000, 0.114], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 145 alarms</p></td>
+<td><p>reports/tables/e4_monitors.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-57</p></td>
+<td><p>E4 monitor quality inside each monitor-triggered arm (secondary): alarm precision, recall and detection delay against drop events from true labels (F1 at least 0.05 below the trailing 3-slot mean; alarm within 2 slots); alarm rate per scored slot; 95% two-stage intervals of pooled-count ratios; seeds 0-9; descriptive</p></td>
+<td><p>lamda lgbm ks d=0: alarm rate 0.242, precision 0.573 [0.353, 0.663], recall 0.507 [0.238, 0.760], mean delay 0.55 slots, 225 drops, 349 alarms; lamda lgbm ks d=3: alarm rate 0.379, precision 0.456 [0.324, 0.639], recall 0.674 [0.400, 0.856], mean delay 0.30 slots, 221 drops, 546 alarms; lamda lgbm mmd d=0: alarm rate 0.326, precision 0.543 [0.372, 0.631], recall 0.728 [0.547, 0.867], mean delay 0.69 slots, 224 drops, 470 alarms; lamda lgbm mmd d=3: alarm rate 0.480, precision 0.467 [0.317, 0.618], recall 0.885 [0.788, 0.935], mean delay 0.44 slots, 218 drops, 691 alarms; lamda lgbm domain_clf d=0: alarm rate 0.544, precision 0.485 [0.337, 0.588], recall 0.983 [0.923, 1.000], mean delay 0.49 slots, 230 drops, 783 alarms; lamda lgbm domain_clf d=3: alarm rate 0.988, precision 0.425 [0.297, 0.519], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 218 drops, 1423 alarms; lamda lgbm p_uniformity d=0: alarm rate 0.562, precision 0.466 [0.288, 0.545], recall 0.780 [0.506, 0.913], mean delay 0.35 slots, 232 drops, 809 alarms; lamda lgbm p_uniformity d=3: alarm rate 0.566, precision 0.439 [0.277, 0.539], recall 0.774 [0.546, 0.882], mean delay 0.32 slots, 221 drops, 815 alarms; lamda lr ks d=0: alarm rate 0.242, precision 0.685 [0.522, 0.753], recall 0.556 [0.290, 0.744], mean delay 0.57 slots, 257 drops, 349 alarms; lamda lr ks d=3: alarm rate 0.379, precision 0.557 [0.515, 0.677], recall 0.668 [0.436, 0.787], mean delay 0.36 slots, 250 drops, 546 alarms; lamda lr mmd d=0: alarm rate 0.326, precision 0.591 [0.420, 0.672], recall 0.676 [0.519, 0.776], mean delay 0.72 slots, 247 drops, 470 alarms; lamda lr mmd d=3: alarm rate 0.476, precision 0.549 [0.423, 0.635], recall 0.833 [0.697, 0.896], mean delay 0.43 slots, 251 drops, 685 alarms; lamda lr domain_clf d=0: alarm rate 0.544, precision 0.567 [0.437, 0.645], recall 0.961 [0.906, 0.993], mean delay 0.44 slots, 258 drops, 783 alarms; lamda lr domain_clf d=3: alarm rate 0.988, precision 0.505 [0.422, 0.589], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 252 drops, 1423 alarms; lamda lr p_uniformity d=0: alarm rate 0.737, precision 0.499 [0.385, 0.588], recall 0.870 [0.780, 0.928], mean delay 0.33 slots, 262 drops, 1061 alarms; lamda lr p_uniformity d=3: alarm rate 0.742, precision 0.474 [0.372, 0.578], recall 0.873 [0.772, 0.933], mean delay 0.36 slots, 252 drops, 1069 alarms; bodmas lgbm ks d=0: alarm rate 0.683, precision 0.171 [0.000, 0.317], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 123 alarms; bodmas lgbm ks d=3: alarm rate 0.867, precision 0.115 [0.000, 0.200], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 8 drops, 156 alarms; bodmas lgbm mmd d=0: alarm rate 0.194, precision 0.200 [0.000, 0.333], recall 0.636 [0.455, 0.875], mean delay 0.14 slots, 11 drops, 35 alarms; bodmas lgbm mmd d=3: alarm rate 0.528, precision 0.105 [0.000, 0.179], recall 0.875 [0.667, 1.000], mean delay 0.00 slots, 8 drops, 95 alarms; bodmas lgbm domain_clf d=0: alarm rate 1.000, precision 0.117 [0.000, 0.233], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lgbm domain_clf d=3: alarm rate 1.000, precision 0.100 [0.000, 0.200], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 8 drops, 180 alarms; bodmas lgbm p_uniformity d=0: alarm rate 0.817, precision 0.122 [0.000, 0.218], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 147 alarms; bodmas lgbm p_uniformity d=3: alarm rate 0.856, precision 0.097 [0.000, 0.179], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 8 drops, 154 alarms; bodmas lr ks d=0: alarm rate 0.683, precision 0.106 [0.000, 0.216], recall 0.917 [0.000, 1.000], mean delay 0.00 slots, 12 drops, 123 alarms; bodmas lr ks d=3: alarm rate 0.867, precision 0.064 [0.000, 0.138], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 156 alarms; bodmas lr mmd d=0: alarm rate 0.228, precision 0.073 [0.000, 0.194], recall 0.214 [0.000, 0.455], mean delay 0.00 slots, 14 drops, 41 alarms; bodmas lr mmd d=3: alarm rate 0.533, precision 0.104 [0.000, 0.182], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 96 alarms; bodmas lr domain_clf d=0: alarm rate 1.000, precision 0.078 [0.000, 0.161], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 12 drops, 180 alarms; bodmas lr domain_clf d=3: alarm rate 1.000, precision 0.056 [0.000, 0.111], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 180 alarms; bodmas lr p_uniformity d=0: alarm rate 0.817, precision 0.088 [0.000, 0.162], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 11 drops, 147 alarms; bodmas lr p_uniformity d=3: alarm rate 0.806, precision 0.069 [0.000, 0.114], recall 1.000 [1.000, 1.000], mean delay 0.00 slots, 10 drops, 145 alarms</p></td>
+<td><p>reports/tables/e4_monitors.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-58</p></td>
+<td><p>E4, retrain events that found no newly arrived label (logged no-ops, not refits) per window at delay 3, seeds 0-9; at delay 0 every arm has none</p></td>
+<td><p>lamda lgbm monitor-domain_clf d=3: 1.62; lamda lgbm monitor-ks d=3: 0.84; lamda lgbm monitor-mmd d=3: 0.98; lamda lgbm monitor-p_uniformity d=3: 0.58; lamda lgbm periodic d=3: 1.00; lamda lr monitor-domain_clf d=3: 1.62; lamda lr monitor-ks d=3: 0.84; lamda lr monitor-mmd d=3: 0.98; lamda lr monitor-p_uniformity d=3: 0.77; lamda lr periodic d=3: 1.00; bodmas lgbm monitor-domain_clf d=3: 2.00; bodmas lgbm monitor-ks d=3: 2.00; bodmas lgbm monitor-mmd d=3: 2.00; bodmas lgbm monitor-p_uniformity d=3: 1.53; bodmas lgbm periodic d=3: 1.00; bodmas lr monitor-domain_clf d=3: 2.00; bodmas lr monitor-ks d=3: 2.00; bodmas lr monitor-mmd d=3: 2.00; bodmas lr monitor-p_uniformity d=3: 1.72; bodmas lr periodic d=3: 1.00</p></td>
+<td><p>reports/tables/e4_policies.csv</p></td>
+<td><p>b0552f2 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-59</p></td>
+<td><p>Supersedes E-52 (stats review E4 applied). E4 lamda, registered contrast M-P = monitor-triggered minus periodic(3) at matched labels spent; A-AUT difference with 95% two-stage interval, seeds 0-9, positive favours the monitor; verdict words: ‘reversed’ = interval entirely below 0 and reaching past -0.01; ‘reversed_within_margin’ = interval below 0 but inside +-0.01 (no change larger than 0.01); ‘equivalent’ = interval inside +-0.01; ‘not_informative_identical_schedule’ = the matched control refitted at exactly the monitor’s slots in every window and seed. ‘Reversed’ is a two-sided descriptive reading beyond the registered RQ4 answer, with no family-wise control (Holm floor 0.0625, P-18). The eight monitor x delay rows of a stratum share the periodic arm, the windows and the seeds; M-P and M-C share the monitor arm. Smallest Holm-adjusted Wilcoxon p among these lamda rows 0.0625; the 32-contrast family minimum is 0.0625</p></td>
+<td><p>lgbm ks d=0: -0.0026 [-0.0050, -0.0003] reversed_within_margin, refits per window 1.90 vs 3.00, identical-schedule share 0.00; lgbm ks d=3: -0.0003 [-0.0012, 0.0007] equivalent, refits per window 1.98 vs 2.00, identical-schedule share 0.00; lgbm mmd d=0: -0.0019 [-0.0041, 0.0000] equivalent, refits per window 2.57 vs 3.00, identical-schedule share 0.00; lgbm mmd d=3: -0.0003 [-0.0011, 0.0003] equivalent, refits per window 2.62 vs 2.00, identical-schedule share 0.04; lgbm domain_clf d=0: -0.0005 [-0.0021, 0.0007] equivalent, refits per window 4.31 vs 3.00, identical-schedule share 0.00; lgbm domain_clf d=3: 0.0001 [-0.0006, 0.0005] equivalent, refits per window 3.99 vs 2.00, identical-schedule share 0.00; lgbm p_uniformity d=0: -0.0014 [-0.0030, -0.0003] reversed_within_margin, refits per window 3.12 vs 3.00, identical-schedule share 0.01; lgbm p_uniformity d=3: -0.0001 [-0.0009, 0.0005] equivalent, refits per window 2.76 vs 2.00, identical-schedule share 0.00; lr ks d=0: -0.0089 [-0.0225, -0.0002] reversed, refits per window 1.90 vs 3.00, identical-schedule share 0.00; lr ks d=3: -0.0052 [-0.0136, -0.0007] reversed, refits per window 1.98 vs 2.00, identical-schedule share 0.00; lr mmd d=0: -0.0063 [-0.0149, 0.0002] not_detected, refits per window 2.55 vs 3.00, identical-schedule share 0.00; lr mmd d=3: -0.0036 [-0.0082, -0.0008] reversed_within_margin, refits per window 2.61 vs 2.00, identical-schedule share 0.03; lr domain_clf d=0: 0.0006 [-0.0008, 0.0025] equivalent, refits per window 4.31 vs 3.00, identical-schedule share 0.00; lr domain_clf d=3: 0.0001 [-0.0023, 0.0026] equivalent, refits per window 3.99 vs 2.00, identical-schedule share 0.00; lr p_uniformity d=0: -0.0033 [-0.0127, 0.0027] not_detected, refits per window 3.70 vs 3.00, identical-schedule share 0.00; lr p_uniformity d=3: -0.0021 [-0.0058, 0.0003] equivalent, refits per window 3.27 vs 2.00, identical-schedule share 0.00</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-60</p></td>
+<td><p>Supersedes E-53 (stats review E4 applied). E4 bodmas, registered contrast M-P = monitor-triggered minus periodic(3) at matched labels spent; A-AUT difference with 95% two-stage interval, seeds 0-9, positive favours the monitor; verdict words: ‘reversed’ = interval entirely below 0 and reaching past -0.01; ‘reversed_within_margin’ = interval below 0 but inside +-0.01 (no change larger than 0.01); ‘equivalent’ = interval inside +-0.01; ‘not_informative_identical_schedule’ = the matched control refitted at exactly the monitor’s slots in every window and seed. ‘Reversed’ is a two-sided descriptive reading beyond the registered RQ4 answer, with no family-wise control (Holm floor 0.0625, P-18). On BODMAS at delay 3, KS, MMD and the domain classifier produce one and the same arm (one refit before slot 4), so their rows are one comparison. The eight monitor x delay rows of a stratum share the periodic arm, the windows and the seeds; M-P and M-C share the monitor arm. Smallest Holm-adjusted Wilcoxon p among these bodmas rows 0.0977; the 32-contrast family minimum is 0.0625</p></td>
+<td><p>lgbm ks d=0: 0.0003 [-0.0008, 0.0014] equivalent, refits per window 1.87 vs 1.00, identical-schedule share 0.00; lgbm ks d=3: 0.0004 [-0.0002, 0.0013] equivalent, refits per window 1.00 vs 0.00, identical-schedule share 0.00, same arm as mmd,domain_clf; lgbm mmd d=0: 0.0002 [-0.0008, 0.0011] equivalent, refits per window 1.47 vs 1.00, identical-schedule share 0.00; lgbm mmd d=3: 0.0004 [-0.0002, 0.0013] equivalent, refits per window 1.00 vs 0.00, identical-schedule share 0.00, same arm as ks,domain_clf; lgbm domain_clf d=0: 0.0003 [-0.0008, 0.0013] equivalent, refits per window 2.00 vs 1.00, identical-schedule share 0.00; lgbm domain_clf d=3: 0.0004 [-0.0002, 0.0013] equivalent, refits per window 1.00 vs 0.00, identical-schedule share 0.00, same arm as ks,mmd; lgbm p_uniformity d=0: 0.0002 [-0.0008, 0.0012] equivalent, refits per window 1.80 vs 1.00, identical-schedule share 0.00; lgbm p_uniformity d=3: 0.0004 [-0.0002, 0.0012] equivalent, refits per window 0.97 vs 0.00, identical-schedule share 0.03; lr ks d=0: -0.0001 [-0.0010, 0.0003] equivalent, refits per window 1.87 vs 1.00, identical-schedule share 0.00; lr ks d=3: -0.0004 [-0.0008, -0.0001] reversed_within_margin, refits per window 1.00 vs 0.00, identical-schedule share 0.00, same arm as mmd,domain_clf; lr mmd d=0: -0.0001 [-0.0009, 0.0004] equivalent, refits per window 1.48 vs 1.00, identical-schedule share 0.00; lr mmd d=3: -0.0004 [-0.0008, -0.0001] reversed_within_margin, refits per window 1.00 vs 0.00, identical-schedule share 0.00, same arm as ks,domain_clf; lr domain_clf d=0: -0.0001 [-0.0009, 0.0004] equivalent, refits per window 2.00 vs 1.00, identical-schedule share 0.00; lr domain_clf d=3: -0.0004 [-0.0008, -0.0001] reversed_within_margin, refits per window 1.00 vs 0.00, identical-schedule share 0.00, same arm as ks,mmd; lr p_uniformity d=0: 0.0001 [-0.0009, 0.0005] equivalent, refits per window 1.95 vs 1.00, identical-schedule share 0.00; lr p_uniformity d=3: -0.0004 [-0.0008, -0.0000] reversed_within_margin, refits per window 0.97 vs 0.00, identical-schedule share 0.03</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-61</p></td>
+<td><p>Supersedes E-54 (stats review E4 applied). E4 lamda, registered contrast M-C = monitor-triggered minus its matched-count control at matched retrains; the control knows each window’s refit count (argued conservative for the monitor in addendum v3, not measured); where the identical-schedule share is high the row does not test timing; A-AUT difference with 95% two-stage interval, seeds 0-9, positive favours the monitor; verdict words: ‘reversed’ = interval entirely below 0 and reaching past -0.01; ‘reversed_within_margin’ = interval below 0 but inside +-0.01 (no change larger than 0.01); ‘equivalent’ = interval inside +-0.01; ‘not_informative_identical_schedule’ = the matched control refitted at exactly the monitor’s slots in every window and seed. ‘Reversed’ is a two-sided descriptive reading beyond the registered RQ4 answer, with no family-wise control (Holm floor 0.0625, P-18). The eight monitor x delay rows of a stratum share the periodic arm, the windows and the seeds; M-P and M-C share the monitor arm. Smallest Holm-adjusted Wilcoxon p among these lamda rows 0.2832; the 32-contrast family minimum is 0.0625</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0009, 0.0014] equivalent, refits per window 1.90 vs 1.90, identical-schedule share 0.27; lgbm ks d=3: -0.0004 [-0.0008, 0.0002] equivalent, refits per window 1.98 vs 1.98, identical-schedule share 0.24; lgbm mmd d=0: -0.0003 [-0.0015, 0.0010] equivalent, refits per window 2.57 vs 2.57, identical-schedule share 0.09; lgbm mmd d=3: -0.0005 [-0.0012, 0.0001] equivalent, refits per window 2.62 vs 2.62, identical-schedule share 0.09; lgbm domain_clf d=0: -0.0002 [-0.0011, 0.0005] equivalent, refits per window 4.31 vs 4.31, identical-schedule share 0.24; lgbm domain_clf d=3: -0.0004 [-0.0007, 0.0001] equivalent, refits per window 3.99 vs 3.99, identical-schedule share 0.00; lgbm p_uniformity d=0: -0.0007 [-0.0019, 0.0000] equivalent, refits per window 3.12 vs 3.12, identical-schedule share 0.23; lgbm p_uniformity d=3: -0.0002 [-0.0007, 0.0002] equivalent, refits per window 2.76 vs 2.76, identical-schedule share 0.09; lr ks d=0: 0.0008 [-0.0015, 0.0034] equivalent, refits per window 1.90 vs 1.90, identical-schedule share 0.27; lr ks d=3: -0.0004 [-0.0024, 0.0014] equivalent, refits per window 1.98 vs 1.98, identical-schedule share 0.24; lr mmd d=0: -0.0021 [-0.0080, 0.0029] equivalent, refits per window 2.55 vs 2.55, identical-schedule share 0.09; lr mmd d=3: -0.0004 [-0.0024, 0.0013] equivalent, refits per window 2.61 vs 2.61, identical-schedule share 0.07; lr domain_clf d=0: -0.0005 [-0.0015, 0.0007] equivalent, refits per window 4.31 vs 4.31, identical-schedule share 0.24; lr domain_clf d=3: 0.0005 [-0.0003, 0.0014] equivalent, refits per window 3.99 vs 3.99, identical-schedule share 0.00; lr p_uniformity d=0: -0.0023 [-0.0090, 0.0017] equivalent, refits per window 3.70 vs 3.70, identical-schedule share 0.28; lr p_uniformity d=3: -0.0007 [-0.0045, 0.0030] equivalent, refits per window 3.27 vs 3.27, identical-schedule share 0.11</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-62</p></td>
+<td><p>Supersedes E-55 (stats review E4 applied). E4 bodmas, registered contrast M-C = monitor-triggered minus its matched-count control at matched retrains; the control knows each window’s refit count (argued conservative for the monitor in addendum v3, not measured); where the identical-schedule share is high the row does not test timing; A-AUT difference with 95% two-stage interval, seeds 0-9, positive favours the monitor; verdict words: ‘reversed’ = interval entirely below 0 and reaching past -0.01; ‘reversed_within_margin’ = interval below 0 but inside +-0.01 (no change larger than 0.01); ‘equivalent’ = interval inside +-0.01; ‘not_informative_identical_schedule’ = the matched control refitted at exactly the monitor’s slots in every window and seed. ‘Reversed’ is a two-sided descriptive reading beyond the registered RQ4 answer, with no family-wise control (Holm floor 0.0625, P-18). On BODMAS at delay 3, KS, MMD and the domain classifier produce one and the same arm (one refit before slot 4), so their rows are one comparison. The eight monitor x delay rows of a stratum share the periodic arm, the windows and the seeds; M-P and M-C share the monitor arm. Smallest Holm-adjusted Wilcoxon p among these bodmas rows 0.0625; the 32-contrast family minimum is 0.0625</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0003, 0.0002] equivalent, refits per window 1.87 vs 1.87, identical-schedule share 0.60; lgbm ks d=3: 0.0002 [-0.0003, 0.0010] equivalent, refits per window 1.00 vs 1.00, identical-schedule share 0.00, same arm as mmd,domain_clf; lgbm mmd d=0: -0.0002 [-0.0007, 0.0003] equivalent, refits per window 1.47 vs 1.47, identical-schedule share 0.20; lgbm mmd d=3: 0.0002 [-0.0003, 0.0010] equivalent, refits per window 1.00 vs 1.00, identical-schedule share 0.00, same arm as ks,domain_clf; lgbm domain_clf d=0: 0.0000 [0.0000, 0.0000] not_informative_identical_schedule, refits per window 2.00 vs 2.00, identical-schedule share 1.00; lgbm domain_clf d=3: 0.0002 [-0.0003, 0.0010] equivalent, refits per window 1.00 vs 1.00, identical-schedule share 0.00, same arm as ks,mmd; lgbm p_uniformity d=0: -0.0003 [-0.0008, 0.0002] equivalent, refits per window 1.80 vs 1.80, identical-schedule share 0.75; lgbm p_uniformity d=3: 0.0002 [-0.0004, 0.0010] equivalent, refits per window 0.97 vs 0.97, identical-schedule share 0.07; lr ks d=0: -0.0000 [-0.0003, 0.0002] equivalent, refits per window 1.87 vs 1.87, identical-schedule share 0.60; lr ks d=3: -0.0004 [-0.0007, -0.0001] reversed_within_margin, refits per window 1.00 vs 1.00, identical-schedule share 0.00, same arm as mmd,domain_clf; lr mmd d=0: -0.0001 [-0.0005, 0.0003] equivalent, refits per window 1.48 vs 1.48, identical-schedule share 0.22; lr mmd d=3: -0.0004 [-0.0007, -0.0001] reversed_within_margin, refits per window 1.00 vs 1.00, identical-schedule share 0.00, same arm as ks,domain_clf; lr domain_clf d=0: 0.0000 [0.0000, 0.0000] not_informative_identical_schedule, refits per window 2.00 vs 2.00, identical-schedule share 1.00; lr domain_clf d=3: -0.0004 [-0.0007, -0.0001] reversed_within_margin, refits per window 1.00 vs 1.00, identical-schedule share 0.00, same arm as ks,mmd; lr p_uniformity d=0: 0.0001 [-0.0001, 0.0003] equivalent, refits per window 1.95 vs 1.95, identical-schedule share 0.68; lr p_uniformity d=3: -0.0003 [-0.0007, -0.0000] reversed_within_margin, refits per window 0.97 vs 0.97, identical-schedule share 0.23</p></td>
+<td><p>reports/tables/e4_contrasts.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-63</p></td>
+<td><p>Supersedes E-56 (stats review E4 applied). E4 monitor quality observing the never arm (primary): alarm precision, recall and detection delay against drop events from true labels (F1 at least 0.05 below the trailing 3-slot mean; alarm within 2 slots), seeds 0-9. Intervals: two-stage bootstrap of pooled-count ratios over one replicate set (replicates with a drop and an alarm), and none when fewer than 3 windows contain a drop. The baselines in brackets (precision of a monitor that alarms in every slot; expected recall of random alarms at the same alarm rate) are exploratory, not registered. Descriptive</p></td>
+<td><p>lamda lgbm ks: alarm rate 0.617, precision 0.462 [0.354, 0.546] (always-alarm 0.443), recall 0.743 [0.421, 0.966] (random at this rate 0.935), 32 distinct drop slots in 16 window(s); lamda lgbm mmd: alarm rate 0.796, precision 0.449 [0.328, 0.546] (always-alarm 0.443), recall 0.942 [0.892, 0.985] (random at this rate 0.987), 32 distinct drop slots in 16 window(s); lamda lgbm domain_clf: alarm rate 0.997, precision 0.444 [0.327, 0.529] (always-alarm 0.443), recall 1.000 [1.000, 1.000] (random at this rate 1.000), 32 distinct drop slots in 16 window(s); lamda lgbm p_uniformity: alarm rate 0.562, precision 0.461 [0.315, 0.555] (always-alarm 0.443), recall 0.796 [0.566, 0.912] (random at this rate 0.906), 32 distinct drop slots in 16 window(s); lamda lr ks: alarm rate 0.617, precision 0.538 [0.445, 0.648] (always-alarm 0.489), recall 0.775 [0.443, 0.972] (random at this rate 0.927), 28 distinct drop slots in 16 window(s); lamda lr mmd: alarm rate 0.785, precision 0.486 [0.379, 0.608] (always-alarm 0.489), recall 0.916 [0.820, 0.977] (random at this rate 0.980), 28 distinct drop slots in 16 window(s); lamda lr domain_clf: alarm rate 0.997, precision 0.490 [0.401, 0.590] (always-alarm 0.489), recall 1.000 [1.000, 1.000] (random at this rate 1.000), 28 distinct drop slots in 16 window(s); lamda lr p_uniformity: alarm rate 0.687, precision 0.465 [0.357, 0.583] (always-alarm 0.489), recall 0.876 [0.757, 0.940] (random at this rate 0.955), 28 distinct drop slots in 16 window(s); bodmas lgbm ks: alarm rate 1.000, precision 0.100 (always-alarm 0.100), recall 1.000 (random at this rate 1.000), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm mmd: alarm rate 1.000, precision 0.100 (always-alarm 0.100), recall 1.000 (random at this rate 1.000), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm domain_clf: alarm rate 1.000, precision 0.100 (always-alarm 0.100), recall 1.000 (random at this rate 1.000), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm p_uniformity: alarm rate 0.872, precision 0.102 (always-alarm 0.100), recall 1.000 (random at this rate 0.948), 2 distinct drop slots in 1 window(s), no interval; bodmas lr ks: alarm rate 1.000, precision 0.056 (always-alarm 0.056), recall 1.000 (random at this rate 1.000), 1 distinct drop slots in 1 window(s), no interval; bodmas lr mmd: alarm rate 1.000, precision 0.056 (always-alarm 0.056), recall 1.000 (random at this rate 1.000), 1 distinct drop slots in 1 window(s), no interval; bodmas lr domain_clf: alarm rate 1.000, precision 0.056 (always-alarm 0.056), recall 1.000 (random at this rate 1.000), 1 distinct drop slots in 1 window(s), no interval; bodmas lr p_uniformity: alarm rate 0.806, precision 0.069 (always-alarm 0.056), recall 1.000 (random at this rate 0.806), 1 distinct drop slots in 1 window(s), no interval</p></td>
+<td><p>reports/tables/e4_monitors.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-64</p></td>
+<td><p>Supersedes E-57 (stats review E4 applied). E4 monitor quality inside each monitor-triggered arm (secondary; drop events come from each arm’s own F1, which its refits change, so not like-for-like with the never arm): alarm precision, recall and detection delay against drop events from true labels (F1 at least 0.05 below the trailing 3-slot mean; alarm within 2 slots), seeds 0-9. Intervals: two-stage bootstrap of pooled-count ratios over one replicate set (replicates with a drop and an alarm), and none when fewer than 3 windows contain a drop. The baselines in brackets (precision of a monitor that alarms in every slot; expected recall of random alarms at the same alarm rate) are exploratory, not registered. Descriptive</p></td>
+<td><p>lamda lgbm ks d=0: alarm rate 0.242, precision 0.573 [0.353, 0.663] (always-alarm 0.441), recall 0.507 [0.238, 0.760] (random at this rate 0.553), 33 distinct drop slots in 16 window(s); lamda lgbm ks d=3: alarm rate 0.379, precision 0.456 [0.324, 0.639] (always-alarm 0.426), recall 0.674 [0.400, 0.856] (random at this rate 0.742), 33 distinct drop slots in 16 window(s); lamda lgbm mmd d=0: alarm rate 0.326, precision 0.543 [0.372, 0.631] (always-alarm 0.433), recall 0.728 [0.547, 0.867] (random at this rate 0.677), 29 distinct drop slots in 15 window(s); lamda lgbm mmd d=3: alarm rate 0.480, precision 0.467 [0.317, 0.618] (always-alarm 0.427), recall 0.885 [0.788, 0.935] (random at this rate 0.847), 31 distinct drop slots in 16 window(s); lamda lgbm domain_clf d=0: alarm rate 0.544, precision 0.485 [0.337, 0.588] (always-alarm 0.446), recall 0.983 [0.923, 1.000] (random at this rate 0.890), 35 distinct drop slots in 16 window(s); lamda lgbm domain_clf d=3: alarm rate 0.988, precision 0.425 [0.297, 0.519] (always-alarm 0.424), recall 1.000 [1.000, 1.000] (random at this rate 1.000), 33 distinct drop slots in 16 window(s); lamda lgbm p_uniformity d=0: alarm rate 0.562, precision 0.466 [0.288, 0.545] (always-alarm 0.451), recall 0.780 [0.506, 0.913] (random at this rate 0.903), 35 distinct drop slots in 16 window(s); lamda lgbm p_uniformity d=3: alarm rate 0.566, precision 0.439 [0.277, 0.539] (always-alarm 0.431), recall 0.774 [0.546, 0.882] (random at this rate 0.906), 33 distinct drop slots in 16 window(s); lamda lr ks d=0: alarm rate 0.242, precision 0.685 [0.522, 0.753] (always-alarm 0.508), recall 0.556 [0.290, 0.744] (random at this rate 0.554), 39 distinct drop slots in 16 window(s); lamda lr ks d=3: alarm rate 0.379, precision 0.557 [0.515, 0.677] (always-alarm 0.496), recall 0.668 [0.436, 0.787] (random at this rate 0.745), 36 distinct drop slots in 16 window(s); lamda lr mmd d=0: alarm rate 0.326, precision 0.591 [0.420, 0.672] (always-alarm 0.492), recall 0.676 [0.519, 0.776] (random at this rate 0.683), 45 distinct drop slots in 16 window(s); lamda lr mmd d=3: alarm rate 0.476, precision 0.549 [0.423, 0.635] (always-alarm 0.497), recall 0.833 [0.697, 0.896] (random at this rate 0.839), 38 distinct drop slots in 16 window(s); lamda lr domain_clf d=0: alarm rate 0.544, precision 0.567 [0.437, 0.645] (always-alarm 0.510), recall 0.961 [0.906, 0.993] (random at this rate 0.893), 45 distinct drop slots in 16 window(s); lamda lr domain_clf d=3: alarm rate 0.988, precision 0.505 [0.422, 0.589] (always-alarm 0.503), recall 1.000 [1.000, 1.000] (random at this rate 1.000), 43 distinct drop slots in 16 window(s); lamda lr p_uniformity d=0: alarm rate 0.737, precision 0.499 [0.385, 0.588] (always-alarm 0.522), recall 0.870 [0.780, 0.928] (random at this rate 0.976), 47 distinct drop slots in 16 window(s); lamda lr p_uniformity d=3: alarm rate 0.742, precision 0.474 [0.372, 0.578] (always-alarm 0.499), recall 0.873 [0.772, 0.933] (random at this rate 0.976), 39 distinct drop slots in 16 window(s); bodmas lgbm ks d=0: alarm rate 0.683, precision 0.171 (always-alarm 0.117), recall 1.000 (random at this rate 0.883), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm ks d=3: alarm rate 0.867, precision 0.115 (always-alarm 0.100), recall 1.000 (random at this rate 0.965), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm mmd d=0: alarm rate 0.194, precision 0.200 (always-alarm 0.122), recall 0.636 (random at this rate 0.374), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm mmd d=3: alarm rate 0.528, precision 0.105 (always-alarm 0.100), recall 0.875 (random at this rate 0.803), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm domain_clf d=0: alarm rate 1.000, precision 0.117 (always-alarm 0.117), recall 1.000 (random at this rate 1.000), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm domain_clf d=3: alarm rate 1.000, precision 0.100 (always-alarm 0.100), recall 1.000 (random at this rate 1.000), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm p_uniformity d=0: alarm rate 0.817, precision 0.122 (always-alarm 0.117), recall 1.000 (random at this rate 0.941), 2 distinct drop slots in 1 window(s), no interval; bodmas lgbm p_uniformity d=3: alarm rate 0.856, precision 0.097 (always-alarm 0.100), recall 1.000 (random at this rate 0.962), 2 distinct drop slots in 1 window(s), no interval; bodmas lr ks d=0: alarm rate 0.683, precision 0.106 [0.000, 0.218] (always-alarm 0.078), recall 0.917 [0.000, 1.000] (random at this rate 0.707), 3 distinct drop slots in 3 window(s); bodmas lr ks d=3: alarm rate 0.867, precision 0.064 (always-alarm 0.056), recall 1.000 (random at this rate 0.867), 1 distinct drop slots in 1 window(s), no interval; bodmas lr mmd d=0: alarm rate 0.228, precision 0.073 [0.000, 0.196] (always-alarm 0.089), recall 0.214 [0.000, 0.455] (random at this rate 0.250), 3 distinct drop slots in 3 window(s); bodmas lr mmd d=3: alarm rate 0.533, precision 0.104 (always-alarm 0.056), recall 1.000 (random at this rate 0.533), 1 distinct drop slots in 1 window(s), no interval; bodmas lr domain_clf d=0: alarm rate 1.000, precision 0.078 [0.006, 0.161] (always-alarm 0.078), recall 1.000 [1.000, 1.000] (random at this rate 1.000), 3 distinct drop slots in 3 window(s); bodmas lr domain_clf d=3: alarm rate 1.000, precision 0.056 (always-alarm 0.056), recall 1.000 (random at this rate 1.000), 1 distinct drop slots in 1 window(s), no interval; bodmas lr p_uniformity d=0: alarm rate 0.817, precision 0.088 (always-alarm 0.072), recall 1.000 (random at this rate 0.833), 2 distinct drop slots in 2 window(s), no interval; bodmas lr p_uniformity d=3: alarm rate 0.806, precision 0.069 (always-alarm 0.056), recall 1.000 (random at this rate 0.806), 1 distinct drop slots in 1 window(s), no interval</p></td>
+<td><p>reports/tables/e4_monitors.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-even"><td><p>E-65</p></td>
+<td><p>Adds the A-AUT standard deviation to E-50 and E-51 (stats review E4): A-AUT per arm, mean over windows and sample SD over windows (averaged over seeds), seeds 0-9</p></td>
+<td><p>lamda lgbm matched-domain_clf d=0: A-AUT 0.7595 (SD over windows 0.0659); lamda lgbm matched-domain_clf d=3: A-AUT 0.7553 (SD over windows 0.0671); lamda lgbm matched-ks d=0: A-AUT 0.7572 (SD over windows 0.0659); lamda lgbm matched-ks d=3: A-AUT 0.7549 (SD over windows 0.0677); lamda lgbm matched-mmd d=0: A-AUT 0.7582 (SD over windows 0.0661); lamda lgbm matched-mmd d=3: A-AUT 0.7550 (SD over windows 0.0676); lamda lgbm matched-p_uniformity d=0: A-AUT 0.7591 (SD over windows 0.0657); lamda lgbm matched-p_uniformity d=3: A-AUT 0.7549 (SD over windows 0.0675); lamda lgbm monitor-domain_clf d=0: A-AUT 0.7593 (SD over windows 0.0656); lamda lgbm monitor-domain_clf d=3: A-AUT 0.7548 (SD over windows 0.0674); lamda lgbm monitor-ks d=0: A-AUT 0.7572 (SD over windows 0.0663); lamda lgbm monitor-ks d=3: A-AUT 0.7545 (SD over windows 0.0680); lamda lgbm monitor-mmd d=0: A-AUT 0.7579 (SD over windows 0.0660); lamda lgbm monitor-mmd d=3: A-AUT 0.7545 (SD over windows 0.0677); lamda lgbm monitor-p_uniformity d=0: A-AUT 0.7583 (SD over windows 0.0656); lamda lgbm monitor-p_uniformity d=3: A-AUT 0.7546 (SD over windows 0.0676); lamda lgbm never: A-AUT 0.7534 (SD over windows 0.0686); lamda lgbm periodic d=0: A-AUT 0.7598 (SD over windows 0.0658); lamda lgbm periodic d=3: A-AUT 0.7548 (SD over windows 0.0676); lamda lr matched-domain_clf d=0: A-AUT 0.6666 (SD over windows 0.0567); lamda lr matched-domain_clf d=3: A-AUT 0.6599 (SD over windows 0.0572); lamda lr matched-ks d=0: A-AUT 0.6558 (SD over windows 0.0603); lamda lr matched-ks d=3: A-AUT 0.6556 (SD over windows 0.0589); lamda lr matched-mmd d=0: A-AUT 0.6613 (SD over windows 0.0575); lamda lr matched-mmd d=3: A-AUT 0.6571 (SD over windows 0.0580); lamda lr matched-p_uniformity d=0: A-AUT 0.6646 (SD over windows 0.0567); lamda lr matched-p_uniformity d=3: A-AUT 0.6589 (SD over windows 0.0576); lamda lr monitor-domain_clf d=0: A-AUT 0.6661 (SD over windows 0.0573); lamda lr monitor-domain_clf d=3: A-AUT 0.6604 (SD over windows 0.0569); lamda lr monitor-ks d=0: A-AUT 0.6566 (SD over windows 0.0607); lamda lr monitor-ks d=3: A-AUT 0.6552 (SD over windows 0.0599); lamda lr monitor-mmd d=0: A-AUT 0.6593 (SD over windows 0.0600); lamda lr monitor-mmd d=3: A-AUT 0.6567 (SD over windows 0.0588); lamda lr monitor-p_uniformity d=0: A-AUT 0.6622 (SD over windows 0.0567); lamda lr monitor-p_uniformity d=3: A-AUT 0.6582 (SD over windows 0.0575); lamda lr never: A-AUT 0.6546 (SD over windows 0.0604); lamda lr periodic d=0: A-AUT 0.6655 (SD over windows 0.0569); lamda lr periodic d=3: A-AUT 0.6603 (SD over windows 0.0573); bodmas lgbm matched-domain_clf d=0: A-AUT 0.9695 (SD over windows 0.0199); bodmas lgbm matched-domain_clf d=3: A-AUT 0.9693 (SD over windows 0.0208); bodmas lgbm matched-ks d=0: A-AUT 0.9695 (SD over windows 0.0199); bodmas lgbm matched-ks d=3: A-AUT 0.9693 (SD over windows 0.0208); bodmas lgbm matched-mmd d=0: A-AUT 0.9695 (SD over windows 0.0204); bodmas lgbm matched-mmd d=3: A-AUT 0.9693 (SD over windows 0.0208); bodmas lgbm matched-p_uniformity d=0: A-AUT 0.9697 (SD over windows 0.0197); bodmas lgbm matched-p_uniformity d=3: A-AUT 0.9693 (SD over windows 0.0208); bodmas lgbm monitor-domain_clf d=0: A-AUT 0.9695 (SD over windows 0.0199); bodmas lgbm monitor-domain_clf d=3: A-AUT 0.9695 (SD over windows 0.0205); bodmas lgbm monitor-ks d=0: A-AUT 0.9695 (SD over windows 0.0199); bodmas lgbm monitor-ks d=3: A-AUT 0.9695 (SD over windows 0.0205); bodmas lgbm monitor-mmd d=0: A-AUT 0.9694 (SD over windows 0.0203); bodmas lgbm monitor-mmd d=3: A-AUT 0.9695 (SD over windows 0.0205); bodmas lgbm monitor-p_uniformity d=0: A-AUT 0.9694 (SD over windows 0.0200); bodmas lgbm monitor-p_uniformity d=3: A-AUT 0.9695 (SD over windows 0.0205); bodmas lgbm never: A-AUT 0.9692 (SD over windows 0.0211); bodmas lgbm periodic d=0: A-AUT 0.9692 (SD over windows 0.0213); bodmas lgbm periodic d=3: A-AUT 0.9692 (SD over windows 0.0211); bodmas lr matched-domain_clf d=0: A-AUT 0.9078 (SD over windows 0.0298); bodmas lr matched-domain_clf d=3: A-AUT 0.9083 (SD over windows 0.0303); bodmas lr matched-ks d=0: A-AUT 0.9078 (SD over windows 0.0298); bodmas lr matched-ks d=3: A-AUT 0.9083 (SD over windows 0.0303); bodmas lr matched-mmd d=0: A-AUT 0.9079 (SD over windows 0.0299); bodmas lr matched-mmd d=3: A-AUT 0.9083 (SD over windows 0.0303); bodmas lr matched-p_uniformity d=0: A-AUT 0.9078 (SD over windows 0.0298); bodmas lr matched-p_uniformity d=3: A-AUT 0.9083 (SD over windows 0.0303); bodmas lr monitor-domain_clf d=0: A-AUT 0.9078 (SD over windows 0.0298); bodmas lr monitor-domain_clf d=3: A-AUT 0.9079 (SD over windows 0.0302); bodmas lr monitor-ks d=0: A-AUT 0.9078 (SD over windows 0.0297); bodmas lr monitor-ks d=3: A-AUT 0.9079 (SD over windows 0.0302); bodmas lr monitor-mmd d=0: A-AUT 0.9078 (SD over windows 0.0299); bodmas lr monitor-mmd d=3: A-AUT 0.9079 (SD over windows 0.0302); bodmas lr monitor-p_uniformity d=0: A-AUT 0.9080 (SD over windows 0.0297); bodmas lr monitor-p_uniformity d=3: A-AUT 0.9079 (SD over windows 0.0302); bodmas lr never: A-AUT 0.9083 (SD over windows 0.0304); bodmas lr periodic d=0: A-AUT 0.9079 (SD over windows 0.0301); bodmas lr periodic d=3: A-AUT 0.9083 (SD over windows 0.0304)</p></td>
+<td><p>reports/tables/e4_policies.csv</p></td>
+<td><p>3b889b7 (results 1d302ea)</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-21</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-01</p></td>
+<td><p>TIF (Zheng et al., arXiv 2502.05098): groups training data into environments by application observation date; multi-proxy contrastive learning and invariant gradient alignment; abstract says it excels on a decade-long dataset, particularly in early deployment stages; accepted by IEEE TSE (arXiv comment)</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2502.05098</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-02</p></td>
+<td><p>ADAPT (Alam, Piplai, Rastogi, arXiv 2507.08597): model-agnostic pseudo-labelling semi-supervised algorithm; experiments on five malware datasets spanning Android, Windows and PDF; the abstract does not mention manual analysis queues</p></td>
+<td><p>5 datasets</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2507.08597</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-03</p></td>
+<td><p>LFreeDA (Li and Bertino, arXiv 2511.14963), Windows, MB-24+ dataset: improves accuracy by up to 12.6% and F1 by 11.1% over no-adaptation lower bounds, is 4% and 3.4% below fully supervised upper bounds in accuracy and F1, and matches state-of-the-art methods given ground truth for 300 target samples</p></td>
+<td><p>12.6%, 11.1%, 4%, 3.4%, 300 samples</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2511.14963</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-04</p></td>
+<td><p>MADCAT (Roh et al., arXiv 2505.18734): test-time training of the encoder on a small, balanced subset of the test-time data; continuous Android malware detection</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2505.18734</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-05</p></td>
+<td><p>DREAM (He et al., arXiv 2405.04095; accepted to ACM CCS 2025 per the arXiv comment): updating a Drebin classifier reaches the same accuracy with 76.6% fewer newly labelled samples than the best existing methods</p></td>
+<td><p>76.6%</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2405.04095</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-06</p></td>
+<td><p>Minnei et al. (arXiv 2603.28396), Android and Windows: combined active and semi-supervised techniques reduce manual annotation cost by up to 90% with detection performance comparable to full-labelling retraining</p></td>
+<td><p>up to 90%</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2603.28396</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-07</p></td>
+<td><p>Kalny, Jurecek, Stamp (arXiv 2604.22629), EMBER2024, six malware families: fixed two-month windowing with feature-level Pearson correlation is the most reliable configuration; no single approach dominates across all pairs</p></td>
+<td><p>6 families, 2-month windows</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2604.22629</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-08</p></td>
+<td><p>LAMDA (Haque et al., arXiv 2505.18551): spans 12 years (2013 to 2025, excluding 2015), over 1 million samples, about 37% malware, 1,380 malware families and 150,000 singleton samples; an ICLR 2026 poster page exists (iclr.cc/virtual/2026/poster/10011850, title and authors confirmed)</p></td>
+<td><p>12 years; over 1 million; 37%; 1,380 families</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2505.18551; iclr.cc poster page</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-09</p></td>
+<td><p>McNdroid (Kamol et al., arXiv 2605.06894): Android benchmark spanning 2013 to 2025 excluding 2015 with static, dynamic and function-call-graph features; clear temporal degradation across increasing train-test gaps</p></td>
+<td><p>3 modalities</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2605.06894</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-10</p></td>
+<td><p>Aurora (Herzog, Eusebi, Cavallaro, arXiv 2505.22843): evaluates the confidence quality and operational resilience of malware classifiers; reports fragility in state-of-the-art frameworks across datasets of varying drift severity</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2505.22843</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-11</p></td>
+<td><p>Chen, Ding, Wagner, Continuous Learning for Android Malware Detection (USENIX Security 2023, pp. 1127 to 1144): F1 fell from 0.99 to 0.76 after 6 months without updates; the false negative rate fell from 14% to 9% and the false positive rate from 0.86% to 0.48% against the best baseline</p></td>
+<td><p>0.99 to 0.76; 14% to 9%; 0.86% to 0.48%</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2302.04332; usenix.org/conference/usenixsecurity23/presentation/chen-yizheng</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-12</p></td>
+<td><p>Transcend: Detecting Concept Drift in Malware Classification Models (Jordaney, Sharad, Dash, Wang, Papini, Nouretdinov, Cavallaro), 26th USENIX Security Symposium 2017, pp. 625 to 642</p></td>
+<td><p>7 authors; pp. 625-642</p></td>
+<td><p>usenix.org/conference/usenixsecurity17/technical-sessions/presentation/jordaney</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-13</p></td>
+<td><p>CADE: Detecting and Explaining Concept Drift Samples for Security Applications (Yang, Guo, Hao, Ciptadi, Ahmadzadeh, Xing, Wang), 30th USENIX Security Symposium 2021, pp. 2327 to 2344</p></td>
+<td><p>7 authors; pp. 2327-2344</p></td>
+<td><p>usenix.org/conference/usenixsecurity21/presentation/yang-limin</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-14</p></td>
+<td><p>Transcendent (Barbero, Pendlebury, Pierazzi, Cavallaro, arXiv 2010.03856; IEEE S&amp;P 2022, DOI 10.1109/SP46214.2022.9833659): a formal treatment of Transcend, two further conformal evaluators that match or surpass it at lower computational cost, evaluated on a 5-year dataset without the original’s experimental bias</p></td>
+<td><p>5 years; 2 evaluators</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2010.03856; Crossref record of the DOI</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-15</p></td>
+<td><p>Shafer and Vovk, A tutorial on conformal prediction (arXiv 0706.3188; JMLR 9:371 to 421, 2008): for error probability epsilon the method returns a set of labels that contains the true label with probability 1 - epsilon when successive examples are sampled independently from the same distribution</p></td>
+<td><p>1 - epsilon</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/0706.3188</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-16</p></td>
+<td><p>Gama, Zliobaite, Bifet, Pechenizkiy, Bouchachia, A survey on concept drift adaptation, ACM Computing Surveys 46(4), 2014, pp. 1 to 37, DOI 10.1145/2523813: concept drift is a change in the relation between input data and target variable over time in online supervised learning</p></td>
+<td><p>5 authors</p></td>
+<td><p>Crossref record of DOI 10.1145/2523813</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-17</p></td>
+<td><p>Ceschin et al., Machine Learning (In) Security: A Stream of Problems (arXiv 2010.16045; Digital Threats 2023, DOI 10.1145/3617897 per the arXiv record): evaluates how concept drift, evolution, delayed labels and adversarial ML affect existing security solutions</p></td>
+<td><p>7 authors</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2010.16045</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-18</p></td>
+<td><p>Botacin and Gomes, Towards more realistic evaluations: the impact of label delays in malware detection pipelines (Computers and Security 148, article 104122, 2025): introduces an exposure metric; delayed labels from limited analysis queues leave up to 75% more attack opportunity than experiments suggest; pseudo-labels reduce the detection loss to about 30% of its original value</p></td>
+<td><p>up to 75%; about 30%</p></td>
+<td><p>par.nsf.gov/biblio/10546490 (abstract summary read 2026-10-22; the publisher page returned HTTP 403); Crossref record of the DOI</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-19</p></td>
+<td><p>ActDroid (Muzaffar et al., arXiv 2401.16982): active online learning for Android malware; accuracy up to 96% with as little as 24% of the training data labelled; compensates for concept drift between release and labelling</p></td>
+<td><p>96%; 24%</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2401.16982</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-20</p></td>
+<td><p>SEED (Amalapuram et al., arXiv 2605.24903): with 20% labelled data on seen tasks, average AUT improvements of 40% on BODMAS and 14% on AndroZoo against HCL*; introduces a delayed buffer update strategy to reduce label-noise propagation during replay (the unit of the delay is not stated in the abstract)</p></td>
+<td><p>40%; 14%; 20% labelled</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2605.24903</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-21</p></td>
+<td><p>FIRCE (Barrett et al., arXiv 2605.01962): conformal-evaluation drift detection for network intrusion detection, on an IoT testbed of 10 devices and the CICIDS2018 and UNSW-NB15 datasets, with four conformal evaluation strategies; it concerns network traffic, not malware files</p></td>
+<td><p>10 devices; 2 benchmark datasets</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2605.01962</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-22</p></td>
+<td><p>TESSERACT extended version (Kan et al., arXiv 2402.01359; v1 2 Feb 2024, v2 9 Apr 2025): constraints for fair experiment design, the AUT metric, an Android dataset of 259,230 samples over five years, and case studies in Windows PE and PDF</p></td>
+<td><p>259,230 samples; 5 years</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2402.01359</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-23</p></td>
+<td><p>Beyond the TESSERACT (Chow et al., arXiv 2506.23814): identifies five factors that cause performance discrepancies in Android malware detectors even with realistic temporal splits and class ratios, and recommends a methodology for curating trustworthy datasets; the abstract does not mention label delay</p></td>
+<td><p>5 factors</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2506.23814</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-24</p></td>
+<td><p>DRMD (McFadden et al., arXiv 2508.18839; AAAI 2026, vol. 40, pp. 854 to 862): deep reinforcement learning that jointly classifies and rejects samples for manual labelling; average AUT improvement of 8.66 and 10.90 for the classification-only and classification-rejection policies</p></td>
+<td><p>8.66; 10.90</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2508.18839</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-25</p></td>
+<td><p>Li, Li, Ye, Xu, Arms Race in Adversarial Malware Detection: A Survey (arXiv 2005.11671; ACM Computing Surveys 55(1), article 15 per the arXiv record): the effectiveness of practical evasion attacks largely depends on the attacker’s freedom to manipulate in the problem space; the effectiveness of adversarial training depends on the defender’s ability to identify the most powerful attack</p></td>
+<td><p>abstract-level findings</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2005.11671</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-26</p></td>
+<td><p>Aryal, Gupta, Abdelsalam, Kunwar, Thuraisingham, A Survey on Adversarial Attacks for Malware Analysis, IEEE Access 13:428 to 459 (issue year 2025; the Crossref record was created on 18 Dec 2024), DOI 10.1109/ACCESS.2024.3519524; the arXiv text 2111.08223 is an earlier version by three of the authors</p></td>
+<td><p>5 authors; pp. 428-459</p></td>
+<td><p>Crossref record of the DOI; arXiv listing 2111.08223</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-27</p></td>
+<td><p>Ryan et al. (arXiv 2602.16304): 13 language models on 4,070 PyPI packages (370 malicious, 3,700 benign); mean F1 for detection from 0.40 to 0.99; weighted F1 0.69 for behaviour types, 0.48 for specific indicators; the authors recommend language models for initial triage</p></td>
+<td><p>13 models; 4,070 packages</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2602.16304</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-28</p></td>
+<td><p>Chawla and Prasad (arXiv 2601.09035): Windows executables decompiled with Ghidra and classified by language models; standard models are not yet robust enough to replace traditional anti-virus software; a fine-tuned model degrades notably on newer malware</p></td>
+<td><p>abstract-level findings</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2601.09035</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-29</p></td>
+<td><p>MalCVE (Cristea, Molnes, Li, arXiv 2510.15567): retrieval-augmented language-model pipeline on a benchmark of 3,839 JAR executables; mean malware-detection accuracy 97%; recall&#64;10 of 65% for associating CVEs</p></td>
+<td><p>3,839 files; 97%</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2510.15567</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-30</p></td>
+<td><p>EMBER2024 (Joyce et al., arXiv 2506.05074; DOI 10.1145/3711896.3737431 per the arXiv record): feature vectors and labels for more than 3.2 million files from six file formats, with a challenge set of files that initially evaded a set of antivirus products; licence Apache-2.0 as confirmed on the dataset card on 2026-10-20</p></td>
+<td><p>over 3.2 million files; 6 formats</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2506.05074</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-31</p></td>
+<td><p>Cerqueira et al. (arXiv 2606.07789; KDD 2026 per the arXiv comment): benchmarks 14 drift detection methods on 7 real-world datasets and 4 drift types with timing-aware criteria such as an F1 detection score and a normalised detection time</p></td>
+<td><p>14 methods; 7 datasets</p></td>
+<td><p>arXiv abstract text via the arXiv API (export.arxiv.org), arxiv.org/abs/2606.07789</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] at abstract level; the full paper was not read</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>D-15</p></td>
+<td><p>LAMDA label rule: an app with vt_detection 0 is benign, one with vt_detection of 4 or more is malware, and apps with 1 to 3 detections are discarded</p></td>
+<td><p>rule holds for every row of the cache (0 conflicts)</p></td>
+<td><p>docs/data_cards/lamda.md (rule from the LAMDA paper, section 3)</p></td>
+<td><p>9b27b58</p></td>
+<td><p>[verified] against the paper; conflict count [measured]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-16</p></td>
+<td><p>LAMDA labels are AV-centric (the dataset card says they are “biased toward highly detected malware”); VirusTotal counts depend on the scan date, which the dataset does not publish, so a label may reflect knowledge later than the collection date (a form of label leakage the study cannot remove)</p></td>
+<td><p>stated limitation</p></td>
+<td><p>docs/data_cards/lamda.md</p></td>
+<td><p>9b27b58</p></td>
+<td><p>[verified] against the dataset card</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>D-17</p></td>
+<td><p>BODMAS: the project page and the repository README do not describe how the labels were produced; its paper has to be consulted. On 22 Oct 2026 the paper’s PDF could not be read here (the copies at par.nsf.gov, conferences.computer.org and gangw.cs.illinois.edu returned no readable text, one host failed its certificate check, and the download guard blocks the author’s host). A web search summary, not a reading of the paper, says the paper takes the first-seen time from VirusTotal reports and the samples from a security company’s database, and the authors’ slides say family labels aggregate several antivirus vendors with about 1% manual analysis; none of this is verified, and it is not used in the report. The researcher should read the paper’s dataset section</p></td>
+<td><p>open</p></td>
+<td><p>docs/data_cards/bodmas.md</p></td>
+<td><p>9b27b58</p></td>
+<td><p>[verify]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-32</p></td>
+<td><p>AV-TEST Institute malware statistics page: the institute registers “over 450,000 new malicious programs (malware)” each day, counting malware and potentially unwanted applications together; the page has no data date (footer 2026) and its per-year, per-month and per-platform charts are images</p></td>
+<td><p>over 450,000 per day</p></td>
+<td><p>https://www.av-test.org/en/statistics/malware/ (page text read through WebFetch)</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] as quoted; the figure is the vendor’s own and undated</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>L-33</p></td>
+<td><p>Li, Iyengar, Kundu, Bertino, Revisiting Concept Drift in Windows Malware Detection: Adaptation to Real Drifted Malware with Minimal Samples: listed on the NDSS 2025 accepted-papers page with these four authors; arXiv 2407.13918 (v1 18 Jul 2024, updated 19 Dec 2024) gives the same title and authors</p></td>
+<td><p>NDSS 2025</p></td>
+<td><p>ndss-symposium.org/ndss2025/accepted-papers/ and ndss-symposium.org/ndss-paper/revisiting-concept-drift-in-windows-malware-detection-adaptation-to-real-drifted-malware-with-minimal-samples/ (read through WebFetch); arXiv API</p></td>
+<td><p>464f16c</p></td>
+<td><p>[verified] that the paper is NDSS 2025; [verify] that it is the paper meant by plan Table G.1</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-66</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table (no experiment run): correlation, over evaluation slots, between the per-slot F1 of the never-retrained detector (rolling variant, 10% target) and the slot’s achieved malware ratio. Slot F1 co-varies with slot prevalence, so part of the variation in per-slot F1 is class prior, not concept drift</p></td>
+<td><p>bodmas lgbm: Pearson r 0.49 over 20 slots, 0.00 of slots below the target ratio; bodmas lr: Pearson r 0.42 over 20 slots, 0.00 of slots below the target ratio; lamda lgbm: Pearson r 0.47 over 57 slots, 0.51 of slots below the target ratio; lamda lr: Pearson r 0.55 over 57 slots, 0.51 of slots below the target ratio</p></td>
+<td><p>reports/tables/e0_per_slot.csv</p></td>
+<td><p>2e1702a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>E-67</p></td>
+<td><p>Clean-clone check for the Phase 11 hand-in: fresh clone of branch <code class="docutils literal notranslate"><span class="pre">phase-11-report</span></code> at ed6be75 into an empty folder, <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span> <span class="pre">--frozen</span></code>, ruff check and format, the fast tests, the guardrail demo, the claims audit, <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">reproduce</span> <span class="pre">table1</span> <span class="pre">--smoke</span></code> and the full <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">reproduce</span> <span class="pre">table1</span></code> on BODMAS fetched into its own data root</p></td>
+<td><p>ruff clean; fast tests 1,004 passed, 141 deselected, in 69.95 s; guardrails 45 of 45; claims audit PASS; smoke MATCH on 2 rows (max difference 0.000000); full Table 1 MATCH on 8 rows, max difference 0.000000 (tolerance 0.002), run 976 s, total 1,102 s</p></td>
+<td><p>results/logs/clean_clone_phase11.log (not committed)</p></td>
+<td><p>ed6be75</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-68</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table <code class="docutils literal notranslate"><span class="pre">reports/tables/e2_per_slot.csv</span></code> by <code class="docutils literal notranslate"><span class="pre">scripts/lifetime_exploratory.py</span></code> (no experiment run): “lifetime” read as the first slot position at which the mean F1 over windows and seeds is at least 0.05 below its value at slot 1, and the least-squares slope of mean F1 per slot. Never-retrained detector, mean F1 at slot 1 to slot 12 on LAMDA (slots are months) and slot 1 to 6 on BODMAS (slots are two weeks)</p></td>
+<td><p>LAMDA, never retrained: LightGBM 0.783 at slot 1, 0.770 at slot 12, first 0.05 below at slot 7, slope -0.0066 per slot; logistic regression 0.698, 0.671, slot 7, -0.0084. BODMAS: LightGBM 0.980 to 0.973, slope -0.0010, never 0.05 below within 6 slots; logistic regression 0.932 to 0.902, slope -0.0039, never 0.05 below. Periodic retraining at delay 0 and budget 5% on LAMDA: LightGBM slope -0.0032 and logistic regression -0.0056, never 0.05 below within 12 slots. The curves are not monotonic (LAMDA LightGBM is higher at slot 3 than at slot 1) and F1 at a fixed threshold moves with the malware share of a slot [E-66], so these are descriptive</p></td>
+<td><p>reports/tables/e2_lifetime_exploratory.csv</p></td>
+<td><p>228c354</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>E-69</p></td>
+<td><p>Hash manifest of the stored predictions of E0 to E4 and a private archive of the same files (<code class="docutils literal notranslate"><span class="pre">scripts/archive_predictions.py</span></code>): predictions, slot tables, run records and ledgers under <code class="docutils literal notranslate"><span class="pre">results/e0</span></code> to <code class="docutils literal notranslate"><span class="pre">results/e4</span></code></p></td>
+<td><p>577 files, 7.20 GiB; every SHA-256 in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code>; <code class="docutils literal notranslate"><span class="pre">--verify</span></code> reports 0 problems against <code class="docutils literal notranslate"><span class="pre">results/</span></code>; the zip (stored, not compressed, 577 entries, <code class="docutils literal notranslate"><span class="pre">testzip</span></code> clean) was written to <code class="docutils literal notranslate"><span class="pre">E:\DriftWatch-archive\driftwatch_predictions_2026-10-22.zip</span></code>, outside the repository and not uploaded anywhere</p></td>
+<td><p>docs/predictions_manifest.csv</p></td>
+<td><p>4094033</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-odd"><td><p>T-02</p></td>
+<td><p>Word counts of the report chapters at the Phase 11 hand-in draft, counted with <code class="docutils literal notranslate"><span class="pre">wc</span> <span class="pre">-w</span></code> equivalent over report/ch01 to ch09</p></td>
+<td><p>ch1 1170; ch2 1099; ch3 2277; ch4 1501; ch5 1572; ch6 3369; ch7 5129; ch8 2977; ch9 1287; total with front matter 21665</p></td>
+<td><p>report/*.md</p></td>
+<td><p>f9de12f</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-22</p></td>
+</tr>
+<tr class="row-even"><td><p>E-70</p></td>
+<td><p>The built wheel runs the smoke experiment from an installed package in an empty folder that is not a checkout (Python 3.12, fresh environment, no data)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">--version</span></code> prints 0.1.0; <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">smoke</span></code> prints MATCH on 2 rows, max difference 0.000000 against a tolerance of 0.002, exit 0; wheel 206,715 bytes (89 files), source archive 165,857 bytes, both pass <code class="docutils literal notranslate"><span class="pre">twine</span> <span class="pre">check</span> <span class="pre">--strict</span></code> and the contents check. Fixture numbers test the code path only</p></td>
+<td><p>reports/phase12_checks.md section 1; docs/architecture/img/term-smoke.png</p></td>
+<td><p>d183423</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-27</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-71</p></td>
+<td><p>Behaviour-preserving cleanup of Phase 12 (commit b87c6eb) against a baseline taken at f7dffb5</p></td>
+<td><p>smoke predictions: 40 rows, probabilities, decisions and labels identical (only config_hash and window_id, which embed the code version, differ); slot table 4 rows and window table 2 rows identical apart from those and a timing column; everything written under reports/ by make_tables.py, make_e3.py and make_e4.py equals the committed copy (git status of reports/ empty; other scripts’ outputs were not rerun); E4-versus-E3 cross-check exit 0</p></td>
+<td><p>reports/phase12_checks.md section 2</p></td>
+<td><p>b87c6eb</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-27</p></td>
+</tr>
+<tr class="row-even"><td><p>E-72</p></td>
+<td><p>Rehearsal of the filtered public history (scripts/make_public_history.py, nothing pushed)</p></td>
+<td><p>193 commits rewritten with docs/source removed; 0 commits touch it and no tree contains it; tags prereg-v1 to prereg-v3 survive; commit count unchanged; largest blob 415,219 bytes; no match for the scanned secret patterns (a pattern scan, not a proof); 193 old-to-new hashes mapped</p></td>
+<td><p>reports/phase12_checks.md section 3</p></td>
+<td><p>3a5b519</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-27</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-73</p></td>
+<td><p>First run of the maintenance playbook, reproduction check: the full <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">reproduce</span> <span class="pre">table1</span></code> on a fresh BODMAS download, clean tracked tree</p></td>
+<td><p>MATCH, 8 rows, max difference 0.000000 against a tolerance of 0.002; comparator columns differ by at most 0.0052 (tolerance 0.02); the 3 raw files equal the committed manifest byte for byte; run 1,103 s, total 1,187 s; peak memory 1,480,376,320 bytes; same development laptop, not a new machine</p></td>
+<td><p>reports/maintenance/2026-10-first-run.md section 2</p></td>
+<td><p>d183423</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-27</p></td>
+</tr>
+<tr class="row-even"><td><p>E-74</p></td>
+<td><p>First run of the maintenance playbook, arXiv audit (scripts/arxiv_audit.py then the arxiv-audit skill) for 2026-09-01 to 2026-10-27, cs.CR and cs.LG</p></td>
+<td><p>49 keyword candidates; 5 recorded in docs/related_work_addendum.md, 3 adjacent set aside, 41 unrelated; abstracts only, entries marked [verify]</p></td>
+<td><p>reports/maintenance/2026-10-first-run.md section 1; reports/arxiv_audit/2026-10-27.md</p></td>
+<td><p>c643f65</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-27</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-75</p></td>
+<td><p>First run of the maintenance playbook, dependency refresh (uv lock –upgrade)</p></td>
+<td><p>21 packages updated (incl. numpy 2.5.3 to 2.5.4, pandas 3.0.6 to 3.1.0, ruff 0.16.10 to 0.17.3); fast suite 1,056 passed, slow suite 142 passed in 373 s, guardrails 45 of 45; everything make_tables.py, make_e3.py and make_e4.py write under reports/ (E2 to E4 tables and figures) equals the committed copy (no modified file under reports/; other scripts’ outputs were not rerun); no GPL-family or new unknown licence</p></td>
+<td><p>reports/maintenance/2026-10-first-run.md section 3</p></td>
+<td><p>68c1076</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-even"><td><p>E-76</p></td>
+<td><p>The public repository Yathindra25KB/driftwatch-lifetime was created from a filtered copy of the development history and its first workflows ran on GitHub’s runners</p></td>
+<td><p>207 commits rewritten with docs/source removed (0 commits touch it, no tree contains it, tags prereg-v1 to prereg-v3 kept, commit count unchanged), 207 old-to-new hashes in the map; only main and the three tags were pushed; CI on main (including the slow suite and the Windows smoke) and the docs workflow (strict build, link check, and the deploy job that created the gh-pages branch) succeeded on the first push; the deep page /latest/docs/architecture/index.html answered HTTP 200</p></td>
+<td><p>docs/commit_map.csv; GitHub Actions runs 40743821507 (docs) and 40743999106 (CI) in the public repository</p></td>
+<td><p>95c4019</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-77</p></td>
+<td><p>TestPyPI rehearsal: release.yml dispatched with target testpypi on branch release/0.1.0rc1 (version 0.1.0rc1, no Private classifier) before any publisher was registered</p></td>
+<td><p>build job succeeded; the wheel smoke (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">smoke</span></code> from the installed wheel in a fresh environment, no checkout) succeeded on ubuntu-latest and on windows-latest; the upload job was refused with <code class="docutils literal notranslate"><span class="pre">invalid-publisher:</span> <span class="pre">valid</span> <span class="pre">token,</span> <span class="pre">but</span> <span class="pre">no</span> <span class="pre">corresponding</span> <span class="pre">publisher</span></code>, and the identity token’s claims named repository Yathindra25KB/driftwatch-lifetime and environment testpypi, so nothing was uploaded and the failure is exactly the missing registration</p></td>
+<td><p>GitHub Actions run 40744366757 in the public repository</p></td>
+<td><p>d568d78</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-even"><td><p>E-78</p></td>
+<td><p>arxiv-audit.yml dispatched on GitHub (since 2026-09-01)</p></td>
+<td><p>run succeeded and opened issue 1 with 50 keyword candidates (cs.CR and cs.LG, 2026-09-01 to 2026-10-28); candidates not yet read</p></td>
+<td><p>GitHub Actions run 40744762191 and issue 1 in the public repository</p></td>
+<td><p>95c4019</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-79</p></td>
+<td><p>The first live documentation deploy had a defect: the version folder had no index.html, so /latest/ returned HTTP 404 while deep pages answered 200</p></td>
+<td><p>fixed by a redirect page copied to the root of each version folder (html_extra_path); the fix is in the public repository’s pull request 2</p></td>
+<td><p>docs/conf.py; docs/_extra/index.html</p></td>
+<td><p>f688c0a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-10-28</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="GRID.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="PREREG.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">DriftWatch pre-registration</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">DriftWatch claims ledger</a><ul>
+<li><a class="reference internal" href="#rules">Rules</a></li>
+<li><a class="reference internal" href="#ledger">Ledger</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
