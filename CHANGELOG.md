@@ -4,7 +4,7 @@ All notable changes to `driftwatch-lifetime` are recorded here. The format follo
 
 ## [Unreleased]
 
-## [0.1.0] - unreleased
+## [0.1.0] - 2026-10-29
 
 Initial public release. It contains the whole study as run for the capstone report. Every number the README and the report chapters report has a row in `docs/CLAIMS.md` with a source file and a commit. Rows that cite files under `results/` can be regenerated only from the stored predictions, which are not in the repository (they are hashed in `docs/predictions_manifest.csv` and archived privately, E-69). A few rows are marked `[verify]` where the source could not be read (for example how BODMAS's labels were produced, D-17).
 
