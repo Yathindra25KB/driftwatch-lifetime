@@ -129,8 +129,11 @@ def test_missing_golden_table_is_caught(tmp_path: Path) -> None:
 
 
 def test_notes_cli_prints_the_section(capsys) -> None:
-    from_repo = cr.changelog_section(cr.pyproject_version())
-    assert cr.main(["--notes", f"v{cr.pyproject_version()}"]) == 0
+    # a release candidate (0.1.0rc1) has no changelog section of its own: its notes are the
+    # section of the release it rehearses (found by the TestPyPI rehearsal branch)
+    release = cr.release_of(cr.pyproject_version())
+    from_repo = cr.changelog_section(release)
+    assert cr.main(["--notes", f"v{release}"]) == 0
     assert capsys.readouterr().out.strip() == from_repo
 
 

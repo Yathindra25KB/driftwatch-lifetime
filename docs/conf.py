@@ -100,6 +100,10 @@ html_theme = "furo"
 html_title = f"DriftWatch {release}"
 html_static_path = ["_static"]
 html_css_files = ["print.css"]
+# The site's front page is docs/index (root_doc), so the built folder has no index.html of its
+# own. This copies a redirect to the root of every version folder, so that .../latest/ and
+# .../v0.1.0/ (the URLs in CITATION.cff and pyproject.toml) open the documentation.
+html_extra_path = ["_extra"]
 html_theme_options = {
     "source_repository": "https://github.com/Yathindra25KB/driftwatch-lifetime/",
     "source_branch": "main",
