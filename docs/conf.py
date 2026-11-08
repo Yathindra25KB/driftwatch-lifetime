@@ -91,8 +91,10 @@ linkcheck_retries = 2
 linkcheck_workers = 4
 linkcheck_ignore = [
     r"https://doi\.org/10\.5281/zenodo\..*",  # minted only when the draft release is published
-    # the tag and compare pages of 0.1.1 exist only after the tag is pushed
-    r"https://github\.com/Yathindra25KB/driftwatch-lifetime/(compare/v0\.1\.1\.\.\.HEAD|releases/tag/v0\.1\.1)",
+    # GitHub answers scripted requests for this repository's own file pages with 504 under load
+    # (the Docs run of 8 Nov 2026 failed twice on it); every such link points at a tracked file,
+    # which a one-off check of the links in the tree confirmed (CLAIMS E-84)
+    r"https://github\.com/Yathindra25KB/driftwatch-lifetime/(blob|tree)/main/.*",
     # a release candidate page is not kept stable
     r"https://test\.pypi\.org/project/driftwatch-lifetime/.*",
 ]

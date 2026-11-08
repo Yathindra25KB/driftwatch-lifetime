@@ -7,7 +7,7 @@ What may come after 0.1.0. Research items come from chapter 9 section 9.5 of the
 | Version | Content | Precondition |
 |---|---|---|
 | 0.1.x | Fixes only: documentation, packaging, dependency refreshes that leave every stored number unchanged | quarterly dependency refresh (docs/MAINTENANCE.md) |
-| 0.2.0 | The 8-page workshop paper (`paper/main.tex`), built from `docs/CLAIMS.md` only, and the researcher's rewrite of the report | after the capstone hand-in (10 Dec 2026) |
+| 0.2.0 | The researcher's rewrite of the paper (`paper/main.tex`, a 7-page first draft exists, built from `docs/CLAIMS.md` only) and of the report | after the capstone hand-in (10 Dec 2026) |
 | 0.3.0 | Any of the research items below that is registered and run | its addendum and tag |
 
 ## Research items (chapter 9 section 9.5)

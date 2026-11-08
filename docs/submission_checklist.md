@@ -1,6 +1,6 @@
 # Submission checklist
 
-This is a checklist for turning the report into a paper. **No paper exists yet.** `paper/main.tex` is not written; the roadmap puts it after the capstone hand-in (`docs/ROADMAP.md`, release 0.2.0). Venue facts below were read on the venues' own pages on 8 Nov 2026 (`reports/source_verification_2026-11-08.md`). Deadlines move: read the call again before relying on a date. "Unconfirmed" means the official page could not be read or has not published a call for the 2027 cycle.
+This is a checklist for submitting the paper. A first full draft exists: `paper/main.tex` (IEEE conference template, A4, 7 pages including references; build with `tectonic paper/main.tex`) and `paper/main.pdf`. It is written from `docs/CLAIMS.md` only, and every number carries its claim id in small type; the claim ids are for the reader of the draft and should be removed or turned into footnotes at submission. Neither the draft nor the report has been read line by line by a person. Venue facts below were read on the venues' own pages on 8 Nov 2026 (`reports/source_verification_2026-11-08.md`). Deadlines move: read the call again before relying on a date. "Unconfirmed" means the official page could not be read or has not published a call for the 2027 cycle.
 
 ## Venues
 
