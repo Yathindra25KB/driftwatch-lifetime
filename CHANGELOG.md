@@ -4,6 +4,13 @@ All notable changes to `driftwatch-lifetime` are recorded here. The format follo
 
 ## [Unreleased]
 
+### Added
+- `paper/main.tex` and `paper/main.pdf`: a 7-page first draft in the IEEE conference template, from `docs/CLAIMS.md` only (CLAIMS E-84).
+- `docs/PROJECT_CONTEXT.md`: a project summary for a new session; `docs/evidence/`: screenshots of the live PyPI and Zenodo pages.
+
+### Changed
+- `ci.yml` pins its actions by commit SHA like the other workflows.
+
 ## [0.1.1] - 2026-11-08
 
 Documentation, evidence and metadata only. The `src/` tree and every reported number are the same as in 0.1.0 (CLAIMS E-82); this release exists so that the archived snapshot (Zenodo) is the corrected text.

@@ -369,3 +369,7 @@ No config file changed in Phase 11 (git log phase-10-polish..HEAD for configs an
 ### Phase 12 config hashes
 
 No config file changed in Phase 12 (`config_hashes.py` gives the Phase 9 hash for every file under `configs/`). **`uv.lock` changed**: it now carries version 0.1.0 of the project and the `docs` dependency group (Sphinx, MyST, Furo and their dependencies; `sphinx-copybutton` was added and then removed); no runtime or development pin moved. Committed lock on `phase-12-release`: `5a94849d17b7ae4626dc3bafa97a3d6329525ec2cae65e304a8f58e944e20919` (84 locked packages besides the project). The stored results of E0 to E4 carry the earlier lock hash in their run records and are unaffected; a new run would carry the new one. The maintenance branch `maint/2026-10-first-run` upgrades the lock further (see `reports/maintenance/2026-10-first-run.md`) and is a separate pull request.
+
+## Final polish (8 Nov 2026)
+
+After release 0.1.1 (CLAIMS E-80 to E-83): a 7-page paper draft (`paper/main.tex`, IEEE conference template), screenshots of the live PyPI and Zenodo pages (`docs/evidence/`), the security checks (CLAIMS E-84), `docs/PROJECT_CONTEXT.md` for a new session, and the stale local branches and worktree removed. No version was bumped and nothing was uploaded to PyPI or Zenodo. The researcher keeps the Gmail address in `CITATION.cff` and the commits. Still the researcher's: the AI-disclosure wording, the line-by-line read, venue choice and submission.

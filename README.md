@@ -93,6 +93,9 @@ Everything below is from stored runs; chapter 7 of the report has the full table
 ## Ethics
 The repository contains no malware, no decompiled code and no evasion tooling, and generates no adversarial examples. Feature files are used under their own licences (LAMDA under the MIT licence; BODMAS code under a BSD licence with the dataset licence not stated by its authors; EMBER2024 under the Apache licence). See `docs/ETHICS.md`.
 
+## Paper and project context
+A first draft of the paper is `paper/main.tex` (built PDF: `paper/main.pdf`, 7 pages [E-84], IEEE conference template). It is a draft written with Claude Code from the claims ledger and has not been read line by line by a person; venues and deadlines are in `docs/submission_checklist.md`. `docs/PROJECT_CONTEXT.md` summarises the whole project (identifiers, structure, protocol, results, decisions, open items) for anyone, or any Claude project, starting from scratch.
+
 ## Documentation
 The documentation site has the protocol, the pre-registration, the claims ledger, the report chapters, the architecture and the API reference: https://yathindra25kb.github.io/driftwatch-lifetime/latest/ (versioned: one folder per release).
 
