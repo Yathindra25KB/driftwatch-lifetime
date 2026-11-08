@@ -109,13 +109,15 @@ Read these before relying on any result. They are stated in full, with their evi
 ## Licence, citation and acknowledgements
 Code: MIT (`LICENSE`). Datasets keep their own licences and are never redistributed (`docs/ETHICS.md`, `docs/licence_audit.md`). The wheel and the repository contain no dataset content other than the synthetic fixture.
 
-To cite the software, use `CITATION.cff` (GitHub shows a "Cite this repository" button); each release is meant to get a DOI from Zenodo (none has been minted yet: the GitHub release v0.1.0 is still a draft, and a DOI is created only when it is published; the DOI is added here then). Until then:
+To cite the software, use `CITATION.cff` (GitHub shows a "Cite this repository" button); each release gets a DOI from Zenodo. Version 0.1.1 is https://doi.org/10.5281/zenodo.24050865; the concept DOI 10.5281/zenodo.24050864 always resolves to the latest version [E-83]. Cite the version you used:
 
 ```bibtex
 @software{kb_driftwatch,
   author  = {K B, Yathindra},
   title   = {DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring},
   year    = {2026},
+  version = {0.1.1},
+  doi     = {10.5281/zenodo.24050865},
   url     = {https://github.com/Yathindra25KB/driftwatch-lifetime},
   license = {MIT}
 }
