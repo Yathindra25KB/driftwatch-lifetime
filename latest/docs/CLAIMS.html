@@ -366,7 +366,7 @@
 <td><p>AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code> (seconds) for 100% of rows; <code class="docutils literal notranslate"><span class="pre">year_month</span></code> equals its month for every row</p></td>
 <td><p>reports/data_inventory.md; reports/data_inventory_notes.md §1</p></td>
 <td><p>18b189d</p></td>
-<td><p>[measured]; meaning of <code class="docutils literal notranslate"><span class="pre">added</span></code> [verify]</p></td>
+<td><p>[measured]; the meaning of <code class="docutils literal notranslate"><span class="pre">added</span></code> is supported by D-19 (README) and by <code class="docutils literal notranslate"><span class="pre">year_month</span></code> equalling its month for every row; the upstream month derivation is undocumented</p></td>
 <td><p>2026-10-10</p></td>
 </tr>
 <tr class="row-odd"><td><p>D-04</p></td>
@@ -1582,7 +1582,7 @@
 <td><p>NDSS 2025</p></td>
 <td><p>ndss-symposium.org/ndss2025/accepted-papers/ and ndss-symposium.org/ndss-paper/revisiting-concept-drift-in-windows-malware-detection-adaptation-to-real-drifted-malware-with-minimal-samples/ (read through WebFetch); arXiv API</p></td>
 <td><p>464f16c</p></td>
-<td><p>[verified] that the paper is NDSS 2025; [verify] that it is the paper meant by plan Table G.1</p></td>
+<td><p>[verified] that the paper is NDSS 2025; plan Table G.1 lists “Li et al. (NDSS 2025)” without title or id (read in the plan PDF 2026-11-08), so the match is by inference</p></td>
 <td><p>2026-10-22</p></td>
 </tr>
 <tr class="row-odd"><td><p>E-66</p></td>
@@ -1784,6 +1784,46 @@
 <td><p>87f000a</p></td>
 <td><p>[measured]</p></td>
 <td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-even"><td><p>D-19</p></td>
+<td><p>LAMDA timestamp provenance, read on 8 Nov 2026: the dataset card (huggingface.co/datasets/IQSeC-Lab/LAMDA) describes <code class="docutils literal notranslate"><span class="pre">year_month</span></code> as “Timestamp in YYYY-MM format”; the paper (arXiv 2505.18551, section 3 and appendix L.2) lists the metadata columns as hash, label, family, vt_count and year_month and does not say how the month is derived; the GitHub README (github.com/IQSeC-Lab/LAMDA) says the year in the file names is when the APK “was added to AndroZoo repository” and has a step that downloads the AndroZoo <code class="docutils literal notranslate"><span class="pre">latest_with-added-date</span></code> file; none of these names <code class="docutils literal notranslate"><span class="pre">added</span></code> as the source of the month. Together with D-03 (<code class="docutils literal notranslate"><span class="pre">year_month</span></code> equals the month of <code class="docutils literal notranslate"><span class="pre">added</span></code> for every row) the assumption is supported and not contradicted; the upstream derivation code was not read</p></td>
+<td><p>see claim</p></td>
+<td><p>reports/source_verification_2026-11-08.md (section 5); docs/data_cards/lamda.md</p></td>
+<td><p>d9eebb8</p></td>
+<td><p>[verified] (what the pages say, read through a summarising fetch tool); derivation unconfirmed</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-36</p></td>
+<td><p>Kaspersky (Securelist), mobile threat report 2025, dated 4 Mar 2026: “815,735 new unique installation packages were observed in 2025”, a fall of nearly one third from the previous year (the 2024 count is in a chart image)</p></td>
+<td><p>815,735 packages</p></td>
+<td><p>https://securelist.com/mobile-threat-report-2025/119076 (read through a summarising fetch tool on 2026-11-08, so not verbatim)</p></td>
+<td><p>d9eebb8</p></td>
+<td><p>[verified] at the page by summary; the figure counts installation packages, not malware families or detections</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-even"><td><p>L-37</p></td>
+<td><p>AV-TEST Security Report 2019/2020: new Android malware samples in 2019 were 3,170,140, the lowest in three years; over 78 percent of newly developed malware targeted Windows in 2019</p></td>
+<td><p>3,170,140; over 78 percent</p></td>
+<td><p>https://av-test.org/en/news/facts-analyses-on-the-threat-scenario-the-av-test-security-report-2019-2020/ (read through a summarising fetch tool on 2026-11-08)</p></td>
+<td><p>d9eebb8</p></td>
+<td><p>[verified] at the page by summary; the vendor’s own count, 2019 only; not comparable with L-36</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-38</p></td>
+<td><p>The guide’s sanity band (guide PDF, section 7 “Published numbers to sanity-check your baselines”, read on 8 Nov 2026 after the PDF text was extracted with PyMuPDF): F1-based AUT over 12-month windows from Table IV of arXiv 2506.23814 as the guide reports it, tagged [verified] by the guide: APIGraph 2014 to 2018 mean AUT 0.88 (Drebin), 0.90 (DeepDrebin), 0.72 (MaMaDroid-style), 0.73 (RAMDA), 0.91 (HCC); Transcendent-style 0.72, 0.70, 0.56, 0.57, 0.72; the guide treats an AUT above 0.9 on a hard split as a possible leakage warning</p></td>
+<td><p>0.56 to 0.91</p></td>
+<td><p>docs/source/DriftWatch_Build_Guide_v2.pdf (course document, not redistributed); the arXiv paper itself was not read</p></td>
+<td><p>d9eebb8</p></td>
+<td><p>[verified] as the guide states it; not checked against arXiv 2506.23814 here; a sanity band only, never a target</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-even"><td><p>E-87</p></td>
+<td><p>Open items worked on 8 Nov 2026 (no experiment run, no number changed)</p></td>
+<td><p>Settled from sources: the plan’s “Li et al. (NDSS 2025)” is listed without title or id (L-33, matched by inference); the guide’s sanity band was read (L-38); the LAMDA timestamp provenance was read (D-19); two platform threat figures were added (L-36, L-37); the arXiv audit of 2026-11 read 18 abstracts and added none (PR 13, <code class="docutils literal notranslate"><span class="pre">reports/arxiv_audit/2026-11-01.md</span></code>). Not settled: the paper, AI wording, the E3 trap-arm rerun, the public deposit of predictions, the readings that need a person, the BODMAS binary-label basis</p></td>
+<td><p>see claim</p></td>
+<td><p>reports/source_verification_2026-11-08.md; docs/related_work_addendum.md</p></td>
+<td><p>d9eebb8</p></td>
+<td><p>[measured] (what was read and where)</p></td>
 </tr>
 </tbody>
 </table>

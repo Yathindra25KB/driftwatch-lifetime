@@ -86,3 +86,74 @@ All dates as stated on the official page; AoE = Anywhere on Earth. "Page limit" 
 | IEEE S&P 2027 (main symposium, not requested) | A third-party aggregator (getpaperpilot.com) lists abstract 2026-11-10 and paper 2026-11-17; not confirmed on the official site, so unconfirmed. | unconfirmed | unconfirmed | https://www.getpaperpilot.com/deadlines/s-p-2027.html (third party) |
 
 Practical read of the above (facts only): with a paper ready in this window, the two venues with confirmed open deadlines are EuroS&P 2027 (2 Dec 2026) and DIMVA 2027 (10 Dec 2026 or 18 Feb 2027). All other shortlist items are unconfirmed or already closed for the 2026-27 cycle.
+
+## 5. LAMDA timestamp, platform threat figures, plan and guide (second check, 8 Nov 2026)
+
+Pages were read through a summarising fetch tool, so wording is not verbatim and quotes should be checked before they are cited. The plan and guide PDFs (course documents, not in this repository) were read after extracting their text with PyMuPDF: the plan's Table G.1 note lists "Li et al. (NDSS 2025)" among papers "not re-read" with no title or arXiv number, and the guide's section 7 gives the sanity band (CLAIMS L-38).
+
+### Notes of the page-reading agent
+
+# verify2: LAMDA timestamp and threat-landscape figures (accessed 2026-11-08)
+
+Note: pages were read through a fetch tool that summarises the page, so quotes are as returned by that tool; re-check before citing verbatim.
+
+## 1. LAMDA timestamp column
+
+### What the sources say
+- HF dataset card (https://huggingface.co/datasets/IQSeC-Lab/LAMDA, raw README read too):
+  - Column table lists `year_month` = "Timestamp in YYYY-MM format."
+  - Other columns: hash (SHA256 index), label, family (AVClass2), vt_count, feat_0..feat_4560.
+  - "Labeled malware if `vt_detection ≥ 4`"; "The dataset was created using ~1M APKs from AndroZoo".
+  - Card gives NO derivation of year_month. No mention of added, dex_date, vt_scan_date, first seen, submission date.
+- arXiv 2505.18551v1 (https://arxiv.org/html/2505.18551v1):
+  - Sec 3, "Label Assignment and Collection Strategy": metadata "including APK hashes, VirusTotal (VT) results, and submission dates."
+    (Ambiguous: not tied to the year_month column.)
+  - "we collect APKs and assign binary labels using the vt_detection field."
+  - Sec 3, Vectorization: "the first five columns represent metadata fields: hash, label, family, vt_count, and year_month."
+  - Appendix L.2: "Metadata columns include: hash, label, family, vt_count, year_month".
+  - Intro: 2015 excluded "due to the unavailability of hashes in the AndroZoo repository".
+  - Appendix J.2: Domain-IL experience = "samples collected during a specific year." (year grouping)
+  - The terms dex_date, vt_scan_date, "first seen", "added", timestamp: not found in the text I read (about first 100k chars plus chars 100k onward; read via summariser, not exhaustive).
+- GitHub README (https://github.com/IQSeC-Lab/LAMDA; raw README.md read):
+  - "YYYY = four digit of the year when the APK was added to AndroZoo repository" (describes the yearly npz file naming).
+  - Step 1: "Download the latest dataset from AndroZoo: latest_with-added-date.csv.gz"
+  - Metadata: "metadata containing binary label, family label, number of virus total flagged, year month and hash".
+  - Monthly: "you might need to split yearly npz files into monthly npz file, if you want it."
+  - Repo contains metadata.csv.gz, code/, scripts named AndroZoo-extractor.py, LAMDA_get_train_test.py, vectorization_npz_creation.py, download_dataset_and_convert_to_npz.py.
+  - README does not say which timestamp yields the month.
+- I could not open the code files: raw/blob URLs for code/AndroZoo-extractor.py returned 404 (path guess probably wrong). So the month derivation in code is UNCONFIRMED.
+- AndroZoo's own page (androzoo.uni.lu, /lists) failed to load in the tool; AndroZoo column definitions are UNCONFIRMED by me.
+
+### Verdict on CLAIMS D-03 ("added column = AndroZoo collection date")
+- Partly supported at the YEAR level: README says the year in file names is when the APK "was added to AndroZoo", and the pipeline downloads AndroZoo's `latest_with-added-date.csv.gz` (so an "added"-type date exists in the source CSV).
+- NOT confirmed for the month: no source I read says year_month is derived from the "added" column (or from dex_date / vt_scan_date). The HF card calls it only "Timestamp in YYYY-MM format".
+- The paper's phrase "submission dates" could mean VT submission/scan date or AndroZoo added date; it is not resolved.
+- Nothing I read contradicts D-03. Suggested wording: "year_month is LAMDA's timestamp; the README ties the yearly grouping to the date the APK was added to AndroZoo; the month derivation is not documented in the card or paper [verify in code/ or by asking the authors]."
+- Also noted: the HF card names the column `year_month`; the repo data card says metadata.csv has `added`. The HF card and paper list `year_month`, not `added`, as the metadata column; check that the local file column name matches.
+
+## 2. Threat-landscape figures
+
+### (a) Android
+- Kaspersky / Securelist, "Mobile threat report 2025" (https://securelist.com/mobile-threat-report-2025/119076, dated 04 Mar 2026):
+  - "815,735 new unique installation packages were observed in 2025."
+  - Page says the figure dropped "by nearly one-third" vs the previous year (no exact 2024 count in the text; it is in a chart image).
+  - (A search snippet adds 255,090 new mobile banking-Trojan packages in 2025; I did not see it on the page I read: unconfirmed.)
+  - These are "malicious and potentially unwanted" Android installation packages seen by Kaspersky; not a census.
+- AV-TEST, "AV-TEST Security Report 2019/2020" news page (https://av-test.org/en/news/facts-analyses-on-the-threat-scenario-the-av-test-security-report-2019-2020/, dated 26 Aug 2020 per page):
+  - Android new malware samples "in 2019 reaching the lowest level in three years with 3,170,140."
+- AV-TEST 2022 Android figure: 1,073,866 new Android samples. I only saw this as a quotation of an AV-TEST post in a web-search result summary (originating from Neowin). Neowin returned HTTP 403 to me, so DIRECT READ UNCONFIRMED. The linuxsecurity.com article (https://linuxsecurity.com/news/security-trends/new-data-shows-constant-rise-of-new-malware-on-windows-linux-macos-and-android, 15 Jan 2023) confirms only rounded Windows/macOS/Linux figures, not Android.
+- AV-TEST statistics page (https://www.av-test.org/en/statistics/malware/): yearly and per-platform values are in chart images (hosted on av-atlas.org), not in page text. Text says AV-TEST "registers over 450,000 new malicious programs (malware)" each day. No platform numbers readable as text.
+
+### (b) Windows PE / Windows
+- AV-TEST 2019/2020 news page (same URL as above): "over 78 percent of malware codes newly-developed by cybercriminals targeted Windows systems" (2019). The tool also reported a 2019 all-platform total of 114,312,703 new samples; I take that from the summariser, so re-check on the page before use. (The ~89 million Windows implied figure is my arithmetic, not a source number.)
+- AV-TEST 2022: linuxsecurity.com (15 Jan 2023) says AV-TEST "had received almost 70 million new malware samples on Windows"; "only 12,000 new samples" for macOS; "2 million" for Linux. The precise 2022 Windows figure 69,504,686 was seen only via a search-result quotation of AV-TEST's post (Neowin), not read directly: unconfirmed.
+  - Caution: that article says Windows is "over 60 times" Linux, which does not match its own 70M/2M (about 35x).
+- Kaspersky Security Bulletin: attempted Kaspersky press-release page returned no per-day or per-platform malware-file figure. UNCONFIRMED for Kaspersky Windows/PE figures.
+- Secondary only (not read on the page; do not cite without checking): a search summary cited Atlas VPN using AV-TEST data: 59.58 million new Windows samples in Q1-Q3 2022, 95.6% of new malware. Not verified.
+
+### Gaps
+- No AV-TEST annual figures for 2023-2025 found in text form.
+- No AndroZoo growth figure retrieved (AndroZoo site failed to load).
+- No Google Play Protect figure searched/verified.
+- The AV-TEST dashboards (portal.av-atlas.org/malware) are charts; read them in a browser if exact per-year numbers are needed.
+
