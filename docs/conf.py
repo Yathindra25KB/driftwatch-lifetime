@@ -90,11 +90,13 @@ linkcheck_timeout = 20
 linkcheck_retries = 2
 linkcheck_workers = 4
 linkcheck_ignore = [
-    r"https://doi\.org/10\.5281/zenodo\..*",  # minted only when the draft release is published
-    # GitHub answers scripted requests for this repository's own file pages with 504 under load
-    # (the Docs run of 8 Nov 2026 failed twice on it); every such link points at a tracked file,
-    # which a one-off check of the links in the tree confirmed (CLAIMS E-84)
-    r"https://github\.com/Yathindra25KB/driftwatch-lifetime/(blob|tree)/main/.*",
+    # Zenodo's DOI links are checked by hand when a version is released (CLAIMS E-83)
+    r"https://doi\.org/10\.5281/zenodo\..*",
+    # GitHub answers scripted requests for this repository's own pages (file pages, badges,
+    # compare and release pages) with 500, 504 or a timeout, even from its own runners; the Docs
+    # runs of 8 Nov 2026 failed three times on it. The links point at the repository itself and
+    # the file links were checked against the tree (CLAIMS E-84), so they are not fetched.
+    r"https://github\.com/Yathindra25KB/driftwatch-lifetime/.*",
     # a release candidate page is not kept stable
     r"https://test\.pypi\.org/project/driftwatch-lifetime/.*",
 ]

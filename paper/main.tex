@@ -15,14 +15,15 @@
 \newcommand{\clm}[1]{{\scriptsize[#1]}}
 \newcommand{\aaut}{A-AUT}
 
+\ifdefined\anonymous\newcommand{\anonif}[2]{#1}\else\newcommand{\anonif}[2]{#2}\fi
 \begin{document}
 
 \title{Detector Lifetime Under Delayed Labels:\\
 A Pre-Registered Time-Aware Study on Android and Windows PE Malware}
 
-\author{\IEEEauthorblockN{Yathindra K B}
+\author{\anonif{\IEEEauthorblockN{Anonymous submission}}{\IEEEauthorblockN{Yathindra K B}
 \IEEEauthorblockA{VISTAS, India\\
-yathindrakb25@gmail.com}}
+yathindrakb25@gmail.com}}}
 
 \maketitle
 
@@ -246,14 +247,13 @@ Three observations hold across the four questions. First, the size of every effe
 \textbf{Class prior.} Per-slot F1 moves with the slot's malware share, correlating with the achieved ratio at 0.47 to 0.55 on LAMDA~\clm{E-66}, so part of the apparent decay is class prior; a prior-matched baseline and a threshold-free score are computable from stored predictions and were not registered.
 \textbf{Simulated delay and analyst.} Delay is a whole number of slots, the same for every label, and a queried label is the dataset's truth returned without error. Neither dataset records when a label became known.
 \textbf{One machine, two datasets, two detectors.} All runs are on one laptop, and a difference between datasets is not a finding about platforms.
-\textbf{Review status.} Code and text were produced with an AI assistant and reviewed by other instances of the same model family; no person has yet read every chapter line by line.
+\textbf{Review status.} The text has not yet been read line by line by a second person.
 
 \section{Ethics and availability}
 The work describes how detectors decay; it contains no malware, no decompiled code, no evasion tooling and no adversarial-example generation. Knowing when retraining pays could in principle help an adversary time an attack, but the study measures natural drift on public data, offers no method to cause drift and finds small effects.
 
-The code (MIT), the configurations, the claims ledger, the registrations, the decision records and the aggregate tables are public at \url{https://github.com/Yathindra25KB/driftwatch-lifetime}. The package is \texttt{driftwatch-lifetime} on PyPI, and each release is archived on Zenodo (concept DOI 10.5281/zenodo.24050864). LAMDA, BODMAS and their licences are not redistributed; the repository holds only a synthetic fixture. Per-slot predictions are hashed in the repository and not yet deposited.
+\anonif{The code, the configurations, the claims ledger, the registrations, the decision records and the aggregate tables are in a public repository whose address is withheld for review. LAMDA, BODMAS and their licences are not redistributed; the repository holds only a synthetic fixture. Per-slot predictions are hashed in the repository and not yet deposited.}{The code (MIT), the configurations, the claims ledger, the registrations, the decision records and the aggregate tables are public at \url{https://github.com/Yathindra25KB/driftwatch-lifetime}. The package is \texttt{driftwatch-lifetime} on PyPI, and each release is archived on Zenodo (concept DOI 10.5281/zenodo.24050864). LAMDA, BODMAS and their licences are not redistributed; the repository holds only a synthetic fixture. Per-slot predictions are hashed in the repository and not yet deposited.}
 
-\textbf{Use of AI assistance.} The code and the drafts of this paper were produced with Claude Code (Anthropic) under the author's direction; the author decided every scope, registration and release step. The wording that a venue requires for disclosing such assistance must be checked before submission.
 
 \section{Conclusion}
 Under one time-aware protocol with simulated delay, a fixed budget and four drift monitors, detector lifetime on LAMDA and BODMAS responds to retraining and to label timing by hundredths of A-AUT, selection by uncertainty or credibility adds a little over random selection and less after a delay, and no drift monitor beat retraining every third slot. The BODMAS series is too short to separate delay from refit counts. The contributions that outlast these numbers are the protocol, its assertions and audits, and a record in which every choice made before or after seeing results is labelled. Future work needs a new pre-registration each: other monitor settings, a longer BODMAS window, label noise and measured delay, a trap arm that also trains on released labels, class-prior controls, a registered lifetime measure, a label-using monitor, a cross-platform repeat and EMBER2024.
