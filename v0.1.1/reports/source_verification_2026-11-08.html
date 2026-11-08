@@ -1,0 +1,615 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Verification findings (access date 2026-11-08) - DriftWatch 0.1.1</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../docs/index.html"><div class="brand">DriftWatch 0.1.1</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../docs/index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.1</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docs/architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../docs/architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/reports/source_verification_2026-11-08.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/reports/source_verification_2026-11-08.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="verification-findings-access-date-2026-11-08">
+<h1>Verification findings (access date 2026-11-08)<a class="headerlink" href="#verification-findings-access-date-2026-11-08" title="Link to this heading">¶</a></h1>
+<p>Method: WebFetch/WebSearch only. Repo not edited. No dataset or malware file touched. Crossref via WebFetch (the repo guard blocked curl to api.crossref.org, so I did not use curl; some Crossref calls returned HTTP 429 and were retried).
+One Python helper (pypdf, installed in the scratchpad only) was used to read the BODMAS paper PDF and the arXiv 2303.04880 PDF; extracted text is in scratchpad (bodmas.txt, icc.txt).
+Marker: [read] = I read the primary source; [snippet] = search-result summary only; unconfirmed = could not read.</p>
+<section id="bodmas-label-provenance">
+<h2>1. BODMAS label provenance<a class="headerlink" href="#bodmas-label-provenance" title="Link to this heading">¶</a></h2>
+<p>Primary source READ: Yang, Ciptadi, Laziuk, Ahmadzadeh, Wang, “BODMAS: An Open Dataset for Learning based Temporal Analysis of PE Malware”, 2021 IEEE Security and Privacy Workshops (SPW), pp. 78-84, DOI 10.1109/SPW53761.2021.00020 (Crossref-confirmed, matches the bib entry yang2021bodmas).
+Full text read from https://gangw.cs.illinois.edu/DLS21_BODMAS.pdf (author-hosted, 7 pages) [read]. Other copies: https://par.nsf.gov/servlets/purl/10232928 and https://conferences.computer.org/sp/pdfs/spw/2021/893400a078.pdf (both unreachable from here: ECONNREFUSED / DNS fail).</p>
+<p>Paper, Section III “Dataset Description” [read]:</p>
+<ul class="simple">
+<li><p>Malware source: “randomly sampled each month from a security company’s internal malware database” (collected 29 Aug 2019 to 30 Sep 2020). Security company = Blue Hexagon (author affiliation).</p></li>
+<li><p>Benign source: “Benign samples are also selected from the security company’s database” (collected 1 Jan 2007 to 30 Sep 2020), to “represent benign PE binary distribution in real world traffic”.</p></li>
+<li><p>Label statement: “we provide the ground-truth label (“malware” or “benign”), curated malware family information, and the first-seen time of a sample based on VirusTotal reports [1].”
+Careful reading: “based on VirusTotal reports” attaches syntactically to the first-seen time. The paper does NOT state how the binary malware/benign ground-truth label was decided (no VirusTotal threshold, no AV-vote rule is given).</p></li>
+<li><p>Family labels: “The family label is obtained mostly by analyzing verdicts from multiple antivirus vendors with in-house scripts (similar as AVClass [26]).”
+“The in-house scripts are constantly curated and updated by our threat team.”
+“A small portion (about 1%) of malware were labeled via manual analysis of the binaries.”
+Abstract/Intro: family labels “curated by security analysts”, 581 families; 14 malware categories (Trojan 29,972; Worm 16,697; Backdoor 7,331; Downloader 1,031; Ransomware 821).</p></li>
+<li><p>So: families came from multi-AV-vendor verdict analysis with in-house scripts (AVClass-like, not AVClass itself), about 1% manual. VirusTotal is named as the source of first-seen time. Binary label provenance: unconfirmed (paper only says “ground-truth label”).</p></li>
+<li><p>Ember comparison in paper: Ember “family tags are not curated … incorrectly parsed from VirusTotal reports” (Sec. II).</p></li>
+<li><p>Licence in paper: none stated [read]. The only release statement: benign binaries not included “due to copyright considerations”. The paper has no licence section.</p></li>
+</ul>
+<p>Repo https://github.com/whyisyoung/BODMAS [read via WebFetch]: states 57,293 malware and 77,142 benign files, “disarmed malware only”; names a “BSD 2-Clause “Simplified” License” for the repository. Says nothing on how labels/families were obtained (no VirusTotal/AVClass mention). No separate dataset terms on that page.
+Project page https://whyisyoung.github.io/BODMAS [read]: https://bodmas.github.io returns HTTP 404. The github.io page: y is “labels, 0 as benign, 1 as malicious”; “If the malware family is empty, then it’s a benign sample”; family info “carefully curated” (no method); feature vectors and metadata “open to everyone” (Google Drive). No licence named for the dataset on that page. Binaries only on request: “Do not share the data with others, except your co-authors”; academics need institutional email plus university webpage; industry needs a justification letter. Benign binaries not released (copyright). Contact: a 2023 update names Pirouz Naghavi (Gang Wang cc’d); a search snippet says it was later redirected to Zhi Chen (unconfirmed, not seen on the page I read).
+Third party: Hugging Face card https://huggingface.co/datasets/it4lia/BODMAS_cleaned/blob/main/README.md says “The original BODMAS data files are associated with the BSD-2 License” (a derivative card, not authoritative).
+Implication for docs/data_cards/bodmas.md: licence = BSD-2 on the GitHub repo (verified); the paper and project page state no dataset licence; label provenance = family labels by multi-AV analysis with in-house AVClass-like scripts (about 1% manual), binary label basis not described (mark [verify]); the project-page note “labels were not described” in REFERENCES_TODO is now answerable from the paper Sec. III.</p>
+</section>
+<section id="two-stage-cluster-bootstrap-references">
+<h2>2. Two-stage / cluster bootstrap references<a class="headerlink" href="#two-stage-cluster-bootstrap-references" title="Link to this heading">¶</a></h2>
+<p>Crossref/IDEAS/Wiley-indexed data, all [read]:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Ref</p></th>
+<th class="head"><p>Verified record</p></th>
+<th class="head"><p>Source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Davison and Hinkley (1997), Bootstrap Methods and their Application</p></td>
+<td><p>Cambridge University Press, DOI 10.1017/CBO9780511802843, monograph, ISBNs 9780521573917 / 9780521574716 / 9780511802843. Section 3.8 is “Hierarchical data” (confirmed only via a snippet; see below).</p></td>
+<td><p>https://api.crossref.org/works?query.bibliographic=Davison+Hinkley+Bootstrap+Methods+and+their+Application+1997+Cambridge</p></td>
+</tr>
+<tr class="row-odd"><td><p>Field and Welsh (2007), Bootstrapping Clustered Data</p></td>
+<td><p>J. Royal Statistical Society Series B 69(3), 369-390, DOI 10.1111/j.1467-9868.2007.00593.x</p></td>
+<td><p>https://api.crossref.org/works/10.1111/j.1467-9868.2007.00593.x</p></td>
+</tr>
+<tr class="row-even"><td><p>Ren, Lai, Tong, Aminzadeh, Hou, Lai (2010), Nonparametric bootstrapping for hierarchical data</p></td>
+<td><p>Journal of Applied Statistics 37(9), 1487-1498, DOI 10.1080/02664760903046102 (note the author order and the six names; Crossref query result)</p></td>
+<td><p>Crossref query above; also https://ideas.repec.org/a/taf/japsta/v37y2010i9p1487-1498.html</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>What each actually says (only what I could read):</p>
+<ul class="simple">
+<li><p>Field and Welsh 2007 (abstract only; full text not read): examines bootstrap for one-way clustered data; finds “the cluster bootstrap” consistent for variance estimates under both the transformation model and the random-effect model, and the residual bootstrap consistent under the transformation model; criteria based on the distribution of bootstrap observations “not very useful”. The abstract does not mention a two-stage bootstrap or that resampling at both stages overstates the variance. Full-text PDF mirror (bemlar.ism.ac.jp) was unreachable. Support for the DriftWatch statement: UNCONFIRMED from what I could read.</p></li>
+<li><p>Ren et al. 2010 (abstract via EconPapers/IDEAS, full text paywalled): simple resampling that treats all observations as independent is inappropriate for hierarchical data; they “proved that the strategy of nonparametric bootstrapping on the highest level” is better than bootstrapping at lower levels, i.e. resample the highest-level units with replacement and lower-level units without replacement within each selected top unit. This is the closest read statement: it supports “resample whole blocks, do not also resample rows with replacement”, but the abstract does not say “double counts / overstates variance” in those words.</p></li>
+<li><p>Davison and Hinkley sect. 3.8: a snippet from a scanned copy (Scribd; I did not open it because the fetch was denied as a pirated copy) describes Strategy 1 (sample groups with replacement, second stage without replacement = keep groups intact) and Strategy 2 (second stage with replacement). The “Strategy 2 variance is too large” claim was NOT confirmed by any source I could read. I recall that the book makes this point (p. 100-101 area) but that is from memory, so treat as [verify] against the book itself.</p></li>
+<li><p>Secondary source READ (arXiv 2303.04880, Rank Intraclass Correlation for Clustered Data, text extracted): “the two-stage bootstrap (Davison and Hinkley, 1997; Field and Welsh, 2007)”; says intra-cluster sampling “can cause positive bias” in estimating the intraclass correlation “because the same observation may be sampled twice”. This is about ICC bias, not the variance of a mean; do not cite it for the DriftWatch statement.</p></li>
+<li><p>Recommendation: cite Davison and Hinkley (1997) sect. 3.8 for the two strategies and Ren et al. (2010) for “highest-level resampling is better than resampling at lower levels”, and word the claim as “resampling windows only (rows kept intact) is the cluster bootstrap; additionally resampling rows within windows is the two-stage bootstrap, which Davison and Hinkley and Field and Welsh discuss” with the variance-inflation clause marked [verify] until the book page is read by the researcher.</p></li>
+</ul>
+</section>
+<section id="paper-references-todo-md-open-rows">
+<h2>3. paper/REFERENCES_TODO.md open rows<a class="headerlink" href="#paper-references-todo-md-open-rows" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Row</p></th>
+<th class="head"><p>Resolved data</p></th>
+<th class="head"><p>Source URL</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Transcend (USENIX Security 2017)</p></td>
+<td><p>Jordaney, Sharad, Dash, Wang, Papini, Nouretdinov, Cavallaro. “Transcend: Detecting Concept Drift in Malware Classification Models”. 26th USENIX Security Symposium (2017), pp. 625-642. PDF https://www.usenix.org/system/files/conference/usenixsecurity17/sec17-jordaney.pdf</p></td>
+<td><p>https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/jordaney</p></td>
+<td><p>resolved (USENIX page read); no DOI exists on the page</p></td>
+</tr>
+<tr class="row-odd"><td><p>CADE (USENIX Security 2021)</p></td>
+<td><p>Yang, Guo, Hao, Ciptadi, Ahmadzadeh, Xing, Wang. “CADE: Detecting and Explaining Concept Drift Samples for Security Applications”. 30th USENIX Security Symposium (2021), pp. 2327-2344. PDF https://www.usenix.org/system/files/sec21-yang-limin.pdf</p></td>
+<td><p>https://www.usenix.org/conference/usenixsecurity21/presentation/yang-limin</p></td>
+<td><p>resolved</p></td>
+</tr>
+<tr class="row-even"><td><p>Li et al. (NDSS 2025)</p></td>
+<td><p>Adrian Shuai Li, Arun Iyengar, Ashish Kundu, Elisa Bertino, “Revisiting Concept Drift in Windows Malware Detection: Adaptation to Real Drifted Malware with Minimal Samples”. Listed on the NDSS Symposium 2025 accepted-papers page (exact title match). The paper page shows no DOI or pages; PDF https://www.ndss-symposium.org/wp-content/uploads/2025-830-paper.pdf. The NDSS page does not itself state the year (filename suggests 2025). Whether this is the paper meant by plan Table G.1 is the researcher’s call, not checkable from sources.</p></td>
+<td><p>https://www.ndss-symposium.org/ndss-paper/revisiting-concept-drift-in-windows-malware-detection-adaptation-to-real-drifted-malware-with-minimal-samples/ and https://www.ndss-symposium.org/ndss2025/accepted-papers/</p></td>
+<td><p>venue confirmed; no DOI/pages (unconfirmed); keep arXiv 2407.13918 as the bib key target</p></td>
+</tr>
+<tr class="row-odd"><td><p>TESSERACT USENIX Sec 2019</p></td>
+<td><p>Pendlebury, Pierazzi, Jordaney, Kinder, Cavallaro. 28th USENIX Security Symposium (2019), pp. 729-746. URL https://www.usenix.org/conference/usenixsecurity19/presentation/pendlebury ; final PDF https://www.usenix.org/system/files/sec19-pendlebury.pdf. arXiv 1807.07838 v4 (12 Sep 2019) comment: “corresponds to the one published at USENIX Security Symposium 2019” with fixed Eq. (4).</p></td>
+<td><p>USENIX page; https://arxiv.org/abs/1807.07838</p></td>
+<td><p>resolved; add url and pages=729–746</p></td>
+</tr>
+<tr class="row-even"><td><p>ActDroid journal version</p></td>
+<td><p>Crossref: Muzaffar, Ragab Hassen, Zantout, Lones, “ActDroid: An active learning framework for android malware detection”, Computers &amp; Security vol. 160, article 104724, DOI 10.1016/j.cose.2025.104724, online 2025-10-23, print issue Jan 2026. Same title and authors as arXiv 2401.16982; arXiv page lists this DOI as “Related DOI”.</p></td>
+<td><p>https://api.crossref.org/works/10.1016/j.cose.2025.104724 ; https://arxiv.org/abs/2401.16982</p></td>
+<td><p>resolved (title and four authors match; contents not diffed, so “same work” rests on arXiv linking it)</p></td>
+</tr>
+<tr class="row-odd"><td><p>LAMDA at ICLR 2026</p></td>
+<td><p>ICLR 2026 poster, Fri 24 Apr 2026; page lists the 7 authors; OpenReview forum https://openreview.net/forum?id=1FnCrZtBNQ (the OpenReview page itself showed a bot check, not read). The dataset’s Hugging Face card gives BibTeX inproceedings key haque2026lamda, “14th International Conference on Learning Representations (ICLR)”, year 2026.</p></td>
+<td><p>https://iclr.cc/virtual/2026/poster/10011850 ; https://huggingface.co/datasets/PtaSack/LAMDA/blob/main/README.md</p></td>
+<td><p>partly resolved: no page range or DOI exists in what I read; OpenReview entry unconfirmed</p></td>
+</tr>
+<tr class="row-even"><td><p>SEED</p></td>
+<td><p>arXiv 2605.24903 v2 (23 Jun 2026): Amalapuram, Shresta, Chebiyam, Tamma, Channappayya. No Comments, no journal-ref, no venue. Title is stylised “SEED: Semi-supervised Continual MalwarE Detection for Tackling ConcEpt Drift on a BuDget”.</p></td>
+<td><p>https://arxiv.org/abs/2605.24903</p></td>
+<td><p>no final venue found</p></td>
+</tr>
+<tr class="row-odd"><td><p>FIRCE</p></td>
+<td><p>arXiv 2605.01962: Barrett, Li, Dorai, Rajaganapathy. Comments: “9 pages, 4 algorithms, 3 tables, 1 figure, accepted by IEEE SmartNets26”. No journal-ref, no DOI beyond arXiv.</p></td>
+<td><p>https://arxiv.org/abs/2605.01962</p></td>
+<td><p>venue per arXiv comment only; proceedings entry unconfirmed</p></td>
+</tr>
+<tr class="row-even"><td><p>Cerqueira et al.</p></td>
+<td><p>arXiv 2606.07789 v1 (5 Jun 2026): Cerqueira, Gomes, Heyden, Pfahringer, Bifet. Comments: “Accepted in KDD’26”. No proceedings/DOI found (search found none).</p></td>
+<td><p>https://arxiv.org/abs/2606.07789</p></td>
+<td><p>KDD’26 per arXiv comment; proceedings entry unconfirmed</p></td>
+</tr>
+<tr class="row-odd"><td><p>Minnei et al.</p></td>
+<td><p>arXiv 2603.28396 v1 (30 Mar 2026). Comments: “Submitted to IEEE Transactions on Information Forensics and Security”. Not accepted per the page; the bib has no venue note, so do not cite it as published.</p></td>
+<td><p>https://arxiv.org/abs/2603.28396</p></td>
+<td><p>still preprint</p></td>
+</tr>
+<tr class="row-even"><td><p>EMA</p></td>
+<td><p>arXiv 2605.13942 v1 (13 May 2026): Yu, Chen, Zhang, Liang, Qiao, Fan Lai. Comments: “SIGCOMM (2026)”. A researchr listing and a search summary say SIGCOMM 2026, Denver, 17-21 Aug 2026 (second-hand). No DOI/pages found; dblp was blocked by bot protection.</p></td>
+<td><p>https://arxiv.org/abs/2605.13942 ; https://researchr.org/publication/YuCZLQL26/authors</p></td>
+<td><p>venue per arXiv comment; proceedings entry unconfirmed</p></td>
+</tr>
+<tr class="row-odd"><td><p>DREAM</p></td>
+<td><p>Published: He, Lei, Qin, Ren, Chen, “Combating Concept Drift with Explanatory Detection and Adaptation for Android Malware Classification”, Proc. 2025 ACM SIGSAC CCS, pp. 978-992, DOI 10.1145/3719027.3744792, issued 2025-11-19. arXiv 2405.04095 v3 lists the same DOI.</p></td>
+<td><p>https://api.crossref.org/works/10.1145/3719027.3744792</p></td>
+<td><p>resolved: final version with DOI and pages</p></td>
+</tr>
+<tr class="row-even"><td><p>TIF</p></td>
+<td><p>Published: Zheng, Yang, Ngai, Jana, Cavallaro, “TIF: Learning Temporal Invariance in Android Malware Detectors”, IEEE Transactions on Software Engineering vol. 52 no. 8, pp. 2463-2474, DOI 10.1109/TSE.2026.3698484, Aug 2026.</p></td>
+<td><p>https://api.crossref.org/works/10.1109/TSE.2026.3698484 (also https://discovery.ucl.ac.uk/id/eprint/10228400 per search snippet)</p></td>
+<td><p>resolved</p></td>
+</tr>
+<tr class="row-odd"><td><p>Botacin and Gomes</p></td>
+<td><p>Crossref: “Towards more realistic evaluations: The impact of label delays in malware detection pipelines”, Computers &amp; Security vol. 148, article 104122, DOI 10.1016/j.cose.2024.104122, Jan 2025. Matches the bib entry. Publisher page itself not retried (403 earlier); Crossref suffices for the bib.</p></td>
+<td><p>https://api.crossref.org/works/10.1016/j.cose.2024.104122</p></td>
+<td><p>resolved via Crossref</p></td>
+</tr>
+<tr class="row-even"><td><p>BODMAS labelling</p></td>
+<td><p>See section 1: families from multi-AV verdict analysis with in-house AVClass-like scripts (~1% manual); first-seen time from VirusTotal; binary label basis not described.</p></td>
+<td><p>https://gangw.cs.illinois.edu/DLS21_BODMAS.pdf</p></td>
+<td><p>resolved (with the binary-label gap noted)</p></td>
+</tr>
+<tr class="row-odd"><td><p>AndroZoo citation</p></td>
+<td><p>Allix, Bissyande, Klein, Le Traon, “AndroZoo: Collecting Millions of Android Apps for the Research Community”, Proc. 13th International Conference on Mining Software Repositories (MSR 2016), pp. 468-471, DOI 10.1145/2901739.2903508 (Crossref-confirmed). That the AndroZoo site asks users to cite this paper comes from a search summary only: androzoo.uni.lu was unreachable (ECONNREFUSED).</p></td>
+<td><p>https://api.crossref.org/works/10.1145/2901739.2903508</p></td>
+<td><p>bibliographic data confirmed; maintainers’ request “unconfirmed” (site unreachable)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Other bib notes spotted while checking:</p>
+<ul class="simple">
+<li><p>Bib entry haque2025lamda note says “Presented at ICLR 2026 (poster page iclr.cc/virtual/2026/poster/10011850)”: consistent with the ICLR page.</p></li>
+<li><p>ADD to TODO closure: DREAM and TIF are no longer “if published”: both are published (above); EMA, FIRCE, Cerqueira remain “accepted per arXiv comment”; Minnei is only “submitted”.</p></li>
+</ul>
+</section>
+<section id="venue-shortlist-for-docs-submission-checklist-md-today-2026-11-08">
+<h2>4. Venue shortlist for docs/submission_checklist.md (today 2026-11-08)<a class="headerlink" href="#venue-shortlist-for-docs-submission-checklist-md-today-2026-11-08" title="Link to this heading">¶</a></h2>
+<p>All dates as stated on the official page; AoE = Anywhere on Earth. “Page limit” = what the page states.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Venue</p></th>
+<th class="head"><p>Current-cycle deadline</p></th>
+<th class="head"><p>Page limit / format</p></th>
+<th class="head"><p>Review</p></th>
+<th class="head"><p>Source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DIMVA 2027 (Enschede, NL, 30 Jun - 2 Jul 2027)</p></td>
+<td><p>Cycle 1: abstract 03 Dec 2026, paper “10 December 2026 (firm)”, notification 28 Jan 2027. Cycle 2: abstract 11 Feb 2027, paper “18 February 2027 (firm)”, notification 08 Apr 2027. Camera-ready 27 May 2027. Rejected Cycle 1 papers cannot go to Cycle 2.</p></td>
+<td><p>“limited to 25 pages total”: 18 main, 5 bibliography, 2 appendix. Springer LNCS template, no margin/font changes.</p></td>
+<td><p>double-blind</p></td>
+<td><p>http://www.dimva.org/dimva2027/ (home https://www.dimva.org/ confirms dates and place)</p></td>
+</tr>
+<tr class="row-odd"><td><p>IEEE EuroS&amp;P 2027 (Madrid, 5-9 Jul 2027)</p></td>
+<td><p>Registration 25 Nov 2026, “Submissions deadline: 02 December 2026 (Wednesday)” AoE; early reject 28 Jan 2027; rebuttals 24 Feb - 01 Mar; notification 18 Mar 2027; camera-ready (tentative) 15 Apr 2027</p></td>
+<td><p>“13 pages of body text”, unlimited references and appendices. LaTeX, A4, the IEEE conference template supplied on the site; other IEEE templates not allowed.</p></td>
+<td><p>not read on the page (I did not extract the review policy)</p></td>
+<td><p>https://eurosp2027.ieee-security.org/cfp.html</p></td>
+</tr>
+<tr class="row-even"><td><p>ARES 2027 (Venice, 24-27 Aug 2027)</p></td>
+<td><p>unconfirmed: the site says “Call for Papers for ARES 2027 will be available soon.” Prior year for planning only: ARES 2026 full-paper deadline 9 Mar 2026 (no extension), abstract 2 Mar 2026.</p></td>
+<td><p>unconfirmed for 2027. ARES 2026: full paper max 22 pages including references, Springer LNCS, short 11, SoK 22, workshop 18</p></td>
+<td><p>unconfirmed</p></td>
+<td><p>https://www.ares-conference.eu/ ; prior year https://www.ieee-security.org/Calendar/cfps/cfp-ARES2026.html</p></td>
+</tr>
+<tr class="row-odd"><td><p>ACSAC 2027</p></td>
+<td><p>unconfirmed: the site shows only ACSAC 2026 (7-11 Dec 2026, Los Angeles). 2026 cycle (past): paper deadline “May 26 (23:59 AoE)” firm, notification Sep 8, camera-ready Oct 22. Use only as a pattern, not as a 2027 date.</p></td>
+<td><p>ACSAC 2026: “no more than 11 double-column pages” plus up to 5 appendix pages, full PDF at most 16 pages; IEEEtran conference,compsoc, US letter</p></td>
+<td><p>double-blind, two rounds (2026)</p></td>
+<td><p>https://www.acsac.org/ ; https://www.acsac.org/2026/submissions/papers/</p></td>
+</tr>
+<tr class="row-even"><td><p>AISec 2027 (ACM workshop at CCS)</p></td>
+<td><p>unconfirmed: the site shows AISec 2026 only (19th, The Hague, 15 Nov 2026; deadline “July 24th, 2026 (firm)”, passed).</p></td>
+<td><p>AISec 2026: “at most 10 pages … double-column ACM format” plus up to 2 pages of references/appendices; anonymised</p></td>
+<td><p>double-blind (anonymised)</p></td>
+<td><p>https://aisec.cc/</p></td>
+</tr>
+<tr class="row-odd"><td><p>IEEE SaTML 2027 (Reykjavik, 3-6 May 2027)</p></td>
+<td><p>Past: abstract 22 Sep 2026, paper “Tue, Sep 29, 2026”, artifacts 2 Oct 2026; early reject 4 Nov; notification 16 Dec 2026. The 2027 cycle is closed. 2028 cycle unconfirmed. Scope note: topics are trustworthy ML; papers that only use a dataset without engaging trustworthiness “may be desk rejected”.</p></td>
+<td><p>up to 12 pages body for research and SoK papers; references and appendices unlimited; two-column IEEEtran (conference), 10pt; anonymised</p></td>
+<td><p>double-blind</p></td>
+<td><p>https://satml.org/ ; https://satml.org/call-for-papers/</p></td>
+</tr>
+<tr class="row-even"><td><p>RAID 2027</p></td>
+<td><p>unconfirmed: raid-symposium.org was unreachable (ECONNREFUSED) and a search found no RAID 2027 CFP. A search snippet says RAID 2026 was in Lancaster, UK, 10-14 Oct 2026 (second-hand).</p></td>
+<td><p>unconfirmed</p></td>
+<td><p>unconfirmed</p></td>
+<td><p>none read</p></td>
+</tr>
+<tr class="row-odd"><td><p>Computers &amp; Security (Elsevier journal)</p></td>
+<td><p>no deadline (journal); not confirmed from the official guide: ScienceDirect guide for authors returned HTTP 403.</p></td>
+<td><p>unconfirmed. Note: the journal already published Botacin and Gomes (vol 148, 104122) and ActDroid (vol 160, 104724), so it is a close-topic venue.</p></td>
+<td><p>unconfirmed</p></td>
+<td><p>https://www.sciencedirect.com/journal/computers-and-security/publish/guide-for-authors (403)</p></td>
+</tr>
+<tr class="row-even"><td><p>IEEE S&amp;P 2027 (main symposium, not requested)</p></td>
+<td><p>A third-party aggregator (getpaperpilot.com) lists abstract 2026-11-10 and paper 2026-11-17; not confirmed on the official site, so unconfirmed.</p></td>
+<td><p>unconfirmed</p></td>
+<td><p>unconfirmed</p></td>
+<td><p>https://www.getpaperpilot.com/deadlines/s-p-2027.html (third party)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Practical read of the above (facts only): with a paper ready in this window, the two venues with confirmed open deadlines are EuroS&amp;P 2027 (2 Dec 2026) and DIMVA 2027 (10 Dec 2026 or 18 Feb 2027). All other shortlist items are unconfirmed or already closed for the 2026-27 cycle.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Verification findings (access date 2026-11-08)</a><ul>
+<li><a class="reference internal" href="#bodmas-label-provenance">1. BODMAS label provenance</a></li>
+<li><a class="reference internal" href="#two-stage-cluster-bootstrap-references">2. Two-stage / cluster bootstrap references</a></li>
+<li><a class="reference internal" href="#paper-references-todo-md-open-rows">3. paper/REFERENCES_TODO.md open rows</a></li>
+<li><a class="reference internal" href="#venue-shortlist-for-docs-submission-checklist-md-today-2026-11-08">4. Venue shortlist for docs/submission_checklist.md (today 2026-11-08)</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

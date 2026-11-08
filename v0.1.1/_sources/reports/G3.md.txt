@@ -1,0 +1,47 @@
+# Gate G3 evidence (Phases 6 and 7)
+
+**Gate:** G3, end of week 14 (Sun 17 Jan 2027). Question (PHASES.md): do the Tier 1 results and the core chapters exist, does `driftwatch reproduce table1` match on a clean machine, and is the claims audit clean? (Stop rule: if not, cancel Tier 2 and Tier 3 and finish the report.)
+**Prepared:** 16 Oct 2026, by Claude Code (engineering lead), from `docs/CLAIMS.md` (E-22 to E-47), `reports/tables/e2_*.csv`, `reports/claims_audit.md`, `docs/reviews/stats-review-e2.md` and the clean-clone reproduction log.
+**The gate decision is the researcher's** (CLAUDE.md). This file states which criteria the evidence meets, which it does not, and what is open. It makes no statement about whether the study "worked": the Tier 1 findings are small effects with wide intervals, reported as measured.
+
+## Decision (researcher, 20 Oct 2026)
+
+**G3: PASS**, decided by the researcher after reading this file. The researcher also decided: keep the E3 trap-arm caveat without a rerun (the choice was delegated: no new addendum, because a rerun of a registered cell after seeing its result needs a new approved addendum and the main E3 results do not use the arm); accept the hold-out cut as recorded; run the 12 LAMDA E3 cells for seeds 5 to 9; push the tags `prereg-v1` and `prereg-v2` (done) and open one pull request for `phase-08-conformal-e3`; have Claude re-check the `[verify]` sources (results to be applied by Claude, spot-checked by the researcher). The open-items list below is kept as it was when the researcher decided.
+
+## Summary
+
+Criteria 1, 3, 4 and 5 are met. Criterion 2 is **partly met**: all eight core chapters exist as drafts, but they are drafts written by Claude Code for the researcher to rewrite and defend, and several are far below the page targets in the guide. Whether that satisfies "core chapters exist" is the researcher's reading of the gate. The stop rule (cancel Tier 2 and 3) is not triggered by missing results; it would be triggered only by a researcher decision that the chapters are not in a state to count.
+
+Tier 2 work already exists beyond this gate's scope: E3 was run (BODMAS complete, LAMDA seeds 0 to 4; LAMDA seeds 5 to 9 were added on 20 Oct 2026 after the decision) under `prereg-v2` before G3, on the researcher's go of 15 Oct 2026 (the addendum records that the tag was created before G3). If G3 is decided FAIL, that work stays in the repository, labelled as outside the gate.
+
+## Criteria
+
+| # | Criterion (PHASES.md G3) | Evidence | Met |
+|---|---|---|---|
+| 1 | Tier 1 results exist | E2 grid complete on both datasets: 54 of 54 cells, none failed, none rerun for a result (E-26); registered contrasts with intervals and verdicts (E-29, E-30), the secondary checks (E-31 to E-36), RQ1 under both comparators (E-35). Tables and figures regenerate byte for byte from stored predictions (E-39) | **Yes** |
+| 2 | Core chapters exist | `report/ch01` to `ch08` exist: introduction 1,042 words (guide target 5 pages), landscape 903 (15), analysis 1,711 (12), latest techniques 1,261 (12), related work 1,325 (8), method 2,641 (12), experiments 2,767 (15), discussion and limitations 1,154 (6, partial: section 8.1 is for the researcher to write). All carry `[researcher: verify]` markers | **Partly: exist, are drafts, are under the page targets** |
+| 3 | `reproduce table1` matches on a clean machine | Clean clone, locked environment, BODMAS fetched into its own data root, E0 config run, 8 rows compared: time-aware columns equal to four decimals, random-split comparator columns within 0.0056 (tolerance 0.02, accepted by the researcher because the comparator draw is keyed by the data manifest), raw files equal the committed manifest; 31 minutes while two other long jobs ran (E-24). The smoke mode runs in minutes on the fixture and is in CI | **Yes** |
+| 4 | Claims audit clean | `uv run python scripts/claims_audit.py`: PASS; every number in the README and chapters 1 to 8 sits in a paragraph with a resolving claim id or a `[verify]` mark; no unresolved ids; no "first" used as a contribution claim (`reports/claims_audit.md`). 21 paragraphs are pending the researcher's verification (mostly sources in chapters 2, 4 and 5) | **Yes** |
+| 5 | `reports/G3.md` exists | This file | Yes |
+
+## Reviews
+
+- **Statistics, Tier 1:** two passes (`docs/reviews/stats-review-e2.md`); the second pass's rows 1 to 14 are applied in the README and chapters 3, 7 and 8 (exploratory labels, "conservative" as a design argument and not a measured coverage, the comparator choice made after seeing both numbers, the restart disclosure, borderline BODMAS contrasts flagged). **No third pass was run on the final Tier 1 text.**
+- **Statistics, E3:** `docs/reviews/stats-review-e3.md`: 12 findings, the seven major ones (LAMDA seed labelling and no adjusted test, non-independent rows, the meaning of "equivalent", BODMAS overstatement, score and trap wording, class-prior confound) are applied to section 7.5, the README and CLAIMS; no third pass on the revised text.
+- **Leakage, Tier 1 code:** reviews in Phases 3 to 5 (`docs/reviews/`); no temporal leak found.
+- **Leakage, E3 code:** `docs/reviews/leakage-review-e3.md`: no leak and no calibration contamination in the non-trap arms; one confound (the trap arm never retrains) and one ADR deviation (the hold-out is cut by timestamp, not at a slot boundary) are open for the researcher.
+
+## What the Tier 1 results are, for the researcher's reading
+
+(Every number is in `docs/CLAIMS.md`; see chapter 7.) On LAMDA, periodic retraining at 5% of the slot and no extra delay is above never retraining by 0.017 to 0.020 A-AUT with intervals that exclude zero (E-30); a delay of three slots costs 0.011 to 0.013 at the same budget (E-30). On BODMAS the effects are at most 0.003 and delay 3 equals never by construction (E-29). Under the registered per-slot comparator the random-split gap is below the 0.05 band in all four strata, under the window-level comparator it is above it on LAMDA (E-35). The effects are hundredths of A-AUT against standard deviations over windows of 0.05 to 0.07 (E-28). Whether that is a result the project can build on is a scientific judgement for the researcher, not a gate criterion.
+
+## Open items for the researcher
+
+1. **Gate G3 itself**, and whether "core chapters exist" is met by drafts of this length.
+2. **Hours** for Phases 6 to 8 (PHASES.md has no hour entries for them; only the researcher can report them). The hour check (under 5 h per week on average for four weeks) cannot be evaluated without them.
+3. **The E3 trap arm** (leakage review finding 1): rerun with released labels also entering the pool under an addendum, add a matched comparator, or keep the caveat.
+4. **The E3 hold-out cut** (finding 2): accept the deviation from ADR-0004 item 8 as recorded, or amend by ADR and rerun every E3 cell.
+5. **LAMDA E3 seeds 5 to 9** (12 cells): decided and done on 20 Oct 2026 (28 of 28 LAMDA cells complete, none failed); the 10-seed primary interactions are in CLAIMS E-42.
+6. **Tags and pushes:** branches are pushed; tags `prereg-v1` and `prereg-v2` exist locally and were not pushed (no authorisation); no pull requests were opened.
+7. **The `[verify]` markers** in chapters 2, 4 and 5, including the title of "Li et al. (NDSS 2025)", which is left marked.
+8. **Practical significance wording** in chapter 7 and the discussion paragraphs of chapter 8 (section 8.1), which are the researcher's to write.

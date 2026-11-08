@@ -1,0 +1,5 @@
+monitor,alpha,change_streams,change_detected,change_delay_max,change_delay_mean,alarms_before_change,slots_before_change,no_drift_streams,no_drift_slots,no_drift_alarms,no_drift_rate,no_drift_rate_max_per_reference
+ks,0.0100,5,5,0,0.0000,0,20,8,800,14,0.0175,0.0700
+mmd,0.0100,5,5,0,0.0000,0,20,8,800,1,0.0013,0.0100
+domain_clf,0.0100,5,5,0,0.0000,0,20,8,800,0,0.0000,0.0000
+p_uniformity,0.0100,5,5,0,0.0000,0,20,8,800,1,0.0013,0.0100
