@@ -3,10 +3,19 @@
 [![CI](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/ci.yml/badge.svg)](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/ci.yml)
 [![Docs](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/docs.yml/badge.svg)](https://yathindra25kb.github.io/driftwatch-lifetime/latest/)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/driftwatch-lifetime.svg)](https://pypi.org/project/driftwatch-lifetime/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24050864.svg)](https://doi.org/10.5281/zenodo.24050864)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pyproject.toml) <!-- DOI, PyPI and Python version: CLAIMS E-83, E-80 -->
 
 **Status (8 Nov 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
 
 > We study malware detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring in a single time-aware protocol, reported with A-AUT, on Android and Windows PE data.
+
+**Start here:** [documentation site](https://yathindra25kb.github.io/driftwatch-lifetime/latest/) · [results, chapter 7](report/ch07_experiments.md) · [claims ledger](docs/CLAIMS.md) · [paper draft (PDF)](paper/main.pdf) · [project summary](docs/PROJECT_CONTEXT.md) · [how to cite](#licence-citation-and-acknowledgements). Try it in two commands: `pip install driftwatch-lifetime` then `driftwatch smoke`.
+
+![Per-slot F1 inside a window for never retraining, periodic retraining with no delay and periodic retraining with a delay of three slots, on LAMDA and BODMAS, for logistic regression and LightGBM](reports/figures/e2_per_slot_curves.png)
+
+*What the study measured, in one picture [E-26]: per-slot F1 inside a window (mean over windows; the band is the range over windows), at 5% of the slot labelled. On LAMDA, retraining holds the curve a little above never retraining in the later slots; on BODMAS the curves are nearly the same. The differences are small, and the limits below apply to all of them.*
 
 ## What it is
 - A reproducible research protocol and the Python package that implements it: a time slicer with C1 to C3 checks, a label-delay and budget simulator, a conformal layer with uncertainty and credibility selectors, four drift monitors behind one alarm interface, and AUT and A-AUT metrics.

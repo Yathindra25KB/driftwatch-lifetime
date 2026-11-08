@@ -66,6 +66,7 @@ exclude_patterns = [
     "CLAUDE.md",
     "SECURITY.md",
     "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
     "reports/arxiv_audit",
     "reports/maintenance",
     "reports/reproduction",
