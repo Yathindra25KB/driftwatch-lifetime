@@ -1777,6 +1777,14 @@
 <td><p>031fad8</p></td>
 <td><p>[measured] (settings, dates as stated by the venues on that day)</p></td>
 </tr>
+<tr class="row-odd"><td><p>E-86</p></td>
+<td><p>Zenodo webhook secret rotated (it had appeared once in a session log)</p></td>
+<td><p>The researcher switched the repository off and on at Zenodo on 8 Nov 2026. Read from GitHub afterwards: the repository has one webhook to the Zenodo receiver, id 709054382, created 2026-11-08 16:37:08 UTC, active, last delivery HTTP 202; the earlier webhook (id 704735280) is gone. The secret itself is not recorded anywhere in the repository. Future releases still mint DOIs through the same integration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">api</span> <span class="pre">repos/Yathindra25KB/driftwatch-lifetime/hooks</span></code> (id, dates and response code only)</p></td>
+<td><p>87f000a</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
 </tbody>
 </table>
 </div>
