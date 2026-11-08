@@ -1,5 +1,7 @@
 # Contributing
 
+By taking part you agree to the [code of conduct](CODE_OF_CONDUCT.md).
+
 Thanks for your interest. DriftWatch is a pre-registered study, so some changes are welcome as they are and some need a process.
 
 ## Welcome as pull requests
