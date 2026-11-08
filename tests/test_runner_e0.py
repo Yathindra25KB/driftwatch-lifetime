@@ -170,7 +170,7 @@ def test_slot_rows_are_the_confusion_of_the_stored_predictions(finished) -> None
         .groupby(key)[["tp", "fp", "fn"]]
         .sum()
     )
-    merged = slots.set_index(key).join(g, rsuffix="_p")
+    merged = slots.set_index(key).join(g.add_suffix("_p"))
     assert (merged["tp"] == merged["tp_p"]).all()
     assert (merged["fp"] == merged["fp_p"]).all()
     assert (merged["fn"] == merged["fn_p"]).all()

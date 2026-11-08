@@ -63,7 +63,7 @@ These statements are the ones a reader is most likely to attribute to the study,
 18. **Predictions are not public.** The result files under `results/` are not committed; the committed tables are the evidence of record, and regenerating E4 on LAMDA alone took 13.0 hours of cell time [E-48]. The stored predictions of E0 to E4 (577 files, 7.20 GiB) are hashed in `docs/predictions_manifest.csv`, and a private archive of them is held by the researcher for examiners who ask [E-69]. Depositing them in a public service is future work and waits for the researcher's go.
 19. **The dynamic results are mostly LAMDA results.** BODMAS has one useful refit per window, a short and drift-poor series, and benign timestamps that are date-only or placeholders; its delay, selection and monitor numbers barely move [E-29, E-41, E-60]. A difference between the two datasets is not a finding about platforms.
 
-**[researcher: verify each of these against your own reading of the data cards; mark any you consider minor.]**
+The limits above were written from the data cards and the stored tables by the same model family that wrote the code, and no person has yet checked each one (see the open items below).
 
 ## 8.4 Ethics and scope
 
@@ -82,3 +82,18 @@ Tier 1 (E0 to E2) is complete on both datasets: all 54 E2 cells ran and none fai
 - A circular or stationary block bootstrap as a sensitivity check on the registered window stage (an addendum before results are read).
 - Drift monitors at lower alarm rates, for example with a larger sample per slot or a stricter significance level, registered in a new addendum before any run. Here E4 tested one frozen level, and most monitors alarmed in most slots [E-63].
 - A trap arm whose released labels also train the model, so that contamination is separated from not retraining (an addendum before the rerun).
+
+## 8.7 Open items
+
+These are the points that no script can settle and that a person has to read, decide or confirm. They are listed here so that nothing is hidden in a draft marker. None changes a reported number.
+
+1. **Review status.** The chapters were drafted by Claude Code and reviewed by other instances of the same model family (self-review); no person has yet read them line by line. The limits in section 8.3 were written from the data cards and the stored tables and have not been checked one by one by a person.
+2. **Disclosure wording.** The wording that a university or a venue requires for disclosing AI assistance is not known to this project, so the front matter describes what was done and does not claim to meet a policy.
+3. **BODMAS labels.** The paper says that families come from multi-vendor antivirus verdicts with in-house scripts and that malware and benign files were taken from a security company's database; it does not say how the binary label was decided, and it states no dataset licence (CLAIMS D-18). The files are used as published and are not redistributed.
+4. **LAMDA timestamps.** The month of a LAMDA sample comes from the `added` column, assumed to be the AndroZoo collection date; neither the paper nor its README names the column (CLAIMS D-03).
+5. **The trap arm.** In the E3 trap arm the released labels enter the calibration buffer and not the training pool, so the arm never retrains and its difference mixes contamination with the absence of retraining (CLAIMS E-45). Rerunning it with the released labels also entering the pool needs an addendum and a new tag; it was not done.
+6. **Readings of the BODMAS columns, of the reversed monitor rows and of the practical size of the effects.** Chapter 7 states these readings and gives the reasons from the stored tables; a person has not yet confirmed them. Chapter 7 does not claim that any effect matters operationally.
+7. **Platform-specific threat figures.** The only threat-landscape figure is the antivirus-test count (L-32); no Android-specific or Windows-specific source was retrieved.
+8. **The cluster bootstrap.** The statement that resampling both stages gives a wider interval rests on a synthetic check (L-34); the two textbook and journal sources named in chapter 3 were not read for that statement.
+9. **Citations.** "Li et al. (NDSS 2025)" is the venue-confirmed paper, but whether it is the paper meant by the original plan is not checkable from sources (L-33). Several 2026 preprints are cited as preprints because no final version was found (`paper/REFERENCES_TODO.md`).
+10. **Public predictions.** The per-slot predictions are hashed in `docs/predictions_manifest.csv` and archived privately; they are not published (limit 18).

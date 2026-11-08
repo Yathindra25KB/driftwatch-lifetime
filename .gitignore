@@ -31,6 +31,9 @@ secrets/
 # Claude Code session state moved off the system drive (memory, transcripts): never committed
 .claude-state/
 
+# oh-my-claudecode tool state (local)
+.omc/
+
 # Claude Code personal files (shared settings live in .claude/settings.json)
 .claude/settings.local.json
 CLAUDE.local.md
