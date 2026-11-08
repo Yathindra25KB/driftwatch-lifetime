@@ -98,6 +98,9 @@ linkcheck_ignore = [
     # runs of 8 Nov 2026 failed three times on it. The links point at the repository itself and
     # the file links were checked against the tree (CLAIMS E-84), so they are not fetched.
     r"https://github\.com/Yathindra25KB/driftwatch-lifetime/.*",
+    # badge image services time out now and then; the badges are checked by looking at the README
+    r"https://img\.shields\.io/.*",
+    r"https://zenodo\.org/badge/.*",
     # a release candidate page is not kept stable
     r"https://test\.pypi\.org/project/driftwatch-lifetime/.*",
 ]
