@@ -22,7 +22,7 @@ The items below were re-checked on 8 Nov 2026 against primary sources (evidence 
 | Item | What is missing |
 |---|---|
 | Two-stage (cluster) bootstrap | Davison and Hinkley (1997) and Ren et al. (2010) are in the bibliography [L-34]; the book's section 3.8 was not read, so the statement that resampling both stages widens the interval stays unconfirmed |
-| "Li et al. (NDSS 2025)" | Venue confirmed [L-33]. Whether `li2024revisiting` is the paper meant by plan Table G.1 can only be answered by the researcher, who has the plan |
+| "Li et al. (NDSS 2025)" | Venue confirmed [L-33]. Plan Table G.1 lists "Li et al. (NDSS 2025)" among papers not re-read, with no title or arXiv number (read in the plan PDF on 8 Nov 2026), so `li2024revisiting` (the NDSS 2025 paper by Li et al. on concept drift in Windows malware detection) is an identification by author, venue and topic; only the researcher can confirm that it is the one intended |
 | Venue versions of SEED, FIRCE, Cerqueira et al., Minnei et al., EMA and LAMDA | SEED: no venue on arXiv. FIRCE (IEEE SmartNets 2026), Cerqueira et al. (KDD 2026) and EMA (SIGCOMM 2026) are "accepted" only according to arXiv comments; no proceedings entry was found. Minnei et al. is "submitted" only. LAMDA is an ICLR 2026 poster with no page range or DOI. The bibliography cites the preprints and says so |
 
 Note on AUT (resolved in ADR-0006 and CLAIMS M-02): TESSERACT arXiv v4 says the published Eq. (4) had an extra 1/N normalisation factor; the guide's 1/(N-1) form equals the numpy trapezoid and is pinned by `tests/test_aut.py`.
