@@ -413,11 +413,11 @@
 </section>
 <section id="quality-evidence-on-8-nov-2026">
 <h2>12. Quality evidence on 8 Nov 2026<a class="headerlink" href="#quality-evidence-on-8-nov-2026" title="Link to this heading">¶</a></h2>
-<p>1,056 fast tests and 142 slow tests pass; ruff clean; guardrail demonstration 45 of 45; claims audit PASS; bibliography 36 of 36 resolved; strict docs build and link check pass in CI; secret-shaped text found in 0 of 444 revisions of the public repository; <code class="docutils literal notranslate"><span class="pre">pip-audit</span></code> on the locked environment found no known vulnerabilities; every workflow declares least-privilege permissions and pins actions by commit SHA.</p>
+<p>1,056 fast tests and 142 slow tests pass; ruff clean; guardrail demonstration 45 of 45; claims audit PASS; bibliography 36 of 36 resolved; strict docs build and link check pass in CI; secret-shaped text found in 0 of 444 revisions of the public repository; <code class="docutils literal notranslate"><span class="pre">pip-audit</span></code> on the locked environment found no known vulnerabilities; Dependabot alerts and security updates are enabled on the public repository (8 Nov 2026); every workflow declares least-privilege permissions and pins actions by commit SHA.</p>
 </section>
 <section id="open-items-that-only-the-researcher-can-settle">
 <h2>13. Open items that only the researcher can settle<a class="headerlink" href="#open-items-that-only-the-researcher-can-settle" title="Link to this heading">¶</a></h2>
-<p>The faculty AI-disclosure wording (and each venue’s policy); whether “Li et al. (NDSS 2025)” is the paper the original plan meant; a line-by-line reading and rewrite of the report and the paper; the capstone hand-in date (about 10 Dec 2026, exact date to confirm); venue choice and the submission itself (EuroS&amp;P 2027 deadline 2 Dec 2026; DIMVA cycle 1 deadline 10 Dec 2026; see <code class="docutils literal notranslate"><span class="pre">docs/submission_checklist.md</span></code>); whether to rerun the E3 trap arm under an addendum; whether to deposit the stored predictions publicly (limit 18); resetting the Zenodo webhook secret that appeared in one session log.</p>
+<p>Following the venue’s AI-use policy at submission (the researcher decided that the paper draft carries no disclosure paragraph; EuroS&amp;P 2027’s call requires one in the acknowledgments, which is part of why DIMVA 2027 cycle 2 was chosen); whether “Li et al. (NDSS 2025)” is the paper the original plan meant; a line-by-line reading and rewrite of the report and the paper; the capstone hand-in date (about 10 Dec 2026, exact date to confirm); the submission itself (target decided 8 Nov 2026: DIMVA 2027 cycle 2, paper deadline 18 Feb 2027, Springer LNCS, double-blind; see <code class="docutils literal notranslate"><span class="pre">docs/submission_checklist.md</span></code>); whether to rerun the E3 trap arm under an addendum; whether to deposit the stored predictions publicly (limit 18); resetting the Zenodo webhook secret that appeared in one session log (only Zenodo can rotate it: zenodo.org/account/settings/github, switch the repository off, then on; not done yet).</p>
 </section>
 <section id="gotchas-learned">
 <h2>14. Gotchas learned<a class="headerlink" href="#gotchas-learned" title="Link to this heading">¶</a></h2>
@@ -432,7 +432,7 @@
 <section id="suggested-next-steps">
 <h2>15. Suggested next steps<a class="headerlink" href="#suggested-next-steps" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Researcher: read and rewrite the paper and report; decide venue; fill the AI-disclosure wording.</p></li>
+<li><p>Researcher: read and rewrite the paper and report; port the paper to the Springer LNCS class and build <code class="docutils literal notranslate"><span class="pre">paper/main-anon.tex</span></code> for the double-blind submission (DIMVA 2027 cycle 2, 18 Feb 2027).</p></li>
 <li><p>If a trap-arm rerun, class-prior controls, a longer BODMAS window or other monitor settings are wanted: write an addendum and tag it before any run (<code class="docutils literal notranslate"><span class="pre">docs/ROADMAP.md</span></code>).</p></li>
 <li><p>Release 0.2.0 only with the researcher’s go (new PyPI file and new Zenodo version).</p></li>
 <li><p>Keep the monthly arXiv audit (<code class="docutils literal notranslate"><span class="pre">docs/MAINTENANCE.md</span></code>) and the quarterly dependency refresh going.</p></li>

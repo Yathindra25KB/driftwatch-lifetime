@@ -15,10 +15,18 @@ This is a checklist for submitting the paper. A first full draft exists: `paper/
 
 The capstone deadline is about 10 Dec 2026 [verify] (researcher, 21 Oct 2026, exact date to confirm; docs/PHASES.md), and the report plus the repository are the hand-in. A paper for the first two rows would have to be written, rewritten by the researcher and checked within days, so the checklist treats them as options for the researcher, not as a plan.
 
+## Decision (8 Nov 2026): venue and AI wording
+
+**Target: DIMVA 2027, cycle 2 (paper deadline 18 Feb 2027, firm; Springer LNCS; 18 pages main text, 25 in all; double-blind).** Reasons: its scope is malware and intrusion detection; the researcher's rewrite and a second person's reading need more than the 3.5 weeks before EuroS&P's 2 Dec 2026 deadline (which falls in the capstone hand-in week); and 18 pages fit the full study. A rejected cycle-1 paper cannot go to cycle 2, so submitting in cycle 2 only is deliberate. **Not EuroS&P 2027**: the call (read 8 Nov 2026) requires the official `eurosp2027` template (not other IEEE templates), anonymous artifact hosting (GitHub is excluded), a discussion of potential harms, and the disclosure of AI-generated content in the acknowledgments, naming the system and the sections concerned. A later venue (ARES 2027, when its call appears) is the fallback.
+
+**AI wording.** The researcher decided on 8 Nov 2026 that the paper draft carries no AI-disclosure paragraph, and it carries none. That is a decision about the draft, not a finding that no venue requires one: EuroS&P's call requires it, and a venue's or a publisher's policy must be read and followed before any submission. The repository itself (README, report chapter 0, CLAUDE.md, commit trailers) records the use of Claude Code and was not changed.
+
+**Build.** `paper/main.tex` is the IEEE-format draft. `paper/main-anon.tex` builds the anonymous variant (no author block, repository address withheld). DIMVA needs the Springer LNCS class: porting is a class change, the bibliography style and the claim ids removed; it has not been done.
+
 ## Before any submission
 
 - [ ] The researcher rewrites and defends the text. Every chapter says it is a draft written with Claude Code.
-- [ ] The venue's policy on AI-assisted writing is read and the disclosure paragraph in `report/ch00_front_matter.md` is changed to match it. The wording of any policy is not known to this project.
+- [ ] The venue's and the publisher's policy on AI-assisted writing and code is read and followed. The paper draft has no disclosure paragraph by the researcher's decision (see above); the venue may require one.
 - [ ] Every number comes from `docs/CLAIMS.md` (`uv run python scripts/claims_audit.py` says PASS).
 - [ ] `uv run python scripts/check_bib.py` resolves every entry; entries cited as "accepted" or "submitted" are updated if a final version exists (`paper/REFERENCES_TODO.md`).
 - [ ] The registered and unregistered parts are labelled as in chapter 7 (RQ1 was registered after E0 and E1 were read; the lifetime reading is exploratory).
