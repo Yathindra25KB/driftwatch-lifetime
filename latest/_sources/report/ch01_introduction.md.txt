@@ -1,6 +1,6 @@
 # Chapter 1: Introduction (draft)
 
-> Status: draft written by Claude Code for the researcher to rewrite in their own words and defend; updated 22 Oct 2026 for the finished Tier 2. Numbers enter only through `docs/CLAIMS.md` and carry their claim id. Paragraphs marked **[researcher: verify]** need your check against the sources. No experimental result is stated in this chapter; results are in chapter 7. Target length: about 5 pages.
+> Status: draft written by Claude Code for the researcher to rewrite in their own words and defend; updated for the finished Tier 2. Numbers enter only through `docs/CLAIMS.md` and carry their claim id. Statements about sources are at abstract level and the open items a person has to settle are listed in the open-items section of chapter 8. No experimental result is stated in this chapter; results are in chapter 7.
 
 ## 1.1 Motivation
 

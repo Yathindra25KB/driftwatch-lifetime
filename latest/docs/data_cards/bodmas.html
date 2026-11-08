@@ -360,7 +360,7 @@
 <h2>Labels<a class="headerlink" href="#labels" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">y</span></code> = 1 marks malware, 0 benign. An empty family means benign [verified, page]. Label and family agree for every row [measured].</p></li>
-<li><p>The page and the repository README do not describe how labels were produced. The paper should be consulted [verify].</p></li>
+<li><p>The page and the repository README do not describe how labels were produced. The paper (Yang et al., IEEE SPW 2021, Section III; read in full on 2026-11-08, <code class="docutils literal notranslate"><span class="pre">reports/source_verification_2026-11-08.md</span></code>, CLAIMS D-18) says: malware were “randomly sampled each month from a security company’s internal malware database” and benign samples were also taken from that database; the family label “is obtained mostly by analyzing verdicts from multiple antivirus vendors with in-house scripts (similar as AVClass)”, with about 1% labelled by manual analysis; the first-seen time is “based on VirusTotal reports”. How the binary malware or benign label was decided is not stated in the paper [verify]; the binary label may derive from the company’s own judgement, which the paper does not state.</p></li>
 <li><p>There are 582 named malware families, 196 of them with at least 10 samples [measured].</p></li>
 <li><p>7 benign rows carry <code class="docutils literal notranslate"><span class="pre">VirusShare_&lt;md5&gt;</span></code> identifiers instead of a sha256. Their labels are kept as published and flagged as an open question (inventory notes, Q3).</p></li>
 </ul>

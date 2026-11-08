@@ -381,7 +381,7 @@
 <li><p><strong>Predictions are not public.</strong> The result files under <code class="docutils literal notranslate"><span class="pre">results/</span></code> are not committed; the committed tables are the evidence of record, and regenerating E4 on LAMDA alone took 13.0 hours of cell time [E-48]. The stored predictions of E0 to E4 (577 files, 7.20 GiB) are hashed in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code>, and a private archive of them is held by the researcher for examiners who ask [E-69]. Depositing them in a public service is future work and waits for the researcher’s go.</p></li>
 <li><p><strong>The dynamic results are mostly LAMDA results.</strong> BODMAS has one useful refit per window, a short and drift-poor series, and benign timestamps that are date-only or placeholders; its delay, selection and monitor numbers barely move [E-29, E-41, E-60]. A difference between the two datasets is not a finding about platforms.</p></li>
 </ol>
-<p><strong>[researcher: verify each of these against your own reading of the data cards; mark any you consider minor.]</strong></p>
+<p>The limits above were written from the data cards and the stored tables by the same model family that wrote the code, and no person has yet checked each one (see the open items below).</p>
 </section>
 <section id="ethics-and-scope">
 <h2>8.4 Ethics and scope<a class="headerlink" href="#ethics-and-scope" title="Link to this heading">¶</a></h2>
@@ -401,6 +401,22 @@
 <li><p>Drift monitors at lower alarm rates, for example with a larger sample per slot or a stricter significance level, registered in a new addendum before any run. Here E4 tested one frozen level, and most monitors alarmed in most slots [E-63].</p></li>
 <li><p>A trap arm whose released labels also train the model, so that contamination is separated from not retraining (an addendum before the rerun).</p></li>
 </ul>
+</section>
+<section id="open-items">
+<h2>8.7 Open items<a class="headerlink" href="#open-items" title="Link to this heading">¶</a></h2>
+<p>These are the points that no script can settle and that a person has to read, decide or confirm. They are listed here so that nothing is hidden in a draft marker. None was found to change a reported number, but the LAMDA timestamp item (CLAIMS D-03) could change every LAMDA number if the assumed column is not the collection date.</p>
+<ol class="arabic simple">
+<li><p><strong>Review status.</strong> The chapters were drafted by Claude Code and reviewed by other instances of the same model family (self-review); no person has yet read them line by line. The limits in section 8.3 were written from the data cards and the stored tables and have not been checked one by one by a person.</p></li>
+<li><p><strong>Disclosure wording.</strong> The wording that a university or a venue requires for disclosing AI assistance is not known to this project, so the front matter describes what was done and does not claim to meet a policy.</p></li>
+<li><p><strong>BODMAS labels.</strong> The paper says that families come mostly from multi-vendor antivirus verdicts analysed with in-house scripts (about 1% by manual analysis) and that malware and benign files were taken from a security company’s database; it does not say how the binary label was decided, and it states no dataset licence (CLAIMS D-18). The files are used as published and are not redistributed.</p></li>
+<li><p><strong>LAMDA timestamps.</strong> The month of a LAMDA sample comes from the <code class="docutils literal notranslate"><span class="pre">added</span></code> column, assumed to be the AndroZoo collection date; neither the paper nor its README names the column (CLAIMS D-03).</p></li>
+<li><p><strong>The trap arm.</strong> In the E3 trap arm the released labels enter the calibration buffer and not the training pool, so the arm never retrains and its difference mixes contamination with the absence of retraining (CLAIMS E-45). Rerunning it with the released labels also entering the pool needs an addendum and a new tag; it was not done.</p></li>
+<li><p><strong>Readings of the BODMAS columns, of the reversed monitor rows and of the practical size of the effects.</strong> Chapter 7 states these readings and gives the reasons from the stored tables; a person has not yet confirmed them. Chapter 7 does not claim that any effect matters operationally.</p></li>
+<li><p><strong>Platform-specific threat figures.</strong> The only threat-landscape figure is the antivirus-test count (L-32); no Android-specific or Windows-specific source was retrieved.</p></li>
+<li><p><strong>The cluster bootstrap.</strong> The registered interval resamples windows and then seeds within them. The sources named in chapter 3 favour resampling whole top-level units only, so the registered scheme departs from them. The statement that resampling both stages gives a wider interval rests on a synthetic check (L-34); those sources were not read for it, so read the interval widths with that in mind.</p></li>
+<li><p><strong>Citations.</strong> “Li et al. (NDSS 2025)” is the venue-confirmed paper, but whether it is the paper meant by the original plan is not checkable from sources (L-33). Several 2026 preprints are cited as preprints because no final version was found (<code class="docutils literal notranslate"><span class="pre">paper/REFERENCES_TODO.md</span></code>).</p></li>
+<li><p><strong>Public predictions.</strong> The per-slot predictions are hashed in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code> and archived privately; they are not published (limit 18).</p></li>
+</ol>
 </section>
 </section>
 
@@ -466,6 +482,7 @@
 <li><a class="reference internal" href="#ethics-and-scope">8.4 Ethics and scope</a></li>
 <li><a class="reference internal" href="#status-of-the-tiers">8.5 Status of the tiers</a></li>
 <li><a class="reference internal" href="#future-work">8.6 Future work</a></li>
+<li><a class="reference internal" href="#open-items">8.7 Open items</a></li>
 </ul>
 </li>
 </ul>

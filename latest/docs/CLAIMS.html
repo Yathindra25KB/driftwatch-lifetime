@@ -1563,7 +1563,7 @@
 </tr>
 <tr class="row-even"><td><p>D-17</p></td>
 <td><p>BODMAS: the project page and the repository README do not describe how the labels were produced; its paper has to be consulted. On 22 Oct 2026 the paper’s PDF could not be read here (the copies at par.nsf.gov, conferences.computer.org and gangw.cs.illinois.edu returned no readable text, one host failed its certificate check, and the download guard blocks the author’s host). A web search summary, not a reading of the paper, says the paper takes the first-seen time from VirusTotal reports and the samples from a security company’s database, and the authors’ slides say family labels aggregate several antivirus vendors with about 1% manual analysis; none of this is verified, and it is not used in the report. The researcher should read the paper’s dataset section</p></td>
-<td><p>open</p></td>
+<td><p>superseded by D-18</p></td>
 <td><p>docs/data_cards/bodmas.md</p></td>
 <td><p>9b27b58</p></td>
 <td><p>[verify]</p></td>
@@ -1704,6 +1704,30 @@
 <td><p>f688c0a</p></td>
 <td><p>[measured]</p></td>
 <td><p>2026-10-28</p></td>
+</tr>
+<tr class="row-even"><td><p>D-18</p></td>
+<td><p>BODMAS label provenance, read in the paper (Yang, Ciptadi, Laziuk, Ahmadzadeh, Wang, IEEE SPW 2021, pp. 78 to 84, DOI 10.1109/SPW53761.2021.00020, Section III, author-hosted PDF) on 8 Nov 2026: malware were randomly sampled each month from a security company’s internal database and benign samples were also taken from it; the family label is obtained mostly from verdicts of multiple antivirus vendors with in-house scripts similar to AVClass, about 1% by manual analysis; the first-seen time is based on VirusTotal reports; the paper does not say how the malware or benign label was decided and states no dataset licence (the repository names BSD-2-Clause for the code)</p></td>
+<td><p>see claim</p></td>
+<td><p>reports/source_verification_2026-11-08.md (section 1); docs/data_cards/bodmas.md</p></td>
+<td><p>f802bab</p></td>
+<td><p>[verified] (what the paper says); [verify] (how the binary label was decided)</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-34</p></td>
+<td><p>Hierarchical bootstrap references added to the bibliography: Davison and Hinkley, Bootstrap Methods and their Application, Cambridge University Press 1997, DOI 10.1017/CBO9780511802843 (section 3.8 treats hierarchical data); Ren, Lai, Tong, Aminzadeh, Hou, Lai, Nonparametric bootstrapping for hierarchical data, Journal of Applied Statistics 37(9), 1487 to 1498, DOI 10.1080/02664760903046102, whose abstract says resampling the highest level is better than resampling lower levels. The statement that resampling both stages widens the interval was not read in either source and rests on the synthetic check in tests/test_stats.py</p></td>
+<td><p>see claim</p></td>
+<td><p>paper/references.bib; reports/source_verification_2026-11-08.md (section 2); Crossref records (WebFetch and the check_bib script)</p></td>
+<td><p>f802bab</p></td>
+<td><p>[verified] bibliographic data and the Ren et al. abstract; [verify] section 3.8 (seen only in a search snippet) and the variance statement</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-even"><td><p>L-35</p></td>
+<td><p>Venue and version check of the open reference rows, 8 Nov 2026: DREAM is ACM CCS 2025 (DOI 10.1145/3719027.3744792), TIF is IEEE TSE (DOI 10.1109/TSE.2026.3698484), ActDroid’s journal version is Computers &amp; Security (DOI 10.1016/j.cose.2025.104724), TESSERACT pp. 729 to 746; FIRCE, Cerqueira et al. and EMA are accepted only according to arXiv comments, Minnei et al. is only submitted, SEED has no venue; Transcend and CADE page numbers confirmed on the USENIX pages</p></td>
+<td><p>see claim</p></td>
+<td><p>paper/REFERENCES_TODO.md; reports/source_verification_2026-11-08.md (section 3)</p></td>
+<td><p>f802bab</p></td>
+<td><p>[verified] at the pages read; proceedings entries unconfirmed where stated</p></td>
+<td><p>2026-11-08</p></td>
 </tr>
 </tbody>
 </table>
