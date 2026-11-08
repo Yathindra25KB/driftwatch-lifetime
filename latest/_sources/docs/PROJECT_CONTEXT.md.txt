@@ -83,6 +83,8 @@ Flagged and left (the researcher's call): the paper (a first draft exists; it st
 
 Settled from sources on 8 Nov 2026: the plan's "Li et al. (NDSS 2025)" (listed without title or id; matched by inference, L-33); the guide's sanity band (L-38); the LAMDA timestamp (the dataset's `year_month` equals the month of the AndroZoo `added` date for every row; upstream derivation undocumented, D-19); platform threat figures (L-36, L-37); the arXiv audits of October and November (no paper combines delay, budget and conformal monitoring for malware in the abstracts read).
 
+Done on 8 Nov 2026 (round 2): the arXiv audit PR and issues were closed; final venues of three references were recorded (L-39); an independent AI review found 0 blockers and 7 major points, all fixed (E-88); the four chapter 7 readings were signed off as written on the researcher's instruction; `docs/REVIEW_PACK.md` is a checklist for the researcher's own line-by-line reading; a draft email to the BODMAS authors exists and has not been sent.
+
 Still open and needing a person or a new registration: a line-by-line reading of the report and paper; the capstone hand-in date (about 10 Dec 2026, exact date to confirm); whether to rerun the E3 trap arm (an addendum, a new tag and code changes; `docs/ROADMAP.md`); whether to deposit the stored predictions publicly (limit 18; BODMAS's dataset licence is not stated); the readings of the BODMAS columns, the reversed monitor rows and practical significance (chapter 7); the BODMAS binary-label basis, which the paper does not state (D-18); final venue versions of several 2026 preprints; whether to close issue 1 (its candidates were triaged in the 2026-10-27 audit) and merge the audit PR for issue 5.
 
 ## 14. Gotchas learned

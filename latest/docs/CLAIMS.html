@@ -1825,6 +1825,22 @@
 <td><p>d9eebb8</p></td>
 <td><p>[measured] (what was read and where)</p></td>
 </tr>
+<tr class="row-odd"><td><p>L-39</p></td>
+<td><p>Final-version check of six 2026 references, 8 Nov 2026 (arXiv pages, conference programme pages, Crossref records; the ACM, IEEE and OpenReview pages returned 403 or a bot check, so ACM and IEEE data are from Crossref): FIRCE appeared at the 2026 SmartNets conference (IEEE, pp. 1 to 9, DOI 10.1109/smartnets69662.2026.11604738); Cerqueira et al. appeared in the KDD ‘26 proceedings (ACM, pp. 8671 to 8682, DOI 10.1145/3770855.3819070; the track is unconfirmed); EMA appeared at ACM SIGCOMM 2026 (pp. 1617 to 1629, DOI 10.1145/3789240.3829142, listed on the SIGCOMM programme page); SEED (arXiv 2605.24903 v2) and Minnei et al. (arXiv 2603.28396 v1, submitted to IEEE TIFS) have no final version found; LAMDA is an ICLR 2026 poster of 24 Apr 2026 with no page range or DOI on iclr.cc</p></td>
+<td><p>see claim</p></td>
+<td><p>paper/references.bib; <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">python</span> <span class="pre">scripts/check_bib.py</span></code> (36 of 36 matched after the update); paper/REFERENCES_TODO.md</p></td>
+<td><p>dbc42f9</p></td>
+<td><p>[verified] through Crossref and the programme pages; publisher pages not read</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-even"><td><p>E-88</p></td>
+<td><p>Independent AI review of the paper, chapters 7 to 9 and the README against this ledger, 8 Nov 2026 (a fresh stats-reviewer instance, read-only), and what was done with it</p></td>
+<td><p>0 blockers, 7 major and 16 minor findings. Major, all fixed: E3 and E2 effects were compared although ADR-0009 says they are not comparable; ranges of point estimates sat under an interval caption; the comparison of monitors with periodic retraining omitted that periodic retraining is only 0.0064 (LightGBM) and 0.0109 (LR) above never retraining on LAMDA and about 0 on BODMAS (E-50, E-51); chapter 7 called the LAMDA intervals likely too narrow while chapter 3 said the net direction is unknown; chapters 8 and 9 said every experiment, or four, were registered before results; the paper stated the LAMDA month derivation as fact; the repeat-vector share (E-10, E-37) and the BODMAS timestamp caveat (D-14) were missing from the paper’s limits. Minor, fixed: wrong or missing claim ids, a BODMAS window count, the 29 of 57 LAMDA months below target (E-08), a restart and a retried memory error that ‘none failed’ omitted, ‘interval above zero’ now ‘entirely above zero’, a seed-basis note, a multiplicity note, ‘lifetime’ read only through A-AUT, README timing basis. Not changed: PREREG (locked), E-59 not_detected rows in chapter 8 (listed as a minor point), the five-seed point estimate remark in chapter 7. The researcher’s instruction of the same day: signed off the four chapter 7 readings as written; kept 10 Dec 2026 as the working hand-in date; a reviewer pack for the researcher’s own reading was written (docs/REVIEW_PACK.md); an email to the BODMAS authors was drafted and not sent</p></td>
+<td><p>see claim</p></td>
+<td><p>docs/REVIEW_PACK.md; report/ch08_discussion.md section 8.7; paper/main.tex</p></td>
+<td><p>dbc42f9</p></td>
+<td><p>[measured] (counts of findings); the review is an AI review and not a human one</p></td>
+</tr>
 </tbody>
 </table>
 </div>

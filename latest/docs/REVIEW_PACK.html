@@ -1,0 +1,1878 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Reviewer pack: reading the report and paper line by line - DriftWatch 0.1.1</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/print.css?v=c60e34cf" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">DriftWatch 0.1.1</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">DriftWatch 0.1.1</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Start here</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">DriftWatch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">The study</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="PROTOCOL.html">DriftWatch protocol: single source of truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PREREG.html">DriftWatch pre-registration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CLAIMS.html">DriftWatch claims ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GRID.html">Running the E2 grid: cells, chunks, the ledger, Kaggle and Colab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch00_front_matter.html">Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch01_introduction.html">Chapter 1: Introduction (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch02_landscape.html">Chapter 2: Landscape (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch03_analysis.html">Chapter 3: How the results are analysed (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch04_latest_techniques.html">Chapter 4: Recent techniques and attacks (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch05_related_work.html">Chapter 5: Related work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch06_method.html">Chapter 6: Method (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch07_experiments.html">Chapter 7: Experiments and results (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch08_discussion.html">Chapter 8: Discussion and limitations (partial draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../report/ch09_conclusion.html">Chapter 9: Conclusion and future work (draft)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_work_addendum.html">Related-work addendum (Phase 7)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="architecture/index.html">Architecture</a><input aria-label="Toggle navigation of Architecture" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/data-and-slicing.html">Data and slicing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/simulator.html">Simulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/conformal-and-monitors.html">Conformal layer and monitors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/evidence-and-reproducibility.html">Evidence and reproducibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/quality-and-release.html">Quality and release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/extending.html">Extending DriftWatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/screenshots.html">The project working</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Decisions and evidence</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0001-tooling-and-guardrails.html">ADR-0001: Tooling and guardrail design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0002-code-licence.html">ADR-0002: Code licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0003-package-name.html">ADR-0003: PyPI distribution name</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0004-slot-definition.html">ADR-0004: Slot definition, minimum-size gate and gap handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0005-windows-and-size-gate.html">ADR-0005: Window parameters (nT, nE, stride), size gate and ratio policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0006-metrics-threshold-scaling.html">ADR-0006: Metrics, decision threshold, scaling policy, A-AUT windows and E0 hyperparameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0007-pool-composition-and-budget.html">ADR-0007: Training-pool composition, new-label weight, budget base, retrain anchor and the simulator’s queue rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0008-rq1-comparator-and-e2-design.html">ADR-0008: RQ1 primary comparator and the E2 grid design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0009-calibration-rows-are-not-training-rows.html">ADR-0009: Calibration rows are not training rows; the E3 initial model leaves a hold-out</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0010-monitor-inputs-and-reference.html">ADR-0010: Monitor inputs, reference rule, label-free p-values and bounded monitor compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DECISIONS/ADR-0011-docs-tool.html">ADR-0011: Documentation site tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/guardrail-review.html">Guardrail review (Phase 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/leakage-review-e3.html">Leakage review of the E3 code (conformal layer, selectors, E3 runner)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/leakage-review-e4.html">Leakage review: Phase 9 (E4 drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/slicer-review.html">Leakage review: Phase 3 time slicer and constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/stats-review-e2.html">Statistics review of the E2 analysis code (Phase 6)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/stats-review-e3.html">Statistics review of the E3 tables and text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reviews/stats-review-e4.html">Statistics review: E4 (RQ4, drift monitors)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PHASES.html">DriftWatch phase ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results_audit.html">Results audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G1.html">Gate G1 evidence (Phase 4)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G2.html">Gate G2 evidence (Phase 5)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G3.html">Gate G3 evidence (Phases 6 and 7)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G4.html">Gate G4 evidence (Phases 8 and 9: Tier 2)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/G5-tier3-decision.html">Tier 3 go/no-go decision (Phase 10)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/claims_audit.html">Claims audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html">Simulated hostile review: “How Long Does a Malware Detector Last? Label Delay, Analyst Budget and Conformal Monitoring in One Time-Aware Protocol”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reports/simulated_review.html#responses-to-the-simulated-review">Responses to the simulated review</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Data, licences and ethics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="data_cards/bodmas.html">Data card: BODMAS (Windows PE)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cards/lamda.html">Data card: LAMDA (Android)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence_audit.html">Licence and ethics audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ETHICS.html">Ethics, licences and data handling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Operating the project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="MAINTENANCE.html">Maintenance playbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RELEASING.html">Releasing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ROADMAP.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CHANGELOG.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API reference</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/blob/main/docs/REVIEW_PACK.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/Yathindra25KB/driftwatch-lifetime/edit/main/docs/REVIEW_PACK.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="reviewer-pack-reading-the-report-and-paper-line-by-line">
+<h1>Reviewer pack: reading the report and paper line by line<a class="headerlink" href="#reviewer-pack-reading-the-report-and-paper-line-by-line" title="Link to this heading">¶</a></h1>
+<p>For the researcher. Generated on 8 Nov 2026 from <code class="docutils literal notranslate"><span class="pre">report/</span></code> and <code class="docutils literal notranslate"><span class="pre">docs/CLAIMS.md</span></code>. The report and the paper were drafted with an AI assistant and checked only by other AI instances (self-review), so no person has yet read them. Reading them is the one check no script can do. Plan about 3 to 4 hours. Mark each box as you go; when everything is ticked, tell Claude (or edit <code class="docutils literal notranslate"><span class="pre">report/ch08_discussion.md</span></code> section 8.7, item 1) so the review-status limit can be changed truthfully.</p>
+<section id="how-to-read-a-chapter">
+<h2>How to read a chapter<a class="headerlink" href="#how-to-read-a-chapter" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Read the whole chapter once for sense before checking anything.</p></li>
+<li><p>For every bracketed id such as <code class="docutils literal notranslate"><span class="pre">[E-30]</span></code>, open the row in <code class="docutils literal notranslate"><span class="pre">docs/CLAIMS.md</span></code> (the table below gives the first words of each row) and confirm the sentence says no more than the row: same number, same interval, same dataset and model, same delay and budget, ‘descriptive’ versus ‘registered’.</p></li>
+<li><p>Flag any sentence that says or implies: a cause, practical importance, priority (‘first’), or a result that is not in the ledger.</p></li>
+<li><p>Rewrite anything you would not defend in front of an examiner. The text is yours to change; <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">python</span> <span class="pre">scripts/claims_audit.py</span></code> tells you if a number lost its id.</p></li>
+</ol>
+</section>
+<section id="sign-off-sheet">
+<h2>Sign-off sheet<a class="headerlink" href="#sign-off-sheet" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item</p></th>
+<th class="head"><p>Read</p></th>
+<th class="head"><p>Claims checked</p></th>
+<th class="head"><p>Wording changed or accepted</p></th>
+<th class="head"><p>Initials, date</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ch00_front_matter</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>ch01_introduction</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>ch02_landscape</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>ch03_analysis</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>ch04_latest_techniques</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>ch05_related_work</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>ch06_method</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>ch07_experiments</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>ch08_discussion</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>ch09_conclusion</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>paper/main.tex</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>README.md</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>section 8.7 open items</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p>[ ]</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch00-front-matter-md">
+<h2>ch00_front_matter.md<a class="headerlink" href="#ch00-front-matter-md" title="Link to this heading">¶</a></h2>
+<p>1,343 words, 8 distinct claim ids. Sections: Malware Detector Lifetime Under Delayed Labels: Small Effects and Null Monitors in a Pre-Registered Time-Aware Study on Android and Windows PE Data; Abstract; Reading guide; How this report was produced, and what an examiner can check; Length against the guide’s page budget; Acknowledgements</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-15</p></td>
+<td><p>LAMDA label rule: an app with vt_detection 0 is benign, one with vt_detection of 4 or mor…</p></td>
+<td><p>rule holds for every row of the cache (0 conflicts)</p></td>
+<td><p>[verified] against the paper; conflict …</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-16</p></td>
+<td><p>LAMDA labels are AV-centric (the dataset card says they are “biased toward highly detecte…</p></td>
+<td><p>stated limitation</p></td>
+<td><p>[verified] against the dataset card</p></td>
+</tr>
+<tr class="row-even"><td><p>E-30</p></td>
+<td><p>E2 LAMDA, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT diff…</p></td>
+<td><p>lr C-D1 0.0032 [-0.0011, 0.0077] equivalent = 0.0011 [-0.0004, 0.0026…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-35</p></td>
+<td><p>RQ1 as registered (prereg-v1): gap between random-split F1 and time-aware AUT, mean over …</p></td>
+<td><p>lamda lgbm per-slot matched 0.0403 [0.0240, 0.0481] point at or above…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-42</p></td>
+<td><p>E3 LAMDA, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 see…</p></td>
+<td><p>lamda lr uncertainty B=1%: 0.0118 [0.0043, 0.0178] detected, 43.6 lab…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-59</p></td>
+<td><p>Supersedes E-52 (stats review E4 applied). E4 lamda, registered contrast M-P = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0026 [-0.0050, -0.0003] reversed_within_margin, refit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-68</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table `reports/tables/e…</p></td>
+<td><p>LAMDA, never retrained: LightGBM 0.783 at slot 1, 0.770 at slot 12, f…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>T-02</p></td>
+<td><p>Word counts of the report chapters at the Phase 11 hand-in draft, counted with <code class="docutils literal notranslate"><span class="pre">wc</span> <span class="pre">-w</span></code> eq…</p></td>
+<td><p>ch1 1170; ch2 1099; ch3 2277; ch4 1501; ch5 1572; ch6 3369; ch7 5129;…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch01-introduction-md">
+<h2>ch01_introduction.md<a class="headerlink" href="#ch01-introduction-md" title="Link to this heading">¶</a></h2>
+<p>1,177 words, 3 distinct claim ids. Sections: Chapter 1: Introduction (draft); 1.1 Motivation; 1.2 Problem statement; 1.3 Research questions; 1.4 Contribution; 1.5 Scope, data and ethics; 1.6 Report outline</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-01</p></td>
+<td><p>LAMDA size and class counts (Baseline subset, HF commit ad9614bd)</p></td>
+<td><p>1,008,381 apps; 369,906 malware; 638,475 benign</p></td>
+<td><p>[verified] (matches arXiv 2505.18551 Ta…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-07</p></td>
+<td><p>BODMAS size and features</p></td>
+<td><p>134,435 samples (57,293 malware, 77,142 benign); 2,381 float32 featur…</p></td>
+<td><p>[verified] against the BODMAS page; den…</p></td>
+</tr>
+<tr class="row-even"><td><p>E-68</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table `reports/tables/e…</p></td>
+<td><p>LAMDA, never retrained: LightGBM 0.783 at slot 1, 0.770 at slot 12, f…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch02-landscape-md">
+<h2>ch02_landscape.md<a class="headerlink" href="#ch02-landscape-md" title="Link to this heading">¶</a></h2>
+<p>1,192 words, 20 distinct claim ids. Sections: Chapter 2: Landscape (draft); 2.1 The problem in one paragraph; 2.2 Concepts used in this report; 2.3 Why Android and Windows PE; 2.4 The datasets; 2.5 What the datasets cannot tell us; 2.6 Threat-landscape context</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-01</p></td>
+<td><p>LAMDA size and class counts (Baseline subset, HF commit ad9614bd)</p></td>
+<td><p>1,008,381 apps; 369,906 malware; 638,475 benign</p></td>
+<td><p>[verified] (matches arXiv 2505.18551 Ta…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-02</p></td>
+<td><p>LAMDA feature count, storage and density</p></td>
+<td><p>4,561 int8 features (values 0-17); 1.63% non-zero</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>D-03</p></td>
+<td><p>LAMDA slotting timestamp</p></td>
+<td><p>AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code> (seconds) for 100% of rows; <code class="docutils literal notranslate"><span class="pre">year_month</span></code> equals its …</p></td>
+<td><p>[measured]; the meaning of <code class="docutils literal notranslate"><span class="pre">added</span></code> is s…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-05</p></td>
+<td><p>LAMDA duplicate feature vectors</p></td>
+<td><p>679,423 distinct vectors; 238,576 rows (23.7%) repeat a vector from a…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>D-07</p></td>
+<td><p>BODMAS size and features</p></td>
+<td><p>134,435 samples (57,293 malware, 77,142 benign); 2,381 float32 featur…</p></td>
+<td><p>[verified] against the BODMAS page; den…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-08</p></td>
+<td><p>BODMAS timestamps by class</p></td>
+<td><p>malware 2019-08-29..2020-09-30 (second resolution); benign 2007-01-01…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>D-14</p></td>
+<td><p>BODMAS benign timestamps are daily batches</p></td>
+<td><p>66,167 benign rows date-only; study-window median 150 rows/day (regul…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-15</p></td>
+<td><p>LAMDA label rule: an app with vt_detection 0 is benign, one with vt_detection of 4 or mor…</p></td>
+<td><p>rule holds for every row of the cache (0 conflicts)</p></td>
+<td><p>[verified] against the paper; conflict …</p></td>
+</tr>
+<tr class="row-even"><td><p>D-16</p></td>
+<td><p>LAMDA labels are AV-centric (the dataset card says they are “biased toward highly detecte…</p></td>
+<td><p>stated limitation</p></td>
+<td><p>[verified] against the dataset card</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-17</p></td>
+<td><p>BODMAS: the project page and the repository README do not describe how the labels were pr…</p></td>
+<td><p>superseded by D-18</p></td>
+<td><p>[verify]</p></td>
+</tr>
+<tr class="row-even"><td><p>D-19</p></td>
+<td><p>LAMDA timestamp provenance, read on 8 Nov 2026: the dataset card (huggingface.co/datasets…</p></td>
+<td><p>see claim</p></td>
+<td><p>[verified] (what the pages say, read th…</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-08</p></td>
+<td><p>LAMDA (Haque et al., arXiv 2505.18551): spans 12 years (2013 to 2025, excluding 2015), ov…</p></td>
+<td><p>12 years; over 1 million; 37%; 1,380 families</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-16</p></td>
+<td><p>Gama, Zliobaite, Bifet, Pechenizkiy, Bouchachia, A survey on concept drift adaptation, AC…</p></td>
+<td><p>5 authors</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-18</p></td>
+<td><p>Botacin and Gomes, Towards more realistic evaluations: the impact of label delays in malw…</p></td>
+<td><p>up to 75%; about 30%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-30</p></td>
+<td><p>EMBER2024 (Joyce et al., arXiv 2506.05074; DOI 10.1145/3711896.3737431 per the arXiv reco…</p></td>
+<td><p>over 3.2 million files; 6 formats</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-32</p></td>
+<td><p>AV-TEST Institute malware statistics page: the institute registers “over 450,000 new mali…</p></td>
+<td><p>over 450,000 per day</p></td>
+<td><p>[verified] as quoted; the figure is the…</p></td>
+</tr>
+<tr class="row-even"><td><p>L-36</p></td>
+<td><p>Kaspersky (Securelist), mobile threat report 2025, dated 4 Mar 2026: “815,735 new unique …</p></td>
+<td><p>815,735 packages</p></td>
+<td><p>[verified] at the page by summary; the …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-37</p></td>
+<td><p>AV-TEST Security Report 2019/2020: new Android malware samples in 2019 were 3,170,140, th…</p></td>
+<td><p>3,170,140; over 78 percent</p></td>
+<td><p>[verified] at the page by summary; the …</p></td>
+</tr>
+<tr class="row-even"><td><p>W-01</p></td>
+<td><p>LAMDA usable runs at 10%, M = 50 (cap and flag)</p></td>
+<td><p>97 usable months in 10 runs; longest 62 (2018-11..2023-12), of which …</p></td>
+<td><p>[measured] (slot counts only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>W-02</p></td>
+<td><p>BODMAS usable runs at 10%, M = 50, placeholder rows excluded</p></td>
+<td><p>26 usable 2-week slots in 2 runs (9 and 17); none below 10%</p></td>
+<td><p>[measured] (slot counts only)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch03-analysis-md">
+<h2>ch03_analysis.md<a class="headerlink" href="#ch03-analysis-md" title="Link to this heading">¶</a></h2>
+<p>2,330 words, 17 distinct claim ids. Sections: Chapter 3: How the results are analysed (draft); 3.1 What is being compared; 3.2 The quantities; 3.3 What the contrasts are; 3.4 Uncertainty: why windows come first; 3.5 Effect sizes in plain units; 3.6 The decision rule, and the equivalence margin; 3.7 What these statistics cannot show; 3.8 Analysis of E3 and E4; 3.9 Reading chapter 7</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>L-34</p></td>
+<td><p>Hierarchical bootstrap references added to the bibliography: Davison and Hinkley, Bootstr…</p></td>
+<td><p>see claim</p></td>
+<td><p>[verified] bibliographic data and the R…</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-01</p></td>
+<td><p>Evaluation slots and their C3 draws depend on seed and slot only, so arms of a contrast s…</p></td>
+<td><p>per-slot draw keyed by (seed, slot id); same rows in every grid cell</p></td>
+<td><p>[verified] code reading and tests</p></td>
+</tr>
+<tr class="row-even"><td><p>P-02</p></td>
+<td><p>Rolling windows (nT, nE, stride)</p></td>
+<td><p>LAMDA 4, 12, 3; BODMAS 3, 6, 2</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-03</p></td>
+<td><p>Fixed decision threshold</p></td>
+<td><p>0.5, malware when P &gt; 0.5</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-04</p></td>
+<td><p>AUT and A-AUT definitions</p></td>
+<td><p>AUT = 1/(N-1) sum (f_k + f_{k+1})/2; A-AUT = mean and sample std (ddo…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-05</p></td>
+<td><p>Budget as a percentage of the evaluated slot after C3, count floor(pct/100 * n + 1/2); gr…</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-06</p></td>
+<td><p>Recovery time definition</p></td>
+<td><p>F1 back to 90% of the pre-drop level; drop = fall of at least 0.05 be…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-07</p></td>
+<td><p>Primary contrasts C-D1, C-D2, C-P, C-B per dataset and model</p></td>
+<td><p>as in the PREREG RQ2 row</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-08</p></td>
+<td><p>Two-stage bootstrap: moving blocks of windows of length ceil(nE/stride) (LAMDA 4, BODMAS …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-09</p></td>
+<td><p>Effect-size units</p></td>
+<td><p>AUT lost per slot of delay (contrast / 3, and OLS slope over d = 0..3…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-10</p></td>
+<td><p>Decision rule and equivalence margin</p></td>
+<td><p>detected when the 95% interval excludes 0 in the hypothesised directi…</p></td>
+<td><p>[estimate] margin and band</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-11</p></td>
+<td><p>Smallest two-sided exact Wilcoxon p-value with n paired seeds</p></td>
+<td><p>0.0625 for 5 pairs; 2/1024 = 0.00195 for 10 pairs</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-12</p></td>
+<td><p>Known limits written before the results: BODMAS one useful refit per window and periodic …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-13</p></td>
+<td><p>Share of scored rows whose 0.5 decision changed after retraining, at 0.5% and 5% of the s…</p></td>
+<td><p>0.2% to 2.1% across datasets and models (E-13 and E-14 give each valu…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-14</p></td>
+<td><p>The per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA</p></td>
+<td><p>mean achieved ratio 0.075 against 0.084 (E-18)</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-17</p></td>
+<td><p>E4 design registered before any E4 result (addendum v3, tag prereg-v3 on 1d302ea, 20 Oct …</p></td>
+<td><p>alpha 0.01 per slot for every monitor; 500 rows per side (MMD 200); K…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-18</p></td>
+<td><p>Smallest Holm-adjusted Wilcoxon p in an E4 family: 32 contrasts, 10 paired seeds, smalles…</p></td>
+<td><p>0.0625</p></td>
+<td><p>[verified]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch04-latest-techniques-md">
+<h2>ch04_latest_techniques.md<a class="headerlink" href="#ch04-latest-techniques-md" title="Link to this heading">¶</a></h2>
+<p>1,501 words, 23 distinct claim ids. Sections: Chapter 4: Recent techniques and attacks (draft); 4.1 Why this chapter exists; 4.2 Handling drift: training, adaptation and detection; 4.3 Evaluation: benchmarks and the evaluation trap; 4.4 Adversaries; 4.5 Language models on the analyst’s side; 4.6 What remains open in this chapter</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-01</p></td>
+<td><p>LAMDA size and class counts (Baseline subset, HF commit ad9614bd)</p></td>
+<td><p>1,008,381 apps; 369,906 malware; 638,475 benign</p></td>
+<td><p>[verified] (matches arXiv 2505.18551 Ta…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-02</p></td>
+<td><p>LAMDA feature count, storage and density</p></td>
+<td><p>4,561 int8 features (values 0-17); 1.63% non-zero</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-43</p></td>
+<td><p>E3 lamda, per-delay advantage adv_S(d,B) of the selector over random at equal labels spen…</p></td>
+<td><p>lamda lr uncertainty B=1% d=0: 0.0145 [0.0071, 0.0173] detected; lamd…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-01</p></td>
+<td><p>TIF (Zheng et al., arXiv 2502.05098): groups training data into environments by applicati…</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-02</p></td>
+<td><p>ADAPT (Alam, Piplai, Rastogi, arXiv 2507.08597): model-agnostic pseudo-labelling semi-sup…</p></td>
+<td><p>5 datasets</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-03</p></td>
+<td><p>LFreeDA (Li and Bertino, arXiv 2511.14963), Windows, MB-24+ dataset: improves accuracy by…</p></td>
+<td><p>12.6%, 11.1%, 4%, 3.4%, 300 samples</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-04</p></td>
+<td><p>MADCAT (Roh et al., arXiv 2505.18734): test-time training of the encoder on a small, bala…</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-05</p></td>
+<td><p>DREAM (He et al., arXiv 2405.04095; accepted to ACM CCS 2025 per the arXiv comment): upda…</p></td>
+<td><p>76.6%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-06</p></td>
+<td><p>Minnei et al. (arXiv 2603.28396), Android and Windows: combined active and semi-supervise…</p></td>
+<td><p>up to 90%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-07</p></td>
+<td><p>Kalny, Jurecek, Stamp (arXiv 2604.22629), EMBER2024, six malware families: fixed two-mont…</p></td>
+<td><p>6 families, 2-month windows</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-08</p></td>
+<td><p>LAMDA (Haque et al., arXiv 2505.18551): spans 12 years (2013 to 2025, excluding 2015), ov…</p></td>
+<td><p>12 years; over 1 million; 37%; 1,380 families</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-09</p></td>
+<td><p>McNdroid (Kamol et al., arXiv 2605.06894): Android benchmark spanning 2013 to 2025 exclud…</p></td>
+<td><p>3 modalities</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-10</p></td>
+<td><p>Aurora (Herzog, Eusebi, Cavallaro, arXiv 2505.22843): evaluates the confidence quality an…</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-11</p></td>
+<td><p>Chen, Ding, Wagner, Continuous Learning for Android Malware Detection (USENIX Security 20…</p></td>
+<td><p>0.99 to 0.76; 14% to 9%; 0.86% to 0.48%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-22</p></td>
+<td><p>TESSERACT extended version (Kan et al., arXiv 2402.01359; v1 2 Feb 2024, v2 9 Apr 2025): …</p></td>
+<td><p>259,230 samples; 5 years</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-23</p></td>
+<td><p>Beyond the TESSERACT (Chow et al., arXiv 2506.23814): identifies five factors that cause …</p></td>
+<td><p>5 factors</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-25</p></td>
+<td><p>Li, Li, Ye, Xu, Arms Race in Adversarial Malware Detection: A Survey (arXiv 2005.11671; A…</p></td>
+<td><p>abstract-level findings</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-26</p></td>
+<td><p>Aryal, Gupta, Abdelsalam, Kunwar, Thuraisingham, A Survey on Adversarial Attacks for Malw…</p></td>
+<td><p>5 authors; pp. 428-459</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-27</p></td>
+<td><p>Ryan et al. (arXiv 2602.16304): 13 language models on 4,070 PyPI packages (370 malicious,…</p></td>
+<td><p>13 models; 4,070 packages</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-28</p></td>
+<td><p>Chawla and Prasad (arXiv 2601.09035): Windows executables decompiled with Ghidra and clas…</p></td>
+<td><p>abstract-level findings</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-29</p></td>
+<td><p>MalCVE (Cristea, Molnes, Li, arXiv 2510.15567): retrieval-augmented language-model pipeli…</p></td>
+<td><p>3,839 files; 97%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-30</p></td>
+<td><p>EMBER2024 (Joyce et al., arXiv 2506.05074; DOI 10.1145/3711896.3737431 per the arXiv reco…</p></td>
+<td><p>over 3.2 million files; 6 formats</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-31</p></td>
+<td><p>Cerqueira et al. (arXiv 2606.07789; KDD 2026 per the arXiv comment): benchmarks 14 drift …</p></td>
+<td><p>14 methods; 7 datasets</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch05-related-work-md">
+<h2>ch05_related_work.md<a class="headerlink" href="#ch05-related-work-md" title="Link to this heading">¶</a></h2>
+<p>1,572 words, 27 distinct claim ids. Sections: Chapter 5: Related work (draft); 5.1 Time-aware evaluation of malware detectors; 5.2 Concept drift; 5.3 Detecting drift with conformal methods; 5.4 Retraining under a labelling budget; 5.5 Label delay; 5.6 Datasets; 5.7 Newer neighbours at abstract level</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-01</p></td>
+<td><p>LAMDA size and class counts (Baseline subset, HF commit ad9614bd)</p></td>
+<td><p>1,008,381 apps; 369,906 malware; 638,475 benign</p></td>
+<td><p>[verified] (matches arXiv 2505.18551 Ta…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-07</p></td>
+<td><p>BODMAS size and features</p></td>
+<td><p>134,435 samples (57,293 malware, 77,142 benign); 2,381 float32 featur…</p></td>
+<td><p>[verified] against the BODMAS page; den…</p></td>
+</tr>
+<tr class="row-even"><td><p>D-08</p></td>
+<td><p>BODMAS timestamps by class</p></td>
+<td><p>malware 2019-08-29..2020-09-30 (second resolution); benign 2007-01-01…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-14</p></td>
+<td><p>BODMAS benign timestamps are daily batches</p></td>
+<td><p>66,167 benign rows date-only; study-window median 150 rows/day (regul…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>L-01</p></td>
+<td><p>TIF (Zheng et al., arXiv 2502.05098): groups training data into environments by applicati…</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-02</p></td>
+<td><p>ADAPT (Alam, Piplai, Rastogi, arXiv 2507.08597): model-agnostic pseudo-labelling semi-sup…</p></td>
+<td><p>5 datasets</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-06</p></td>
+<td><p>Minnei et al. (arXiv 2603.28396), Android and Windows: combined active and semi-supervise…</p></td>
+<td><p>up to 90%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-08</p></td>
+<td><p>LAMDA (Haque et al., arXiv 2505.18551): spans 12 years (2013 to 2025, excluding 2015), ov…</p></td>
+<td><p>12 years; over 1 million; 37%; 1,380 families</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-09</p></td>
+<td><p>McNdroid (Kamol et al., arXiv 2605.06894): Android benchmark spanning 2013 to 2025 exclud…</p></td>
+<td><p>3 modalities</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-10</p></td>
+<td><p>Aurora (Herzog, Eusebi, Cavallaro, arXiv 2505.22843): evaluates the confidence quality an…</p></td>
+<td><p>abstract-level description</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-11</p></td>
+<td><p>Chen, Ding, Wagner, Continuous Learning for Android Malware Detection (USENIX Security 20…</p></td>
+<td><p>0.99 to 0.76; 14% to 9%; 0.86% to 0.48%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-12</p></td>
+<td><p>Transcend: Detecting Concept Drift in Malware Classification Models (Jordaney, Sharad, Da…</p></td>
+<td><p>7 authors; pp. 625-642</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-13</p></td>
+<td><p>CADE: Detecting and Explaining Concept Drift Samples for Security Applications (Yang, Guo…</p></td>
+<td><p>7 authors; pp. 2327-2344</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-14</p></td>
+<td><p>Transcendent (Barbero, Pendlebury, Pierazzi, Cavallaro, arXiv 2010.03856; IEEE S&amp;P 2022, …</p></td>
+<td><p>5 years; 2 evaluators</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-15</p></td>
+<td><p>Shafer and Vovk, A tutorial on conformal prediction (arXiv 0706.3188; JMLR 9:371 to 421, …</p></td>
+<td><p>1 - epsilon</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-16</p></td>
+<td><p>Gama, Zliobaite, Bifet, Pechenizkiy, Bouchachia, A survey on concept drift adaptation, AC…</p></td>
+<td><p>5 authors</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-17</p></td>
+<td><p>Ceschin et al., Machine Learning (In) Security: A Stream of Problems (arXiv 2010.16045; D…</p></td>
+<td><p>7 authors</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-18</p></td>
+<td><p>Botacin and Gomes, Towards more realistic evaluations: the impact of label delays in malw…</p></td>
+<td><p>up to 75%; about 30%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-19</p></td>
+<td><p>ActDroid (Muzaffar et al., arXiv 2401.16982): active online learning for Android malware;…</p></td>
+<td><p>96%; 24%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-20</p></td>
+<td><p>SEED (Amalapuram et al., arXiv 2605.24903): with 20% labelled data on seen tasks, average…</p></td>
+<td><p>40%; 14%; 20% labelled</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-21</p></td>
+<td><p>FIRCE (Barrett et al., arXiv 2605.01962): conformal-evaluation drift detection for networ…</p></td>
+<td><p>10 devices; 2 benchmark datasets</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-22</p></td>
+<td><p>TESSERACT extended version (Kan et al., arXiv 2402.01359; v1 2 Feb 2024, v2 9 Apr 2025): …</p></td>
+<td><p>259,230 samples; 5 years</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-23</p></td>
+<td><p>Beyond the TESSERACT (Chow et al., arXiv 2506.23814): identifies five factors that cause …</p></td>
+<td><p>5 factors</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-24</p></td>
+<td><p>DRMD (McFadden et al., arXiv 2508.18839; AAAI 2026, vol. 40, pp. 854 to 862): deep reinfo…</p></td>
+<td><p>8.66; 10.90</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-30</p></td>
+<td><p>EMBER2024 (Joyce et al., arXiv 2506.05074; DOI 10.1145/3711896.3737431 per the arXiv reco…</p></td>
+<td><p>over 3.2 million files; 6 formats</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-31</p></td>
+<td><p>Cerqueira et al. (arXiv 2606.07789; KDD 2026 per the arXiv comment): benchmarks 14 drift …</p></td>
+<td><p>14 methods; 7 datasets</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>M-02</p></td>
+<td><p>TESSERACT AUT normalisation</p></td>
+<td><p>arXiv v4 comments: published Eq. (4) had an extra 1/N factor (typo); …</p></td>
+<td><p>[verified] (comment text); equivalence …</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch06-method-md">
+<h2>ch06_method.md<a class="headerlink" href="#ch06-method-md" title="Link to this heading">¶</a></h2>
+<p>3,369 words, 10 distinct claim ids. Sections: Chapter 6: Method (draft); 6.1 What the simulator is for; 6.2 Data flow; 6.3 The label queue and the delay rule; 6.4 Budget and selection; 6.5 Retraining and the training pool; 6.6 Runs, determinism and resumption; 6.7 Limits stated before results; 6.8 The E1 comparator; 6.9 Threats to validity of the instrument; 6.10 The grid, its ledger and the statistics; 6.11 The conformal layer and selection; 6.12 Drift monitors and monitor-triggered retraining</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>E-13</p></td>
+<td><p>Label-influence diagnostic, LAMDA (periodic every 3 slots, d = 0, random selection, weigh…</p></td>
+<td><p>LR 0.88% / 2.11% (16,451 / 39,449 of 1,872,651 rows); LightGBM 0.71% …</p></td>
+<td><p>[measured] (counts decision changes onl…</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-15</p></td>
+<td><p>Changed decisions by true class at 5% of the slot (E-13, E-14 runs) and the spread over w…</p></td>
+<td><p>LAMDA: malware rows 7.70% (LR) and 4.40% (LightGBM) against benign ro…</p></td>
+<td><p>[measured] (no noise floor or placebo a…</p></td>
+</tr>
+<tr class="row-even"><td><p>P-02</p></td>
+<td><p>Rolling windows (nT, nE, stride)</p></td>
+<td><p>LAMDA 4, 12, 3; BODMAS 3, 6, 2</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-05</p></td>
+<td><p>Budget as a percentage of the evaluated slot after C3, count floor(pct/100 * n + 1/2); gr…</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-12</p></td>
+<td><p>Known limits written before the results: BODMAS one useful refit per window and periodic …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-15</p></td>
+<td><p>The E2 grid expands to 27 runs per dataset: 16 periodic cells (4 delays x 4 budgets, seed…</p></td>
+<td><p>27 per dataset, 54 in all</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-16</p></td>
+<td><p>Retrain events of the periodic policy: before evaluation slots 3, 6, 9, … counted from …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-17</p></td>
+<td><p>E4 design registered before any E4 result (addendum v3, tag prereg-v3 on 1d302ea, 20 Oct …</p></td>
+<td><p>alpha 0.01 per slot for every monitor; 500 rows per side (MMD 200); K…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>S-01</p></td>
+<td><p>Queue rule under test: a label queried in slot t is usable from slot t+1+d, released exac…</p></td>
+<td><p>d in {0, 1, 2, 3}, parametrised and 150 property-based scenarios; 21 …</p></td>
+<td><p>[measured] (code-behaviour check, not e…</p></td>
+</tr>
+<tr class="row-odd"><td><p>S-05</p></td>
+<td><p>Determinism and resume: same config and seed give identical predictions; a run killed aft…</p></td>
+<td><p>predictions sha256 equal; 0 duplicate (seed, window, slot, row, model…</p></td>
+<td><p>[measured] (code-behaviour check)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch07-experiments-md">
+<h2>ch07_experiments.md<a class="headerlink" href="#ch07-experiments-md" title="Link to this heading">¶</a></h2>
+<p>5,150 words, 50 distinct claim ids. Sections: Chapter 7: Experiments and results (draft); 7.1 What was run; 7.2 E0 and E1: the time-aware baseline and the random-split gap (RQ1); 7.3 E2: label delay and analyst budget (RQ2); 7.4 What E2 does not show; 7.5 E3: selection under delay (RQ3); 7.6 E4: drift monitors and retraining (RQ4); 7.7 An exploratory reading of “lifetime” from the stored E2 curves</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>E-02</p></td>
+<td><p>BODMAS headline, ADR-0005 windows (6), 10%, five seeds: A-AUT(F1) mean ± std over windows…</p></td>
+<td><p>LR 0.912 ± 0.018; 0.940; 0.028; 0.000 to 0.057; 0.014 to 0.038. Light…</p></td>
+<td><p>[measured] (windows overlap: descriptiv…</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-03</p></td>
+<td><p>LAMDA headline, ADR-0005 windows (16), 10%, five seeds (same columns as E-02)</p></td>
+<td><p>LR 0.678 ± 0.058; 0.831; 0.152; 0.041 to 0.244; 0.100 to 0.175. Light…</p></td>
+<td><p>[measured] (windows overlap: descriptiv…</p></td>
+</tr>
+<tr class="row-even"><td><p>E-09</p></td>
+<td><p>Real-data leakage canary (nearest-centroid, ADR-0005 windows)</p></td>
+<td><p>LAMDA, 4 windows: AUT 0.446 (true timestamps), 0.632 (shuffled), rand…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-12</p></td>
+<td><p>Context numbers for the E0 report</p></td>
+<td><p>BODMAS evaluates 20 distinct two-week slots (about nine months, two s…</p></td>
+<td><p>slot count [verified]; pooling effect […</p></td>
+</tr>
+<tr class="row-even"><td><p>E-16</p></td>
+<td><p>E1 time-aware series reproduces E0’s A-AUT (same windows, five seeds, never retrained)</p></td>
+<td><p>LAMDA LR 0.6785 (E0 0.678), LightGBM 0.7599 (0.760); BODMAS LR 0.9122…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-18</p></td>
+<td><p>Ratio actually reached by each series in E-17, and the gap on cells where both series rea…</p></td>
+<td><p>LAMDA: mean achieved ratio 0.084 (time-aware) and 0.075 (random split…</p></td>
+<td><p>[measured] (per-slot F1 differences, no…</p></td>
+</tr>
+<tr class="row-even"><td><p>E-19</p></td>
+<td><p>Why E0’s gap and E-17’s differ, from the E1 run (same fitted comparator model): E0-style …</p></td>
+<td><p>LAMDA LR: E0-style gap 0.152; random-split F1 pooled over evaluation …</p></td>
+<td><p>[measured]; the part due to held-out tr…</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-22</p></td>
+<td><p>Leakage canary re-run with the final analysis and simulator code, same windows as Phase 4…</p></td>
+<td><p>LAMDA, 4 windows: AUT 0.446 (true timestamps), 0.632 (shuffled), rand…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-26</p></td>
+<td><p>E2 grid completeness (planned against completed against failed)</p></td>
+<td><p>BODMAS: 27 of 27 cells complete, 0 failed, code version(s) [‘c26aa5f’…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-27</p></td>
+<td><p>E2 BODMAS A-AUT(F1) per arm, five seeds, ADR-0005 windows (6 windows): mean over windows,…</p></td>
+<td><p>lr never 0.912 (sd 0.018); lr periodic d=0 B=0.5% 0.912 (sd 0.019; 13…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-28</p></td>
+<td><p>E2 LAMDA A-AUT(F1) per arm, five seeds, ADR-0005 windows (16 windows): mean over windows,…</p></td>
+<td><p>lr never 0.679 (sd 0.058); lr periodic d=0 B=0.5% 0.682 (sd 0.058; 21…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-29</p></td>
+<td><p>E2 BODMAS, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT dif…</p></td>
+<td><p>lr C-D1 0.0010 [-0.0001, 0.0023] equivalent = 0.0003 [-0.0000, 0.0008…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-30</p></td>
+<td><p>E2 LAMDA, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT diff…</p></td>
+<td><p>lr C-D1 0.0032 [-0.0011, 0.0077] equivalent = 0.0011 [-0.0004, 0.0026…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-31</p></td>
+<td><p>E2 supporting check: seed-level Wilcoxon signed-rank p (10 paired seeds, floor 0.00195) a…</p></td>
+<td><p>bodmas lr: p C-D1 0.1309, C-D2 0.0020, C-P 0.0020, C-B 0.0020; Holm C…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-32</p></td>
+<td><p>E2 the same four contrasts on seeds 0 to 4 only (nested in the 10-seed set, so not a repl…</p></td>
+<td><p>bodmas lr: C-D1 0.0011 [-0.0003, 0.0028] equivalent, C-D2 0.0030 [0.0…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-33</p></td>
+<td><p>E2 OLS slope of A-AUT over delay 0 to 3 at each budget (five seeds), as AUT lost per slot…</p></td>
+<td><p>bodmas lr: AUT lost per slot of delay (positive = falls) B=0.5% 0.000…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-34</p></td>
+<td><p>E2 budget response at delay 0, 10 seeds: AUT gained per 100 extra labels per slot between…</p></td>
+<td><p>bodmas lr: 0.5-&gt;1 0.0054 [0.0007, 0.0100], 1-&gt;2 0.0014 [-0.0031, 0.00…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-35</p></td>
+<td><p>RQ1 as registered (prereg-v1): gap between random-split F1 and time-aware AUT, mean over …</p></td>
+<td><p>lamda lgbm per-slot matched 0.0403 [0.0240, 0.0481] point at or above…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-36</p></td>
+<td><p>E2 secondary check at Chow’s window stride (seeds 0 to 4): C-D1, C-D2 and C-P</p></td>
+<td><p>bodmas lr (4 windows): C-D1 0.0008 [-0.0009, 0.0025] equivalent, C-D2…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-37</p></td>
+<td><p>E2 absolute label counts and pool facts (LR, five seeds)</p></td>
+<td><p>bodmas: at B=5%, d=0 140.7 labels queried per slot, 844 per window, 7…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-38</p></td>
+<td><p>E2 drop events (fall of at least 0.05 below the trailing 3-slot mean) and recovery (F1 ba…</p></td>
+<td><p>bodmas lr: drop events per window-seed series never 0.27 (recovered 0…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-40</p></td>
+<td><p>E3 grid completeness (planned against complete against failed) and equal labels spent</p></td>
+<td><p>bodmas: 28 complete, 0 planned and not run, 0 failed; lamda: 28 compl…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-41</p></td>
+<td><p>E3 BODMAS, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 se…</p></td>
+<td><p>bodmas lr uncertainty B=1%: 0.0030 [0.0000, 0.0035] detected_within_m…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-42</p></td>
+<td><p>E3 LAMDA, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 see…</p></td>
+<td><p>lamda lr uncertainty B=1%: 0.0118 [0.0043, 0.0178] detected, 43.6 lab…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-43</p></td>
+<td><p>E3 lamda, per-delay advantage adv_S(d,B) of the selector over random at equal labels spen…</p></td>
+<td><p>lamda lr uncertainty B=1% d=0: 0.0145 [0.0071, 0.0173] detected; lamd…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-44</p></td>
+<td><p>E3 bodmas, per-delay advantage adv_S(d,B) of the selector over random at equal labels spe…</p></td>
+<td><p>bodmas lr uncertainty B=1% d=0: 0.0030 [0.0000, 0.0035] detected_with…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-45</p></td>
+<td><p>E3 reserved-slice ablation at d=0, B=2%, credibility selection, seeds 0 to 4: A-AUT advan…</p></td>
+<td><p>lamda lgbm reserved share 0 (trap): advantage -0.0117 [-0.0136, -0.00…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-46</p></td>
+<td><p>E3 nonconformity-score comparison at d=0, B=2%, credibility selection, reserved share 0.2…</p></td>
+<td><p>lamda lgbm probability: A-AUT 0.7806, set coverage 0.8801, mean set s…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-47</p></td>
+<td><p>E3 selection arms at d=0, B=2%, reserved share 0.20, probability score, seeds 0 to 4: cla…</p></td>
+<td><p>lamda lr credibility: arrived malware share 0.193, set coverage 0.898…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-48</p></td>
+<td><p>E4 grid completeness, resources and registration order; every cell ran at code version 1d…</p></td>
+<td><p>bodmas: 38 of 38 complete, 0 failed, peak memory 1.29 GB, longest fit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-49</p></td>
+<td><p>E4 periodic cells reproduce the stored E3 random-arm predictions exactly (same prediction…</p></td>
+<td><p>8 of 8 pairs match</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-50</p></td>
+<td><p>E4 lamda, A-AUT per arm (seeds 0-9, 16 windows, mean over windows) with mean actual refit…</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.7595, 4.31 refits per window; lg…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-51</p></td>
+<td><p>E4 bodmas, A-AUT per arm (seeds 0-9, 6 windows, mean over windows) with mean actual refit…</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.9695, 2.00 refits per window; lg…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-58</p></td>
+<td><p>E4, retrain events that found no newly arrived label (logged no-ops, not refits) per wind…</p></td>
+<td><p>lamda lgbm monitor-domain_clf d=3: 1.62; lamda lgbm monitor-ks d=3: 0…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-59</p></td>
+<td><p>Supersedes E-52 (stats review E4 applied). E4 lamda, registered contrast M-P = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0026 [-0.0050, -0.0003] reversed_within_margin, refit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-60</p></td>
+<td><p>Supersedes E-53 (stats review E4 applied). E4 bodmas, registered contrast M-P = monitor-t…</p></td>
+<td><p>lgbm ks d=0: 0.0003 [-0.0008, 0.0014] equivalent, refits per window 1…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-61</p></td>
+<td><p>Supersedes E-54 (stats review E4 applied). E4 lamda, registered contrast M-C = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0009, 0.0014] equivalent, refits per window …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-62</p></td>
+<td><p>Supersedes E-55 (stats review E4 applied). E4 bodmas, registered contrast M-C = monitor-t…</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0003, 0.0002] equivalent, refits per window …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-63</p></td>
+<td><p>Supersedes E-56 (stats review E4 applied). E4 monitor quality observing the never arm (pr…</p></td>
+<td><p>lamda lgbm ks: alarm rate 0.617, precision 0.462 [0.354, 0.546] (alwa…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-64</p></td>
+<td><p>Supersedes E-57 (stats review E4 applied). E4 monitor quality inside each monitor-trigger…</p></td>
+<td><p>lamda lgbm ks d=0: alarm rate 0.242, precision 0.573 [0.353, 0.663] (…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-66</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table (no experiment ru…</p></td>
+<td><p>bodmas lgbm: Pearson r 0.49 over 20 slots, 0.00 of slots below the ta…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-68</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table `reports/tables/e…</p></td>
+<td><p>LAMDA, never retrained: LightGBM 0.783 at slot 1, 0.770 at slot 12, f…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-02</p></td>
+<td><p>Rolling windows (nT, nE, stride)</p></td>
+<td><p>LAMDA 4, 12, 3; BODMAS 3, 6, 2</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-03</p></td>
+<td><p>Fixed decision threshold</p></td>
+<td><p>0.5, malware when P &gt; 0.5</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-10</p></td>
+<td><p>Decision rule and equivalence margin</p></td>
+<td><p>detected when the 95% interval excludes 0 in the hypothesised directi…</p></td>
+<td><p>[estimate] margin and band</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-11</p></td>
+<td><p>Smallest two-sided exact Wilcoxon p-value with n paired seeds</p></td>
+<td><p>0.0625 for 5 pairs; 2/1024 = 0.00195 for 10 pairs</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-12</p></td>
+<td><p>Known limits written before the results: BODMAS one useful refit per window and periodic …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-14</p></td>
+<td><p>The per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA</p></td>
+<td><p>mean achieved ratio 0.075 against 0.084 (E-18)</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-17</p></td>
+<td><p>E4 design registered before any E4 result (addendum v3, tag prereg-v3 on 1d302ea, 20 Oct …</p></td>
+<td><p>alpha 0.01 per slot for every monitor; 500 rows per side (MMD 200); K…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-18</p></td>
+<td><p>Smallest Holm-adjusted Wilcoxon p in an E4 family: 32 contrasts, 10 paired seeds, smalles…</p></td>
+<td><p>0.0625</p></td>
+<td><p>[verified]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch08-discussion-md">
+<h2>ch08_discussion.md<a class="headerlink" href="#ch08-discussion-md" title="Link to this heading">¶</a></h2>
+<p>3,819 words, 47 distinct claim ids. Sections: Chapter 8: Discussion and limitations (partial draft); 8.1 What was measured; 8.2 What the results do not show; 8.3 Threats to validity; 8.4 Ethics and scope; 8.5 Status of the tiers; 8.6 Future work; 8.7 Open items</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-03</p></td>
+<td><p>LAMDA slotting timestamp</p></td>
+<td><p>AndroZoo <code class="docutils literal notranslate"><span class="pre">added</span></code> (seconds) for 100% of rows; <code class="docutils literal notranslate"><span class="pre">year_month</span></code> equals its …</p></td>
+<td><p>[measured]; the meaning of <code class="docutils literal notranslate"><span class="pre">added</span></code> is s…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-15</p></td>
+<td><p>LAMDA label rule: an app with vt_detection 0 is benign, one with vt_detection of 4 or mor…</p></td>
+<td><p>rule holds for every row of the cache (0 conflicts)</p></td>
+<td><p>[verified] against the paper; conflict …</p></td>
+</tr>
+<tr class="row-even"><td><p>D-16</p></td>
+<td><p>LAMDA labels are AV-centric (the dataset card says they are “biased toward highly detecte…</p></td>
+<td><p>stated limitation</p></td>
+<td><p>[verified] against the dataset card</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-17</p></td>
+<td><p>BODMAS: the project page and the repository README do not describe how the labels were pr…</p></td>
+<td><p>superseded by D-18</p></td>
+<td><p>[verify]</p></td>
+</tr>
+<tr class="row-even"><td><p>D-18</p></td>
+<td><p>BODMAS label provenance, read in the paper (Yang, Ciptadi, Laziuk, Ahmadzadeh, Wang, IEEE…</p></td>
+<td><p>see claim</p></td>
+<td><p>[verified] (what the paper says); [veri…</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-19</p></td>
+<td><p>LAMDA timestamp provenance, read on 8 Nov 2026: the dataset card (huggingface.co/datasets…</p></td>
+<td><p>see claim</p></td>
+<td><p>[verified] (what the pages say, read th…</p></td>
+</tr>
+<tr class="row-even"><td><p>E-08</p></td>
+<td><p>Operating point and prevalence (10%, ADR-0005 windows)</p></td>
+<td><p>Mean FPR / FNR: LAMDA LR 0.036 / 0.291, LightGBM 0.020 / 0.269; BODMA…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-10</p></td>
+<td><p>Evaluated rows repeating a feature vector of their training window (rolling, LR, seed 0, …</p></td>
+<td><p>BODMAS 0 of 101,247; LAMDA 52,985 of 838,012 (6.3%)</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-18</p></td>
+<td><p>Ratio actually reached by each series in E-17, and the gap on cells where both series rea…</p></td>
+<td><p>LAMDA: mean achieved ratio 0.084 (time-aware) and 0.075 (random split…</p></td>
+<td><p>[measured] (per-slot F1 differences, no…</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-19</p></td>
+<td><p>Why E0’s gap and E-17’s differ, from the E1 run (same fitted comparator model): E0-style …</p></td>
+<td><p>LAMDA LR: E0-style gap 0.152; random-split F1 pooled over evaluation …</p></td>
+<td><p>[measured]; the part due to held-out tr…</p></td>
+</tr>
+<tr class="row-even"><td><p>E-24</p></td>
+<td><p>Clean-clone reproduction of Table 1 on BODMAS (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">reproduce</span> <span class="pre">table1</span></code>): fresh clon…</p></td>
+<td><p>MATCH on 8 rows: largest difference in the time-aware columns 0.0000 …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-26</p></td>
+<td><p>E2 grid completeness (planned against completed against failed)</p></td>
+<td><p>BODMAS: 27 of 27 cells complete, 0 failed, code version(s) [‘c26aa5f’…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-28</p></td>
+<td><p>E2 LAMDA A-AUT(F1) per arm, five seeds, ADR-0005 windows (16 windows): mean over windows,…</p></td>
+<td><p>lr never 0.679 (sd 0.058); lr periodic d=0 B=0.5% 0.682 (sd 0.058; 21…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-29</p></td>
+<td><p>E2 BODMAS, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT dif…</p></td>
+<td><p>lr C-D1 0.0010 [-0.0001, 0.0023] equivalent = 0.0003 [-0.0000, 0.0008…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-30</p></td>
+<td><p>E2 LAMDA, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT diff…</p></td>
+<td><p>lr C-D1 0.0032 [-0.0011, 0.0077] equivalent = 0.0011 [-0.0004, 0.0026…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-34</p></td>
+<td><p>E2 budget response at delay 0, 10 seeds: AUT gained per 100 extra labels per slot between…</p></td>
+<td><p>bodmas lr: 0.5-&gt;1 0.0054 [0.0007, 0.0100], 1-&gt;2 0.0014 [-0.0031, 0.00…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-35</p></td>
+<td><p>RQ1 as registered (prereg-v1): gap between random-split F1 and time-aware AUT, mean over …</p></td>
+<td><p>lamda lgbm per-slot matched 0.0403 [0.0240, 0.0481] point at or above…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-40</p></td>
+<td><p>E3 grid completeness (planned against complete against failed) and equal labels spent</p></td>
+<td><p>bodmas: 28 complete, 0 planned and not run, 0 failed; lamda: 28 compl…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-41</p></td>
+<td><p>E3 BODMAS, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 se…</p></td>
+<td><p>bodmas lr uncertainty B=1%: 0.0030 [0.0000, 0.0035] detected_within_m…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-42</p></td>
+<td><p>E3 LAMDA, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 see…</p></td>
+<td><p>lamda lr uncertainty B=1%: 0.0118 [0.0043, 0.0178] detected, 43.6 lab…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-43</p></td>
+<td><p>E3 lamda, per-delay advantage adv_S(d,B) of the selector over random at equal labels spen…</p></td>
+<td><p>lamda lr uncertainty B=1% d=0: 0.0145 [0.0071, 0.0173] detected; lamd…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-45</p></td>
+<td><p>E3 reserved-slice ablation at d=0, B=2%, credibility selection, seeds 0 to 4: A-AUT advan…</p></td>
+<td><p>lamda lgbm reserved share 0 (trap): advantage -0.0117 [-0.0136, -0.00…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-47</p></td>
+<td><p>E3 selection arms at d=0, B=2%, reserved share 0.20, probability score, seeds 0 to 4: cla…</p></td>
+<td><p>lamda lr credibility: arrived malware share 0.193, set coverage 0.898…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-48</p></td>
+<td><p>E4 grid completeness, resources and registration order; every cell ran at code version 1d…</p></td>
+<td><p>bodmas: 38 of 38 complete, 0 failed, peak memory 1.29 GB, longest fit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-50</p></td>
+<td><p>E4 lamda, A-AUT per arm (seeds 0-9, 16 windows, mean over windows) with mean actual refit…</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.7595, 4.31 refits per window; lg…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-51</p></td>
+<td><p>E4 bodmas, A-AUT per arm (seeds 0-9, 6 windows, mean over windows) with mean actual refit…</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.9695, 2.00 refits per window; lg…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-59</p></td>
+<td><p>Supersedes E-52 (stats review E4 applied). E4 lamda, registered contrast M-P = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0026 [-0.0050, -0.0003] reversed_within_margin, refit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-60</p></td>
+<td><p>Supersedes E-53 (stats review E4 applied). E4 bodmas, registered contrast M-P = monitor-t…</p></td>
+<td><p>lgbm ks d=0: 0.0003 [-0.0008, 0.0014] equivalent, refits per window 1…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-61</p></td>
+<td><p>Supersedes E-54 (stats review E4 applied). E4 lamda, registered contrast M-C = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0009, 0.0014] equivalent, refits per window …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-63</p></td>
+<td><p>Supersedes E-56 (stats review E4 applied). E4 monitor quality observing the never arm (pr…</p></td>
+<td><p>lamda lgbm ks: alarm rate 0.617, precision 0.462 [0.354, 0.546] (alwa…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-66</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table (no experiment ru…</p></td>
+<td><p>bodmas lgbm: Pearson r 0.49 over 20 slots, 0.00 of slots below the ta…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-69</p></td>
+<td><p>Hash manifest of the stored predictions of E0 to E4 and a private archive of the same fil…</p></td>
+<td><p>577 files, 7.20 GiB; every SHA-256 in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code>…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-88</p></td>
+<td><p>Independent AI review of the paper, chapters 7 to 9 and the README against this ledger, 8…</p></td>
+<td><p>0 blockers, 7 major and 16 minor findings. Major, all fixed: E3 and E…</p></td>
+<td><p>[measured] (counts of findings); the re…</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-12</p></td>
+<td><p>Transcend: Detecting Concept Drift in Malware Classification Models (Jordaney, Sharad, Da…</p></td>
+<td><p>7 authors; pp. 625-642</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-14</p></td>
+<td><p>Transcendent (Barbero, Pendlebury, Pierazzi, Cavallaro, arXiv 2010.03856; IEEE S&amp;P 2022, …</p></td>
+<td><p>5 years; 2 evaluators</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-18</p></td>
+<td><p>Botacin and Gomes, Towards more realistic evaluations: the impact of label delays in malw…</p></td>
+<td><p>up to 75%; about 30%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-22</p></td>
+<td><p>TESSERACT extended version (Kan et al., arXiv 2402.01359; v1 2 Feb 2024, v2 9 Apr 2025): …</p></td>
+<td><p>259,230 samples; 5 years</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-33</p></td>
+<td><p>Li, Iyengar, Kundu, Bertino, Revisiting Concept Drift in Windows Malware Detection: Adapt…</p></td>
+<td><p>NDSS 2025</p></td>
+<td><p>[verified] that the paper is NDSS 2025;…</p></td>
+</tr>
+<tr class="row-even"><td><p>L-34</p></td>
+<td><p>Hierarchical bootstrap references added to the bibliography: Davison and Hinkley, Bootstr…</p></td>
+<td><p>see claim</p></td>
+<td><p>[verified] bibliographic data and the R…</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-36</p></td>
+<td><p>Kaspersky (Securelist), mobile threat report 2025, dated 4 Mar 2026: “815,735 new unique …</p></td>
+<td><p>815,735 packages</p></td>
+<td><p>[verified] at the page by summary; the …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-37</p></td>
+<td><p>AV-TEST Security Report 2019/2020: new Android malware samples in 2019 were 3,170,140, th…</p></td>
+<td><p>3,170,140; over 78 percent</p></td>
+<td><p>[verified] at the page by summary; the …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-39</p></td>
+<td><p>Final-version check of six 2026 references, 8 Nov 2026 (arXiv pages, conference programme…</p></td>
+<td><p>see claim</p></td>
+<td><p>[verified] through Crossref and the pro…</p></td>
+</tr>
+<tr class="row-even"><td><p>P-10</p></td>
+<td><p>Decision rule and equivalence margin</p></td>
+<td><p>detected when the 95% interval excludes 0 in the hypothesised directi…</p></td>
+<td><p>[estimate] margin and band</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-12</p></td>
+<td><p>Known limits written before the results: BODMAS one useful refit per window and periodic …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-13</p></td>
+<td><p>Share of scored rows whose 0.5 decision changed after retraining, at 0.5% and 5% of the s…</p></td>
+<td><p>0.2% to 2.1% across datasets and models (E-13 and E-14 give each valu…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-14</p></td>
+<td><p>The per-slot comparator reaches a lower malware ratio than the time-aware series on LAMDA</p></td>
+<td><p>mean achieved ratio 0.075 against 0.084 (E-18)</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>P-17</p></td>
+<td><p>E4 design registered before any E4 result (addendum v3, tag prereg-v3 on 1d302ea, 20 Oct …</p></td>
+<td><p>alpha 0.01 per slot for every monitor; 500 rows per side (MMD 200); K…</p></td>
+<td><p>[verified]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ch09-conclusion-md">
+<h2>ch09_conclusion.md<a class="headerlink" href="#ch09-conclusion-md" title="Link to this heading">¶</a></h2>
+<p>1,360 words, 28 distinct claim ids. Sections: Chapter 9: Conclusion and future work (draft); 9.1 What was done; 9.2 What was found; 9.3 What the study contributes; 9.4 Limits that apply to every finding; 9.5 Future work; 9.6 Reproducibility and release status</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>id</p></th>
+<th class="head"><p>row (first words)</p></th>
+<th class="head"><p>result (first words)</p></th>
+<th class="head"><p>tag</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D-15</p></td>
+<td><p>LAMDA label rule: an app with vt_detection 0 is benign, one with vt_detection of 4 or mor…</p></td>
+<td><p>rule holds for every row of the cache (0 conflicts)</p></td>
+<td><p>[verified] against the paper; conflict …</p></td>
+</tr>
+<tr class="row-odd"><td><p>D-16</p></td>
+<td><p>LAMDA labels are AV-centric (the dataset card says they are “biased toward highly detecte…</p></td>
+<td><p>stated limitation</p></td>
+<td><p>[verified] against the dataset card</p></td>
+</tr>
+<tr class="row-even"><td><p>E-18</p></td>
+<td><p>Ratio actually reached by each series in E-17, and the gap on cells where both series rea…</p></td>
+<td><p>LAMDA: mean achieved ratio 0.084 (time-aware) and 0.075 (random split…</p></td>
+<td><p>[measured] (per-slot F1 differences, no…</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-24</p></td>
+<td><p>Clean-clone reproduction of Table 1 on BODMAS (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">reproduce</span> <span class="pre">table1</span></code>): fresh clon…</p></td>
+<td><p>MATCH on 8 rows: largest difference in the time-aware columns 0.0000 …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-26</p></td>
+<td><p>E2 grid completeness (planned against completed against failed)</p></td>
+<td><p>BODMAS: 27 of 27 cells complete, 0 failed, code version(s) [‘c26aa5f’…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-28</p></td>
+<td><p>E2 LAMDA A-AUT(F1) per arm, five seeds, ADR-0005 windows (16 windows): mean over windows,…</p></td>
+<td><p>lr never 0.679 (sd 0.058); lr periodic d=0 B=0.5% 0.682 (sd 0.058; 21…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-29</p></td>
+<td><p>E2 BODMAS, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT dif…</p></td>
+<td><p>lr C-D1 0.0010 [-0.0001, 0.0023] equivalent = 0.0003 [-0.0000, 0.0008…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-30</p></td>
+<td><p>E2 LAMDA, registered primary contrasts (periodic, random selection), 10 seeds, A-AUT diff…</p></td>
+<td><p>lr C-D1 0.0032 [-0.0011, 0.0077] equivalent = 0.0011 [-0.0004, 0.0026…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-35</p></td>
+<td><p>RQ1 as registered (prereg-v1): gap between random-split F1 and time-aware AUT, mean over …</p></td>
+<td><p>lamda lgbm per-slot matched 0.0403 [0.0240, 0.0481] point at or above…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-40</p></td>
+<td><p>E3 grid completeness (planned against complete against failed) and equal labels spent</p></td>
+<td><p>bodmas: 28 complete, 0 planned and not run, 0 failed; lamda: 28 compl…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-42</p></td>
+<td><p>E3 LAMDA, registered primary interaction I_S(B) = adv_S(d=0,B) minus adv_S(d=3,B), 10 see…</p></td>
+<td><p>lamda lr uncertainty B=1%: 0.0118 [0.0043, 0.0178] detected, 43.6 lab…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-45</p></td>
+<td><p>E3 reserved-slice ablation at d=0, B=2%, credibility selection, seeds 0 to 4: A-AUT advan…</p></td>
+<td><p>lamda lgbm reserved share 0 (trap): advantage -0.0117 [-0.0136, -0.00…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-47</p></td>
+<td><p>E3 selection arms at d=0, B=2%, reserved share 0.20, probability score, seeds 0 to 4: cla…</p></td>
+<td><p>lamda lr credibility: arrived malware share 0.193, set coverage 0.898…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-48</p></td>
+<td><p>E4 grid completeness, resources and registration order; every cell ran at code version 1d…</p></td>
+<td><p>bodmas: 38 of 38 complete, 0 failed, peak memory 1.29 GB, longest fit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-50</p></td>
+<td><p>E4 lamda, A-AUT per arm (seeds 0-9, 16 windows, mean over windows) with mean actual refit…</p></td>
+<td><p>lgbm matched-domain_clf d=0: A-AUT 0.7595, 4.31 refits per window; lg…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-59</p></td>
+<td><p>Supersedes E-52 (stats review E4 applied). E4 lamda, registered contrast M-P = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0026 [-0.0050, -0.0003] reversed_within_margin, refit…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-60</p></td>
+<td><p>Supersedes E-53 (stats review E4 applied). E4 bodmas, registered contrast M-P = monitor-t…</p></td>
+<td><p>lgbm ks d=0: 0.0003 [-0.0008, 0.0014] equivalent, refits per window 1…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-61</p></td>
+<td><p>Supersedes E-54 (stats review E4 applied). E4 lamda, registered contrast M-C = monitor-tr…</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0009, 0.0014] equivalent, refits per window …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-62</p></td>
+<td><p>Supersedes E-55 (stats review E4 applied). E4 bodmas, registered contrast M-C = monitor-t…</p></td>
+<td><p>lgbm ks d=0: -0.0000 [-0.0003, 0.0002] equivalent, refits per window …</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-63</p></td>
+<td><p>Supersedes E-56 (stats review E4 applied). E4 monitor quality observing the never arm (pr…</p></td>
+<td><p>lamda lgbm ks: alarm rate 0.617, precision 0.462 [0.354, 0.546] (alwa…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-66</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table (no experiment ru…</p></td>
+<td><p>bodmas lgbm: Pearson r 0.49 over 20 slots, 0.00 of slots below the ta…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-68</p></td>
+<td><p>EXPLORATORY, not registered, computed from the committed per-slot table `reports/tables/e…</p></td>
+<td><p>LAMDA, never retrained: LightGBM 0.783 at slot 1, 0.770 at slot 12, f…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-even"><td><p>E-69</p></td>
+<td><p>Hash manifest of the stored predictions of E0 to E4 and a private archive of the same fil…</p></td>
+<td><p>577 files, 7.20 GiB; every SHA-256 in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code>…</p></td>
+<td><p>[measured]</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-12</p></td>
+<td><p>Transcend: Detecting Concept Drift in Malware Classification Models (Jordaney, Sharad, Da…</p></td>
+<td><p>7 authors; pp. 625-642</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-14</p></td>
+<td><p>Transcendent (Barbero, Pendlebury, Pierazzi, Cavallaro, arXiv 2010.03856; IEEE S&amp;P 2022, …</p></td>
+<td><p>5 years; 2 evaluators</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>L-18</p></td>
+<td><p>Botacin and Gomes, Towards more realistic evaluations: the impact of label delays in malw…</p></td>
+<td><p>up to 75%; about 30%</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-even"><td><p>L-30</p></td>
+<td><p>EMBER2024 (Joyce et al., arXiv 2506.05074; DOI 10.1145/3711896.3737431 per the arXiv reco…</p></td>
+<td><p>over 3.2 million files; 6 formats</p></td>
+<td><p>[verified] at abstract level; the full …</p></td>
+</tr>
+<tr class="row-odd"><td><p>P-12</p></td>
+<td><p>Known limits written before the results: BODMAS one useful refit per window and periodic …</p></td>
+<td><p>as stated</p></td>
+<td><p>[verified]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="limits-of-chapter-8-section-8-3-tick-each-one-you-consider-correct-and-complete">
+<h2>Limits of chapter 8 (section 8.3): tick each one you consider correct and complete<a class="headerlink" href="#limits-of-chapter-8-section-8-3-tick-each-one-you-consider-correct-and-complete" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>[ ] 1. Time labels.</p></li>
+<li><p>[ ] 2. Class prior.</p></li>
+<li><p>[ ] 3. Repeated feature vectors.</p></li>
+<li><p>[ ] 4. The pool design.</p></li>
+<li><p>[ ] 5. Two models.</p></li>
+<li><p>[ ] 6. E3 calibration set-up.</p></li>
+<li><p>[ ] 7. Evaluation by one metric.</p></li>
+<li><p>[ ] 8. Label noise and the VirusTotal threshold.</p></li>
+<li><p>[ ] 9. Temporal luck.</p></li>
+<li><p>[ ] 10. Simulated delay.</p></li>
+<li><p>[ ] 11. A simulated perfect analyst.</p></li>
+<li><p>[ ] 12. Dataset mix.</p></li>
+<li><p>[ ] 13. One alarm level per monitor.</p></li>
+<li><p>[ ] 14. Class prior confounds the metric.</p></li>
+<li><p>[ ] 15. What the “conformal” monitor is.</p></li>
+<li><p>[ ] 16. A seed extension decided after reading.</p></li>
+<li><p>[ ] 17. The RQ1 comparator is not stable to the last digit.</p></li>
+<li><p>[ ] 18. Predictions are not public.</p></li>
+<li><p>[ ] 19. The dynamic results are mostly LAMDA results.</p></li>
+</ul>
+</section>
+<section id="paper-paper-main-tex">
+<h2>Paper (paper/main.tex)<a class="headerlink" href="#paper-paper-main-tex" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>[ ] Introduction</p></li>
+<li><p>[ ] Background</p></li>
+<li><p>[ ] Protocol</p></li>
+<li><p>[ ] Simulator and assurance</p></li>
+<li><p>[ ] Experiments and pre-registration</p></li>
+<li><p>[ ] Results</p></li>
+<li><p>[ ] Reading the results together</p></li>
+<li><p>[ ] Threats to validity and limits</p></li>
+<li><p>[ ] Ethics and availability</p></li>
+<li><p>[ ] Conclusion</p></li>
+</ul>
+<p>Paper-specific checks: every <code class="docutils literal notranslate"><span class="pre">\clm{...}</span></code> id exists (the build check already confirms this); no sentence claims priority; the contribution statement is word for word the guide’s; the limits in the paper match chapter 8; the anonymous build (<code class="docutils literal notranslate"><span class="pre">paper/main-anon.tex</span></code>) shows no identifying text before submission.</p>
+</section>
+<section id="things-only-you-can-decide-while-reading">
+<h2>Things only you can decide while reading<a class="headerlink" href="#things-only-you-can-decide-while-reading" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Whether the AI-use wording is right for the venue (the paper draft has none; the venue may require one).</p></li>
+<li><p>Whether the effects, all of hundredths of A-AUT, deserve the emphasis the abstract gives them.</p></li>
+<li><p>Whether the null result on monitors is worded as strongly as you are willing to stand behind.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Yathindra K B (MIT licence)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Reviewer pack: reading the report and paper line by line</a><ul>
+<li><a class="reference internal" href="#how-to-read-a-chapter">How to read a chapter</a></li>
+<li><a class="reference internal" href="#sign-off-sheet">Sign-off sheet</a></li>
+<li><a class="reference internal" href="#ch00-front-matter-md">ch00_front_matter.md</a></li>
+<li><a class="reference internal" href="#ch01-introduction-md">ch01_introduction.md</a></li>
+<li><a class="reference internal" href="#ch02-landscape-md">ch02_landscape.md</a></li>
+<li><a class="reference internal" href="#ch03-analysis-md">ch03_analysis.md</a></li>
+<li><a class="reference internal" href="#ch04-latest-techniques-md">ch04_latest_techniques.md</a></li>
+<li><a class="reference internal" href="#ch05-related-work-md">ch05_related_work.md</a></li>
+<li><a class="reference internal" href="#ch06-method-md">ch06_method.md</a></li>
+<li><a class="reference internal" href="#ch07-experiments-md">ch07_experiments.md</a></li>
+<li><a class="reference internal" href="#ch08-discussion-md">ch08_discussion.md</a></li>
+<li><a class="reference internal" href="#ch09-conclusion-md">ch09_conclusion.md</a></li>
+<li><a class="reference internal" href="#limits-of-chapter-8-section-8-3-tick-each-one-you-consider-correct-and-complete">Limits of chapter 8 (section 8.3): tick each one you consider correct and complete</a></li>
+<li><a class="reference internal" href="#paper-paper-main-tex">Paper (paper/main.tex)</a></li>
+<li><a class="reference internal" href="#things-only-you-can-decide-while-reading">Things only you can decide while reading</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
