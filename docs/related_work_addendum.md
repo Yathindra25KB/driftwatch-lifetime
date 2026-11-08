@@ -62,3 +62,11 @@ Run by `scripts/arxiv_audit.py` for papers published from 2026-09-01 to 2026-10-
 **Combination check:** none of the recorded abstracts combines label delay as a parameter, a fixed analyst budget and conformal drift monitoring for malware. This is "not found in the abstracts of this month's candidates", the same limited statement as above.
 
 **Chapters that may need a change (not made here):** `report/ch05_related_work.md` (HYDRA and 2609.24280 as Android and Windows PE neighbours; 2610.05352 for delayed labels in streams). The researcher decides.
+
+## Audit 2026-11-01 (GitHub issue 5)
+
+Run by the monthly workflow for papers published from 2026-10-01 to 2026-11-01 in cs.CR and cs.LG (candidate list in the issue and in `reports/arxiv_audit/2026-11-01.md`). 18 candidates matched the keyword filter. All 18 abstracts were read from the arXiv abstract pages on 2026-11-08 (no full paper was read). **0 added, 18 read.** One (*Rethinking Tabular Foundation Models On Data Streams*, 2610.05352) is already recorded above; 17 are keyword matches from unrelated fields (brain imaging, sleep scoring, robot navigation, ECG authentication, flutter physics, radiology, time-series forecasting, email and prompt-injection screening, network traffic agents, adversarial query search, IoT poisoning, model-weight sanitisation). Only one concerns malware at all (*GrayShield*, 2610.04319, which sanitises malware payloads hidden in model weights and has no delay, budget or monitor component).
+
+**Combination check:** none of the 18 abstracts combines label delay as a parameter, a fixed analyst budget and conformal drift monitoring for malware. The nearest are 2610.05352 (delayed labels in streams, not malware) and 2610.05810 (drift detectors on IoT streams under poisoning, not malware, no label budget). This is "not found in the abstracts of this month's candidates", the same limited statement as above.
+
+**Chapters that may need a change (not made here):** none.
