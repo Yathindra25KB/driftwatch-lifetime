@@ -15,13 +15,13 @@ The items below were re-checked on 8 Nov 2026 against primary sources (evidence 
 | TIF | Published: IEEE Transactions on Software Engineering vol. 52 no. 8, pp. 2463 to 2474, DOI 10.1109/TSE.2026.3698484 |
 | Botacin and Gomes | Computers & Security vol. 148, article 104122, DOI 10.1016/j.cose.2024.104122 (Crossref) |
 | BODMAS labelling | Read in the paper, Section III: families from multi-vendor antivirus verdicts with in-house scripts (about 1% manual), first-seen time from VirusTotal reports; how the binary label was decided is not stated [CLAIMS D-18] |
-| Two-stage (cluster) bootstrap | Davison and Hinkley (1997) and Ren et al. (2010) added to the bibliography [L-34] |
 | AndroZoo | Allix et al., MSR 2016, DOI 10.1145/2901739.2903508 (Crossref). AndroZoo is not used by this study |
 
 ## Still open
 
 | Item | What is missing |
 |---|---|
+| Two-stage (cluster) bootstrap | Davison and Hinkley (1997) and Ren et al. (2010) are in the bibliography [L-34]; the book's section 3.8 was not read, so the statement that resampling both stages widens the interval stays unconfirmed |
 | "Li et al. (NDSS 2025)" | Venue confirmed [L-33]. Whether `li2024revisiting` is the paper meant by plan Table G.1 can only be answered by the researcher, who has the plan |
 | Venue versions of SEED, FIRCE, Cerqueira et al., Minnei et al., EMA and LAMDA | SEED: no venue on arXiv. FIRCE (IEEE SmartNets 2026), Cerqueira et al. (KDD 2026) and EMA (SIGCOMM 2026) are "accepted" only according to arXiv comments; no proceedings entry was found. Minnei et al. is "submitted" only. LAMDA is an ICLR 2026 poster with no page range or DOI. The bibliography cites the preprints and says so |
 

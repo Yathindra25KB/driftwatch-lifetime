@@ -13,7 +13,7 @@ This is a checklist for turning the report into a paper. **No paper exists yet.*
 | ACSAC, AISec, RAID (2027 editions) | Unconfirmed: no 2027 call found | Unconfirmed (ACSAC 2026: 11 pages plus appendix; AISec 2026: 10 pages plus 2) | acsac.org, aisec.cc |
 | Computers & Security (journal) | None (journal) | Unconfirmed: the author guide could not be read. The journal has published two closely related papers (Botacin and Gomes; ActDroid) | sciencedirect.com |
 
-The capstone deadline is about 10 Dec 2026, and the report plus the repository are the hand-in. A paper for the first two rows would have to be written, rewritten by the researcher and checked within days, so the checklist treats them as options for the researcher, not as a plan.
+The capstone deadline is about 10 Dec 2026 [verify] (researcher, 21 Oct 2026, exact date to confirm; docs/PHASES.md), and the report plus the repository are the hand-in. A paper for the first two rows would have to be written, rewritten by the researcher and checked within days, so the checklist treats them as options for the researcher, not as a plan.
 
 ## Before any submission
 
