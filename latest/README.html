@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Getting started" href="docs/getting-started.html"><link rel="prev" title="DriftWatch" href="docs/index.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
-        <title>DriftWatch - DriftWatch 0.1.0</title>
+        <title>DriftWatch - DriftWatch 0.1.1</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+      <a href="docs/index.html"><div class="brand">DriftWatch 0.1.1</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="docs/index.html">
   
-  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  <span class="sidebar-brand-text">DriftWatch 0.1.1</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -374,7 +374,7 @@
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading">¶</a></h2>
 <p>Python <code class="docutils literal notranslate"><span class="pre">3.12</span></code> is required.</p>
-<p><strong>Not yet published to PyPI</strong> (the release is pending, <code class="docutils literal notranslate"><span class="pre">docs/RELEASING.md</span></code>). Until it is, build the wheel from a clone (<code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">build</span></code>) and install that: <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">dist/driftwatch_lifetime-0.1.0-py3-none-any.whl</span></code>. A locally built wheel ran the smoke experiment from an empty folder with no clone and no data [E-70]. After the release, this works:</p>
+<p>The package is on PyPI (first upload, 0.1.0, on 29 Oct 2026 through Trusted Publishing from a signed tag; 0.1.1 changes documentation and metadata only) and installs and runs the smoke experiment from an empty folder with no clone and no data [E-80, E-81]. To work on the code or reproduce the tables, use a clone (next section).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>driftwatch-lifetime<span class="w">        </span><span class="c1"># or: uv tool install driftwatch-lifetime</span>
 driftwatch<span class="w"> </span>--version
 driftwatch<span class="w"> </span>smoke<span class="w">                       </span><span class="c1"># no data and no clone needed; ends with a line starting MATCH</span>
@@ -493,7 +493,7 @@ uv<span class="w"> </span>run<span class="w"> </span>driftwatch<span class="w"> 
 <section id="licence-citation-and-acknowledgements">
 <h2>Licence, citation and acknowledgements<a class="headerlink" href="#licence-citation-and-acknowledgements" title="Link to this heading">¶</a></h2>
 <p>Code: MIT (<code class="docutils literal notranslate"><span class="pre">LICENSE</span></code>). Datasets keep their own licences and are never redistributed (<code class="docutils literal notranslate"><span class="pre">docs/ETHICS.md</span></code>, <code class="docutils literal notranslate"><span class="pre">docs/licence_audit.md</span></code>). The wheel and the repository contain no dataset content other than the synthetic fixture.</p>
-<p>To cite the software, use <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code> (GitHub shows a “Cite this repository” button); each release is meant to get a DOI from Zenodo (none exists yet; it is added here when it does). Until then:</p>
+<p>To cite the software, use <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code> (GitHub shows a “Cite this repository” button); each release is meant to get a DOI from Zenodo (none has been minted yet: the GitHub release v0.1.0 is still a draft, and a DOI is created only when it is published; the DOI is added here then). Until then:</p>
 <div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@software</span><span class="p">{</span><span class="nl">kb_driftwatch</span><span class="p">,</span>
 <span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{K B, Yathindra}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring}</span><span class="p">,</span>
@@ -583,7 +583,7 @@ uv<span class="w"> </span>run<span class="w"> </span>driftwatch<span class="w"> 
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=01f34227"></script>
+</div><script src="_static/documentation_options.js?v=a58bc63e"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

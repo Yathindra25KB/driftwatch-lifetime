@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="API reference" href="docs/reference.html"><link rel="prev" title="Roadmap" href="docs/ROADMAP.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
-        <title>Changelog - DriftWatch 0.1.0</title>
+        <title>Changelog - DriftWatch 0.1.1</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="docs/index.html"><div class="brand">DriftWatch 0.1.0</div></a>
+      <a href="docs/index.html"><div class="brand">DriftWatch 0.1.1</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="docs/index.html">
   
-  <span class="sidebar-brand-text">DriftWatch 0.1.0</span>
+  <span class="sidebar-brand-text">DriftWatch 0.1.1</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -318,10 +318,23 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <p>All notable changes to <code class="docutils literal notranslate"><span class="pre">driftwatch-lifetime</span></code> are recorded here. The format follows <a class="reference external" href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and versions follow <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>. Before 1.0.0, a minor version may change the command-line interface or the Python API. Any change that alters a reported number is listed under <strong>Results</strong> with its CLAIMS id.</p>
 <section id="unreleased">
-<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/compare/v0.1.0...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Link to this heading">¶</a></h2>
+<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/compare/v0.1.1...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Link to this heading">¶</a></h2>
 </section>
 <section id="id1">
-<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.0">0.1.0</a> - 2026-10-29<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.1">0.1.1</a> - 2026-11-08<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>Documentation, evidence and metadata only. The <code class="docutils literal notranslate"><span class="pre">src/</span></code> tree and every reported number are the same as in 0.1.0 (CLAIMS E-82); this release exists so that the archived snapshot (Zenodo) is the corrected text.</p>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Report:</strong> the inline draft markers are gone. What a source check could settle was settled (BODMAS label provenance read in the paper, CLAIMS D-18; hierarchical-bootstrap references, L-34; venue and version checks, L-35); what only a person can settle is listed in chapter 8, section 8.7. Statements the evidence does not support were narrowed (the bootstrap sentence in chapter 3, the status lines of chapters 1 and 7).</p></li>
+<li><p><strong>README:</strong> the install section now describes the PyPI release; the limits name the review status of the report.</p></li>
+<li><p><strong>Docs:</strong> <code class="docutils literal notranslate"><span class="pre">docs/submission_checklist.md</span></code> (venues read on their own pages, with unconfirmed items marked), the live release record (CLAIMS E-80 to E-82), a corrected docs build command, narrower link-check ignores.</p></li>
+<li><p><strong>Tests:</strong> a pandas <code class="docutils literal notranslate"><span class="pre">join</span></code> call in <code class="docutils literal notranslate"><span class="pre">tests/test_runner_e0.py</span></code> no longer warns.</p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.0">0.1.0</a> - 2026-10-29<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
 <p>Initial public release. It contains the whole study as run for the capstone report. Every number the README and the report chapters report has a row in <code class="docutils literal notranslate"><span class="pre">docs/CLAIMS.md</span></code> with a source file and a commit. Rows that cite files under <code class="docutils literal notranslate"><span class="pre">results/</span></code> can be regenerated only from the stored predictions, which are not in the repository (they are hashed in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code> and archived privately, E-69). A few rows are marked <code class="docutils literal notranslate"><span class="pre">[verify]</span></code> where the source could not be read (for example how BODMAS’s labels were produced, D-17).</p>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
@@ -413,7 +426,11 @@
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
 <li><a class="reference internal" href="#unreleased">Unreleased</a></li>
-<li><a class="reference internal" href="#id1">0.1.0 - 2026-10-29</a><ul>
+<li><a class="reference internal" href="#id1">0.1.1 - 2026-11-08</a><ul>
+<li><a class="reference internal" href="#changed">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">0.1.0 - 2026-10-29</a><ul>
 <li><a class="reference internal" href="#added">Added</a></li>
 <li><a class="reference internal" href="#results">Results</a></li>
 <li><a class="reference internal" href="#not-included">Not included</a></li>
@@ -430,7 +447,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=01f34227"></script>
+</div><script src="_static/documentation_options.js?v=a58bc63e"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
