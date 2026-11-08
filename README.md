@@ -5,7 +5,7 @@
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/driftwatch-lifetime.svg)](https://pypi.org/project/driftwatch-lifetime/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24050864.svg)](https://doi.org/10.5281/zenodo.24050864)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pyproject.toml)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pyproject.toml) <!-- DOI, PyPI and Python version: CLAIMS E-83, E-80 -->
 
 **Status (8 Nov 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
 
