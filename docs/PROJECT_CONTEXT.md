@@ -75,11 +75,11 @@ PyPI uses Trusted Publishing from `release.yml` (environments `testpypi` and `py
 
 ## 12. Quality evidence on 8 Nov 2026
 
-1,056 fast tests and 142 slow tests pass; ruff clean; guardrail demonstration 45 of 45; claims audit PASS; bibliography 36 of 36 resolved; strict docs build and link check pass in CI; secret-shaped text found in 0 of 444 revisions of the public repository; `pip-audit` on the locked environment found no known vulnerabilities; every workflow declares least-privilege permissions and pins actions by commit SHA.
+1,056 fast tests and 142 slow tests pass; ruff clean; guardrail demonstration 45 of 45; claims audit PASS; bibliography 36 of 36 resolved; strict docs build and link check pass in CI; secret-shaped text found in 0 of 444 revisions of the public repository; `pip-audit` on the locked environment found no known vulnerabilities; Dependabot alerts and security updates are enabled on the public repository (8 Nov 2026); every workflow declares least-privilege permissions and pins actions by commit SHA.
 
 ## 13. Open items that only the researcher can settle
 
-The faculty AI-disclosure wording (and each venue's policy); whether "Li et al. (NDSS 2025)" is the paper the original plan meant; a line-by-line reading and rewrite of the report and the paper; the capstone hand-in date (about 10 Dec 2026, exact date to confirm); venue choice and the submission itself (EuroS&P 2027 deadline 2 Dec 2026; DIMVA cycle 1 deadline 10 Dec 2026; see `docs/submission_checklist.md`); whether to rerun the E3 trap arm under an addendum; whether to deposit the stored predictions publicly (limit 18); resetting the Zenodo webhook secret that appeared in one session log.
+Following the venue's AI-use policy at submission (the researcher decided that the paper draft carries no disclosure paragraph; EuroS&P 2027's call requires one in the acknowledgments, which is part of why DIMVA 2027 cycle 2 was chosen); whether "Li et al. (NDSS 2025)" is the paper the original plan meant; a line-by-line reading and rewrite of the report and the paper; the capstone hand-in date (about 10 Dec 2026, exact date to confirm); the submission itself (target decided 8 Nov 2026: DIMVA 2027 cycle 2, paper deadline 18 Feb 2027, Springer LNCS, double-blind; see `docs/submission_checklist.md`); whether to rerun the E3 trap arm under an addendum; whether to deposit the stored predictions publicly (limit 18); resetting the Zenodo webhook secret that appeared in one session log (only Zenodo can rotate it: zenodo.org/account/settings/github, switch the repository off, then on; not done yet).
 
 ## 14. Gotchas learned
 
@@ -91,7 +91,7 @@ The faculty AI-disclosure wording (and each venue's policy); whether "Li et al. 
 
 ## 15. Suggested next steps
 
-1. Researcher: read and rewrite the paper and report; decide venue; fill the AI-disclosure wording.
+1. Researcher: read and rewrite the paper and report; port the paper to the Springer LNCS class and build `paper/main-anon.tex` for the double-blind submission (DIMVA 2027 cycle 2, 18 Feb 2027).
 2. If a trap-arm rerun, class-prior controls, a longer BODMAS window or other monitor settings are wanted: write an addendum and tag it before any run (`docs/ROADMAP.md`).
 3. Release 0.2.0 only with the researcher's go (new PyPI file and new Zenodo version).
 4. Keep the monthly arXiv audit (`docs/MAINTENANCE.md`) and the quarterly dependency refresh going.

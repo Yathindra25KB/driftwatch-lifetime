@@ -54,3 +54,6 @@ Thumbs.db
 
 # Browser-automation scratch output
 .playwright-mcp/
+
+# anonymous review build of the paper (regenerate with tectonic paper/main-anon.tex)
+paper/main-anon.pdf
