@@ -26,7 +26,7 @@ Terms are defined where first used. A glossary of the terms used throughout: **c
 
 ## How this report was produced, and what an examiner can check
 
-[Researcher: the faculty's policy on disclosing AI assistance is not known (`docs/PHASES.md`). Replace this paragraph with the wording the policy requires.] The report and the code were produced with Claude Code (Anthropic), working as the engineering lead under the researcher's direction, with the researcher deciding every scope, pre-registration, gate and publication step. The researcher rewrites and defends the text. Everything that could be checked mechanically is: the claims audit (`scripts/claims_audit.py`) refuses a number without a ledger row, the bibliography check (`scripts/check_bib.py`) resolves every reference against Crossref or arXiv, the tables regenerate from stored predictions, and reviews (leakage, statistics, a simulated hostile review) are saved under `docs/reviews/` and `reports/`. Those reviews were written by separate instances of the same model family that wrote the code and the drafts, so they are self-review, not independent review. [Researcher: say here what you wrote and what you checked yourself, and add any review by a person.]
+**AI assistance.** The report and the code were produced with Claude Code (Anthropic), working as the engineering lead under the researcher's direction, with the researcher deciding every scope, pre-registration, gate and publication step. The researcher rewrites and defends the text. Everything that could be checked mechanically is: the claims audit (`scripts/claims_audit.py`) refuses a number without a ledger row, the bibliography check (`scripts/check_bib.py`) resolves every reference against Crossref or arXiv, the tables regenerate from stored predictions, and reviews (leakage, statistics, a simulated hostile review) are saved under `docs/reviews/` and `reports/`. Those reviews were written by separate instances of the same model family that wrote the code and the drafts, so they are self-review, not independent review. No person has yet reviewed the chapters line by line; the open items that a person has to settle are listed in section 8.7 of chapter 8, and the wording that a university or venue may require for disclosing AI assistance is not fixed by this report.
 
 <!-- length-table:start -->
 ## Length against the guide's page budget
@@ -49,4 +49,4 @@ Counted from the chapter files on 22 Oct 2026 [T-02]. The chapters are shorter t
 
 ## Acknowledgements
 
-[Researcher: to be written.]
+The study uses the LAMDA dataset (Android) and the BODMAS dataset (Windows PE), whose authors released pre-extracted feature files; it builds on the TESSERACT time-aware protocol and on the open-source libraries listed in `docs/licence_audit.md`. The authors of these works are thanked for making them public. Any error in this report is the researcher's.

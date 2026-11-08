@@ -44,6 +44,7 @@ exclude_patterns = [
     ".cache",
     ".claude",
     ".claude-state",
+    ".omc",
     ".agents",
     ".codex",
     ".playwright-mcp",

@@ -54,4 +54,4 @@ Before you stop: run the phase-closeout skill; update docs/PHASES.md with status
 - docs/licence_audit.md
 - .claude/skills/arxiv-audit/SKILL.md
 - .github/ISSUE_TEMPLATE/
-- docs/DECISIONS/ADR-0008-docs-tool.md
+- docs/DECISIONS/ADR-0011-docs-tool.md (the prompt named ADR-0008; that number was already taken, see ADR-0011 and docs/PHASES.md)

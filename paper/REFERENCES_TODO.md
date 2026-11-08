@@ -1,21 +1,28 @@
-# References still open
+# References: status of the open items
 
-`paper/references.bib` holds 34 entries. Each was built from the arXiv or Crossref record named by its identifier and is re-resolved by `scripts/check_bib.py` (22 Oct 2026: 34 of 34 resolved and matched). Never add an entry by hand from memory: fetch the record, then run the script.
+`paper/references.bib` holds 36 entries. Each was built from the arXiv or Crossref record named by its identifier and is re-resolved by `scripts/check_bib.py`. Never add an entry by hand from memory: fetch the record, then run the script.
 
-Resolved on 22 Oct 2026 (CLAIMS L-nn rows hold the evidence): EMBER and EMBER2024; the extended TESSERACT paper; the Gama survey; Ceschin et al.; ADAPT; LFreeDA; MADCAT; TIF; DREAM; Aurora; McNdroid; Kalny et al.; EMA; the two adversarial surveys; Shafer and Vovk; the three language-model papers. The pages of Chen et al. (USENIX Security 2023, 1127 to 1144), Transcend (2017, 625 to 642) and CADE (2021, 2327 to 2344) come from the USENIX pages [L-11, L-12, L-13]. Li et al. is NDSS 2025 [L-33].
+The items below were re-checked on 8 Nov 2026 against primary sources (evidence and URLs: `reports/source_verification_2026-11-08.md`, CLAIMS L-34, L-35). Two things remain open and need a person.
 
-Open:
+## Resolved on 8 Nov 2026
 
-| Item | What is missing | Where it came from |
-|---|---|---|
-| Transcend (USENIX Security 2017) and CADE (USENIX Security 2021) | No DOI or arXiv record, so they are not in `references.bib` and `check_bib.py` cannot resolve them. They are cited in chapter 5 by their USENIX pages [L-12, L-13] | USENIX proceedings |
-| "Li et al. (NDSS 2025)" | The researcher confirms that `li2024revisiting` is the paper meant by plan Table G.1 | `docs/related_work_addendum.md` |
-| TESSERACT, USENIX Security 2019 | Proceedings pages or URL (the bib uses arXiv 1807.07838; v4 matches the USENIX version) | arXiv comment |
-| ActDroid journal version | arXiv lists related DOI 10.1016/j.cose.2025.104724; confirm it is the same work before citing the journal version | arXiv page |
-| LAMDA at ICLR 2026 | Formal proceedings entry (only the poster page was found; its title and authors match the arXiv record) | iclr.cc |
-| SEED, FIRCE, Cerqueira et al., Minnei et al., EMA, DREAM, TIF | Final venue versions, if published (the arXiv comments name KDD 2026, SIGCOMM 2026, ACM CCS 2025 and IEEE TSE for some) | arXiv pages |
-| Botacin and Gomes | The publisher page returned HTTP 403; the abstract was read on the NSF Public Access Repository [L-18] | par.nsf.gov |
-| BODMAS labelling | How its labels were produced (the project page does not say) [D-17] | docs/data_cards/bodmas.md |
-| AndroZoo | Citation the AndroZoo maintainers request (only if AndroZoo is ever used; currently excluded) | Build guide section 6 |
+| Item | Result |
+|---|---|
+| Transcend (USENIX Security 2017, pp. 625 to 642) and CADE (USENIX Security 2021, pp. 2327 to 2344) | Confirmed on the USENIX pages. They have no DOI or arXiv record, so they stay out of `references.bib` and are cited by their USENIX pages [L-12, L-13] |
+| TESSERACT, USENIX Security 2019 | pp. 729 to 746; final PDF at usenix.org; arXiv v4 states that it corresponds to the published version. The bib keeps the arXiv identifier |
+| ActDroid journal version | Computers & Security vol. 160, article 104724, DOI 10.1016/j.cose.2025.104724 (Crossref); title and four authors match the arXiv record, which lists the DOI as related. The bib cites the arXiv record |
+| DREAM | Published: ACM CCS 2025, pp. 978 to 992, DOI 10.1145/3719027.3744792 |
+| TIF | Published: IEEE Transactions on Software Engineering vol. 52 no. 8, pp. 2463 to 2474, DOI 10.1109/TSE.2026.3698484 |
+| Botacin and Gomes | Computers & Security vol. 148, article 104122, DOI 10.1016/j.cose.2024.104122 (Crossref) |
+| BODMAS labelling | Read in the paper, Section III: families from multi-vendor antivirus verdicts with in-house scripts (about 1% manual), first-seen time from VirusTotal reports; how the binary label was decided is not stated [CLAIMS D-18] |
+| AndroZoo | Allix et al., MSR 2016, DOI 10.1145/2901739.2903508 (Crossref). AndroZoo is not used by this study |
+
+## Still open
+
+| Item | What is missing |
+|---|---|
+| Two-stage (cluster) bootstrap | Davison and Hinkley (1997) and Ren et al. (2010) are in the bibliography [L-34]; the book's section 3.8 was not read, so the statement that resampling both stages widens the interval stays unconfirmed |
+| "Li et al. (NDSS 2025)" | Venue confirmed [L-33]. Whether `li2024revisiting` is the paper meant by plan Table G.1 can only be answered by the researcher, who has the plan |
+| Venue versions of SEED, FIRCE, Cerqueira et al., Minnei et al., EMA and LAMDA | SEED: no venue on arXiv. FIRCE (IEEE SmartNets 2026), Cerqueira et al. (KDD 2026) and EMA (SIGCOMM 2026) are "accepted" only according to arXiv comments; no proceedings entry was found. Minnei et al. is "submitted" only. LAMDA is an ICLR 2026 poster with no page range or DOI. The bibliography cites the preprints and says so |
 
 Note on AUT (resolved in ADR-0006 and CLAIMS M-02): TESSERACT arXiv v4 says the published Eq. (4) had an extra 1/N normalisation factor; the guide's 1/(N-1) form equals the numpy trapezoid and is pinned by `tests/test_aut.py`.

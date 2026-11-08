@@ -4,7 +4,7 @@
 [![Docs](https://github.com/Yathindra25KB/driftwatch-lifetime/actions/workflows/docs.yml/badge.svg)](https://yathindra25kb.github.io/driftwatch-lifetime/latest/)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-**Status (27 Oct 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
+**Status (8 Nov 2026): Tiers 1 and 2 are run (E0 to E4; every planned cell of E2 to E4 completed [E-26, E-40, E-48]); the report is a draft; Tier 3 (cross-platform replication, EMBER2024) is future work.** DriftWatch is an open-source study of how long a malware detector stays useful as malware changes. It applies one time-aware evaluation protocol (TESSERACT constraints C1 to C3, reported with AUT and A-AUT) to pre-extracted feature files from LAMDA (Android) and BODMAS (Windows PE), and asks how **label delay**, a fixed **analyst budget** and **conformal drift monitoring** change a detector's lifetime.
 
 > We study malware detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring in a single time-aware protocol, reported with A-AUT, on Android and Windows PE data.
 
@@ -101,8 +101,9 @@ Read these before relying on any result. They are stated in full, with their evi
 - The effects are small against the spread over windows, and several intervals are wide by design (see the limits paragraph under "Headline results").
 - Seeds are draws of a subsample, not replicates of a model, and LAMDA's windows overlap: its 16 windows are about four independent blocks [E-42].
 - RQ1 (how far a random split overstates the time-aware score) was registered after E0 and E1 had been run and read, so it is a registered reading of known numbers, and its primary comparator was chosen after both numbers were seen [E-18].
-- Delay is simulated and the analyst is perfect (the dataset label is the truth). Labels are the datasets' own: LAMDA's card warns of antivirus-centric labelling, and how BODMAS's labels were produced is not verified (D-17, still open). None of this is measured in a real security operations centre.
+- Delay is simulated and the analyst is perfect (the dataset label is the truth). Labels are the datasets' own: LAMDA's card warns of antivirus-centric labelling, and BODMAS's paper says its families come mostly from multi-vendor antivirus verdicts (about 1% manual) but does not say how the binary label was decided [D-18]. None of this is measured in a real security operations centre.
 - Two datasets, two detectors, one machine. Tier 3 (another platform, EMBER2024) was not run.
+- The report is a draft written with Claude Code and reviewed only by other instances of the same model family; no person has yet read it line by line. Open items that a person has to settle are listed in chapter 8, section 8.7.
 - The fixture used by `driftwatch smoke` is random data in the real layout. Its numbers are never evidence.
 
 ## Licence, citation and acknowledgements
