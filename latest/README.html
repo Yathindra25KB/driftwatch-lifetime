@@ -473,6 +473,10 @@ uv<span class="w"> </span>run<span class="w"> </span>driftwatch<span class="w"> 
 <h2>Ethics<a class="headerlink" href="#ethics" title="Link to this heading">¶</a></h2>
 <p>The repository contains no malware, no decompiled code and no evasion tooling, and generates no adversarial examples. Feature files are used under their own licences (LAMDA under the MIT licence; BODMAS code under a BSD licence with the dataset licence not stated by its authors; EMBER2024 under the Apache licence). See <code class="docutils literal notranslate"><span class="pre">docs/ETHICS.md</span></code>.</p>
 </section>
+<section id="paper-and-project-context">
+<h2>Paper and project context<a class="headerlink" href="#paper-and-project-context" title="Link to this heading">¶</a></h2>
+<p>A first draft of the paper is <code class="docutils literal notranslate"><span class="pre">paper/main.tex</span></code> (built PDF: <code class="docutils literal notranslate"><span class="pre">paper/main.pdf</span></code>, 7 pages [E-84], IEEE conference template). It is a draft written with Claude Code from the claims ledger and has not been read line by line by a person; venues and deadlines are in <code class="docutils literal notranslate"><span class="pre">docs/submission_checklist.md</span></code>. <code class="docutils literal notranslate"><span class="pre">docs/PROJECT_CONTEXT.md</span></code> summarises the whole project (identifiers, structure, protocol, results, decisions, open items) for anyone, or any Claude project, starting from scratch.</p>
+</section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
 <p>The documentation site has the protocol, the pre-registration, the claims ledger, the report chapters, the architecture and the API reference: https://yathindra25kb.github.io/driftwatch-lifetime/latest/ (versioned: one folder per release).</p>
@@ -493,11 +497,13 @@ uv<span class="w"> </span>run<span class="w"> </span>driftwatch<span class="w"> 
 <section id="licence-citation-and-acknowledgements">
 <h2>Licence, citation and acknowledgements<a class="headerlink" href="#licence-citation-and-acknowledgements" title="Link to this heading">¶</a></h2>
 <p>Code: MIT (<code class="docutils literal notranslate"><span class="pre">LICENSE</span></code>). Datasets keep their own licences and are never redistributed (<code class="docutils literal notranslate"><span class="pre">docs/ETHICS.md</span></code>, <code class="docutils literal notranslate"><span class="pre">docs/licence_audit.md</span></code>). The wheel and the repository contain no dataset content other than the synthetic fixture.</p>
-<p>To cite the software, use <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code> (GitHub shows a “Cite this repository” button); each release is meant to get a DOI from Zenodo (none has been minted yet: the GitHub release v0.1.0 is still a draft, and a DOI is created only when it is published; the DOI is added here then). Until then:</p>
+<p>To cite the software, use <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code> (GitHub shows a “Cite this repository” button); each release gets a DOI from Zenodo. Version 0.1.1 is https://doi.org/10.5281/zenodo.24050865; the concept DOI 10.5281/zenodo.24050864 always resolves to the latest version [E-83]. Cite the version you used:</p>
 <div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@software</span><span class="p">{</span><span class="nl">kb_driftwatch</span><span class="p">,</span>
 <span class="w">  </span><span class="na">author</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{K B, Yathindra}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">title</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{DriftWatch: malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">year</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{0.1.1}</span><span class="p">,</span>
+<span class="w">  </span><span class="na">doi</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{10.5281/zenodo.24050865}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">url</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{https://github.com/Yathindra25KB/driftwatch-lifetime}</span><span class="p">,</span>
 <span class="w">  </span><span class="na">license</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{MIT}</span>
 <span class="p">}</span>
@@ -569,6 +575,7 @@ uv<span class="w"> </span>run<span class="w"> </span>driftwatch<span class="w"> 
 <li><a class="reference internal" href="#headline-results-tier-1-with-their-limits">Headline results (Tier 1), with their limits</a></li>
 <li><a class="reference internal" href="#where-things-are">Where things are</a></li>
 <li><a class="reference internal" href="#ethics">Ethics</a></li>
+<li><a class="reference internal" href="#paper-and-project-context">Paper and project context</a></li>
 <li><a class="reference internal" href="#documentation">Documentation</a></li>
 <li><a class="reference internal" href="#limits">Limits</a></li>
 <li><a class="reference internal" href="#licence-citation-and-acknowledgements">Licence, citation and acknowledgements</a></li>

@@ -1753,6 +1753,22 @@
 <td><p>[measured]</p></td>
 <td><p>2026-11-08</p></td>
 </tr>
+<tr class="row-even"><td><p>E-83</p></td>
+<td><p>Release 0.1.1 and its DOI, read from PyPI, GitHub and the Zenodo API on 8 Nov 2026</p></td>
+<td><p>PyPI lists 0.1.1 (wheel 204,913 bytes uploaded 2026-11-08 08:50:45 UTC, sdist 165,031 bytes, no Private classifier); the signed tag v0.1.1 verifies locally (ED25519, <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-v</span></code> Good signature); release workflow run 42463861266 succeeded (build, wheel smoke on ubuntu and windows, PyPI publish after the pypi environment approval, draft release); <code class="docutils literal notranslate"><span class="pre">pip</span></code>-style install of 0.1.1 from PyPI into a new environment printed <code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">0.1.1</span></code> and <code class="docutils literal notranslate"><span class="pre">MATCH:</span> <span class="pre">2</span> <span class="pre">rows,</span> <span class="pre">max</span> <span class="pre">absolute</span> <span class="pre">difference</span> <span class="pre">0.000000</span></code> from an empty folder; the GitHub release v0.1.1 was published 2026-11-08 08:54 UTC; Zenodo record 24050865 (status published, version v0.1.1, creator K B, Yathindra, licence MIT, one zip of the repository at the tag, 2,798,496 bytes) has version DOI 10.5281/zenodo.24050865 and concept DOI 10.5281/zenodo.24050864. The 0.1.0 release has no DOI (its draft was deleted unpublished)</p></td>
+<td><p>pypi.org/pypi/driftwatch-lifetime/0.1.1/json; GitHub Actions run 42463861266; zenodo.org/api/records/24050865</p></td>
+<td><p>ff20334</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
+<tr class="row-odd"><td><p>E-84</p></td>
+<td><p>Final polish of 8 Nov 2026, development laptop: the paper draft, screenshots of the live PyPI and Zenodo pages, and the security checks</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">paper/main.tex</span></code> compiles with Tectonic to 7 pages in the IEEE conference class (A4) with 36 bibliography entries resolved; all 30 claim ids used in it exist in this ledger and no first-claim phrase or open marker is in it; screenshots <code class="docutils literal notranslate"><span class="pre">docs/evidence/pypi-driftwatch-lifetime-0.1.1.png</span></code> and <code class="docutils literal notranslate"><span class="pre">docs/evidence/zenodo-record-24050865.png</span></code> show PyPI 0.1.1 and Zenodo record 24050865 (version v0.1.1, concept DOI 10.5281/zenodo.24050864); a scan of every revision of the public repository for secret-shaped text (cloud and GitHub tokens, PyPI tokens, private key blocks, API-key shapes) found 0 matches in 444 revisions and no tracked env, key or credential file; <code class="docutils literal notranslate"><span class="pre">pip-audit</span></code> on the exported lock (no dependencies resolved beyond the pins) found no known vulnerabilities; every workflow declares least-privilege permissions and, after this change, pins actions by commit SHA; GitHub secret scanning and push protection are enabled on the repository, Dependabot security updates are not; the three links in the tree to this repository’s own file pages all point at tracked files (the external link check no longer fetches them because GitHub answered with 504)</p></td>
+<td><p>paper/main.tex; docs/evidence/; the commands in this row</p></td>
+<td><p>8d43920</p></td>
+<td><p>[measured]</p></td>
+<td><p>2026-11-08</p></td>
+</tr>
 </tbody>
 </table>
 </div>

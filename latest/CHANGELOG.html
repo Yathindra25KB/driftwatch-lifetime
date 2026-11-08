@@ -319,12 +319,25 @@
 <p>All notable changes to <code class="docutils literal notranslate"><span class="pre">driftwatch-lifetime</span></code> are recorded here. The format follows <a class="reference external" href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>, and versions follow <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>. Before 1.0.0, a minor version may change the command-line interface or the Python API. Any change that alters a reported number is listed under <strong>Results</strong> with its CLAIMS id.</p>
 <section id="unreleased">
 <h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/compare/v0.1.1...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Link to this heading">¶</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">paper/main.tex</span></code> and <code class="docutils literal notranslate"><span class="pre">paper/main.pdf</span></code>: a 7-page first draft in the IEEE conference template, from <code class="docutils literal notranslate"><span class="pre">docs/CLAIMS.md</span></code> only (CLAIMS E-84).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs/PROJECT_CONTEXT.md</span></code>: a project summary for a new session; <code class="docutils literal notranslate"><span class="pre">docs/evidence/</span></code>: screenshots of the live PyPI and Zenodo pages.</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ci.yml</span></code> pins its actions by commit SHA like the other workflows.</p></li>
+</ul>
+</section>
 </section>
 <section id="id1">
 <h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.1">0.1.1</a> - 2026-11-08<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>Documentation, evidence and metadata only. The <code class="docutils literal notranslate"><span class="pre">src/</span></code> tree and every reported number are the same as in 0.1.0 (CLAIMS E-82); this release exists so that the archived snapshot (Zenodo) is the corrected text.</p>
-<section id="changed">
-<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<section id="id2">
+<h3>Changed<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Report:</strong> the inline draft markers are gone. What a source check could settle was settled (BODMAS label provenance read in the paper, CLAIMS D-18; hierarchical-bootstrap references, L-34; venue and version checks, L-35); what only a person can settle is listed in chapter 8, section 8.7. Statements the evidence does not support were narrowed (the bootstrap sentence in chapter 3, the status lines of chapters 1 and 7).</p></li>
 <li><p><strong>README:</strong> the install section now describes the PyPI release; the limits name the review status of the report.</p></li>
@@ -333,11 +346,11 @@
 </ul>
 </section>
 </section>
-<section id="id2">
-<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.0">0.1.0</a> - 2026-10-29<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h2><a class="reference external" href="https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.0">0.1.0</a> - 2026-10-29<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
 <p>Initial public release. It contains the whole study as run for the capstone report. Every number the README and the report chapters report has a row in <code class="docutils literal notranslate"><span class="pre">docs/CLAIMS.md</span></code> with a source file and a commit. Rows that cite files under <code class="docutils literal notranslate"><span class="pre">results/</span></code> can be regenerated only from the stored predictions, which are not in the repository (they are hashed in <code class="docutils literal notranslate"><span class="pre">docs/predictions_manifest.csv</span></code> and archived privately, E-69). A few rows are marked <code class="docutils literal notranslate"><span class="pre">[verify]</span></code> where the source could not be read (for example how BODMAS’s labels were produced, D-17).</p>
-<section id="added">
-<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<section id="id4">
+<h3>Added<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Data:</strong> download, build, verify and inventory the LAMDA (Android) and BODMAS (Windows PE) feature files. Caching respects a memory cap, and a manifest records the expected hashes (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">...</span></code>). No dataset content is shipped.</p></li>
 <li><p><strong>Time-aware protocol:</strong> a slot and window slicer with the TESSERACT constraints C1 to C3 as raising assertions, and a leakage canary (<code class="docutils literal notranslate"><span class="pre">driftwatch</span> <span class="pre">data</span> <span class="pre">slice</span></code>).</p></li>
@@ -425,13 +438,17 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#unreleased">Unreleased</a></li>
-<li><a class="reference internal" href="#id1">0.1.1 - 2026-11-08</a><ul>
+<li><a class="reference internal" href="#unreleased">Unreleased</a><ul>
+<li><a class="reference internal" href="#added">Added</a></li>
 <li><a class="reference internal" href="#changed">Changed</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id2">0.1.0 - 2026-10-29</a><ul>
-<li><a class="reference internal" href="#added">Added</a></li>
+<li><a class="reference internal" href="#id1">0.1.1 - 2026-11-08</a><ul>
+<li><a class="reference internal" href="#id2">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">0.1.0 - 2026-10-29</a><ul>
+<li><a class="reference internal" href="#id4">Added</a></li>
 <li><a class="reference internal" href="#results">Results</a></li>
 <li><a class="reference internal" href="#not-included">Not included</a></li>
 </ul>
