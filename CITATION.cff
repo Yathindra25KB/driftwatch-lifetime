@@ -17,8 +17,8 @@ authors:
 repository-code: "https://github.com/Yathindra25KB/driftwatch-lifetime"
 url: "https://yathindra25kb.github.io/driftwatch-lifetime/latest/"
 license: MIT
-version: 0.1.0
-date-released: 2026-10-29
+version: 0.1.1
+date-released: 2026-11-08
 keywords:
   - malware detection
   - concept drift

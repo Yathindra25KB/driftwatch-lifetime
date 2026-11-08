@@ -29,7 +29,7 @@
 ## Install
 Python `3.12` is required.
 
-**Not yet published to PyPI** (the release is pending, `docs/RELEASING.md`). Until it is, build the wheel from a clone (`uv build`) and install that: `uv pip install dist/driftwatch_lifetime-0.1.0-py3-none-any.whl`. A locally built wheel ran the smoke experiment from an empty folder with no clone and no data [E-70]. After the release, this works:
+The package is on PyPI (first upload, 0.1.0, on 29 Oct 2026 through Trusted Publishing from a signed tag; 0.1.1 changes documentation and metadata only) and installs and runs the smoke experiment from an empty folder with no clone and no data [E-80, E-81]. To work on the code or reproduce the tables, use a clone (next section).
 
 ```bash
 pip install driftwatch-lifetime        # or: uv tool install driftwatch-lifetime
@@ -109,7 +109,7 @@ Read these before relying on any result. They are stated in full, with their evi
 ## Licence, citation and acknowledgements
 Code: MIT (`LICENSE`). Datasets keep their own licences and are never redistributed (`docs/ETHICS.md`, `docs/licence_audit.md`). The wheel and the repository contain no dataset content other than the synthetic fixture.
 
-To cite the software, use `CITATION.cff` (GitHub shows a "Cite this repository" button); each release is meant to get a DOI from Zenodo (none exists yet; it is added here when it does). Until then:
+To cite the software, use `CITATION.cff` (GitHub shows a "Cite this repository" button); each release is meant to get a DOI from Zenodo (none has been minted yet: the GitHub release v0.1.0 is still a draft, and a DOI is created only when it is published; the DOI is added here then). Until then:
 
 ```bibtex
 @software{kb_driftwatch,

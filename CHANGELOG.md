@@ -4,6 +4,16 @@ All notable changes to `driftwatch-lifetime` are recorded here. The format follo
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-08
+
+Documentation, evidence and metadata only. The `src/` tree and every reported number are the same as in 0.1.0 (CLAIMS E-82); this release exists so that the archived snapshot (Zenodo) is the corrected text.
+
+### Changed
+- **Report:** the inline draft markers are gone. What a source check could settle was settled (BODMAS label provenance read in the paper, CLAIMS D-18; hierarchical-bootstrap references, L-34; venue and version checks, L-35); what only a person can settle is listed in chapter 8, section 8.7. Statements the evidence does not support were narrowed (the bootstrap sentence in chapter 3, the status lines of chapters 1 and 7).
+- **README:** the install section now describes the PyPI release; the limits name the review status of the report.
+- **Docs:** `docs/submission_checklist.md` (venues read on their own pages, with unconfirmed items marked), the live release record (CLAIMS E-80 to E-82), a corrected docs build command, narrower link-check ignores.
+- **Tests:** a pandas `join` call in `tests/test_runner_e0.py` no longer warns.
+
 ## [0.1.0] - 2026-10-29
 
 Initial public release. It contains the whole study as run for the capstone report. Every number the README and the report chapters report has a row in `docs/CLAIMS.md` with a source file and a commit. Rows that cite files under `results/` can be regenerated only from the stored predictions, which are not in the repository (they are hashed in `docs/predictions_manifest.csv` and archived privately, E-69). A few rows are marked `[verify]` where the source could not be read (for example how BODMAS's labels were produced, D-17).
@@ -29,5 +39,6 @@ Initial public release. It contains the whole study as run for the capstone repo
 - Tier 3 (E5 cross-platform replication, E6 EMBER2024) was not run; see `docs/ROADMAP.md`.
 - The 8-page paper is planned for a later 0.x release.
 
-[Unreleased]: https://github.com/Yathindra25KB/driftwatch-lifetime/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Yathindra25KB/driftwatch-lifetime/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Yathindra25KB/driftwatch-lifetime/releases/tag/v0.1.0

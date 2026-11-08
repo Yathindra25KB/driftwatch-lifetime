@@ -1,6 +1,6 @@
 [project]
 name = "driftwatch-lifetime"
-version = "0.1.0"
+version = "0.1.1"
 description = "Time-aware study of malware-detector lifetime under label delay, a fixed analyst budget and conformal drift monitoring."
 readme = "README.md"
 license = "MIT"
